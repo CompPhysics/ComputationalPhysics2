@@ -1,0 +1,664 @@
+# Slides for FYS-KJM4480
+TITLE: Slides from FYS-KJM4411/9411 Definitions of the many-body problem
+AUTHOR: Morten Hjorth-Jensen at Department of Physics, University of Oslo, Oslo, Norway and National Superconducting Cyclotron Laboratory, Michigan State University, East Lansing, MI 48824, USA
+DATE: Spring 2015
+
+!split
+===== Quantum Many-particle Methods =====
+!bblock
+* Large-scale diagonalization (Iterative methods, Lanczo's method, dimensionalities $10^{10}$ states)
+* Coupled cluster theory, favoured method in quantum chemistry, molecular and atomic physics. Applications to ab initio calculations in nuclear physics as well for large nuclei.
+* Perturbative many-body methods 
+* Density functional theories/Mean-field theory and Hartree-Fock theory (covered partly also in FYS-MENA4111)
+* Monte-Carlo methods (Only in FYS4411, Computational quantum mechanics)
+* Green's function theories (depending on interest)
+* and other. The physics of the system hints at which many-body methods to use.
+!eblock
+
+!split
+===== Selected Texts and Many-body theory =====
+!bblock
+* Blaizot and Ripka, *Quantum Theory of Finite systems*, MIT press 1986
+* Negele and Orland, *Quantum Many-Particle Systems*, Addison-Wesley, 1987.
+* Fetter and Walecka, *Quantum Theory of Many-Particle Systems*, McGraw-Hill, 1971.
+* Helgaker, Jorgensen and Olsen, *Molecular Electronic Structure Theory*, Wiley, 2001.
+* Mattuck, *Guide to Feynman Diagrams in the Many-Body Problem*, Dover, 1971.
+* Dickhoff and Van Neck, *Many-Body Theory Exposed*, World Scientific, 2006.
+!eblock
+
+
+!split 
+===== Definitions ===== 
+!bblock
+An operator is defined as $\hat{O}$ throughout. Unless otherwise specified the number of particles is
+always $N$ and $d$ is the dimension of the system.  In nuclear physics
+we normally define the total number of particles to be $A=N+Z$, where
+$N$ is total number of neutrons and $Z$ the total number of
+protons. In case of other baryons such isobars $\Delta$ or various
+hyperons such as $\Lambda$ or $\Sigma$, one needs to add their
+definitions.  Hereafter, $N$ is reserved for the total number of
+particles, unless otherwise specificied. 
+!eblock
+
+!split
+===== Definitions =====
+!bblock
+The quantum numbers of a single-particle state in coordinate space are
+defined by the variable 
+!bt
+\[
+x=({\bf r},\sigma), 
+\]
+!et
+where 
+!bt
+\[
+{\bf r}\in {\mathbb{R}}^{d},
+\]
+!et
+with $d=1,2,3$ represents the spatial coordinates and $\sigma$ is the eigenspin of the particle. For fermions with eigenspin $1/2$ this means that
+!bt
+\[
+ x\in {\mathbb{R}}^{d}\oplus (\frac{1}{2}),
+\]
+!et
+and the integral $\int dx = \sum_{\sigma}\int d^dr = \sum_{\sigma}\int d{\bf r}$,
+and
+!bt
+\[
+\int d^Nx= \int dx_1\int dx_2\dots\int dx_N.
+\]
+!et
+!eblock
+
+
+!split
+===== Definitions =====
+!bblock
+The quantum mechanical wave function of a given state with quantum numbers $\lambda$ (encompassing all quantum numbers needed to specify the system), ignoring time, is
+!bt
+\[
+\Psi_{\lambda}=\Psi_{\lambda}(x_1,x_2,\dots,x_N),
+\]
+!et
+with $x_i=({\bf r}_i,\sigma_i)$ and the projection of $\sigma_i$ takes the values
+$\{-1/2,+1/2\}$ for particles with spin $1/2$. 
+We will hereafter always refer to $\Psi_{\lambda}$ as the exact wave function, and if the ground state is not degenerate we label it as 
+!bt
+\[
+\Psi_0=\Psi_0(x_1,x_2,\dots,x_N).
+\]
+!et
+!eblock
+
+
+!split
+===== Definitions =====
+!bblock
+Since the solution $\Psi_{\lambda}$ seldomly can be found in closed form, approximations are sought. Here we define an approximative wave function or an ansatz to the exact wave function as 
+!bt
+\[
+\Phi_{\lambda}=\Phi_{\lambda}(x_1,x_2,\dots,x_N),
+\]
+!et
+with
+!bt 
+\[
+\Phi_0=\Phi_0(x_1,x_2,\dots,x_N),
+\]
+!et
+being the ansatz to the ground state.  
+!eblock
+
+
+!split
+===== Definitions =====
+!bblock
+The wave function $\Psi_{\lambda}$ is sought in the Hilbert space of either symmetric or anti-symmetric $N$-body functions, namely
+!bt
+\[
+\Psi_{\lambda}\in {\cal H}_N:= {\cal H}_1\oplus{\cal H}_1\oplus\dots\oplus{\cal H}_1,
+\]
+!et
+where the single-particle Hilbert space $\hat{H}_1$ is the space of square integrable functions over
+$\in {\mathbb{R}}^{d}\oplus (\sigma)$
+resulting in
+!bt
+\[
+{\cal H}_1:= L^2(\mathbb{R}^{d}\oplus (\sigma)).
+\]
+!et
+!eblock
+
+
+
+!split
+===== Definitions =====
+!bblock
+Our Hamiltonian is invariant under the permutation (interchange) of two particles.
+Since we deal with fermions however, the total wave function is antisymmetric.
+Let $\hat{P}$ be an operator which interchanges two particles.
+Due to the symmetries we have ascribed to our Hamiltonian, this operator commutes with the total Hamiltonian,
+!bt
+\[
+[\hat{H},\hat{P}] = 0,
+\]
+!et
+meaning that $\Psi_{\lambda}(x_1, x_2, \dots , x_N)$ is an eigenfunction of 
+$\hat{P}$ as well, that is
+!bt
+\[
+\hat{P}_{ij}\Psi_{\lambda}(x_1, x_2, \dots,x_i,\dots,x_j,\dots,x_N)=
+\beta\Psi_{\lambda}(x_1, x_2, \dots,x_j,\dots,x_i,\dots,x_N),
+\]
+!et
+where $\beta$ is the eigenvalue of $\hat{P}$. We have introduced the suffix $ij$ in order to indicate that we permute particles $i$ and $j$.
+The Pauli principle tells us that the total wave function for a system of fermions
+has to be antisymmetric, resulting in the eigenvalue $\beta = -1$.   
+!eblock
+
+
+!split
+===== Definitions and notations =====
+!bblock
+The Schrodinger equation reads 
+!bt
+\begin{equation}
+\hat{H}(x_1, x_2, \dots , x_N) \Psi_{\lambda}(x_1, x_2, \dots , x_N) = 
+E_\lambda  \Psi_\lambda(x_1, x_2, \dots , x_N), label{eq:basicSE1}
+\end{equation}
+!et
+where the vector $x_i$ represents the coordinates (spatial and spin) of particle $i$, $\lambda$ stands  for all the quantum
+numbers needed to classify a given $N$-particle state and $\Psi_{\lambda}$ is the pertaining eigenfunction.  Throughout this course,
+$\Psi$ refers to the exact eigenfunction, unless otherwise stated.
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+We write the Hamilton operator, or Hamiltonian,  in a generic way 
+!bt
+\[
+	\hat{H} = \hat{T} + \hat{V} 
+\]
+!et
+where $\hat{T}$  represents the kinetic energy of the system
+!bt
+\[
+	\hat{T} = \sum_{i=1}^N \frac{\mathbf{p}_i^2}{2m_i} = \sum_{i=1}^N \left( -\frac{\hbar^2}{2m_i} \mathbf{\nabla_i}^2 \right) =
+		\sum_{i=1}^N t(x_i)
+\]
+!et
+while the operator $\hat{V}$ for the potential energy is given by
+!bt
+\begin{equation}
+	\hat{V} = \sum_{i=1}^N \hat{u}_{\mathrm{ext}}(x_i) + \sum_{ji=1}^N v(x_i,x_j)+\sum_{ijk=1}^Nv(x_i,x_j,x_k)+\dots
+label{eq:firstv}
+\end{equation}
+!et
+Hereafter we use natural units, viz.~$\hbar=c=e=1$, with $e$ the elementary charge and $c$ the speed of light. This means that momenta and masses
+have dimension energy. 
+!eblock
+
+ 
+!split
+===== Definitions and notations =====
+!bblock
+If one does quantum chemistry, after having introduced the  Born-Oppenheimer approximation which effectively freezes out the nucleonic degrees of freedom, the Hamiltonian for $N=n_e$ electrons takes the following form 
+!bt 
+\[
+  \hat{H} = \sum_{i=1}^{n_e} t(x_i) - \sum_{i=1}^{n_e} k\frac{Z}{r_i} + \sum_{i < j}^{n_e} \frac{k}{r_{ij}},
+\]
+!et
+with $k=1.44$ eVnm
+!eblock
+
+
+!split
+===== Definitions and notations =====
+!bblock
+We can rewrite this as
+!bt
+\begin{equation}
+    \hat{H} = \hat{H}_0 + \hat{H}_I 
+    = \sum_{i=1}^{n_e}\hat{h}_0(x_i) + \sum_{i < j}^{n_e}\frac{1}{r_{ij}},
+label{H1H2}
+\end{equation}
+!et
+where  we have defined 
+!bt
+\[
+r_{ij}=| {\bf r}_i-{\bf r}_j|,
+\]
+!et
+ and
+!bt
+\begin{equation}
+  \hat{h}_0(x_i) =  \hat{t}(x_i) - \frac{Z}{x_i}.
+label{hi}
+\end{equation}
+!et
+The first term of Eq.~(ref{H1H2}), $H_0$, is the sum of the $N$
+*one-body* Hamiltonians $\hat{h}_0$. Each individual
+Hamiltonian $\hat{h}_0$ contains the kinetic energy operator of an
+electron and its potential energy due to the attraction of the
+nucleus. The second term, $H_I$, is the sum of the $n_e(n_e-1)/2$
+two-body interactions between each pair of electrons. Note that the double sum carries a restriction $i < j$.
+!eblock
+
+
+!split
+===== Definitions and notations =====
+!bblock
+The potential energy term due to the attraction of the nucleus defines the onebody field $u_i=u_{\mathrm{ext}}(x_i)$ of Eq.~(ref{eq:firstv}).
+We have moved this term into the $\hat{H}_0$ part of the Hamiltonian, instead of keeping  it in $\hat{V}$ as in  Eq.~(ref{eq:firstv}).
+The reason is that we will hereafter treat $\hat{H}_0$ as our non-interacting  Hamiltonian. For a many-body wavefunction $\Phi_{\lambda}$ defined by an  
+appropriate single-particle basis, we may solve exactly the non-interacting eigenvalue problem 
+!bt 
+\[
+\hat{H}_0\Phi_{\lambda}= w_{\lambda}\Phi_{\lambda},
+\]
+!et
+with $w_{\lambda}$ being the non-interacting energy. This energy is defined by the sum over single-particle energies to be defined below.
+For atoms the single-particle energies could be the hydrogen-like single-particle energies corrected for the charge $Z$. For nuclei and quantum
+dots, these energies could be given by the harmonic oscillator in three and two dimensions, respectively.
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+We will assume that the interacting part of the Hamiltonian
+can be approximated by a two-body interaction.
+This means that our Hamiltonian is written as 
+!bt
+\begin{equation}
+    \hat{H} = \hat{H}_0 + \hat{H}_I 
+    = \sum_{i=1}^N \hat{h}_0(x_i) + \sum_{i < j}^N V(r_{ij}),
+label{Hnuclei}
+\end{equation}
+!et
+with 
+!bt
+\begin{equation}
+  H_0=\sum_{i=1}^N \hat{h}_0(x_i) =  \sum_{i=1}^N\left(\hat{t}(x_i) + \hat{u}_{\mathrm{ext}}(x_i)\right).
+label{hinuclei}
+\end{equation}
+!et
+The onebody part $u_{\mathrm{ext}}(x_i)$ is normally approximated by a harmonic oscillator potential or the Coulomb interaction an electron feels from the nucleus. However, other potentials are fully possible, such as 
+one derived from the self-consistent solution of the Hartree-Fock equations.
+!eblock
+
+
+!split
+===== Definitions and notations =====
+!bblock
+Our Hamiltonian is invariant under the permutation (interchange) of two particles. % (exercise here, prove it)
+Since we deal with fermions however, the total wave function is antisymmetric.
+Let $\hat{P}$ be an operator which interchanges two particles.
+Due to the symmetries we have ascribed to our Hamiltonian, this operator commutes with the total Hamiltonian,
+!bt 
+\[
+[\hat{H},\hat{P}] = 0,
+ \]
+!et
+meaning that $\Psi_{\lambda}(x_1, x_2, \dots , x_N)$ is an eigenfunction of 
+$\hat{P}$ as well, that is
+!bt 
+\[
+\hat{P}_{ij}\Psi_{\lambda}(x_1, x_2, \dots,x_i,\dots,x_j,\dots,x_N)=
+\beta\Psi_{\lambda}(x_1, x_2, \dots,x_i,\dots,x_j,\dots,x_N),
+\]
+!et
+where $\beta$ is the eigenvalue of $\hat{P}$. We have introduced the suffix $ij$ in order to indicate that we permute particles $i$ and $j$.
+The Pauli principle tells us that the total wave function for a system of fermions
+has to be antisymmetric, resulting in the eigenvalue $\beta = -1$.   
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+In our case we assume that  we can approximate the exact eigenfunction with a Slater determinant
+!bt
+\begin{equation}
+   \Phi(x_1, x_2,\dots ,x_N,\alpha,\beta,\dots, \sigma)=\frac{1}{\sqrt{N!}}
+\left| \begin{array}{ccccc} \psi_{\alpha}(x_1)& \psi_{\alpha}(x_2)& \dots & \dots & \psi_{\alpha}(x_N)\\
+                            \psi_{\beta}(x_1)&\psi_{\beta}(x_2)& \dots & \dots & \psi_{\beta}(x_N)\\  
+                            \dots & \dots & \dots & \dots & \dots \\
+                            \dots & \dots & \dots & \dots & \dots \\
+                     \psi_{\sigma}(x_1)&\psi_{\sigma}(x_2)& \dots & \dots & \psi_{\sigma}(x_N)\end{array} \right|, label{eq:HartreeFockDet}
+\end{equation}
+!et
+where  $x_i$  stand for the coordinates and spin values of a particle $i$ and $\alpha,\beta,\dots, \gamma$ 
+are quantum numbers needed to describe remaining quantum numbers.  
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+The single-particle function $\psi_{\alpha}(x_i)$  are eigenfunctions of the onebody
+Hamiltonian $h_i$, that is
+!bt 
+\[
+\hat{h}_0(x_i)=\hat{t}(x_i) + \hat{u}_{\mathrm{ext}}(x_i),
+\]
+!et
+with eigenvalues 
+!bt 
+\[
+\hat{h}_0(x_i) \psi_{\alpha}(x_i)=\left(\hat{t}(x_i) + \hat{u}_{\mathrm{ext}}(x_i)\right)\psi_{\alpha}(x_i)=\varepsilon_{\alpha}\psi_{\alpha}(x_i).
+\]
+!et
+The energies $\varepsilon_{\alpha}$ are the so-called non-interacting single-particle energies, or unperturbed energies. 
+The total energy is in this case the sum over all  single-particle energies, if no two-body or more complicated
+many-body interactions are present.
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+Let us denote the ground state energy by $E_0$. According to the
+variational principle we have
+!bt
+\[
+  E_0 \le E[\Phi] = \int \Phi^*\hat{H}\Phi d\mathbf{\tau}
+\]
+!et
+where $\Phi$ is a trial function which we assume to be normalized
+!bt
+\[
+  \int \Phi^*\Phi d\mathbf{\tau} = 1,
+\]
+!et
+where we have used the shorthand $d\mathbf{\tau}=d\mathbf{r}_1d\mathbf{r}_2\dots d\mathbf{r}_N$.
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+In the Hartree-Fock method the trial function is the Slater
+determinant of Eq.~(ref{eq:HartreeFockDet}) which can be rewritten as 
+!bt
+\[
+  \Phi(x_1,x_2,\dots,x_N,\alpha,\beta,\dots,\nu) = \frac{1}{\sqrt{N!}}\sum_{P} (-)^P\hat{P}\psi_{\alpha}(x_1)
+    \psi_{\beta}(x_2)\dots\psi_{\nu}(x_N)=\sqrt{N!}\hat{A}\Phi_H,
+\]
+!et
+where we have introduced the antisymmetrization operator $\hat{A}$ defined by the 
+summation over all possible permutations of two particles.
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+It is defined as
+!bt
+\begin{equation}
+  \hat{A} = \frac{1}{N!}\sum_{p} (-)^p\hat{P},
+label{antiSymmetryOperator}
+\end{equation}
+!et
+with $p$ standing for the number of permutations. We have introduced for later use the so-called
+Hartree-function, defined by the simple product of all possible single-particle functions
+!bt
+\[
+  \Phi_H(x_1,x_2,\dots,x_N,\alpha,\beta,\dots,\nu) =
+  \psi_{\alpha}(x_1)
+    \psi_{\beta}(x_2)\dots\psi_{\nu}(x_N).
+\]
+!et
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+Both $\hat{H}_0$ and $\hat{H}_I$ are invariant under all possible permutations of any two particles
+and hence commute with $\hat{A}$
+!bt
+\begin{equation}
+  [H_0,\hat{A}] = [H_I,\hat{A}] = 0. label{commutionAntiSym}
+\end{equation}
+!et
+Furthermore, $\hat{A}$ satisfies
+!bt
+\begin{equation}
+  \hat{A}^2 = \hat{A},  label{AntiSymSquared}
+\end{equation}
+!et
+since every permutation of the Slater
+determinant reproduces it. 
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+The expectation value of $\hat{H}_0$ 
+!bt
+\[
+  \int \Phi^*\hat{H}_0\Phi d\mathbf{\tau} 
+  = N! \int \Phi_H^*\hat{A}\hat{H}_0\hat{A}\Phi_H d\mathbf{\tau}
+\]
+!et
+is readily reduced to
+!bt
+\[
+  \int \Phi^*\hat{H}_0\Phi d\mathbf{\tau} 
+  = N! \int \Phi_H^*\hat{H}_0\hat{A}\Phi_H d\mathbf{\tau},
+\]
+!et
+where we have used Eqs.~(ref{commutionAntiSym}) and
+(ref{AntiSymSquared}). The next step is to replace the antisymmetrization
+operator by its definition and to
+replace $\hat{H}_0$ with the sum of one-body operators
+!bt
+\[
+  \int \Phi^*\hat{H}_0\Phi  d\mathbf{\tau}
+  = \sum_{i=1}^N \sum_{p} (-)^p\int 
+  \Phi_H^*\hat{h}_0\hat{P}\Phi_H d\mathbf{\tau}.
+\]
+!et
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+The integral vanishes if two or more particles are permuted in only one
+of the Hartree-functions $\Phi_H$ because the individual single-particle wave functions are
+orthogonal. We obtain then
+!bt
+\[
+  \int \Phi^*\hat{H}_0\Phi  d\mathbf{\tau}= \sum_{i=1}^N \int \Phi_H^*\hat{h}_0\Phi_H  d\mathbf{\tau}.
+\]
+!et
+Orthogonality of the single-particle functions allows us to further simplify the integral, and we
+arrive at the following expression for the expectation values of the
+sum of one-body Hamiltonians 
+!bt
+\begin{equation}
+  \int \Phi^*\hat{H}_0\Phi  d\mathbf{\tau}
+  = \sum_{\mu=1}^N \int \psi_{\mu}^*(\mathbf{r})\hat{h}_0\psi_{\mu}(\mathbf{r})
+  d\mathbf{r}.
+  label{H1Expectation}
+\end{equation}
+!et
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+We introduce the following shorthand for the above integral
+!bt
+\[
+\langle \mu | \hat{h}_0 | \mu \rangle = \int \psi_{\mu}^*(\mathbf{r})\hat{h}_0\psi_{\mu}(\mathbf{r}),
+\]
+!et
+and rewrite Eq.~(ref{H1Expectation}) as
+!bt
+\begin{equation}
+  \int \Phi^*\hat{H}_0\Phi  d\mathbf{\tau}
+  = \sum_{\mu=1}^N \langle \mu | \hat{h}_0 | \mu \rangle.
+  label{H1Expectation1}
+\end{equation}
+!et
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+The expectation value of the two-body part of the Hamiltonian is obtained in a
+similar manner. We have
+!bt
+\[
+  \int \Phi^*\hat{H}_I\Phi d\mathbf{\tau} 
+  = N! \int \Phi_H^*\hat{A}\hat{H}_I\hat{A}\Phi_H d\mathbf{\tau},
+\]
+!et
+which reduces to
+!bt
+\[
+ \int \Phi^*\hat{H}_I\Phi d\mathbf{\tau} 
+  = \sum_{i\le j=1}^N \sum_{p} (-)^p\int 
+  \Phi_H^*V(r_{ij})\hat{P}\Phi_H d\mathbf{\tau},
+\]
+!et
+by following the same arguments as for the one-body
+Hamiltonian. 
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+Because of the dependence on the inter-particle distance $r_{ij}$,  permutations of
+any two particles no longer vanish, and we get
+!bt
+\[
+  \int \Phi^*\hat{H}_I\Phi d\mathbf{\tau} 
+  = \sum_{i < j=1}^N \int  
+  \Phi_H^*V(r_{ij})(1-P_{ij})\Phi_H d\mathbf{\tau}.
+\]
+!et
+where $P_{ij}$ is the permutation operator that interchanges
+particle $i$ and particle $j$. Again we use the assumption that the single-particle wave functions
+are orthogonal. 
+!eblock
+
+
+!split
+===== Definitions and notations =====
+!bblock
+We obtain
+!bt
+\begin{equation}
+\begin{split}
+  \int \Phi^*\hat{H}_I\Phi d\mathbf{\tau} 
+  = \frac{1}{2}\sum_{\mu=1}^N\sum_{\nu=1}^N
+    &\left[ \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)V(r_{ij})\psi_{\mu}(x_i)\psi_{\nu}(x_j)
+    dx_ix_j \right.\\
+  &\left.
+  - \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)
+  V(r_{ij})\psi_{\nu}(x_i)\psi_{\mu}(x_j)
+  dx_ix_j
+  \right]. label{H2Expectation}
+\end{split}
+\end{equation}
+!et
+The first term is the so-called direct term. It is frequently also called the  Hartree term, 
+while the second is due to the Pauli principle and is called
+the exchange term or just the Fock term.
+The factor  $1/2$ is introduced because we now run over
+all pairs twice. 
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+The last equation allows us to  introduce some further definitions.  
+The single-particle wave functions $\psi_{\mu}(x)$, defined by the quantum numbers $\mu$ and $x$
+are defined as the overlap 
+!bt
+\[
+   \psi_{\alpha}(x)  = \langle x | \alpha \rangle .
+\]
+!et
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+We introduce the following shorthands for the above two integrals
+!bt
+\[
+\langle \mu\nu|\hat{v}|\mu\nu\rangle =  \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)V(r_{ij})\psi_{\mu}(x_i)\psi_{\nu}(x_j)
+    dx_ix_j,
+\]
+!et
+and
+!bt 
+\[
+\langle \mu\nu|\hat{v}|\nu\mu\rangle = \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)
+  V(r_{ij})\psi_{\nu}(x_i)\psi_{\mu}(x_j)
+  dx_ix_j.  
+\]
+!et
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+The direct and exchange matrix elements can be  brought together if we define the antisymmetrized matrix element
+!bt
+\[
+\langle \mu\nu|\hat{v}|\mu\nu\rangle_{\mathrm{AS}}= \langle \mu\nu|\hat{v}|\mu\nu\rangle-\langle \mu\nu|\hat{v}|\nu\mu\rangle,
+\]
+!et
+or for a general matrix element  
+!bt
+\[
+\langle \mu\nu|\hat{v}|\sigma\tau\rangle_{\mathrm{AS}}= \langle \mu\nu|\hat{v}|\sigma\tau\rangle-\langle \mu\nu|\hat{v}|\tau\sigma\rangle.
+\]
+!et
+It has the symmetry property
+!bt
+\[
+\langle \mu\nu|\hat{v}|\sigma\tau\rangle_{\mathrm{AS}}= -\langle \mu\nu|\hat{v}|\tau\sigma\rangle_{\mathrm{AS}}=-\langle \nu\mu|\hat{v}|\sigma\tau\rangle_{\mathrm{AS}}.
+\]
+!et
+!eblock
+
+
+!split
+===== Definitions and notations =====
+!bblock
+The antisymmetric matrix element is also hermitian, implying 
+!bt
+\[
+\langle \mu\nu|\hat{v}|\sigma\tau\rangle_{\mathrm{AS}}= \langle \sigma\tau|\hat{v}|\mu\nu\rangle_{\mathrm{AS}}.
+\]
+!et
+With these notations we rewrite Eq.~(ref{H2Expectation}) as 
+!bt
+\begin{equation}
+  \int \Phi^*\hat{H}_I\Phi d\mathbf{\tau} 
+  = \frac{1}{2}\sum_{\mu=1}^N\sum_{\nu=1}^N \langle \mu\nu|\hat{v}|\mu\nu\rangle_{\mathrm{AS}}.
+label{H2Expectation2}
+\end{equation}
+!et
+!eblock
+
+!split
+===== Definitions and notations =====
+!bblock
+Combining Eqs.~(ref{H1Expectation1}) and
+(ref{H2Expectation2}) we obtain the energy functional 
+!bt
+\begin{equation}
+  E[\Phi] 
+  = \sum_{\mu=1}^N \langle \mu | \hat{h}_0 | \mu \rangle +
+  \frac{1}{2}\sum_{{\mu}=1}^N\sum_{{\nu}=1}^N \langle \mu\nu|\hat{v}|\mu\nu\rangle_{\mathrm{AS}}.
+label{FunctionalEPhi}
+\end{equation}
+!et
+which we will use as our starting point for the Hartree-Fock calculations later in this course. 
+!eblock
+
+
+
