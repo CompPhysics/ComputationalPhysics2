@@ -1,0 +1,941 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="Slides from FYS-KJM4411/9411 Variational Monte Carlo methods">
+
+<title>Slides from FYS-KJM4411/9411 Variational Monte Carlo methods</title>
+
+
+<style type="text/css">
+/* blueish style */
+
+/* Color definitions:  http://www.december.com/html/spec/color0.html
+   CSS examples:       http://www.w3schools.com/css/css_examples.asp */
+
+body {
+  margin-top: 1.0em;
+  background-color: #ffffff;
+  font-family: Helvetica, Arial, FreeSans, san-serif;
+  color: #000000;
+}
+h1 { font-size: 1.8em; color: #1e36ce; }
+h2 { font-size: 1.6em; color: #1e36ce; }
+h3 { font-size: 1.4em; color: #1e36ce; }
+a { color: #1e36ce; text-decoration:none; }
+tt { font-family: "Courier New", Courier; }
+/* pre style removed because it will interfer with pygments */
+p { text-indent: 0px; }
+hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+p.caption { width: 80%; font-style: normal; text-align: left; }
+hr.figure { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+.alert-text-small   { font-size: 80%;  }
+.alert-text-large   { font-size: 130%; }
+.alert-text-normal  { font-size: 90%;  }
+.alert {
+  padding:8px 35px 8px 14px; margin-bottom:18px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5);
+  border:1px solid #bababa;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  color: #555;
+  background-color: #f8f8f8;
+  background-position: 10px 5px;
+  background-repeat: no-repeat;
+  background-size: 38px;
+  padding-left: 55px;
+  width: 75%;
+ }
+.alert-block {padding-top:14px; padding-bottom:14px}
+.alert-block > p, .alert-block > ul {margin-bottom:1em}
+.alert li {margin-top: 1em}
+.alert-block p+p {margin-top:5px}
+.alert-notice { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_notice.png); }
+.alert-summary  { background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_summary.png); }
+.alert-warning { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_warning.png); }
+.alert-question {background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_question.png); }
+
+div { text-align: justify; text-justify: inter-word; }
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [(' Basic Matrix Features ', 2, None, '___sec0'),
+              (' Quantum Monte Carlo Motivation ', 2, None, '___sec1'),
+              (' Quantum Monte Carlo Motivation ', 2, None, '___sec2'),
+              (' Quantum Monte Carlo Motivation ', 2, None, '___sec3'),
+              (' Quantum Monte Carlo Motivation ', 2, None, '___sec4'),
+              (' Quantum Monte Carlo Motivation ', 2, None, '___sec5'),
+              (' Quantum Monte Carlo Motivation ', 2, None, '___sec6'),
+              (' Quantum Monte Carlo Motivation ', 2, None, '___sec7'),
+              (' Quantum Monte Carlo ', 2, None, '___sec8'),
+              (' Quantum Monte Carlo: hydrogen atom ', 2, None, '___sec9'),
+              (' Quantum Monte Carlo: hydrogen atom ', 2, None, '___sec10'),
+              (' Quantum Monte Carlo: hydrogen atom ', 2, None, '___sec11'),
+              (' Quantum Monte Carlo: the helium atom ', 2, None, '___sec12'),
+              (' Quantum Monte Carlo: the helium atom ', 2, None, '___sec13'),
+              (' Quantum Monte Carlo: the helium atom ', 2, None, '___sec14'),
+              (' Quantum Monte Carlo: the helium atom ', 2, None, '___sec15'),
+              (' The first attempt at solving the Helium atom ',
+               2,
+               None,
+               '___sec16'),
+              (' The first attempt at solving the Helium atom ',
+               2,
+               None,
+               '___sec17'),
+              (' The first attempt at solving the Helium atom ',
+               2,
+               None,
+               '___sec18'),
+              (' The first attempt at solving the Helium atom ',
+               2,
+               None,
+               '___sec19'),
+              (' The first attempt at solving the helium atom ',
+               2,
+               None,
+               '___sec20'),
+              (' The first attempt at solving the Helium atom ',
+               2,
+               None,
+               '___sec21'),
+              (' The first attempt at solving the Helium atom ',
+               2,
+               None,
+               '___sec22'),
+              (' The first attempt at solving the Helium atom ',
+               2,
+               None,
+               '___sec23')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- ------------------- main content ---------------------- -->
+
+
+
+<center><h1>Slides from FYS-KJM4411/9411 Variational Monte Carlo methods</h1></center>  <!-- document title -->
+
+<p>
+<!-- author(s): Morten Hjorth-Jensen -->
+
+<center>
+<b>Morten Hjorth-Jensen</b> [1, 2]
+</center>
+
+
+<p>
+<!-- institution(s) -->
+
+<center>[1] <b>Department of Physics, University of Oslo, Oslo, Norway</b></center>
+<center>[2] <b>Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University, East Lansing, MI 48824, USA</b></center>
+<p>
+<center><h4>Spring 2015</h4></center> <!-- date -->
+<p>
+<!-- !split -->
+
+<h2 id="___sec0">Basic Matrix Features </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Matrix properties reminder.</b>
+<p>
+$$
+ {\bf A} =
+      \left( \begin{array}{cccc} a_{11} & a_{12} & a_{13} & a_{14} \\
+                                 a_{21} & a_{22} & a_{23} & a_{24} \\
+                                   a_{31} & a_{32} & a_{33} & a_{34} \\
+                                  a_{41} & a_{42} & a_{43} & a_{44}
+             \end{array} \right)\qquad
+{\bf I} =
+      \left( \begin{array}{cccc} 1 & 0 & 0 & 0 \\
+                                 0 & 1 & 0 & 0 \\
+                                 0 & 0 & 1 & 0 \\
+                                 0 & 0 & 0 & 1
+             \end{array} \right)
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec1">Quantum Monte Carlo Motivation </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Given a hamiltonian \( H \) and a trial wave function \( \Psi_T \), the variational principle states that the expectation value of \( \langle H \rangle \), defined through 
+$$
+   E[H]= \langle H \rangle =
+   \frac{\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})H(\boldsymbol{R})\Psi_T(\boldsymbol{R})}
+        {\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})\Psi_T(\boldsymbol{R})},
+$$
+
+is an upper bound to the ground state energy \( E_0 \) of the hamiltonian \( H \), that is 
+$$
+    E_0 \le \langle H \rangle .
+$$
+
+In general, the integrals involved in the calculation of various  expectation values  are multi-dimensional ones. Traditional integration methods such as the Gauss-Legendre will not be adequate for say the  computation of the energy of a many-body system.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec2">Quantum Monte Carlo Motivation </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The trial wave function can be expanded in the eigenstates of the hamiltonian since they form a complete set, viz.,
+$$
+   \Psi_T(\boldsymbol{R})=\sum_i a_i\Psi_i(\boldsymbol{R}),
+$$
+
+and assuming the set of eigenfunctions to be normalized one obtains 
+$$
+     \frac{\sum_{nm}a^*_ma_n \int d\boldsymbol{R}\Psi^{\ast}_m(\boldsymbol{R})H(\boldsymbol{R})\Psi_n(\boldsymbol{R})}
+        {\sum_{nm}a^*_ma_n \int d\boldsymbol{R}\Psi^{\ast}_m(\boldsymbol{R})\Psi_n(\boldsymbol{R})} =\frac{\sum_{n}a^2_n E_n}
+        {\sum_{n}a^2_n} \ge E_0,
+$$
+
+where we used that \( H(\boldsymbol{R})\Psi_n(\boldsymbol{R})=E_n\Psi_n(\boldsymbol{R}) \).
+In general, the integrals involved in the calculation of various  expectation
+values  are multi-dimensional ones. 
+The variational principle yields the lowest state of a given symmetry.
+
+
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec3">Quantum Monte Carlo Motivation </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+In most cases, a wave function has only small values in large parts of 
+configuration space, and a straightforward procedure which uses
+homogenously distributed random points in configuration space 
+will most likely lead to poor results. This may suggest that some kind
+of importance sampling combined with e.g., the Metropolis algorithm 
+may be  a more efficient way of obtaining the ground state energy.
+The hope is then that those regions of configurations space where
+the wave function assumes appreciable values are sampled more 
+efficiently.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec4">Quantum Monte Carlo Motivation </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The tedious part in a VMC calculation is the search for the variational
+minimum. A good knowledge of the system is required in order to carry out
+reasonable VMC calculations. This is not always the case, 
+and often VMC calculations 
+serve rather as the starting
+point for so-called diffusion Monte Carlo calculations (DMC). DMC is a way of
+solving exactly the many-body Schroedinger equation by means of 
+a stochastic procedure. A good guess on the binding energy
+and its wave function is however necessary. 
+A carefully performed VMC calculation can aid in this context.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec5">Quantum Monte Carlo Motivation </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<ul>
+<li> Construct first a trial wave function \( \psi_T(\boldsymbol{R},\boldsymbol{\alpha}) \),  for a many-body system consisting of \( N \) particles located at positions</li> 
+</ul>
+
+\( \boldsymbol{R}=(\boldsymbol{R}_1,\dots ,\boldsymbol{R}_N) \). The trial wave function depends on \( \alpha \) variational parameters \( \boldsymbol{\alpha}=(\alpha_1,\dots ,\alpha_M) \).
+
+<ul>
+<li> Then we evaluate the expectation value of the hamiltonian \( H \)</li> 
+</ul>
+
+$$
+   E[H]=\langle H \rangle =
+   \frac{\int d\boldsymbol{R}\Psi^{\ast}_{T}(\boldsymbol{R},\boldsymbol{\alpha})H(\boldsymbol{R})\Psi_{T}(\boldsymbol{R},\boldsymbol{\alpha})}
+        {\int d\boldsymbol{R}\Psi^{\ast}_{T}(\boldsymbol{R},\boldsymbol{\alpha})\Psi_{T}(\boldsymbol{R},\boldsymbol{\alpha})}.
+$$
+
+
+<ul>
+<li> Thereafter we vary \( \alpha \) according to some minimization algorithm and return to the first step.</li>
+</ul>
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec6">Quantum Monte Carlo Motivation </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Basic steps.</b>
+<p>
+Choose a trial wave function
+\( \psi_T(\boldsymbol{R}) \).
+$$
+   P(\boldsymbol{R})= \frac{\left|\psi_T(\boldsymbol{R})\right|^2}{\int \left|\psi_T(\boldsymbol{R})\right|^2d\boldsymbol{R}}.
+$$
+
+This is our new probability distribution function  (PDF).
+The approximation to the expectation value of the Hamiltonian is now 
+$$
+   E[H(\boldsymbol{\alpha})] = 
+   \frac{\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R},\boldsymbol{\alpha})H(\boldsymbol{R})\Psi_T(\boldsymbol{R},\boldsymbol{\alpha})}
+        {\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R},\boldsymbol{\alpha})\Psi_T(\boldsymbol{R},\boldsymbol{\alpha})}.
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec7">Quantum Monte Carlo Motivation </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Define a new quantity
+$$
+   E_L(\boldsymbol{R},\boldsymbol{\alpha})=\frac{1}{\psi_T(\boldsymbol{R},\boldsymbol{\alpha})}H\psi_T(\boldsymbol{R},\boldsymbol{\alpha}),
+   \label{eq:locale1}
+$$
+
+called the local energy, which, together with our trial PDF yields
+$$
+  E[H(\boldsymbol{\alpha})]= = \int P(\boldsymbol{R})E_L(\boldsymbol{R}) d\boldsymbol{R}\approx \frac{1}{N}\sum_{i=1}^NP(\boldsymbol{R_i},\boldsymbol{\alpha})E_L(\boldsymbol{R_i},\boldsymbol{\alpha})
+  \label{eq:vmc1}
+$$
+
+with \( N \) being the number of Monte Carlo samples.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec8">Quantum Monte Carlo </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The Algorithm for performing a variational Monte Carlo calculations runs thus as this
+
+<ul>
+   <li> Initialisation: Fix the number of Monte Carlo steps. Choose an initial \( \boldsymbol{R} \) and variational parameters \( \alpha \) and calculate \( \left|\psi_T^{\alpha}(\boldsymbol{R})\right|^2 \).</li> 
+   <li> Initialise the energy and the variance and start the Monte Carlo calculation.</li>
+
+<ul>
+      <li> Calculate  a trial position  \( \boldsymbol{R}_p=\boldsymbol{R}+r*step \) where \( r \) is a random variable \( r \in [0,1] \).</li>
+      <li> Metropolis algorithm to accept or reject this move  \( w = P(\boldsymbol{R}_p)/P(\boldsymbol{R}) \).</li>
+      <li> If the step is accepted, then we set \( \boldsymbol{R}=\boldsymbol{R}_p \).</li> 
+      <li> Update averages</li>
+</ul>
+
+   <li> Finish and compute final averages.</li>
+</ul>
+
+Observe that the jumping in space is governed by the variable <em>step</em>. This is Called brute-force sampling.
+Need importance sampling to get more relevant sampling, see lectures below.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec9">Quantum Monte Carlo: hydrogen atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The radial Schroedinger equation for the hydrogen atom can be
+written as
+$$
+-\frac{\hbar^2}{2m}\frac{\partial^2 u(r)}{\partial r^2}-
+\left(\frac{ke^2}{r}-\frac{\hbar^2l(l+1)}{2mr^2}\right)u(r)=Eu(r),
+$$
+
+or with dimensionless variables
+$$
+-\frac{1}{2}\frac{\partial^2 u(\rho)}{\partial \rho^2}-
+\frac{u(\rho)}{\rho}+\frac{l(l+1)}{2\rho^2}u(\rho)-\lambda u(\rho)=0,
+\label{eq:hydrodimless1}
+$$
+
+with the hamiltonian
+$$
+H=-\frac{1}{2}\frac{\partial^2 }{\partial \rho^2}-
+\frac{1}{\rho}+\frac{l(l+1)}{2\rho^2}.
+$$
+
+Use variational parameter \( \alpha \) in the trial
+wave function 
+$$
+   u_T^{\alpha}(\rho)=\alpha\rho e^{-\alpha\rho}. 
+   \label{eq:trialhydrogen}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec10">Quantum Monte Carlo: hydrogen atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Inserting this wave function into the expression for the
+local energy \( E_L \) gives
+$$
+   E_L(\rho)=-\frac{1}{\rho}-
+              \frac{\alpha}{2}\left(\alpha-\frac{2}{\rho}\right).
+$$
+
+A simple variational Monte Carlo calculation results in
+<table border="1">
+<thead>
+<tr><td align="center">\( \alpha \)</td> <td align="center">\( \langle H \rangle  \)</td> <td align="center">\( \sigma^2 \)</td> <td align="center">\( \sigma/\sqrt{N} \)</td> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   7.00000E-01     </td> <td align="center">   -4.57759E-01                </td> <td align="center">   4.51201E-02       </td> <td align="center">   6.71715E-04              </td> </tr>
+<tr><td align="center">   8.00000E-01     </td> <td align="center">   -4.81461E-01                </td> <td align="center">   3.05736E-02       </td> <td align="center">   5.52934E-04              </td> </tr>
+<tr><td align="center">   9.00000E-01     </td> <td align="center">   -4.95899E-01                </td> <td align="center">   8.20497E-03       </td> <td align="center">   2.86443E-04              </td> </tr>
+<tr><td align="center">   1.00000E-00     </td> <td align="center">   -5.00000E-01                </td> <td align="center">   0.00000E+00       </td> <td align="center">   0.00000E+00              </td> </tr>
+<tr><td align="center">   1.10000E+00     </td> <td align="center">   -4.93738E-01                </td> <td align="center">   1.16989E-02       </td> <td align="center">   3.42036E-04              </td> </tr>
+<tr><td align="center">   1.20000E+00     </td> <td align="center">   -4.75563E-01                </td> <td align="center">   8.85899E-02       </td> <td align="center">   9.41222E-04              </td> </tr>
+<tr><td align="center">   1.30000E+00     </td> <td align="center">   -4.54341E-01                </td> <td align="center">   1.45171E-01       </td> <td align="center">   1.20487E-03              </td> </tr>
+</tbody>
+</table>
+
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec11">Quantum Monte Carlo: hydrogen atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+We note that at \( \alpha=1 \) we obtain the exact
+result, and the variance is zero, as it should. The reason is that 
+we then have the exact wave function, and the action of the hamiltionan
+on the wave function
+$$
+   H\psi = \mathrm{constant}\times \psi,
+$$
+
+yields just a constant. The integral which defines various 
+expectation values involving moments of the hamiltonian becomes then
+$$
+   \langle H^n \rangle =
+   \frac{\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})H^n(\boldsymbol{R})\Psi_T(\boldsymbol{R})}
+        {\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})\Psi_T(\boldsymbol{R})}=
+\mathrm{constant}\times\frac{\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})\Psi_T(\boldsymbol{R})}
+        {\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})\Psi_T(\boldsymbol{R})}=\mathrm{constant}.
+$$
+
+<b>This gives an important information: the exact wave function leads to zero variance!</b>
+Variation is then performed by minimizing both the energy and the variance.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec12">Quantum Monte Carlo: the helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The helium atom consists of two electrons and a nucleus with
+charge \( Z=2 \). 
+The contribution  
+to the potential energy due to the attraction from the nucleus is
+$$
+   -\frac{2ke^2}{r_1}-\frac{2ke^2}{r_2},
+$$
+
+and if we add the repulsion arising from the two 
+interacting electrons, we obtain the potential energy
+$$
+ V(r_1, r_2)=-\frac{2ke^2}{r_1}-\frac{2ke^2}{r_2}+
+               \frac{ke^2}{r_{12}},
+$$
+
+with the electrons separated at a distance 
+\( r_{12}=|\boldsymbol{r}_1-\boldsymbol{r}_2| \).
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec13">Quantum Monte Carlo: the helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+The hamiltonian becomes then
+$$
+   \hat{H}=-\frac{\hbar^2\nabla_1^2}{2m}-\frac{\hbar^2\nabla_2^2}{2m}
+          -\frac{2ke^2}{r_1}-\frac{2ke^2}{r_2}+
+               \frac{ke^2}{r_{12}},
+$$
+
+and  Schroedingers equation reads
+$$
+   \hat{H}\psi=E\psi.
+$$
+
+All observables are evaluated with respect to the probability distribution
+$$
+   P(\boldsymbol{R})= \frac{\left|\psi_T(\boldsymbol{R})\right|^2}{\int \left|\psi_T(\boldsymbol{R})\right|^2d\boldsymbol{R}}.
+$$
+
+generated by the trial wave function.   
+The trial wave function must approximate an exact 
+eigenstate in order that accurate results are to be obtained.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec14">Quantum Monte Carlo: the helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Choice of trial wave function for Helium:
+Assume \( r_1 \rightarrow 0 \).
+$$
+   E_L(\boldsymbol{R})=\frac{1}{\psi_T(\boldsymbol{R})}H\psi_T(\boldsymbol{R})=
+     \frac{1}{\psi_T(\boldsymbol{R})}\left(-\frac{1}{2}\nabla^2_1
+     -\frac{Z}{r_1}\right)\psi_T(\boldsymbol{R}) + \mathrm{finite \hspace{0.1cm}terms}.
+$$
+
+$$ 
+    E_L(R)=
+    \frac{1}{{\cal R}_T(r_1)}\left(-\frac{1}{2}\frac{d^2}{dr_1^2}-
+     \frac{1}{r_1}\frac{d}{dr_1}
+     -\frac{Z}{r_1}\right){\cal R}_T(r_1) + \mathrm{finite\hspace{0.1cm} terms}
+$$
+
+For small values of \( r_1 \), the terms which dominate are
+$$ 
+    \lim_{r_1 \rightarrow 0}E_L(R)=
+    \frac{1}{{\cal R}_T(r_1)}\left(-
+     \frac{1}{r_1}\frac{d}{dr_1}
+     -\frac{Z}{r_1}\right){\cal R}_T(r_1),
+$$
+
+since the second derivative does not diverge due to the finiteness of  \( \Psi \) at the origin.
+</div>
+x
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec15">Quantum Monte Carlo: the helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+This results in
+$$
+     \frac{1}{{\cal R}_T(r_1)}\frac{d {\cal R}_T(r_1)}{dr_1}=-Z,
+$$
+
+and
+$$
+   {\cal R}_T(r_1)\propto e^{-Zr_1}.
+$$
+
+A similar condition applies to electron 2 as well. 
+For orbital momenta \( l > 0 \) we have 
+$$
+     \frac{1}{{\cal R}_T(r)}\frac{d {\cal R}_T(r)}{dr}=-\frac{Z}{l+1}.
+$$
+
+Similarly, studying the case \( r_{12}\rightarrow 0 \) we can write 
+a possible trial wave function as
+$$
+   \psi_T(\boldsymbol{R})=e^{-\alpha(r_1+r_2)}e^{\beta r_{12}}.
+    \label{eq:wavehelium2}
+$$
+
+The last equation can be generalized to
+$$
+   \psi_T(\boldsymbol{R})=\phi(\boldsymbol{r}_1)\phi(\boldsymbol{r}_2)\dots\phi(\boldsymbol{r}_N)
+                   \prod_{i < j}f(r_{ij}),
+$$
+
+for a system with \( N \) electrons or particles.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec16">The first attempt at solving the Helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>The main program.</b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #BC7A00">#include &quot;vmcsolver.h&quot;</span>
+<span style="color: #BC7A00">#include &lt;iostream&gt;</span>
+
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> std;
+
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>()
+{
+    VMCSolver <span style="color: #666666">*</span>solver <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> VMCSolver();
+    solver<span style="color: #666666">-&gt;</span>runMonteCarloIntegration();
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec17">The first attempt at solving the Helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>The VMCSolver class.</b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #BC7A00">#ifndef VMCSOLVER_H</span>
+<span style="color: #BC7A00">#define VMCSOLVER_H</span>
+<span style="color: #BC7A00">#include &lt;armadillo&gt;</span>
+
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> arma;
+<span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">VMCSolver</span>
+{
+<span style="color: #A0A000">public:</span>
+    VMCSolver();
+    <span style="color: #B00040">void</span> <span style="color: #0000FF">runMonteCarloIntegration</span>();
+<span style="color: #A0A000">private:</span>
+    <span style="color: #B00040">double</span> <span style="color: #0000FF">waveFunction</span>(<span style="color: #008000; font-weight: bold">const</span> mat <span style="color: #666666">&amp;</span>r);
+    <span style="color: #B00040">double</span> <span style="color: #0000FF">localEnergy</span>(<span style="color: #008000; font-weight: bold">const</span> mat <span style="color: #666666">&amp;</span>r);
+    <span style="color: #B00040">int</span> nDimensions, charge, nparticles;
+    <span style="color: #B00040">double</span> stepLength, h, h2, alpha;
+    <span style="color: #B00040">long</span> idum;
+    <span style="color: #B00040">int</span> nCycles;
+    mat rOld, rNew;
+};
+<span style="color: #BC7A00">#endif </span><span style="color: #408080; font-style: italic">// VMCSOLVER_H</span>
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec18">The first attempt at solving the Helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>The VMCSolver class.</b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #BC7A00">#include &quot;vmcsolver.h&quot;</span>
+<span style="color: #BC7A00">#include &quot;lib.h&quot;</span>
+<span style="color: #BC7A00">#include &lt;armadillo&gt;</span>
+<span style="color: #BC7A00">#include &lt;iostream&gt;</span>
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> arma;
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> 
+VMCSolver<span style="color: #666666">::</span>VMCSolver() <span style="color: #666666">:</span>
+    nDimensions(<span style="color: #666666">3</span>),
+    charge(<span style="color: #666666">2</span>),
+    stepLength(<span style="color: #666666">1.0</span>),
+    nparticles(<span style="color: #666666">2</span>),
+    h(<span style="color: #666666">0.001</span>),
+    h2(<span style="color: #666666">1000000</span>),
+    idum(<span style="color: #666666">-1</span>),
+    alpha(<span style="color: #666666">0.5*</span>charge),
+    nCycles(<span style="color: #666666">1000000</span>)
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec19">The first attempt at solving the Helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>The VMCSolver class.</b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #B00040">void</span> VMCSolver<span style="color: #666666">::</span>runMonteCarloIntegration()
+{
+    rOld <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>mat<span style="color: #666666">&gt;</span>(nparticles, nDimensions);
+    rNew <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>mat<span style="color: #666666">&gt;</span>(nparticles, nDimensions);
+    <span style="color: #B00040">double</span> waveFunctionOld <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> waveFunctionNew <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> energySum <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> energySquaredSum <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> deltaE;
+    <span style="color: #408080; font-style: italic">// initial trial positions</span>
+    <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> nparticles; i<span style="color: #666666">++</span>) {
+        <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> nDimensions; j<span style="color: #666666">++</span>) {
+            rOld(i,j) <span style="color: #666666">=</span> stepLength <span style="color: #666666">*</span> (ran2(<span style="color: #666666">&amp;</span>idum) <span style="color: #666666">-</span> <span style="color: #666666">0.5</span>);
+        }
+    }
+    rNew <span style="color: #666666">=</span> rOld;
+    <span style="color: #408080; font-style: italic">// loop over Monte Carlo cycles</span>
+    <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> cycle <span style="color: #666666">=</span> <span style="color: #666666">0</span>; cycle <span style="color: #666666">&lt;</span> nCycles; cycle<span style="color: #666666">++</span>) {
+        <span style="color: #408080; font-style: italic">// Store the current value of the wave function</span>
+        waveFunctionOld <span style="color: #666666">=</span> waveFunction(rOld);
+        <span style="color: #408080; font-style: italic">// New position to test</span>
+        <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> nparticles; i<span style="color: #666666">++</span>) {
+            <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> nDimensions; j<span style="color: #666666">++</span>) {
+                rNew(i,j) <span style="color: #666666">=</span> rOld(i,j) <span style="color: #666666">+</span> stepLength<span style="color: #666666">*</span>(ran2(<span style="color: #666666">&amp;</span>idum) <span style="color: #666666">-</span> <span style="color: #666666">0.5</span>);
+            }
+            <span style="color: #408080; font-style: italic">// Recalculate the value of the wave function</span>
+            waveFunctionNew <span style="color: #666666">=</span> waveFunction(rNew);
+            <span style="color: #408080; font-style: italic">// Check for step acceptance (if yes, update position, if no, reset position)</span>
+            <span style="color: #008000; font-weight: bold">if</span>(ran2(<span style="color: #666666">&amp;</span>idum) <span style="color: #666666">&lt;=</span> (waveFunctionNew<span style="color: #666666">*</span>waveFunctionNew) <span style="color: #666666">/</span> (waveFunctionOld<span style="color: #666666">*</span>waveFunctionOld)) {
+                <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> nDimensions; j<span style="color: #666666">++</span>) {
+                    rOld(i,j) <span style="color: #666666">=</span> rNew(i,j);
+                    waveFunctionOld <span style="color: #666666">=</span> waveFunctionNew;
+                }
+            } <span style="color: #008000; font-weight: bold">else</span> {
+                <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> nDimensions; j<span style="color: #666666">++</span>) {
+                    rNew(i,j) <span style="color: #666666">=</span> rOld(i,j);
+                }
+            }
+            <span style="color: #408080; font-style: italic">// update energies</span>
+            deltaE <span style="color: #666666">=</span> localEnergy(rNew);
+            energySum <span style="color: #666666">+=</span> deltaE;
+            energySquaredSum <span style="color: #666666">+=</span> deltaE<span style="color: #666666">*</span>deltaE;
+        }
+    }
+    <span style="color: #B00040">double</span> energy <span style="color: #666666">=</span> energySum<span style="color: #666666">/</span>(nCycles <span style="color: #666666">*</span> nparticles);
+    <span style="color: #B00040">double</span> energySquared <span style="color: #666666">=</span> energySquaredSum<span style="color: #666666">/</span>(nCycles <span style="color: #666666">*</span> nparticles);
+    cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Energy: &quot;</span> <span style="color: #666666">&lt;&lt;</span> energy <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; Energy (squared sum): &quot;</span> <span style="color: #666666">&lt;&lt;</span> energySquared <span style="color: #666666">&lt;&lt;</span> endl;
+}
+<span style="color: #B00040">double</span> VMCSolver<span style="color: #666666">::</span>localEnergy(<span style="color: #008000; font-weight: bold">const</span> mat <span style="color: #666666">&amp;</span>r)
+{
+    mat rPlus <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>mat<span style="color: #666666">&gt;</span>(nparticles, nDimensions);
+    mat rMinus <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>mat<span style="color: #666666">&gt;</span>(nparticles, nDimensions);
+    rPlus <span style="color: #666666">=</span> rMinus <span style="color: #666666">=</span> r;
+    <span style="color: #B00040">double</span> waveFunctionMinus <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> waveFunctionPlus <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> waveFunctionCurrent <span style="color: #666666">=</span> waveFunction(r);
+    <span style="color: #408080; font-style: italic">// Kinetic energy</span>
+    <span style="color: #B00040">double</span> kineticEnergy <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> nparticles; i<span style="color: #666666">++</span>) {
+        <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> nDimensions; j<span style="color: #666666">++</span>) {
+            rPlus(i,j) <span style="color: #666666">+=</span> h;
+            rMinus(i,j) <span style="color: #666666">-=</span> h;
+            waveFunctionMinus <span style="color: #666666">=</span> waveFunction(rMinus);
+            waveFunctionPlus <span style="color: #666666">=</span> waveFunction(rPlus);
+            kineticEnergy <span style="color: #666666">-=</span> (waveFunctionMinus <span style="color: #666666">+</span> waveFunctionPlus <span style="color: #666666">-</span> <span style="color: #666666">2</span> <span style="color: #666666">*</span> waveFunctionCurrent);
+            rPlus(i,j) <span style="color: #666666">=</span> r(i,j);
+            rMinus(i,j) <span style="color: #666666">=</span> r(i,j);
+        }
+    }
+    kineticEnergy <span style="color: #666666">=</span> <span style="color: #666666">0.5</span> <span style="color: #666666">*</span> h2 <span style="color: #666666">*</span> kineticEnergy <span style="color: #666666">/</span> waveFunctionCurrent;
+    <span style="color: #408080; font-style: italic">// Potential energy</span>
+    <span style="color: #B00040">double</span> potentialEnergy <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> rSingleParticle  <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> nparticles; i<span style="color: #666666">++</span>) {
+        rSingleParticle  <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+        <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> nDimensions; j<span style="color: #666666">++</span>) {
+            rSingleParticle  <span style="color: #666666">+=</span> r(i,j)<span style="color: #666666">*</span>r(i,j);
+        }
+        potentialEnergy <span style="color: #666666">-=</span> charge <span style="color: #666666">/</span> sqrt(rSingleParticle );
+    }
+    <span style="color: #408080; font-style: italic">// Contribution from electron-electron potential</span>
+    <span style="color: #B00040">double</span> r12 <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> nparticles; i<span style="color: #666666">++</span>) {
+        <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> i <span style="color: #666666">+</span> <span style="color: #666666">1</span>; j <span style="color: #666666">&lt;</span> nparticles; j<span style="color: #666666">++</span>) {
+            r12 <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+            <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> k <span style="color: #666666">=</span> <span style="color: #666666">0</span>; k <span style="color: #666666">&lt;</span> nDimensions; k<span style="color: #666666">++</span>) {
+                r12 <span style="color: #666666">+=</span> (r(i,k) <span style="color: #666666">-</span> r(j,k)) <span style="color: #666666">*</span> (r(i,k) <span style="color: #666666">-</span> r(j,k));
+            }
+            potentialEnergy <span style="color: #666666">+=</span> <span style="color: #666666">1</span> <span style="color: #666666">/</span> sqrt(r12);
+        }
+    }
+    <span style="color: #008000; font-weight: bold">return</span> kineticEnergy <span style="color: #666666">+</span> potentialEnergy;
+}
+<span style="color: #B00040">double</span> VMCSolver<span style="color: #666666">::</span>waveFunction(<span style="color: #008000; font-weight: bold">const</span> mat <span style="color: #666666">&amp;</span>r)
+{
+    <span style="color: #B00040">double</span> argument <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> nparticles; i<span style="color: #666666">++</span>) {
+        <span style="color: #B00040">double</span> rSingleParticle  <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+        <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> nDimensions; j<span style="color: #666666">++</span>) {
+            rSingleParticle  <span style="color: #666666">+=</span> r(i,j) <span style="color: #666666">*</span> r(i,j);
+        }
+        argument <span style="color: #666666">+=</span> sqrt(rSingleParticle );
+    }
+    <span style="color: #008000; font-weight: bold">return</span> exp(<span style="color: #666666">-</span>argument <span style="color: #666666">*</span> alpha);
+}
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec20">The first attempt at solving the helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+During the development of our code we need to make several checks. It is also very instructive to compute a closed form expression for the local energy. Since our wave function is rather simple  it is straightforward
+to find an analytic expressions.  Consider first the case of the simple helium function 
+$$
+   \Psi_T(\boldsymbol{r}_1,\boldsymbol{r}_2) = e^{-\alpha(r_1+r_2)}
+$$
+
+The local energy is for this case 
+$$ 
+E_{L1} = \left(\alpha-Z\right)\left(\frac{1}{r_1}+\frac{1}{r_2}\right)+\frac{1}{r_{12}}-\alpha^2
+$$
+
+which gives an expectation value for the local energy given by
+$$
+\langle E_{L1} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
+$$
+
+In our project, the simple form is
+$$
+   \Psi_T(\boldsymbol{r}_1,\boldsymbol{r}_2) = e^{-\alpha\omega(r_1^2+r_2^2)/2}
+$$
+
+Find the contribution to the local energy!
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec21">The first attempt at solving the Helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+With closed form formulae we  can speed up the computation of the correlation. In our case
+we write it as 
+$$
+\Psi_C= \exp{\left\{\sum_{i < j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
+$$
+
+which means that the gradient needed for the so-called quantum force and local energy 
+can be calculated analytically.
+This will speed up your code since the computation of the correlation part and the Slater determinant are the most 
+time consuming parts in your code.  
+
+<p>
+We will refer to this correlation function as \( \Psi_C \) or the <em>linear Pad\'e-Jastrow</em>.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec22">The first attempt at solving the Helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+We can test this by computing the local energy for our helium wave function
+$$
+   \psi_{T}(\boldsymbol{r}_1,\boldsymbol{r}_2) = 
+   \exp{\left(-\alpha(r_1+r_2)\right)}
+   \exp{\left(\frac{r_{12}}{2(1+\beta r_{12})}\right)}, 
+$$
+
+with \( \alpha \) and \( \beta \) as variational parameters.
+
+<p>
+The local energy is for this case 
+$$ 
+E_{L2} = E_{L1}+\frac{1}{2(1+\beta r_{12})^2}\left\{\frac{\alpha(r_1+r_2)}{r_{12}}(1-\frac{\boldsymbol{r}_1\boldsymbol{r}_2}{r_1r_2})-\frac{1}{2(1+\beta r_{12})^2}-\frac{2}{r_{12}}+\frac{2\beta}{1+\beta r_{12}}\right\}
+$$
+
+It is very useful to test your code against these expressions. It means also that you don't need to
+compute a derivative numerically as discussed in the above code example.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec23">The first attempt at solving the Helium atom </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<ul>
+ <li> Implement the closed form expression for the local energy and the so-called quantum force</li>
+ <li> Convince yourself that the closed form expressions are correct.</li>
+ <li> Implement the closed form expressions for systems with more than two electrons.</li>
+ <li> Make another copy of your code.</li>
+ <li> Implement the closed form expression for the local energy</li>
+ <li> Compile the new and old codes with the -pg option for profiling.</li>
+ <li> Run both codes and profile them afterwards using <em>gprof executable > outputprofile</em>.</li>
+ <li> Study the time usage in the file <b>outprofile</b></li>
+</ul>
+</div>
+
+
+<!-- ------------------- end of main content --------------- -->
+
+
+</body>
+</html>
+    
+

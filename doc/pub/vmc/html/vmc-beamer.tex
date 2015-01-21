@@ -1,56 +1,185 @@
-TITLE: Slides from FYS-KJM4411/9411 Variational Monte Carlo methods
-AUTHOR: Morten Hjorth-Jensen at Department of Physics, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University, East Lansing, MI 48824, USA
-DATE: Spring 2015
+
+% LaTeX Beamer file automatically generated from DocOnce
+% https://github.com/hplgit/doconce
+
+%-------------------- begin beamer-specific preamble ----------------------
+
+\documentclass{beamer}
+
+\usetheme{red_plain}
+\usecolortheme{default}
+
+% turn off the almost invisible, yet disturbing, navigation symbols:
+\setbeamertemplate{navigation symbols}{}
+
+% Examples on customization:
+%\usecolortheme[named=RawSienna]{structure}
+%\usetheme[height=7mm]{Rochester}
+%\setbeamerfont{frametitle}{family=\rmfamily,shape=\itshape}
+%\setbeamertemplate{items}[ball]
+%\setbeamertemplate{blocks}[rounded][shadow=true]
+%\useoutertheme{infolines}
+%
+%\usefonttheme{}
+%\useinntertheme{}
+%
+%\setbeameroption{show notes}
+%\setbeameroption{show notes on second screen=right}
+
+% fine for B/W printing:
+%\usecolortheme{seahorse}
+
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{relsize}
+
+\usepackage{fancybox}  % make sure fancybox is loaded before fancyvrb
+
+\usepackage{fancyvrb}
+\usepackage{minted} % requires pygments and latex -shell-escape filename
+%\usepackage{anslistings}
+
+\usepackage{amsmath,amssymb,bm}
+%\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{colortbl}
+\usepackage[english]{babel}
+\usepackage{tikz}
+\usepackage{framed}
+% Use some nice templates
+\beamertemplatetransparentcovereddynamic
+
+% --- begin table of contents based on sections ---
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each section:
+% (Only section headings can enter the table of contents in Beamer
+% slides generated from DocOnce source, while subsections are used
+% for the title in ordinary slides.)
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>[plain]
+  \frametitle{}
+  %\frametitle{Outline}
+  \tableofcontents[currentsection]
+  \end{frame}
+}
+% --- end table of contents based on sections ---
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command:
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\newcommand{\shortinlinecomment}[3]{\note{\textbf{#1}: #2}}
+\newcommand{\longinlinecomment}[3]{\shortinlinecomment{#1}{#2}{#3}}
+
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3
+    }
+\setlength{\parskip}{0pt}  % {1em}
+
+\newenvironment{doconceexercise}{}{}
+\newcounter{doconceexercisecounter}
+\newenvironment{doconce:movie}{}{}
+\newcounter{doconce:movie:counter}
+
+\newcommand{\subex}[1]{\noindent\textbf{#1}}  % for subexercises: a), b), etc
+
+%-------------------- end beamer-specific preamble ----------------------
+
+% Add user's preamble
 
 
-!split
-===== Quantum Monte Carlo Motivation =====
-!bblock
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+
+
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\title{Slides from FYS-KJM4411/9411 Variational Monte Carlo methods}
+
+% ----------------- author(s) -------------------------
+
+\author{Morten Hjorth-Jensen\inst{1,2}}
+\institute{Department of Physics, University of Oslo, Oslo, Norway\inst{1}
+\and
+Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University, East Lansing, MI 48824, USA\inst{2}}
+% ----------------- end author(s) -------------------------
+
+\date{Spring 2015
+% <optional titlepage figure>
+}
+
+\begin{frame}[plain,fragile]
+\titlepage
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo Motivation}
+
+\begin{block}{}
 Given a hamiltonian $H$ and a trial wave function $\Psi_T$, the variational principle states that the expectation value of $\langle H \rangle$, defined through 
-!bt
 \[
    E[H]= \langle H \rangle =
    \frac{\int d\bm{R}\Psi^{\ast}_T(\bm{R})H(\bm{R})\Psi_T(\bm{R})}
         {\int d\bm{R}\Psi^{\ast}_T(\bm{R})\Psi_T(\bm{R})},
 \]
-!et
 is an upper bound to the ground state energy $E_0$ of the hamiltonian $H$, that is 
-!bt
 \[
     E_0 \le \langle H \rangle .
 \]
-!et
 In general, the integrals involved in the calculation of various  expectation values  are multi-dimensional ones. Traditional integration methods such as the Gauss-Legendre will not be adequate for say the  computation of the energy of a many-body system.
-!eblock
+\end{block}
+\end{frame}
 
-!split
-===== Quantum Monte Carlo Motivation =====
-!bblock
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo Motivation}
+
+\begin{block}{}
 The trial wave function can be expanded in the eigenstates of the hamiltonian since they form a complete set, viz.,
-!bt
 \[
    \Psi_T(\bm{R})=\sum_i a_i\Psi_i(\bm{R}),
 \]
-!et
 and assuming the set of eigenfunctions to be normalized one obtains 
-!bt
 \[
      \frac{\sum_{nm}a^*_ma_n \int d\bm{R}\Psi^{\ast}_m(\bm{R})H(\bm{R})\Psi_n(\bm{R})}
         {\sum_{nm}a^*_ma_n \int d\bm{R}\Psi^{\ast}_m(\bm{R})\Psi_n(\bm{R})} =\frac{\sum_{n}a^2_n E_n}
         {\sum_{n}a^2_n} \ge E_0,
 \]
-!et
 where we used that $H(\bm{R})\Psi_n(\bm{R})=E_n\Psi_n(\bm{R})$.
 In general, the integrals involved in the calculation of various  expectation
 values  are multi-dimensional ones. 
 The variational principle yields the lowest state of a given symmetry.
 
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo Motivation}
 
-!split
-===== Quantum Monte Carlo Motivation =====
-!bblock
+\begin{block}{}
 In most cases, a wave function has only small values in large parts of 
 configuration space, and a straightforward procedure which uses
 homogenously distributed random points in configuration space 
@@ -60,12 +189,13 @@ may be  a more efficient way of obtaining the ground state energy.
 The hope is then that those regions of configurations space where
 the wave function assumes appreciable values are sampled more 
 efficiently. 
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo Motivation}
 
-!split
-===== Quantum Monte Carlo Motivation =====
-!bblock
+\begin{block}{}
 The tedious part in a VMC calculation is the search for the variational
 minimum. A good knowledge of the system is required in order to carry out
 reasonable VMC calculations. This is not always the case, 
@@ -76,169 +206,182 @@ solving exactly the many-body Schroedinger equation by means of
 a stochastic procedure. A good guess on the binding energy
 and its wave function is however necessary. 
 A carefully performed VMC calculation can aid in this context. 
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo Motivation}
 
-!split
-===== Quantum Monte Carlo Motivation =====
-!bblock
-* Construct first a trial wave function $\psi_T(\bm{R},\bm{\alpha})$,  for a many-body system consisting of $N$ particles located at positions 
+\begin{block}{}
+\begin{itemize}
+\item Construct first a trial wave function $\psi_T(\bm{R},\bm{\alpha})$,  for a many-body system consisting of $N$ particles located at positions 
+\end{itemize}
+
+\noindent
 $\bm{R}=(\bm{R}_1,\dots ,\bm{R}_N)$. The trial wave function depends on $\alpha$ variational parameters $\bm{\alpha}=(\alpha_1,\dots ,\alpha_M)$.
-* Then we evaluate the expectation value of the hamiltonian $H$ 
-!bt
+\begin{itemize}
+\item Then we evaluate the expectation value of the hamiltonian $H$ 
+\end{itemize}
+
+\noindent
 \[
    E[H]=\langle H \rangle =
    \frac{\int d\bm{R}\Psi^{\ast}_{T}(\bm{R},\bm{\alpha})H(\bm{R})\Psi_{T}(\bm{R},\bm{\alpha})}
         {\int d\bm{R}\Psi^{\ast}_{T}(\bm{R},\bm{\alpha})\Psi_{T}(\bm{R},\bm{\alpha})}.
 \]
-!et
-* Thereafter we vary $\alpha$ according to some minimization algorithm and return to the first step.
-!eblock
+\begin{itemize}
+\item Thereafter we vary $\alpha$ according to some minimization algorithm and return to the first step.
+\end{itemize}
 
+\noindent
+\end{block}
+\end{frame}
 
-!split
-===== Quantum Monte Carlo Motivation =====
-!bblock Basic steps
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo Motivation}
+
+\begin{block}{Basic steps }
 Choose a trial wave function
 $\psi_T(\bm{R})$.
-!bt
 \[
    P(\bm{R})= \frac{\left|\psi_T(\bm{R})\right|^2}{\int \left|\psi_T(\bm{R})\right|^2d\bm{R}}.
 \]
-!et
 This is our new probability distribution function  (PDF).
 The approximation to the expectation value of the Hamiltonian is now 
-!bt
 \[
    E[H(\bm{\alpha})] = 
    \frac{\int d\bm{R}\Psi^{\ast}_T(\bm{R},\bm{\alpha})H(\bm{R})\Psi_T(\bm{R},\bm{\alpha})}
         {\int d\bm{R}\Psi^{\ast}_T(\bm{R},\bm{\alpha})\Psi_T(\bm{R},\bm{\alpha})}.
 \]
-!et
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo Motivation}
 
-!split
-===== Quantum Monte Carlo Motivation =====
-!bblock
+\begin{block}{}
 Define a new quantity
-!bt
 \[
    E_L(\bm{R},\bm{\alpha})=\frac{1}{\psi_T(\bm{R},\bm{\alpha})}H\psi_T(\bm{R},\bm{\alpha}),
-   label{eq:locale1}
+   \label{eq:locale1}
 \]
-!et
 called the local energy, which, together with our trial PDF yields
-!bt
 \[
   E[H(\bm{\alpha})]= = \int P(\bm{R})E_L(\bm{R}) d\bm{R}\approx \frac{1}{N}\sum_{i=1}^NP(\bm{R_i},\bm{\alpha})E_L(\bm{R_i},\bm{\alpha})
-  label{eq:vmc1}
+  \label{eq:vmc1}
 \]
-!et
 with $N$ being the number of Monte Carlo samples.
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo}
 
-
-
-
-
-!split
-===== Quantum Monte Carlo =====
-!bblock
+\begin{block}{}
 The Algorithm for performing a variational Monte Carlo calculations runs thus as this
-       
-  *  Initialisation: Fix the number of Monte Carlo steps. Choose an initial $\bm{R}$ and variational parameters $\alpha$ and calculate $\left|\psi_T^{\alpha}(\bm{R})\right|^2$. 
-  *  Initialise the energy and the variance and start the Monte Carlo calculation.
-     *  Calculate  a trial position  $\bm{R}_p=\bm{R}+r*step$ where $r$ is a random variable $r \in [0,1]$.
-     *  Metropolis algorithm to accept or reject this move  $w = P(\bm{R}_p)/P(\bm{R})$.
-     *  If the step is accepted, then we set $\bm{R}=\bm{R}_p$. 
-     *  Update averages
-  *  Finish and compute final averages.
-      
-Observe that the jumping in space is governed by the variable *step*. This is Called brute-force sampling.
-Need importance sampling to get more relevant sampling, see lectures below.
-!eblock
 
-!split
-===== Quantum Monte Carlo: hydrogen atom =====
-!bblock
+\begin{itemize}
+   \item Initialisation: Fix the number of Monte Carlo steps. Choose an initial $\bm{R}$ and variational parameters $\alpha$ and calculate $\left|\psi_T^{\alpha}(\bm{R})\right|^2$. 
+
+   \item Initialise the energy and the variance and start the Monte Carlo calculation.
+\begin{itemize}
+
+      \item Calculate  a trial position  $\bm{R}_p=\bm{R}+r*step$ where $r$ is a random variable $r \in [0,1]$.
+
+      \item Metropolis algorithm to accept or reject this move  $w = P(\bm{R}_p)/P(\bm{R})$.
+
+      \item If the step is accepted, then we set $\bm{R}=\bm{R}_p$. 
+
+      \item Update averages
+
+\end{itemize}
+
+\noindent
+   \item Finish and compute final averages.
+\end{itemize}
+
+\noindent
+Observe that the jumping in space is governed by the variable \emph{step}. This is Called brute-force sampling.
+Need importance sampling to get more relevant sampling, see lectures below.
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo: hydrogen atom}
+
+\begin{block}{}
 The radial Schroedinger equation for the hydrogen atom can be
 written as
-!bt
 \[
 -\frac{\hbar^2}{2m}\frac{\partial^2 u(r)}{\partial r^2}-
 \left(\frac{ke^2}{r}-\frac{\hbar^2l(l+1)}{2mr^2}\right)u(r)=Eu(r),
 \]
-!et
 or with dimensionless variables
-!bt
 \[
 -\frac{1}{2}\frac{\partial^2 u(\rho)}{\partial \rho^2}-
 \frac{u(\rho)}{\rho}+\frac{l(l+1)}{2\rho^2}u(\rho)-\lambda u(\rho)=0,
-label{eq:hydrodimless1}
+\label{eq:hydrodimless1}
 \]
-!et
 with the hamiltonian
-!bt
 \[
 H=-\frac{1}{2}\frac{\partial^2 }{\partial \rho^2}-
 \frac{1}{\rho}+\frac{l(l+1)}{2\rho^2}.
 \]
-!et
 Use variational parameter $\alpha$ in the trial
 wave function 
-!bt
 \[
    u_T^{\alpha}(\rho)=\alpha\rho e^{-\alpha\rho}. 
-   label{eq:trialhydrogen}
+   \label{eq:trialhydrogen}
 \]
-!et
-!eblock
+\end{block}
+\end{frame}
 
-!split
-===== Quantum Monte Carlo: hydrogen atom =====
-!bblock
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo: hydrogen atom}
+
+\begin{block}{}
 Inserting this wave function into the expression for the
 local energy $E_L$ gives
-!bt
 \[
    E_L(\rho)=-\frac{1}{\rho}-
               \frac{\alpha}{2}\left(\alpha-\frac{2}{\rho}\right).
 \]
-!et
 A simple variational Monte Carlo calculation results in
-|----------------------------------------------------------------------------------------|
-|     $\alpha$      |     $\langle H \rangle $      | $\sigma^2$  |  $\sigma/\sqrt{N}$   |
-|----------------------------------------------------------------------------------------|
-| 7.00000E-01 |        -4.57759E-01 |  4.51201E-02 |  6.71715E-04  |
-| 8.00000E-01 |        -4.81461E-01 |  3.05736E-02 |  5.52934E-04 |
-| 9.00000E-01 | -4.95899E-01 |  8.20497E-03 |  2.86443E-04  |
-| 1.00000E-00 | -5.00000E-01 |  0.00000E+00 |  0.00000E+00  |
-| 1.10000E+00 | -4.93738E-01 |  1.16989E-02 |  3.42036E-04  |
-| 1.20000E+00 | -4.75563E-01 |  8.85899E-02 |  9.41222E-04  |
-| 1.30000E+00 | -4.54341E-01 |  1.45171E-01 |  1.20487E-03  |
-|----------------------------------------------------------------------------------------|
 
-!eblock
+{\footnotesize
+\begin{tabular}{cccc}
+\hline
+\multicolumn{1}{c}{ $\alpha$ } & \multicolumn{1}{c}{ $\langle H \rangle $ } & \multicolumn{1}{c}{ $\sigma^2$ } & \multicolumn{1}{c}{ $\sigma/\sqrt{N}$ } \\
+\hline
+7.00000E-01 & -4.57759E-01         & 4.51201E-02 & 6.71715E-04       \\
+8.00000E-01 & -4.81461E-01         & 3.05736E-02 & 5.52934E-04       \\
+9.00000E-01 & -4.95899E-01         & 8.20497E-03 & 2.86443E-04       \\
+1.00000E-00 & -5.00000E-01         & 0.00000E+00 & 0.00000E+00       \\
+1.10000E+00 & -4.93738E-01         & 1.16989E-02 & 3.42036E-04       \\
+1.20000E+00 & -4.75563E-01         & 8.85899E-02 & 9.41222E-04       \\
+1.30000E+00 & -4.54341E-01         & 1.45171E-01 & 1.20487E-03       \\
+\hline
+\end{tabular}
+}
 
+\noindent
+\end{block}
+\end{frame}
 
-!split
-===== Quantum Monte Carlo: hydrogen atom =====
-!bblock
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo: hydrogen atom}
+
+\begin{block}{}
 
 We note that at $\alpha=1$ we obtain the exact
 result, and the variance is zero, as it should. The reason is that 
 we then have the exact wave function, and the action of the hamiltionan
 on the wave function
-!bt
 \[
    H\psi = \mathrm{constant}\times \psi,
 \]
-!et
 yields just a constant. The integral which defines various 
 expectation values involving moments of the hamiltonian becomes then
-!bt
 \[
    \langle H^n \rangle =
    \frac{\int d\bm{R}\Psi^{\ast}_T(\bm{R})H^n(\bm{R})\Psi_T(\bm{R})}
@@ -246,226 +389,192 @@ expectation values involving moments of the hamiltonian becomes then
 \mathrm{constant}\times\frac{\int d\bm{R}\Psi^{\ast}_T(\bm{R})\Psi_T(\bm{R})}
         {\int d\bm{R}\Psi^{\ast}_T(\bm{R})\Psi_T(\bm{R})}=\mathrm{constant}.
 \]
-!et
-_This gives an important information: the exact wave function leads to zero variance!_
+\textbf{This gives an important information: the exact wave function leads to zero variance!}
 Variation is then performed by minimizing both the energy and the variance.
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo: the helium atom}
 
-
-!split
-===== Quantum Monte Carlo: the helium atom =====
-!bblock
+\begin{block}{}
 The helium atom consists of two electrons and a nucleus with
 charge $Z=2$. 
 The contribution  
 to the potential energy due to the attraction from the nucleus is
-!bt
 \[
    -\frac{2ke^2}{r_1}-\frac{2ke^2}{r_2},
 \] 
-!et
 and if we add the repulsion arising from the two 
 interacting electrons, we obtain the potential energy
-!bt
 \[
  V(r_1, r_2)=-\frac{2ke^2}{r_1}-\frac{2ke^2}{r_2}+
                \frac{ke^2}{r_{12}},
 \]
-!et
 with the electrons separated at a distance 
 $r_{12}=|\bm{r}_1-\bm{r}_2|$.
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo: the helium atom}
 
-!split
-===== Quantum Monte Carlo: the helium atom =====
-!bblock
+\begin{block}{}
 
 The hamiltonian becomes then
-!bt
 \[
    \hat{H}=-\frac{\hbar^2\nabla_1^2}{2m}-\frac{\hbar^2\nabla_2^2}{2m}
           -\frac{2ke^2}{r_1}-\frac{2ke^2}{r_2}+
                \frac{ke^2}{r_{12}},
 \]
-!et
 and  Schroedingers equation reads
-!bt
 \[
    \hat{H}\psi=E\psi.
 \]
-!et
 All observables are evaluated with respect to the probability distribution
-!bt
 \[
    P(\bm{R})= \frac{\left|\psi_T(\bm{R})\right|^2}{\int \left|\psi_T(\bm{R})\right|^2d\bm{R}}.
 \]
-!et
 generated by the trial wave function.   
 The trial wave function must approximate an exact 
 eigenstate in order that accurate results are to be obtained. 
-!eblock
+\end{block}
+\end{frame}
 
-!split
-===== Quantum Monte Carlo: the helium atom =====
-!bblock
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo: the helium atom}
+
+\begin{block}{}
 Choice of trial wave function for Helium:
 Assume $r_1 \rightarrow 0$.
-!bt
 \[
    E_L(\bm{R})=\frac{1}{\psi_T(\bm{R})}H\psi_T(\bm{R})=
      \frac{1}{\psi_T(\bm{R})}\left(-\frac{1}{2}\nabla^2_1
      -\frac{Z}{r_1}\right)\psi_T(\bm{R}) + \mathrm{finite \hspace{0.1cm}terms}.
 \]
-!et
-!bt
 \[ 
     E_L(R)=
     \frac{1}{{\cal R}_T(r_1)}\left(-\frac{1}{2}\frac{d^2}{dr_1^2}-
      \frac{1}{r_1}\frac{d}{dr_1}
      -\frac{Z}{r_1}\right){\cal R}_T(r_1) + \mathrm{finite\hspace{0.1cm} terms}
 \]
-!et
 For small values of $r_1$, the terms which dominate are
-!bt
 \[ 
     \lim_{r_1 \rightarrow 0}E_L(R)=
     \frac{1}{{\cal R}_T(r_1)}\left(-
      \frac{1}{r_1}\frac{d}{dr_1}
      -\frac{Z}{r_1}\right){\cal R}_T(r_1),
 \]
-!et
 since the second derivative does not diverge due to the finiteness of  $\Psi$ at the origin.
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{Quantum Monte Carlo: the helium atom}
 
-
-
-!split
-===== Quantum Monte Carlo: the helium atom =====
-!bblock
+\begin{block}{}
 This results in
-!bt
 \[
      \frac{1}{{\cal R}_T(r_1)}\frac{d {\cal R}_T(r_1)}{dr_1}=-Z,
 \]
-!et
 and
-!bt
 \[
    {\cal R}_T(r_1)\propto e^{-Zr_1}.
 \]
-!et
 A similar condition applies to electron 2 as well. 
 For orbital momenta $l > 0$ we have 
-!bt
 \[
      \frac{1}{{\cal R}_T(r)}\frac{d {\cal R}_T(r)}{dr}=-\frac{Z}{l+1}.
 \]
-!et
 Similarly, studying the case $r_{12}\rightarrow 0$ we can write 
 a possible trial wave function as
-!bt
 \[
    \psi_T(\bm{R})=e^{-\alpha(r_1+r_2)}e^{\beta r_{12}}.
-    label{eq:wavehelium2}
+    \label{eq:wavehelium2}
 \]
-!et
 The last equation can be generalized to
-!bt
 \[
    \psi_T(\bm{R})=\phi(\bm{r}_1)\phi(\bm{r}_2)\dots\phi(\bm{r}_N)
                    \prod_{i < j}f(r_{ij}),
 \]
-!et
 for a system with $N$ electrons or particles. 
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the helium atom}
 
-
-
-!split
-===== The first attempt at solving the helium atom =====
-!bblock
+\begin{block}{}
 
 During the development of our code we need to make several checks. It is also very instructive to compute a closed form expression for the local energy. Since our wave function is rather simple  it is straightforward
 to find an analytic expressions.  Consider first the case of the simple helium function 
-!bt
 \[
    \Psi_T(\bm{r}_1,\bm{r}_2) = e^{-\alpha(r_1+r_2)}
 \]
-!et
 The local energy is for this case 
-!bt
 \[ 
 E_{L1} = \left(\alpha-Z\right)\left(\frac{1}{r_1}+\frac{1}{r_2}\right)+\frac{1}{r_{12}}-\alpha^2
 \]
-!et
 which gives an expectation value for the local energy given by
-!bt
 \[
 \langle E_{L1} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
 \]
-!et
-!eblock
+\end{block}
+\end{frame}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
+
+\begin{block}{}
 
 With closed form formulae we  can speed up the computation of the correlation. In our case
 we write it as 
-!bt
 \[
 \Psi_C= \exp{\left\{\sum_{i < j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
 \]
-!et
 which means that the gradient needed for the so-called quantum force and local energy 
 can be calculated analytically.
 This will speed up your code since the computation of the correlation part and the Slater determinant are the most 
 time consuming parts in your code.  
 
-We will refer to this correlation function as $\Psi_C$ or the *linear Pade-Jastrow*.
-!eblock
+We will refer to this correlation function as $\Psi_C$ or the \emph{linear Pade-Jastrow}.
+\end{block}
+\end{frame}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
+
+\begin{block}{}
 
 We can test this by computing the local energy for our helium wave function
-!bt
 \[
    \psi_{T}(\bm{r}_1,\bm{r}_2) = 
    \exp{\left(-\alpha(r_1+r_2)\right)}
    \exp{\left(\frac{r_{12}}{2(1+\beta r_{12})}\right)}, 
 \]
-!et
 with $\alpha$ and $\beta$ as variational parameters.
 
 The local energy is for this case 
-!bt
 \[ 
 E_{L2} = E_{L1}+\frac{1}{2(1+\beta r_{12})^2}\left\{\frac{\alpha(r_1+r_2)}{r_{12}}(1-\frac{\bm{r}_1\bm{r}_2}{r_1r_2})-\frac{1}{2(1+\beta r_{12})^2}-\frac{2}{r_{12}}+\frac{2\beta}{1+\beta r_{12}}\right\}
 \]
-!et
 It is very useful to test your code against these expressions. It means also that you don't need to
 compute a derivative numerically as discussed in the code example below. 
-!eblock
+\end{block}
+\end{frame}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
+
+\begin{block}{}
 For the computation of various derivatives with different types of wave functions, you will find it useful to use python with symbolic python, that is sympy, see URL: 'http://docs.sympy.org/latest/index.html'.  Using sympy allows you autogenerate both Latex code as well c++, python or Fortran codes. Here you will find some simple examples. We choose 
 the $2s$ hydrogen-orbital  (not normalized) as an example
-!bt
 \[
  \phi_{2s}(\bm{r}) = (Zr - 2)\exp{-(\frac{1}{2}Zr)},
 \]
-!et
 with $ r^2 = x^2 + y^2 + z^2$.
 
-!bc pycod
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{python}
 from sympy import symbols, diff, exp, sqrt
 x, y, z, Z = symbols('x y z Z')
 r = sqrt(x*x + y*y + z*z)
@@ -473,15 +582,17 @@ r
 phi = (Z*r - 2)*exp(-Z*r/2)
 phi
 diff(phi, x)
-!ec
+\end{minted}
 This doesn't look very nice, but sympy provides several functions that allow for improving and simplifying the output.
-!eblock
+\end{block}
+\end{frame}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
+
+\begin{block}{}
 We can improve our output by factorizing and substituting expressions
-!bc pycod
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{python}
 from sympy import symbols, diff, exp, sqrt, factor, Symbol, printing
 x, y, z, Z = symbols('x y z Z')
 r = sqrt(x*x + y*y + z*z)
@@ -490,15 +601,16 @@ R = Symbol('r') #Creates a symbolic equivalent of r
 #print latex and c++ code
 print printing.latex(diff(phi, x).factor().subs(r, R))
 print printing.ccode(diff(phi, x).factor().subs(r, R))
-!ec
-!eblock
+\end{minted}
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock
+\begin{block}{}
 We can in turn look at second derivatives
-!bc pycod
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{python}
 from sympy import symbols, diff, exp, sqrt, factor, Symbol, printing
 x, y, z, Z = symbols('x y z Z')
 r = sqrt(x*x + y*y + z*z)
@@ -510,14 +622,16 @@ R = Symbol('r') #Creates a symbolic equivalent of r
 # Factorize also the r**2 terms
 (diff(diff(phi, x), x) + diff(diff(phi, y), y) + diff(diff(phi, z), z)).factor().collect(Z).subs(r, R).subs(r**2, R**2).factor()
 print printing.ccode((diff(diff(phi, x), x) + diff(diff(phi, y), y) + diff(diff(phi, z), z)).factor().collect(Z).subs(r, R).subs(r**2, R**2).factor())
-!ec
+\end{minted}
 With some practice this allows one to be able to check one's own calculation and translate automatically into code lines.
-!eblock
+\end{block}
+\end{frame}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock  The c++ code with a VMC Solver class, main program first
-!bc cppcod
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
+
+\begin{block}{The c++ code with a VMC Solver class, main program first }
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 #include "vmcsolver.h"
 #include <iostream>
 using namespace std;
@@ -528,13 +642,15 @@ int main()
     solver->runMonteCarloIntegration();
     return 0;
 }
-!ec
-!eblock
+\end{minted}
+\end{block}
+\end{frame}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock  The c++ code with a VMC Solver class, the VMCSolver header file
-!bc cppcod
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
+
+\begin{block}{The c++ code with a VMC Solver class, the VMCSolver header file }
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 #ifndef VMCSOLVER_H
 #define VMCSOLVER_H
 #include <armadillo>
@@ -561,13 +677,15 @@ private:
     mat rNew;
 };
 #endif // VMCSOLVER_H
-!ec
-!eblock
+\end{minted}
+\end{block}
+\end{frame}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock  The c++ code with a VMC Solver class, VMCSolver codes, initialize
-!bc cppcod
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
+
+\begin{block}{The c++ code with a VMC Solver class, VMCSolver codes, initialize }
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 #include "vmcsolver.h"
 #include "lib.h"
 #include <armadillo>
@@ -587,14 +705,15 @@ VMCSolver::VMCSolver() :
     nCycles(1000000)
 {
 }
-!ec
-!eblock
+\end{minted}
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock  The c++ code with a VMC Solver class, VMCSolver codes
-!bc cppcod
+\begin{block}{The c++ code with a VMC Solver class, VMCSolver codes }
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 void VMCSolver::runMonteCarloIntegration()
 {
     rOld = zeros<mat>(nParticles, nDimensions);
@@ -643,14 +762,15 @@ void VMCSolver::runMonteCarloIntegration()
     double energySquared = energySquaredSum/(nCycles * nParticles);
     cout << "Energy: " << energy << " Energy (squared sum): " << energySquared << endl;
 }
-!ec
-!eblock
+\end{minted}
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock  The c++ code with a VMC Solver class, VMCSolver codes
-!bc cppcod
+\begin{block}{The c++ code with a VMC Solver class, VMCSolver codes }
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 double VMCSolver::localEnergy(const mat &r)
 {
     mat rPlus = zeros<mat>(nParticles, nDimensions);
@@ -696,14 +816,15 @@ double VMCSolver::localEnergy(const mat &r)
     }
     return kineticEnergy + potentialEnergy;
 }
-!ec
-!eblock
+\end{minted}
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock  The c++ code with a VMC Solver class, VMCSolver codes
-!bc cppcod
+\begin{block}{The c++ code with a VMC Solver class, VMCSolver codes }
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 double VMCSolver::waveFunction(const mat &r)
 {
     double argument = 0;
@@ -716,21 +837,24 @@ double VMCSolver::waveFunction(const mat &r)
     }
     return exp(-argument * alpha);
 }
-!ec
-!eblock
+\end{minted}
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock  The c++ code with a VMC Solver class, all in one file
-!bc cppcod
-!ec
-!eblock
+\begin{block}{The c++ code with a VMC Solver class, all in one file }
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+\end{minted}
+\end{block}
+\end{frame}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock  The c++ code with a VMC Solver class, the VMCSolver header file
-!bc cppcod
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
+
+\begin{block}{The c++ code with a VMC Solver class, the VMCSolver header file }
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 #include <armadillo>
 #include <iostream>
 using namespace arma;
@@ -969,28 +1093,33 @@ int main()
     solver->runMonteCarloIntegration();
     return 0;
 }
-!ec
+\end{minted}
 
 
 
 
-!eblock
+\end{block}
+\end{frame}
 
+\begin{frame}[plain,fragile]
+\frametitle{The first attempt at solving the Helium atom}
 
-!split
-===== The first attempt at solving the Helium atom =====
-!bblock Exercises for first lab session
+\begin{block}{Exercises for first lab session }
 
-*  If you have never used git, Qt, armadillo etc, get familiar with them
-*  Study the simple program in the folder URL: 'https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/vmc/programs/'
-*  Implement the closed form expression for the local energy and the so-called quantum force
-*  Convince yourself that the closed form expressions are correct. Check both wave functions
-*  Implement the closed form expression for the local energy and compare with a code where the second derivatives are computed numerically.
-!eblock
+\begin{itemize}
+ \item If you have never used git, Qt, armadillo etc, get familiar with them
 
+ \item Study the simple program in the folder URL: 'https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/vmc/programs/'
 
+ \item Implement the closed form expression for the local energy and the so-called quantum force
 
+ \item Convince yourself that the closed form expressions are correct. Check both wave functions
 
+ \item Implement the closed form expression for the local energy and compare with a code where the second derivatives are computed numerically.
+\end{itemize}
 
+\noindent
+\end{block}
+\end{frame}
 
-
+\end{document}
