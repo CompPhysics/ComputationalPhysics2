@@ -1,0 +1,452 @@
+
+
+!split
+===== Statistics and blocking =====
+!bblock
+Let us analyze the problem by splitting up the correlation term into
+partial sums of the form:
+!bt
+\[
+f_d = \frac{1}{n-d}\sum_{k=1}^{n-d}(x_k - \bar x_n)(x_{k+d} - \bar x_n)
+\]
+!et
+The correlation term of the error can now be rewritten in terms of
+$f_d$
+!bt
+\[
+\frac{2}{n}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n) =
+2\sum_{d=1}^{n-1} f_d
+\]
+!et
+The value of $f_d$ reflects the correlation between measurements
+separated by the distance $d$ in the sample samples.  Notice that for
+$d=0$, $f$ is just the sample variance, $\mathrm{var}(x)$. If we divide $f_d$
+by $\mathrm{var}(x)$, we arrive at the so called *autocorrelation function*
+!bt
+\[
+\kappa_d = \frac{f_d}{\mathrm{var}(x)}
+\]
+!et
+which gives us a useful measure of the correlation pair correlation
+starting always at $1$ for $d=0$.
+!eblock
+
+
+!split
+===== Statistics and blocking =====
+!bblock
+The sample error (see eq.~(ref{eq:error_estimate_split_up})) can now be
+written in terms of the autocorrelation function:
+!bt
+\begin{eqnarray}
+\mathrm{err}_X^2 &=&
+\frac{1}{n}\mathrm{var}(x)+\frac{2}{n}\cdot\mathrm{var}(x)\sum_{d=1}^{n-1}
+\frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
+\left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
+&=&\rule{0pt}{17pt}
+\frac{\tau}{n}\cdot\mathrm{var}(x)
+label{eq:error_estimate_corr_time}
+\end{eqnarray}
+!et
+and we see that $\mathrm{err}_X$ can be expressed in terms the
+uncorrelated sample variance times a correction factor $\tau$ which
+accounts for the correlation between measurements. We call this
+correction factor the *autocorrelation time}:
+!bt
+\begin{equation}
+\tau = 1+2\sum_{d=1}^{n-1}\kappa_d
+label{eq:autocorrelation_time}
+\end{equation}
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+For a correlation free experiment, $\tau$
+equals 1. From the point of view of
+eq.~(ref{eq:error_estimate_corr_time}) we can interpret a sequential
+correlation as an effective reduction of the number of measurements by
+a factor $\tau$. The effective number of measurements becomes:
+!bt
+\[
+n_\mathrm{eff} = \frac{n}{\tau}
+\]
+!et
+To neglect the autocorrelation time $\tau$ will always cause our
+simple uncorrelated estimate of $\mathrm{err}_X^2\approx \mathrm{var}(x)/n$ to
+be less than the true sample error. The estimate of the error will be
+too *good*. On the other hand, the calculation of the full
+autocorrelation time poses an efficiency problem if the set of
+measurements is very large.
+!eblock
+
+
+
+
+
+!split
+===== Can we understand this? Time Auto-correlation Function =====
+!bblock
+The so-called time-displacement autocorrelation $\phi(t)$ for a quantity ${\cal M}$ is given by
+!bt
+\[
+\phi(t) = \int dt' \left[{\cal M}(t')-\langle {\cal M} \rangle\right]\left[{\cal M}(t'+t)-\langle {\cal M} \rangle\right],
+\]
+!et
+which can be rewritten as 
+!bt
+\[
+\phi(t) = \int dt' \left[{\cal M}(t'){\cal M}(t'+t)-\langle {\cal M} \rangle^2\right],
+\]
+!et
+where $\langle {\cal M} \rangle$ is the average value and
+${\cal M}(t)$ its instantaneous value. We can discretize this function as follows, where we used our
+set of computed values ${\cal M}(t)$ for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
+!bt
+\[
+\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t'){\cal M}(t'+t)
+-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t')\times
+\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t'+t).label{eq:phitf}
+\]
+!et
+!eblock
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+One should be careful with times close to $t_{\mathrm{max}}$, the upper limit of the sums 
+becomes small and we end up integrating over a rather small time interval. This means that the statistical
+error in $\phi(t)$ due to the random nature of the fluctuations in ${\cal M}(t)$ can become large.
+
+One should therefore choose $t \ll t_{\mathrm{max}}$.
+
+Note that the variable ${\cal M}$ can be any expectation values of interest.
+
+
+
+The time-correlation function gives a measure of the correlation between the various values of the variable 
+at a time $t'$ and a time $t'+t$. If we multiply the values of ${\cal M}$ at these two different times,
+we will get a positive contribution if they are fluctuating in the same direction, or a negative value
+if they fluctuate in the opposite direction. If we then integrate over time, or use the discretized version of, the time correlation function $\phi(t)$ should take a non-zero value if the fluctuations are 
+correlated, else it should gradually go to zero. For times a long way apart 
+the different values of ${\cal M}$  are most likely 
+uncorrelated and $\phi(t)$ should be zero.
+!eblock
+
+
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+We can derive the correlation time by observing that our Metropolis algorithm is based on a random
+walk in the space of all  possible spin configurations. 
+Our probability 
+distribution function ${\bf \hat{w}}(t)$ after a given number of time steps $t$ could be written as
+!bt
+\[
+   {\bf \hat{w}}(t) = {\bf \hat{W}^t\hat{w}}(0),
+\]
+!et
+with ${\bf \hat{w}}(0)$ the distribution at $t=0$ and ${\bf \hat{W}}$ representing the 
+transition probability matrix. 
+We can always expand ${\bf \hat{w}}(0)$ in terms of the right eigenvectors of 
+${\bf \hat{v}}$ of ${\bf \hat{W}}$ as 
+!bt
+\[
+    {\bf \hat{w}}(0)  = \sum_i\alpha_i{\bf \hat{v}}_i,
+\]
+!et
+resulting in 
+!bt
+\[
+   {\bf \hat{w}}(t) = {\bf \hat{W}}^t{\bf \hat{w}}(0)={\bf \hat{W}}^t\sum_i\alpha_i{\bf \hat{v}}_i=
+\sum_i\lambda_i^t\alpha_i{\bf \hat{v}}_i,
+\]
+!et
+with $\lambda_i$ the $i^{\mathrm{th}}$ eigenvalue corresponding to  
+the eigenvector ${\bf \hat{v}}_i$. 
+!eblock
+
+
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+If we assume that $\lambda_0$ is the largest eigenvector we see that in the limit $t\rightarrow \infty$,
+${\bf \hat{w}}(t)$ becomes proportional to the corresponding eigenvector 
+${\bf \hat{v}}_0$. This is our steady state or final distribution. 
+
+We can relate this property to an observable like the mean energy.
+With the probabilty ${\bf \hat{w}}(t)$ (which in our case is the squared trial wave function) we
+can write the expectation values as 
+!bt
+\[
+ \langle {\cal M}(t) \rangle  = \sum_{\mu} {\bf \hat{w}}(t)_{\mu}{\cal M}_{\mu},
+\] 
+!et 
+or as the scalar of a  vector product
+!bt
+ \[
+ \langle {\cal M}(t) \rangle  = {\bf \hat{w}}(t){\bf m},
+\] 
+!et 
+with ${\bf m}$ being the vector whose elements are the values of ${\cal M}_{\mu}$ in its 
+various microstates $\mu$.
+!eblock
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+We rewrite this relation  as
+!bt
+ \[
+ \langle {\cal M}(t) \rangle  = {\bf \hat{w}}(t){\bf m}=\sum_i\lambda_i^t\alpha_i{\bf \hat{v}}_i{\bf m}_i.
+\] 
+!et 
+If we define $m_i={\bf \hat{v}}_i{\bf m}_i$ as the expectation value of
+${\cal M}$ in the $i^{\mathrm{th}}$ eigenstate we can rewrite the last equation as
+!bt
+ \[
+ \langle {\cal M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
+\] 
+!et
+Since we have that in the limit $t\rightarrow \infty$ the mean value is dominated by the 
+the largest eigenvalue $\lambda_0$, we can rewrite the last equation as
+!bt
+ \[
+ \langle {\cal M}(t) \rangle  = \langle {\cal M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
+\] 
+!et
+We define the quantity
+!bt
+\[
+   \tau_i=-\frac{1}{log\lambda_i},
+\]
+!et
+and rewrite the last expectation value as
+!bt
+ \[
+ \langle {\cal M}(t) \rangle  = \langle {\cal M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
+label{eq:finalmeanm}
+\] 
+!et
+!eblock
+
+
+!split
+{
+===== Time Auto-correlation Function}
+
+
+The quantities $\tau_i$ are the correlation times for the system. They control also the auto-correlation function 
+discussed above.  The longest correlation time is obviously given by the second largest
+eigenvalue $\tau_1$, which normally defines the correlation time discussed above. For large times, this is the 
+only correlation time that survives. If higher eigenvalues of the transition matrix are well separated from 
+$\lambda_1$ and we simulate long enough,  $\tau_1$ may well define the correlation time. 
+In other cases we may not be able to extract a reliable result for $\tau_1$. 
+Coming back to the time correlation function $\phi(t)$ we can present a more general definition in terms
+of the mean magnetizations $ \langle {\cal M}(t) \rangle$. Recalling that the mean value is equal 
+to $ \langle {\cal M}(\infty) \rangle$ we arrive at the expectation values
+\[
+\phi(t) =\langle {\cal M}(0)-{\cal M}(\infty)\rangle \langle {\cal M}(t)-{\cal M}(\infty)\rangle,
+\]
+resulting in
+\[
+\phi(t) =\sum_{i,j\ne 0}m_i\alpha_im_j\alpha_je^{-t/\tau_i},
+\]
+which is appropriate for all times.
+}
+!eblock
+}
+
+
+
+!split
+{
+===== Correlation Time}
+
+
+If the correlation function decays exponentially
+!bt
+\[ \phi (t) \sim \exp{(-t/\tau)}\]
+!et
+then the exponential correlation time can be computed as the average
+!bt
+\[   \tau_{\mathrm{exp}}  =  -\langle  \frac{t}{log|\frac{\phi(t)}{\phi(0)}|} \rangle. \]
+!et
+If the decay is exponential, then
+!bt
+\[  \int_0^{\infty} dt \phi(t)  = \int_0^{\infty} dt \phi(0)\exp{(-t/\tau)}  = \tau \phi(0),\] 
+!et
+which  suggests another measure of correlation
+!bt
+\[   \tau_{\mathrm{int}} = \sum_k \frac{\phi(k)}{\phi(0)}, \]
+!et
+called the integrated correlation time.
+!eblock
+
+
+
+
+
+
+
+!split
+===== What is blocking?}
+!bblock Blocking}
+    * Say that we have a set of samples from a Monte Carlo
+      experiment
+    * Assuming (wrongly) that our samples are uncorrelated our
+      best estimate of the standard deviation of the mean $\langle {\cal M}\rangle$ is given
+      by
+      \begin{equation*}
+        \sigma=\sqrt{\frac{1}{n}\left(\langle {\cal M}^2\rangle-\langle {\cal M}\rangle^2\right)} 
+      \end{equation*}
+    * If the samples are correlated we can rewrite our results to show  that
+      \begin{equation*}
+        \sigma=\sqrt{\frac{1+2\tau/\Delta
+            t}{n}\left(\langle {\cal M}^2\rangle-\langle {\cal M}\rangle^2\right)}
+      \end{equation*}
+      where $\tau$ is the correlation time (the time between a sample
+      and the next uncorrelated sample) and $\Delta t$ is time between
+      each sample
+    
+  
+}
+
+!split
+===== What is blocking?}
+!bblock Blocking}
+    
+    * If $\Delta t\gg\tau$ our first estimate of $\sigma$ still holds
+    * Much more common that $\Delta t<\tau$
+    * In the method of data blocking we divide the sequence of
+      samples into blocks
+    * We then take the mean $\langle {\cal M}_i\rangle$ of block $i=1\ldots
+      n_{blocks}$ to calculate the total mean and variance
+    * The size of each block must be so large that sample $j$ of
+      block $i$ is not correlated with sample $j$ of block $i+1$
+    * The correlation time $\tau$ would be a good choice
+    
+  
+}
+
+!split
+===== What is blocking?}
+!bblock Blocking}
+    
+    * Problem: We don't know $\tau$ or it is too expensive to compute
+    * Solution: Make a plot of std. dev. as a function of block
+      size
+    * The estimate of std. dev. of correlated data is too low $\to$
+      the error will increase with increasing block size until the
+      blocks are uncorrelated, where we reach a plateau
+    * When the std. dev. stops increasing the blocks are uncorrelated
+    
+  
+}
+
+!split
+===== Implementation}
+!bblock Main ideas}
+    
+    * Do a parallel Monte Carlo simulation, storing all samples to
+      files (one per process)
+    * Do the statistical analysis on these files, independently of
+      your Monte Carlo program
+    * Read the files into an array
+    * Loop over various block sizes
+    * For each block size $n_b$, loop over the array in steps of
+      $n_b$ taking the mean of elements $i n_b,\ldots,(i+1) n_b$
+    * Take the mean and variance of the resulting array
+    * Write the results for each block size to file for later
+      analysis
+    
+  
+}
+
+
+
+!split
+===== Implementation}
+!bblock Parallel file output}
+    
+    * The total number of samples from all processes may get very
+      large
+    * Hence, storing all samples on the master node is not a
+      scalable solution
+    * Instead we store the samples from each process in separate
+      files
+    * Must make sure these files have different names
+    
+  
+!bblock String handling}
+    \lstinputlisting{ostringstream.cpp}
+  
+}
+
+!split
+===== Implementation}
+!bblock Parallel file output}
+    
+    * Having separated the filenames it's just a matter of
+      taking the samples and store them to file
+    * Note that there is no need for communication between the
+      processes in this procedure
+    
+  
+!bblock File dumping}
+    \lstinputlisting{binaryout.cpp}
+  
+}
+
+\lstset{basicstyle=\tiny}
+!split
+===== Implementation}
+!bblock Reading the files}
+    
+    * Reading the files is only about mirroring the output
+    * To make life easier for ourselves we find the filesize, and
+      hence the number of samples by using the C function \texttt{stat}
+    
+!bblock File loading}
+    \lstinputlisting{binaryin.cpp}
+  
+  
+}
+\lstset{basicstyle=\small}
+
+!split
+===== Implementation}
+!bblock Blocking}
+    
+      * Loop over block sizes $i
+      n_b,\ldots,(i+1) n_b$
+    
+  
+!bblock Loop over block sizes}
+    \lstinputlisting{blocksizeloop.cpp}
+  
+}
+
+!split
+===== Implementation}
+!bblock Blocking
+    
+    * The blocking itself is now just a matter of finding the
+      number of blocks (note the integer division) and taking the mean of
+      each block 
+    * Note the pointer aritmetic: Adding a number $i$ to an array
+      pointer moves the pointer to element $i$ in the array
+    
+  
+!bblock Blocking function}
+    \lstinputlisting{blocking.cpp}
+  
+}
+
