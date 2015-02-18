@@ -2,6 +2,7 @@
 %% Automatically generated file from DocOnce source
 %% (https://github.com/hplgit/doconce/)
 %%
+%%
 
 
 %-------------------- begin preamble ----------------------
@@ -20,17 +21,20 @@ final,                   % or draft (marks overfull hboxes, figures with paths)
 \usepackage{fancyvrb} % packages needed for verbatim environments
 
 \usepackage{minted}
-\usemintedstyle{trac}
+\usemintedstyle{default}
 
 \usepackage[T1]{fontenc}
 %\usepackage[latin1]{inputenc}
-\usepackage[utf8]{inputenc}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
 
 \usepackage{lmodern}         % Latin Modern fonts derived from Computer Modern
 
 % Hyperlinks in PDF:
 \definecolor{linkcolor}{rgb}{0,0,0.4}
-\usepackage[%
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
     colorlinks=true,
     linkcolor=linkcolor,
     urlcolor=linkcolor,
@@ -40,7 +44,7 @@ final,                   % or draft (marks overfull hboxes, figures with paths)
     pdfmenubar=true,
     pdftoolbar=true,
     bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
-            ]{hyperref}
+    }
 %\hyperbaseurl{}   % hyperlinks are relative to this root
 
 \setcounter{tocdepth}{2}  % number chapter, section, subsection
@@ -96,7 +100,7 @@ final,                   % or draft (marks overfull hboxes, figures with paths)
 \begin{center}
 {\LARGE\bf
 \begin{spacing}{1.25}
-Slides from FYS4411/9411 Variational Monte Carlo methods
+Variational Monte Carlo methods
 \end{spacing}
 }
 \end{center}
@@ -1970,8 +1974,7 @@ written in terms of the autocorrelation function:
 \frac{1}{n}\mathrm{var}(x)+\frac{2}{n}\cdot\mathrm{var}(x)\sum_{d=1}^{n-1}
 \frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
 \left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
-&=&\rule{0pt}{17pt}
-\frac{\tau}{n}\cdot\mathrm{var}(x)
+&=&\frac{\tau}{n}\cdot\mathrm{var}(x)
 \label{eq:error_estimate_corr_time}
 \end{eqnarray}
 and we see that $\mathrm{err}_X$ can be expressed in terms the
@@ -2032,7 +2035,8 @@ set of computed values ${\cal M}(t)$ for a set of discretized times (our Monte C
 \[
 \phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t'){\cal M}(t'+t)
 -\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t')\times
-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t'+t).\label{eq:phitf}
+\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t'+t).
+\label{eq:phitf}
 \]
 % --- end paragraph admon ---
 
@@ -2076,24 +2080,24 @@ uncorrelated and $\phi(t)$ should be zero.
 We can derive the correlation time by observing that our Metropolis algorithm is based on a random
 walk in the space of all  possible spin configurations. 
 Our probability 
-distribution function ${\bf \hat{w}}(t)$ after a given number of time steps $t$ could be written as
+distribution function $\mathbf{\hat{w}}(t)$ after a given number of time steps $t$ could be written as
 \[
-   {\bf \hat{w}}(t) = {\bf \hat{W}^t\hat{w}}(0),
+   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}^t\hat{w}}(0),
 \]
-with ${\bf \hat{w}}(0)$ the distribution at $t=0$ and ${\bf \hat{W}}$ representing the 
+with $\mathbf{\hat{w}}(0)$ the distribution at $t=0$ and $\mathbf{\hat{W}}$ representing the 
 transition probability matrix. 
-We can always expand ${\bf \hat{w}}(0)$ in terms of the right eigenvectors of 
-${\bf \hat{v}}$ of ${\bf \hat{W}}$ as 
+We can always expand $\mathbf{\hat{w}}(0)$ in terms of the right eigenvectors of 
+$\mathbf{\hat{v}}$ of $\mathbf{\hat{W}}$ as 
 \[
-    {\bf \hat{w}}(0)  = \sum_i\alpha_i{\bf \hat{v}}_i,
+    \mathbf{\hat{w}}(0)  = \sum_i\alpha_i\mathbf{\hat{v}}_i,
 \]
 resulting in 
 \[
-   {\bf \hat{w}}(t) = {\bf \hat{W}}^t{\bf \hat{w}}(0)={\bf \hat{W}}^t\sum_i\alpha_i{\bf \hat{v}}_i=
-\sum_i\lambda_i^t\alpha_i{\bf \hat{v}}_i,
+   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}}^t\mathbf{\hat{w}}(0)=\mathbf{\hat{W}}^t\sum_i\alpha_i\mathbf{\hat{v}}_i=
+\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i,
 \]
 with $\lambda_i$ the $i^{\mathrm{th}}$ eigenvalue corresponding to  
-the eigenvector ${\bf \hat{v}}_i$.
+the eigenvector $\mathbf{\hat{v}}_i$.
 % --- end paragraph admon ---
 
 
@@ -2107,20 +2111,20 @@ the eigenvector ${\bf \hat{v}}_i$.
 % --- begin paragraph admon ---
 \paragraph{}
 If we assume that $\lambda_0$ is the largest eigenvector we see that in the limit $t\rightarrow \infty$,
-${\bf \hat{w}}(t)$ becomes proportional to the corresponding eigenvector 
-${\bf \hat{v}}_0$. This is our steady state or final distribution. 
+$\mathbf{\hat{w}}(t)$ becomes proportional to the corresponding eigenvector 
+$\mathbf{\hat{v}}_0$. This is our steady state or final distribution. 
 
 We can relate this property to an observable like the mean energy.
-With the probabilty ${\bf \hat{w}}(t)$ (which in our case is the squared trial wave function) we
+With the probabilty $\mathbf{\hat{w}}(t)$ (which in our case is the squared trial wave function) we
 can write the expectation values as 
 \[
- \langle {\cal M}(t) \rangle  = \sum_{\mu} {\bf \hat{w}}(t)_{\mu}{\cal M}_{\mu},
+ \langle {\cal M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}{\cal M}_{\mu},
 \] 
 or as the scalar of a  vector product
  \[
- \langle {\cal M}(t) \rangle  = {\bf \hat{w}}(t){\bf m},
+ \langle {\cal M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
 \] 
-with ${\bf m}$ being the vector whose elements are the values of ${\cal M}_{\mu}$ in its 
+with $\mathbf{m}$ being the vector whose elements are the values of ${\cal M}_{\mu}$ in its 
 various microstates $\mu$.
 % --- end paragraph admon ---
 
@@ -2134,9 +2138,9 @@ various microstates $\mu$.
 \paragraph{}
 We rewrite this relation  as
  \[
- \langle {\cal M}(t) \rangle  = {\bf \hat{w}}(t){\bf m}=\sum_i\lambda_i^t\alpha_i{\bf \hat{v}}_i{\bf m}_i.
+ \langle {\cal M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
 \] 
-If we define $m_i={\bf \hat{v}}_i{\bf m}_i$ as the expectation value of
+If we define $m_i=\mathbf{\hat{v}}_i\mathbf{m}_i$ as the expectation value of
 ${\cal M}$ in the $i^{\mathrm{th}}$ eigenstate we can rewrite the last equation as
  \[
  \langle {\cal M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
@@ -2305,6 +2309,1215 @@ called the integrated correlation time.
 
 \noindent
 % --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+We need to replace the brute force
+Metropolis algorithm with a walk in coordinate space biased by the trial wave function.
+This approach is based on the Fokker-Planck equation and the Langevin equation for generating a trajectory in coordinate space.  The link between the Fokker-Planck equation and the Langevin equations are explained, only partly, in the slides below.
+An excellent reference on topics like Brownian motion, Markov chains, the Fokker-Planck equation and the Langevin equation is the text by  Van Kampen, see \href{{http://www.elsevier.com/books/stochastic-processes-in-physics-and-chemistry/van-kampen/978-0-444-52965-7}}{\nolinkurl{http://www.elsevier.com/books/stochastic-processes-in-physics-and-chemistry/van-kampen/978-0-444-52965-7}}
+Here we will focus first on the implementation part first.
+
+For a diffusion process characterized by a time-dependent probability density $P(x,t)$ in one dimension the Fokker-Planck
+equation reads (for one particle /walker) 
+\[
+   \frac{\partial P}{\partial t} = D\frac{\partial }{\partial x}\left(\frac{\partial }{\partial x} -F\right)P(x,t),
+\]
+where $F$ is a drift term and $D$ is the diffusion coefficient.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+The new positions in coordinate space are given as the solutions of the Langevin equation using Euler's method, namely,
+we go from the Langevin equation
+\[ 
+   \frac{\partial x(t)}{\partial t} = DF(x(t)) +\eta,
+\]
+with $\eta$ a random variable,
+yielding a new position 
+\[
+   y = x+DF(x)\Delta t +\xi,
+\]
+where $\xi$ is gaussian random variable and $\Delta t$ is a chosen time step.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+The process of isotropic diffusion characterized by a time-dependent probability density $P(\mathbf{x},t)$ obeys (as an approximation) the so-called Fokker-Planck equation 
+\[
+   \frac{\partial P}{\partial t} = \sum_i D\frac{\partial }{\partial \mathbf{x_i}}\left(\frac{\partial }{\partial \mathbf{x_i}} -\mathbf{F_i}\right)P(\mathbf{x},t),
+\]
+where $\mathbf{F_i}$ is the $i^{th}$ component of the drift term (drift velocity) caused by an external potential, and $D$ is the diffusion coefficient. The convergence to a stationary probability density can be obtained by setting the left hand side to zero. The resulting equation will be satisfied if and only if all the terms of the sum are equal zero,
+\[
+\frac{\partial^2 P}{\partial {\mathbf{x_i}^2}} = P\frac{\partial}{\partial {\mathbf{x_i}}}\mathbf{F_i} + \mathbf{F_i}\frac{\partial}{\partial {\mathbf{x_i}}}P.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+The drift vector should be of the form $\mathbf{F} = g(\mathbf{x}) \frac{\partial P}{\partial \mathbf{x}}$. Then,
+\[
+\frac{\partial^2 P}{\partial {\mathbf{x_i}^2}} = P\frac{\partial g}{\partial P}\left( \frac{\partial P}{\partial {\mathbf{x}_i}}  \right)^2 + P g \frac{\partial ^2 P}{\partial {\mathbf{x}_i^2}}  + g \left( \frac{\partial P}{\partial {\mathbf{x}_i}}  \right)^2.
+\]
+The condition of stationary density means that the left hand side equals zero. In other words, the terms containing first and second derivatives have to cancel each other. It is possible only if $g = \frac{1}{P}$, which yields
+\begin{equation}
+\boxed{\mathbf{F} = 2\frac{1}{\Psi_T}\nabla\Psi_T,}
+\end{equation}
+\label{quantumForceEQ}
+which is known as the so-called \emph{quantum force}. This term is responsible for pushing the walker towards regions of configuration space where the trial wave function is large, increasing the efficiency of the simulation in contrast to the Metropolis algorithm where the walker has the same probability of moving in every direction.
+% --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+The Fokker-Planck equation yields a (the solution to the equation) transition probability given by the Green's function
+\[
+  G(y,x,\Delta t) = \frac{1}{(4\pi D\Delta t)^{3N/2}} \exp{\left(-(y-x-D\Delta t F(x))^2/4D\Delta t\right)}
+\]
+which in turn means that our brute force Metropolis algorithm
+\[ 
+    A(y,x) = \mathrm{min}(1,q(y,x))),
+\]
+with $q(y,x) = |\Psi_T(y)|^2/|\Psi_T(x)|^2$ is now replaced by the Metropolis-Hastings algorithm, see
+\href{{http://scitation.aip.org/content/aip/journal/jcp/21/6/10.1063/1.1699114}}{\nolinkurl{http://scitation.aip.org/content/aip/journal/jcp/21/6/10.1063/1.1699114}} and URL "http://biomet.oxfordjournals.org/content/57/1/97.abstract", 
+\[
+q(y,x) = \frac{G(x,y,\Delta t)|\Psi_T(y)|^2}{G(y,x,\Delta t)|\Psi_T(x)|^2}
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, program elements}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=7mm]{c++}
+ for (variate=1; variate <= max_variations; variate++){
+    // initialisations of variational parameters and energies 
+    beta += 0.1;  
+    energy = energy2 = delta_e = 0.0;
+    //  initial trial position, note calling with beta 
+    for (i = 0; i < number_particles; i++) { 
+      for ( j=0; j < dimension; j++) {
+	r_old[i][j] = gaussian_deviate(&idum)*sqrt(timestep);
+      }
+    }
+    wfold = wave_function(r_old, beta);
+    quantum_force(r_old, qforce_old, beta, wfold);
+\end{minted}
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Importance sampling, program elements}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=7mm]{c++}
+    // loop over monte carlo cycles 
+    for (cycles = 1; cycles <= number_cycles; cycles++){ 
+      // new position 
+      for (i = 0; i < number_particles; i++) { 
+	for ( j=0; j < dimension; j++) {
+	  // gaussian deviate to compute new positions using a given timestep
+	  r_new[i][j] = r_old[i][j] + gaussian_deviate(&idum)*sqrt(timestep)+qforce_old[i][j]*timestep*D;
+//  we move only one particle  at the time
+        for (k = 0; k < number_particles; k++) {
+	  if ( k != i) {
+	    for ( j=0; j < dimension; j++) {
+	      r_new[k][j] = r_old[k][j];
+	    }
+	  } 
+        }
+\end{minted}
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, program elements}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=7mm]{c++}
+        wfnew = wave_function(r_new, beta); 
+        quantum_force(r_new, qforce_new, beta, wfnew);
+	//  we compute the log of the ratio of the greens functions to be used in the 
+	//  Metropolis-Hastings algorithm
+        greensfunction = 0.0;            
+	for ( j=0; j < dimension; j++) {
+	  greensfunction += 0.5*(qforce_old[i][j]+qforce_new[i][j])*
+	    (D*timestep*0.5*(qforce_old[i][j]-qforce_new[i][j])-r_new[i][j]+r_old[i][j]);
+        }
+        greensfunction = exp(greensfunction);
+
+\end{minted}
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, program elements}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=7mm]{c++}
+ 	// The Metropolis test is performed by moving one particle  at the time
+	if(ran2(&idum) <= greensfunction*wfnew*wfnew/wfold/wfold ) { 
+	  for ( j=0; j < dimension; j++) {
+	    r_old[i][j] = r_new[i][j];
+	    qforce_old[i][j] = qforce_new[i][j];
+	  }
+	  wfold = wfnew;
+          .....
+\end{minted}
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, program elements}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=7mm]{c++}
+void  quantum_force(double **r, double **qforce, double beta, double wf)
+{
+  int i, j;
+  double wfminus, wfplus; 
+  double **r_plus, **r_minus;
+
+  r_plus = (double **) matrix( number_particles, dimension, sizeof(double));
+  r_minus = (double **) matrix( number_particles, dimension, sizeof(double));
+  for (i = 0; i < number_particles; i++) { 
+    for ( j=0; j < dimension; j++) {
+      r_plus[i][j] = r_minus[i][j] = r[i][j];
+    }
+  }
+...
+\end{minted}
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Importance sampling, program elements}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=7mm]{c++}
+  // compute the first derivative
+  for (i = 0; i < number_particles; i++) {
+    for (j = 0; j < dimension; j++) { 
+      r_plus[i][j] = r[i][j]+h;
+      r_minus[i][j] = r[i][j]-h;
+      wfminus = wave_function(r_minus, beta); 
+      wfplus  = wave_function(r_plus, beta); 
+      qforce[i][j] = (wfplus-wfminus)*2.0/wf/(2*h);
+      r_plus[i][j] = r[i][j];
+      r_minus[i][j] = r[i][j];
+    }
+  }
+\end{minted}
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, program elements}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The general derivative formula of the Jastrow factor is
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k}
+\]
+However, 
+with our
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
+\]
+the gradient needed for the quantum force and local energy is easy to compute.  
+We get for particle  $k$
+\[
+\frac{ \nabla_k \Psi_C}{ \Psi_C }= \sum_{j\ne k}\frac{\mathbf{r}_{kj}}{r_{kj}}\frac{a}{(1+\beta r_{kj})^2},
+\]
+which is rather easy to code.  Remember to sum over all particles  when you compute the local energy.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, program elements}
+
+% --- begin paragraph admon ---
+\paragraph{}
+In the Metropolis/Hasting algorithm, the \emph{acceptance ratio} determines the probability for a particle  to be accepted at a new position. The ratio of the trial wave functions evaluated at the new and current positions is given by
+\[
+R \equiv \frac{\Psi_{T}^{new}}{\Psi_{T}^{cur} = \underbrace{\frac{\Psi_{D}^{new}}{\Psi_{D}^{cur}}}_{R_{SD}}\, \underbrace{\frac{\Psi_{C}^{new}}{\Psi_{C}^{cur}}}_{R_{C}}.}
+\]
+Here $\Psi_{D}$ is our Slater determinant while $\Psi_{C}$ is our correlation function. 
+We need to optimize $\nabla \Psi_T / \Psi_T$ ratio and the second derivative as well, that is
+the $\mathbf{\nabla}^2 \Psi_T/\Psi_T$ ratio. The first is needed when we compute the so-called quantum force in importance sampling.
+The second is needed when we compute the kinetic energy term of the local energy.
+\[
+\frac{\mathbf{\mathbf{\nabla}}  \Psi}{\Psi}  = \frac{\mathbf{\nabla}  (\Psi_{D} \, \Psi_{C})}{\Psi_{D} \, \Psi_{C}}  =  \frac{ \Psi_C \mathbf{\nabla}  \Psi_{D} + \Psi_{D} \mathbf{\nabla}  \Psi_{C}}{\Psi_{D} \Psi_{C}} = \frac{\mathbf{\nabla}  \Psi_{D}}{\Psi_{D}} + \frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+The expectation value of the kinetic energy expressed in atomic units for electron $i$ is 
+\[
+ \langle \hat{K}_i \rangle = -\frac{1}{2}\frac{\langle\Psi|\mathbf{\nabla}_{i}^2|\Psi \rangle}{\langle\Psi|\Psi \rangle},
+\]
+\[
+\hat{K}_i = -\frac{1}{2}\frac{\mathbf{\nabla}_{i}^{2} \Psi}{\Psi}.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+\begin{eqnarray}
+\frac{\mathbf{\nabla}^2 \Psi}{\Psi} & = & \frac{\mathbf{\nabla}^2 ({\Psi_{D} \,  \Psi_C})}{\Psi_{D} \,  \Psi_C} = \frac{\mathbf{\nabla}  \cdot [\mathbf{\nabla}  {(\Psi_{D} \,  \Psi_C)}]}{\Psi_{D} \,  \Psi_C} = \frac{\mathbf{\nabla}  \cdot [ \Psi_C \mathbf{\nabla}  \Psi_{D} + \Psi_{D} \mathbf{\nabla}   \Psi_C]}{\Psi_{D} \,  \Psi_C}\nonumber\\
+&  = & \frac{\mathbf{\nabla}   \Psi_C \cdot \mathbf{\nabla}  \Psi_{D} +  \Psi_C \mathbf{\nabla}^2 \Psi_{D} + \mathbf{\nabla}  \Psi_{D} \cdot \mathbf{\nabla}   \Psi_C + \Psi_{D} \mathbf{\nabla}^2  \Psi_C}{\Psi_{D} \,  \Psi_C}\nonumber\\
+\end{eqnarray}
+\begin{eqnarray}
+\frac{\mathbf{\nabla}^2 \Psi}{\Psi}
+& = & \frac{\mathbf{\nabla}^2 \Psi_{D}}{\Psi_{D}} + \frac{\mathbf{\nabla}^2  \Psi_C}{ \Psi_C} + 2 \frac{\mathbf{\nabla}  \Psi_{D}}{\Psi_{D}}\cdot\frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+\end{eqnarray}
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+We define the correlated function as
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})=\prod_{i< j}^Ng(r_{ij})= \prod_{i=1}^N\prod_{j=i+1}^Ng(r_{ij}),
+\]
+with 
+$r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2+(z_i-z_j)^2}$ for three dimensions and
+$r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2}$ for two dimensions.
+
+In our particular case we have
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})=\exp{\left\{\sum_{i<j}f(r_{ij})\right\}}=
+\exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+The total number of different relative distances $r_{ij}$ is $N(N-1)/2$. In a matrix storage format, the set forms a strictly upper triangular matrix
+\[
+ \mathbf{r} \equiv \begin{pmatrix}
+  0 & r_{1,2} & r_{1,3} & \cdots & r_{1,N} \\
+  \vdots & 0       & r_{2,3} & \cdots & r_{2,N} \\
+  \vdots & \vdots  & 0  & \ddots & \vdots  \\
+  \vdots & \vdots  & \vdots  & \ddots  & r_{N-1,N} \\
+  0 & 0  & 0  & \cdots  & 0
+ \end{pmatrix}.
+\]
+This applies to  $\mathbf{g} = \mathbf{g}(r_{ij})$ as well. 
+
+In our algorithm we will move one particle  at the time, say the $kth$-particle . Keep this in mind in the discussion to come.
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+\[
+R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur} =
+\prod_{i=1}^{k-1}\frac{g_{ik}^\mathrm{new}}{g_{ik}^\mathrm{cur}}\;
+\prod_{i=k+1}^{N}\frac{g_{ki}^\mathrm{new}}{g_{ki}^\mathrm{cur}}}.
+\]
+For the Pade-Jastrow form
+\[
+ R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur} = \frac{e^{U_{new}}}{e^{U_{cur}}} = e^{\Delta U},}
+\]
+where
+\[
+\Delta U =
+\sum_{i=1}^{k-1}\big(f_{ik}^\mathrm{new}-f_{ik}^\mathrm{cur}\big)
++
+\sum_{i=k+1}^{N}\big(f_{ki}^\mathrm{new}-f_{ki}^\mathrm{cur}\big)
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+One needs to develop a special algorithm 
+that runs only through the elements of the upper triangular
+matrix $\mathbf{g}$ and have $k$ as an index. 
+
+The expression to be derived in the following is of interest when computing the quantum force and the kinetic energy. It has the form
+\[
+\frac{\mathbf{\nabla}_i\Psi_C}{\Psi_C} = \frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_i},
+\]
+for all dimensions and with $i$ running over all particles.
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+For the first derivative only $N-1$ terms survive the ratio because the $g$-terms that are not differentiated cancel with their corresponding ones in the denominator. Then,
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_k}.
+\]
+An equivalent equation is obtained for the exponential form after replacing $g_{ij}$ by $\exp(f_{ij})$, yielding:
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k},
+\]
+with both expressions scaling as $\mathcal{O}(N)$.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{Main ideas.}
+
+Using the identity 
+\[
+\frac{\partial}{\partial x_i}g_{ij} = -\frac{\partial}{\partial x_j}g_{ij},
+\]
+we get expressions where all the derivatives acting on the particle  are represented by the \emph{second} index of $g$:
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
+-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_i},
+\]
+and for the exponential case:
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
+-\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}.
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+For correlation forms depending only on the scalar distances $r_{ij}$ we can use the chain rule. Noting that 
+\[
+\frac{\partial g_{ij}}{\partial x_j} = \frac{\partial g_{ij}}{\partial r_{ij}} \frac{\partial r_{ij}}{\partial x_j} = \frac{x_j - x_i}{r_{ij}} \frac{\partial g_{ij}}{\partial r_{ij}},
+\]
+we arrive at
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} = 
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}} \frac{\mathbf{r_{ik}}}{r_{ik}} \frac{\partial g_{ik}}{\partial r_{ik}}
+-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial g_{ki}}{\partial r_{ki}}.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Note that for the Pade-Jastrow form we can set $g_{ij} \equiv g(r_{ij}) = e^{f(r_{ij})} = e^{f_{ij}}$ and 
+\[
+\frac{\partial g_{ij}}{\partial r_{ij}} = g_{ij} \frac{\partial f_{ij}}{\partial r_{ij}}.
+\]
+Therefore, 
+\[
+\frac{1}{\Psi_{C}}\frac{\partial \Psi_{C}}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\mathbf{r_{ik}}}{r_{ik}}\frac{\partial f_{ik}}{\partial r_{ik}}
+-\sum_{i=k+1}^{N}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial f_{ki}}{\partial r_{ki}},
+\]
+where 
+\[
+ \mathbf{r}_{ij} = |\mathbf{r}_j - \mathbf{r}_i| = (x_j - x_i)\vec{e}_1 + (y_j - y_i)\vec{e}_2 + (z_j - z_i)\vec{e}_3
+\]
+is the relative distance.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+When the correlation function is the \emph{linear Pade-Jastrow} we have
+\[
+f_{ij} = \frac{a r_{ij}}{(1 + \beta r_{ij})},
+\]
+which yields the closed form expression
+\[
+\frac{\partial f_{ij}}{\partial r_{ij}} = \frac{a}{(1 + \beta r_{ij})^2}.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The second derivative of the Jastrow factor divided by the Jastrow factor (the way it enters the kinetic energy) is
+\[
+\left[\frac{\mathbf{\nabla}^2 \Psi_C}{\Psi_C}\right]_x =\  
+2\sum_{k=1}^{N}
+\sum_{i=1}^{k-1}\frac{\partial^2 g_{ik}}{\partial x_k^2}\ +\ 
+\sum_{k=1}^N
+\left(
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k} -
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}
+\right)^2
+\]
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+But we have a simple form for the function, namely
+\[
+\Psi_{C}=\prod_{i< j}\exp{f(r_{ij})}= \exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
+\]
+and it is easy to see that for particle  $k$
+we have
+\[
+  \frac{\mathbf{\nabla}^2_k \Psi_C}{\Psi_C }=
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}f'(r_{ki})f'(r_{kj})+
+\sum_{j\ne k}\left( f''(r_{kj})+\frac{2}{r_{kj}}f'(r_{kj})\right)
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Using 
+\[
+f(r_{ij})= \frac{ar_{ij}}{1+\beta r_{ij}},
+\]
+and $g'(r_{kj})=dg(r_{kj})/dr_{kj}$ and 
+$g''(r_{kj})=d^2g(r_{kj})/dr_{kj}^2$  we find that for particle  $k$
+we have
+\[
+  \frac{\mathbf{\nabla}^2_k \Psi_C}{\Psi_C }=
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}\frac{a}{(1+\beta r_{ki})^2}
+\frac{a}{(1+\beta r_{kj})^2}+
+\sum_{j\ne k}\left(\frac{2a}{r_{kj}(1+\beta r_{kj})^2}-\frac{2a\beta}{(1+\beta r_{kj})^3}\right)
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+For the correlation part 
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
+\]
+we need to take into account whether electrons have equal or opposite spins since we have to obey the
+electron-electron cusp condition as well.  
+When the electrons have  equal spins 
+\[
+a= 1/4,
+\]
+while for opposite spins (like the ground state in Helium)
+\[
+a= 1/2
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+A stochastic process is simply a function of two variables, one is the time,
+the other is a stochastic variable $X$, defined by specifying
+\begin{itemize}
+\item the set $\left\{x\right\}$ of possible values for $X$;
+
+\item the probability distribution, $w_X(x)$,  over this set, or briefly $w(x)$
+\end{itemize}
+
+\noindent
+The set of values $\left\{x\right\}$ for $X$ 
+may be discrete, or continuous. If the set of
+values is continuous, then $w_X (x)$ is a probability density so that 
+$w_X (x)dx$
+is the probability that one finds the stochastic variable $X$ to have values
+in the range $[x, x + dx]$ .
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+     An arbitrary number of other stochastic variables may be derived from
+$X$. For example, any $Y$ given by a mapping of $X$, is also a stochastic
+variable. The mapping may also be time-dependent, that is, the mapping
+depends on an additional variable $t$
+\[
+                              Y_X (t) = f (X, t) .
+\]
+The quantity $Y_X (t)$ is called a random function, or, since $t$ often is time,
+a stochastic process. A stochastic process is a function of two variables,
+one is the time, the other is a stochastic variable $X$. Let $x$ be one of the
+possible values of $X$ then
+\[
+                               y(t) = f (x, t),
+\]
+is a function of $t$, called a sample function or realization of the process.
+In physics one considers the stochastic process to be an ensemble of such
+sample functions.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+     For many physical systems initial distributions of a stochastic 
+variable $y$ tend to equilibrium distributions: $w(y, t)\rightarrow w_0(y)$ 
+as $t\rightarrow\infty$. In
+equilibrium detailed balance constrains the transition rates
+\[
+     W(y\rightarrow y')w(y ) = W(y'\rightarrow y)w_0 (y),
+\]
+where $W(y'\rightarrow y)$ 
+is the probability, per unit time, that the system changes
+from a state $|y\rangle$ , characterized by the value $y$ 
+for the stochastic variable $Y$ , to a state $|y'\rangle$.
+
+Note that for a system in equilibrium the transition rate 
+$W(y'\rightarrow y)$ and
+the reverse $W(y\rightarrow y')$ may be very different.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Consider, for instance, a simple
+system that has only two energy levels $\epsilon_0 = 0$ and 
+$\epsilon_1 = \Delta E$. 
+
+For a system governed by the Boltzmann distribution we find (the partition function has been taken out)
+\[
+     W(0\rightarrow 1)\exp{-\epsilon_0/kT} = W(1\rightarrow 0)\exp{-\epsilon_1/kT}
+\]
+We get then
+\[
+     \frac{W(1\rightarrow 0)}{W(0 \rightarrow 1)}=\exp{-\Delta E/kT},
+\]
+which goes to zero when $T$ tends to zero.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+If we assume a discrete set of events,
+our initial probability
+distribution function can be  given by 
+\[
+   w_i(0) = \delta_{i,0},
+\]
+and its time-development after a given time step $\Delta t=\epsilon$ is
+\[ 
+   w_i(t) = \sum_{j}W(j\rightarrow i)w_j(t=0).
+\] 
+The continuous analog to $w_i(0)$ is
+\[
+   w(\mathbf{x})\rightarrow \delta(\mathbf{x}),
+\]
+where we now have generalized the one-dimensional position $x$ to a generic-dimensional  
+vector $\mathbf{x}$. The Kroenecker $\delta$ function is replaced by the $\delta$ distribution
+function $\delta(\mathbf{x})$ at  $t=0$.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The transition from a state $j$ to a state $i$ is now replaced by a transition
+to a state with position $\mathbf{y}$ from a state with position $\mathbf{x}$. 
+The discrete sum of transition probabilities can then be replaced by an integral
+and we obtain the new distribution at a time $t+\Delta t$ as 
+\[
+   w(\mathbf{y},t+\Delta t)= \int W(\mathbf{y},t+\Delta t| \mathbf{x},t)w(\mathbf{x},t)d\mathbf{x},
+\]
+and after $m$ time steps we have
+\[
+   w(\mathbf{y},t+m\Delta t)= \int W(\mathbf{y},t+m\Delta t| \mathbf{x},t)w(\mathbf{x},t)d\mathbf{x}.
+\]
+When equilibrium is reached we have
+\[
+   w(\mathbf{y})= \int W(\mathbf{y}|\mathbf{x}, t)w(\mathbf{x})d\mathbf{x},
+\]
+that is no time-dependence. Note our change of notation for $W$
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We can solve the equation for $w(\mathbf{y},t)$ by making a Fourier transform to
+momentum space. 
+The PDF $w(\mathbf{x},t)$ is related to its Fourier transform
+$\tilde{w}(\mathbf{k},t)$ through
+\[
+   w(\mathbf{x},t) = \int_{-\infty}^{\infty}d\mathbf{k} \exp{(i\mathbf{kx})}\tilde{w}(\mathbf{k},t),
+\]
+and using the definition of the 
+$\delta$-function 
+\[
+   \delta(\mathbf{x}) = \frac{1}{2\pi} \int_{-\infty}^{\infty}d\mathbf{k} \exp{(i\mathbf{kx})},
+\]
+ we see that
+\[
+   \tilde{w}(\mathbf{k},0)=1/2\pi.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We can then use the Fourier-transformed diffusion equation 
+\[
+    \frac{\partial \tilde{w}(\mathbf{k},t)}{\partial t} = -D\mathbf{k}^2\tilde{w}(\mathbf{k},t),
+\]
+with the obvious solution
+\[
+   \tilde{w}(\mathbf{k},t)=\tilde{w}(\mathbf{k},0)\exp{\left[-(D\mathbf{k}^2t)\right)}=
+    \frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}. 
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+With the Fourier transform we obtain 
+\[
+   w(\mathbf{x},t)=\int_{-\infty}^{\infty}d\mathbf{k} \exp{\left[i\mathbf{kx}\right]}\frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}=
+    \frac{1}{\sqrt{4\pi Dt}}\exp{\left[-(\mathbf{x}^2/4Dt)\right]}, 
+\]
+with the normalization condition
+\[
+   \int_{-\infty}^{\infty}w(\mathbf{x},t)d\mathbf{x}=1.
+\]
+% --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The solution represents the probability of finding
+our random walker at position ${\bf x}$ at time $t$ if the initial distribution 
+was placed at ${\bf x}=0$ at $t=0$. 
+
+There is another interesting feature worth observing. The discrete transition probability $W$
+itself is given by a binomial distribution.
+The results from the central limit theorem state that 
+transition probability in the limit $n\rightarrow \infty$ converges to the normal 
+distribution. It is then possible to show that
+\[
+    W(il-jl,n\epsilon)\rightarrow W({\bf y},t+\Delta t|{\bf x},t)=
+    \frac{1}{\sqrt{4\pi D\Delta t}}\exp{\left[-(({\bf y}-{\bf x})^2/4D\Delta t)\right]},
+\]
+and that it satisfies the normalization condition and is itself a solution
+to the diffusion equation.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Let us now assume that we have three PDFs for times $t_0 < t' < t$, that is
+$w({\bf x}_0,t_0)$, $w({\bf x}',t')$ and $w({\bf x},t)$.
+We have then  
+\[
+   w({\bf x},t)= \int_{-\infty}^{\infty} W({\bf x}.t|{\bf x}'.t')w({\bf x}',t')d{\bf x}',
+\]
+and
+\[
+   w({\bf x},t)= \int_{-\infty}^{\infty} W({\bf x}.t|{\bf x}_0.t_0)w({\bf x}_0,t_0)d{\bf x}_0,
+\]
+and
+\[
+   w({\bf x}',t')= \int_{-\infty}^{\infty} W({\bf x}'.t'|{\bf x}_0,t_0)w({\bf x}_0,t_0)d{\bf x}_0.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We can combine these equations and arrive at the famous Einstein-Smoluchenski-Kolmogorov-Chapman (ESKC) relation
+\[
+ W({\bf x}t|{\bf x}_0t_0)  = \int_{-\infty}^{\infty} W({\bf x},t|{\bf x}',t')W({\bf x}',t'|{\bf x}_0,t_0)d{\bf x}'.
+\]
+We can replace the spatial dependence with a dependence upon say the velocity
+(or momentum), that is we have
+\[
+ W({\bf v},t|{\bf v}_0,t_0)  = \int_{-\infty}^{\infty} W({\bf v},t|{\bf v}',t')W({\bf v}',t'|{\bf v}_0,t_0)d{\bf x}'.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We will now derive the Fokker-Planck equation. 
+We start from the ESKC equation
+\[
+ W({\bf x},t|{\bf x}_0,t_0)  = \int_{-\infty}^{\infty} W({\bf x},t|{\bf x}',t')W({\bf x}',t'|{\bf x}_0,t_0)d{\bf x}'.
+\]
+Define $s=t'-t_0$, $\tau=t-t'$ and $t-t_0=s+\tau$. We have then
+\[
+ W({\bf x},s+\tau|{\bf x}_0)  = \int_{-\infty}^{\infty} W({\bf x},\tau|{\bf x}')W({\bf x}',s|{\bf x}_0)d{\bf x}'.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Assume now that $\tau$ is very small so that we can make an expansion in terms of a small step $xi$, with ${\bf x}'={\bf x}-\xi$, that is
+\[
+ W({\bf x},s|{\bf x}_0)+\frac{\partial W}{\partial s}\tau +O(\tau^2) = \int_{-\infty}^{\infty} W({\bf x},\tau|{\bf x}-\xi)W({\bf x}-\xi,s|{\bf x}_0)d{\bf x}'.
+\]
+We assume that $W({\bf x},\tau|{\bf x}-\xi)$ takes non-negligible values only when $\xi$ is small. This is just another way of stating the Master equation!!
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We say thus that ${\bf x}$ changes only by a small amount in the time interval $\tau$. 
+This means that we can make a Taylor expansion in terms of $\xi$, that is we
+expand
+\[
+W({\bf x},\tau|{\bf x}-\xi)W({\bf x}-\xi,s|{\bf x}_0) =
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W({\bf x}+\xi,\tau|{\bf x})W({\bf x},s|{\bf x}_0)
+\right].
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We can then rewrite the ESKC equation as 
+\[
+\frac{\partial W}{\partial s}\tau=-W({\bf x},s|{\bf x}_0)+
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W({\bf x},s|{\bf x}_0)\int_{-\infty}^{\infty} \xi^nW({\bf x}+\xi,\tau|{\bf x})d\xi\right].
+\]
+We have neglected higher powers of $\tau$ and have used that for $n=0$ 
+we get simply $W({\bf x},s|{\bf x}_0)$ due to normalization.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We say thus that ${\bf x}$ changes only by a small amount in the time interval $\tau$. 
+This means that we can make a Taylor expansion in terms of $\xi$, that is we
+expand
+\[
+W({\bf x},\tau|{\bf x}-\xi)W({\bf x}-\xi,s|{\bf x}_0) =
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W({\bf x}+\xi,\tau|{\bf x})W({\bf x},s|{\bf x}_0)
+\right].
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We can then rewrite the ESKC equation as 
+\[
+\frac{\partial W({\bf x},s|{\bf x}_0)}{\partial s}\tau=-W({\bf x},s|{\bf x}_0)+
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W({\bf x},s|{\bf x}_0)\int_{-\infty}^{\infty} \xi^nW({\bf x}+\xi,\tau|{\bf x})d\xi\right].
+\]
+We have neglected higher powers of $\tau$ and have used that for $n=0$ 
+we get simply $W({\bf x},s|{\bf x}_0)$ due to normalization.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We simplify the above by introducing the moments 
+\[
+M_n=\frac{1}{\tau}\int_{-\infty}^{\infty} \xi^nW({\bf x}+\xi,\tau|{\bf x})d\xi=
+\frac{\langle [\Delta x(\tau)]^n\rangle}{\tau},
+\]
+resulting in
+\[
+\frac{\partial W({\bf x},s|{\bf x}_0)}{\partial s}=
+\sum_{n=1}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W({\bf x},s|{\bf x}_0)M_n\right].
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+When $\tau \rightarrow 0$ we assume that $\langle [\Delta x(\tau)]^n\rangle \rightarrow 0$ more rapidly than $\tau$ itself if $n > 2$. 
+When $\tau$ is much larger than the standard correlation time of 
+system then $M_n$ for $n > 2$ can normally be neglected.
+This means that fluctuations become negligible at large time scales.
+
+If we neglect such terms we can rewrite the ESKC equation as 
+\[
+\frac{\partial W({\bf x},s|{\bf x}_0)}{\partial s}=
+-\frac{\partial M_1W({\bf x},s|{\bf x}_0)}{\partial x}+
+\frac{1}{2}\frac{\partial^2 M_2W({\bf x},s|{\bf x}_0)}{\partial x^2}.
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+In a more compact form we have
+\[
+\frac{\partial W}{\partial s}=
+-\frac{\partial M_1W}{\partial x}+
+\frac{1}{2}\frac{\partial^2 M_2W}{\partial x^2},
+\]
+which is the Fokker-Planck equation!  It is trivial to replace 
+position with velocity (momentum).
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+Consider a particle  suspended in a liquid. On its path through the liquid it will continuously collide with the liquid molecules. Because on average the particle  will collide more often on the front side than on the back side, it will experience a systematic force proportional with its velocity, and directed opposite to its velocity. Besides this systematic force the particle  will experience a stochastic force  $\mathbf{F}(t)$. 
+The equations of motion are 
+\begin{itemize}
+\item $\frac{d\mathbf{r}}{dt}=\mathbf{v}$ and 
+
+\item $\frac{d\mathbf{v}}{dt}=-\xi \mathbf{v}+\mathbf{F}$.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+From hydrodynamics  we know that the friction constant  $\xi$ is given by
+\[
+\xi =6\pi \eta a/m 
+\]
+where $\eta$ is the viscosity  of the solvent and a is the radius of the particle .
+
+Solving the second equation in the previous slide we get 
+\[
+\mathbf{v}(t)=\mathbf{v}_{0}e^{-\xi t}+\int_{0}^{t}d\tau e^{-\xi (t-\tau )}\mathbf{F }(\tau ). 
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+If we want to get some useful information out of this, we have to average over all possible realizations of 
+$\mathbf{F}(t)$, with the initial velocity as a condition. A useful quantity for example is
+\[ 
+\langle \mathbf{v}(t)\cdot \mathbf{v}(t)\rangle_{\mathbf{v}_{0}}=v_{0}^{-\xi 2t}
++2\int_{0}^{t}d\tau e^{-\xi (2t-\tau)}\mathbf{v}_{0}\cdot \langle \mathbf{F}(\tau )\rangle_{\mathbf{v}_{0}}
+\]
+\[  	  	
+ +\int_{0}^{t}d\tau ^{\prime }\int_{0}^{t}d\tau e^{-\xi (2t-\tau -\tau ^{\prime })}
+\langle \mathbf{F}(\tau )\cdot \mathbf{F}(\tau ^{\prime })\rangle_{ \mathbf{v}_{0}}.
+\]
+% --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+In order to continue we have to make some assumptions about the conditional averages of the stochastic forces. 
+In view of the chaotic character of the stochastic forces the following assumptions seem to be appropriate
+\[ 
+\langle \mathbf{F}(t)\rangle=0, 
+\]
+\[
+\langle \mathbf{F}(t)\cdot \mathbf{F}(t^{\prime })\rangle_{\mathbf{v}_{0}}=  C_{\mathbf{v}_{0}}\delta (t-t^{\prime }).
+\] 	
+
+We omit the subscript $\mathbf{v}_{0}$, when the quantity of interest turns out to be independent of $\mathbf{v}_{0}$. Using the last three equations we get
+ \[
+\langle \mathbf{v}(t)\cdot \mathbf{v}(t)\rangle_{\mathbf{v}_{0}}=v_{0}^{2}e^{-2\xi t}+\frac{C_{\mathbf{v}_{0}}}{2\xi }(1-e^{-2\xi t}).
+\]
+For large t this should be equal to 3kT/m, from which it follows that
+\[
+\langle \mathbf{F}(t)\cdot \mathbf{F}(t^{\prime })\rangle =6\frac{kT}{m}\xi \delta (t-t^{\prime }). 
+\]
+This result is called the fluctuation-dissipation theorem .
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+Integrating 
+ \[ 
+\mathbf{v}(t)=\mathbf{v}_{0}e^{-\xi t}+\int_{0}^{t}d\tau e^{-\xi (t-\tau )}\mathbf{F }(\tau ), 
+\] 
+we get
+\[
+\mathbf{r}(t)=\mathbf{r}_{0}+\mathbf{v}_{0}\frac{1}{\xi }(1-e^{-\xi t})+
+\int_0^td\tau \int_0^{\tau}\tau ^{\prime } e^{-\xi (\tau -\tau ^{\prime })}\mathbf{F}(\tau ^{\prime }), 
+\]
+from which we calculate the mean square displacement 
+\[
+\langle ( \mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle _{\mathbf{v}_{0}}=\frac{v_0^2}{\xi}(1-e^{-\xi t})^{2}+\frac{3kT}{m\xi ^{2}}(2\xi t-3+4e^{-\xi t}-e^{-2\xi t}). 
+\]
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+For very large $t$ this becomes
+\[
+\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =\frac{6kT}{m\xi }t 
+\] 
+from which we get the Einstein relation  
+ \[ 
+D= \frac{kT}{m\xi } 
+\] 	
+where we have used $\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =6Dt$.
+% --- end paragraph admon ---
+
 
 
 
