@@ -1,0 +1,1657 @@
+
+% LaTeX Beamer file automatically generated from DocOnce
+% https://github.com/hplgit/doconce
+
+%-------------------- begin beamer-specific preamble ----------------------
+
+\documentclass{beamer}
+
+\usetheme{red_plain}
+\usecolortheme{default}
+
+% turn off the almost invisible, yet disturbing, navigation symbols:
+\setbeamertemplate{navigation symbols}{}
+
+% Examples on customization:
+%\usecolortheme[named=RawSienna]{structure}
+%\usetheme[height=7mm]{Rochester}
+%\setbeamerfont{frametitle}{family=\rmfamily,shape=\itshape}
+%\setbeamertemplate{items}[ball]
+%\setbeamertemplate{blocks}[rounded][shadow=true]
+%\useoutertheme{infolines}
+%
+%\usefonttheme{}
+%\useinntertheme{}
+%
+%\setbeameroption{show notes}
+%\setbeameroption{show notes on second screen=right}
+
+% fine for B/W printing:
+%\usecolortheme{seahorse}
+
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{relsize}
+
+\usepackage{fancybox}  % make sure fancybox is loaded before fancyvrb
+
+\usepackage{fancyvrb}
+\usepackage{minted} % requires pygments and latex -shell-escape filename
+%\usepackage{anslistings}
+
+\usepackage{amsmath,amssymb,bm}
+%\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{colortbl}
+\usepackage[english]{babel}
+\usepackage{tikz}
+\usepackage{framed}
+% Use some nice templates
+\beamertemplatetransparentcovereddynamic
+
+% --- begin table of contents based on sections ---
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each section:
+% (Only section headings can enter the table of contents in Beamer
+% slides generated from DocOnce source, while subsections are used
+% for the title in ordinary slides.)
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>[plain]
+  \frametitle{}
+  %\frametitle{Outline}
+  \tableofcontents[currentsection]
+  \end{frame}
+}
+% --- end table of contents based on sections ---
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command:
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\newcommand{\shortinlinecomment}[3]{\note{\textbf{#1}: #2}}
+\newcommand{\longinlinecomment}[3]{\shortinlinecomment{#1}{#2}{#3}}
+
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3
+    }
+\setlength{\parskip}{0pt}  % {1em}
+
+\newenvironment{doconceexercise}{}{}
+\newcounter{doconceexercisecounter}
+\newenvironment{doconce:movie}{}{}
+\newcounter{doconce:movie:counter}
+
+\newcommand{\subex}[1]{\noindent\textbf{#1}}  % for subexercises: a), b), etc
+
+%-------------------- end beamer-specific preamble ----------------------
+
+% Add user's preamble
+
+
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+
+
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\title{How to parallelize a Variational Monte Carlo code with MPI and OpenMP}
+
+% ----------------- author(s) -------------------------
+
+\author{Morten Hjorth-Jensen\inst{1,2}}
+\institute{National Superconducting Cyclotron Laboratory and Department of Physics and Astronomy, Michigan State University, East Lansing, MI 48824, USA\inst{1}
+\and
+Department of Physics, University of Oslo, Oslo, Norway\inst{2}}
+% ----------------- end author(s) -------------------------
+
+\date{Spring 2015
+% <optional titlepage figure>
+}
+
+\begin{frame}[plain,fragile]
+\titlepage
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Your background}
+
+\begin{block}{}
+\begin{itemize}
+\item You have some experience in programming but have never tried to parallelize your codes
+
+\item Here I will base my examples on C/C++ using Message Passing Interface (MPI) and OpenMP. 
+
+\item I will also give you some simple hints on how to run and install codes on your laptop/office PC
+
+\item The programs and slides can be found at the weblink
+
+\item Good text: Karniadakis and Kirby, Parallel Scientific Computing in C++ and MPI, Cambridge.
+\end{itemize}
+
+\noindent
+We will discuss Message passing interface (MPI) and OpenMP.
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+% No title on this slide
+
+=====  =====
+\begin{block}{}
+\begin{itemize}
+\item Develop codes locally, run with some few processes and test your codes.  Do benchmarking, timing and so forth on local nodes, for example your laptop or PC.  You can install MPICH2 on  your laptop/PC. 
+
+\item Test by typing \emph{which mpd}
+
+\item When you are convinced that your codes run correctly, you start your production runs on available supercomputers, in our case \emph{smaug} locally (to be discussed after Easter).
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{How do I run MPI on a PC/Laptop?}
+
+\begin{block}{}
+Most machines at computer labs at UiO are quad-cores
+\begin{itemize}
+\item Compile with mpicxx or mpic++ or mpif90
+
+\item Set up collaboration between processes and run 
+\end{itemize}
+
+\noindent
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+mpd --ncpus=4 &
+#  run code with
+mpiexec -n 4 ./nameofprog
+\end{minted}
+Here we declare that we will use 4 processes via the \emph{-ncpus} option and via $-n 4$ when running.
+\begin{itemize}
+\item End with \emph{mpdallexit}
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Can I do it on my own PC/laptop?}
+
+\begin{block}{}
+Of course:
+\begin{itemize}
+\item go to the website of \href{{http://www.mcs.anl.gov/research/projects/mpich2/}}{Argonne National Lab}
+
+\item follow the instructions and install it on your own PC/laptop
+
+\item Versions for Ubuntu/Linux, windows and mac
+
+\item For windows, you may think of installing WUBI
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{What is Message Passing Interface (MPI)?}
+
+\begin{block}{}
+
+MPI is a library, not a language. It specifies the names, calling sequences and results of functions
+or subroutines to be called from C/C++ or Fortran programs, and the classes and methods that make up the MPI C++
+library. The programs that users write in Fortran, C or C++ are compiled with ordinary compilers and linked
+with the MPI library.
+
+MPI programs should be able to run
+on all possible machines and run all MPI implementetations without change.
+
+An MPI computation is a collection of processes communicating with messages.
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Going Parallel with MPI}
+
+\begin{block}{}
+\textbf{Task parallelism}: the work of a global problem can be divided
+into a number of independent tasks, which rarely need to synchronize. 
+Monte Carlo simulations or numerical integration are examples of this.
+
+
+MPI is a message-passing library where all the routines
+have corresponding C/C++-binding
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+   MPI_Command_name
+\end{minted}
+and Fortran-binding (routine names are in uppercase, but can also be in lower case)
+\begin{Verbatim}[numbers=none,fontsize=\fontsize{9pt}{9pt},baselinestretch=0.95]
+   MPI_COMMAND_NAME
+\end{Verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{MPI is a library}
+
+\begin{block}{}
+MPI is a library specification for the message passing interface,
+proposed as a standard.
+
+\begin{itemize}
+\item independent of hardware;
+
+\item not a language or compiler specification;
+
+\item not a specific implementation or product.
+\end{itemize}
+
+\noindent
+A message passing standard for portability and ease-of-use. 
+Designed for high performance.
+
+Insert communication and synchronization functions where necessary.
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{The basic ideas of parallel computing}
+
+\begin{block}{}
+
+\begin{itemize}
+\item Pursuit of shorter computation time and larger simulation size gives rise to parallel computing.
+
+\item Multiple processors are involved to solve a global problem.
+
+\item The essence is to divide the entire computation evenly among collaborative processors.  Divide and conquer.
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{A rough classification of hardware models}
+
+\begin{block}{}
+
+\begin{itemize}
+\item Conventional single-processor computers can be called SISD (single-instruction-single-data) machines.
+
+\item SIMD (single-instruction-multiple-data) machines incorporate the idea of parallel processing, which use a large number of processing units to execute the same instruction on different data.
+
+\item Modern parallel computers are so-called MIMD (multiple-instruction-multiple-data) machines and can execute different instruction streams in parallel on different data.
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Shared memory and distributed memory}
+
+\begin{block}{}
+
+\begin{itemize}
+\item One way of categorizing modern parallel computers is to look at the memory configuration.
+
+\item In shared memory systems the CPUs share the same address space. Any CPU can access any data in the global memory.
+
+\item In distributed memory systems each CPU has its own memory.
+\end{itemize}
+
+\noindent
+The CPUs are connected by some network and may exchange
+messages.
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Different parallel programming paradigms}
+
+\begin{block}{}
+
+\begin{itemize}
+\item \textbf{Task parallelism}:  the work of a global problem can be divided into a number of independent tasks, which rarely need to synchronize.  Monte Carlo simulation is one example. Integration is another. However this paradigm is of limited use.
+
+\item \textbf{Data parallelism}:  use of multiple threads (e.g.~one thread per processor) to dissect loops over arrays etc.  This paradigm requires a single memory address space.  Communication and synchronization between processors are often hidden, thus easy to program. However, the user surrenders much control to a specialized compiler. Examples of data parallelism are compiler-based parallelization and OpenMP directives. 
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Different parallel programming paradigms}
+
+\begin{block}{}
+
+\begin{itemize}
+\item \textbf{Message passing}:  all involved processors have an independent memory address space. The user is responsible for  partitioning the data/work of a global problem and distributing the  subproblems to the processors. Collaboration between processors is achieved by explicit message passing, which is used for data transfer plus synchronization.
+
+\item This paradigm is the most general one where the user has full control. Better parallel efficiency is usually achieved by explicit message passing. However, message-passing programming is more difficult.
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{SPMD (single-program-multiple-data)}
+
+\begin{block}{}
+
+Although message-passing programming supports MIMD, it 
+suffices with an SPMD (single-program-multiple-data) model, which
+is flexible enough for practical cases:
+
+\begin{itemize}
+\item Same executable for all the processors.
+
+\item Each processor works primarily with its assigned local data.
+
+\item Progression of code is allowed to differ between synchronization points.
+
+\item Possible to have a master/slave model. The standard option in Monte Carlo calculations and numerical integration.
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Today's situation of parallel computing}
+
+\begin{block}{}
+
+\begin{itemize}
+\item Distributed memory is the dominant hardware configuration. There is a large diversity in these machines, from  MPP (massively parallel processing) systems to clusters of off-the-shelf PCs, which are very cost-effective.
+
+\item Message-passing is a mature programming paradigm and widely accepted. It often provides an efficient match to the hardware. It is primarily used for the distributed memory systems, but can also be used on shared memory systems.
+
+\item Modern nodes have nowadays several cores, which makes it interesting to use both shared memory (the given node) and distributed memory (several nodes with communication). This leads often to codes which use both MPI and OpenMP.
+\end{itemize}
+
+\noindent
+Our lectures will focus on both MPI and OpenMP.
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Overhead present in parallel computing}
+
+\begin{block}{}
+
+\begin{itemize}
+\item \textbf{Uneven load balance}:  not all the processors can perform useful work at all time.
+
+\item \textbf{Overhead of synchronization}
+
+\item \textbf{Overhead of communication}
+
+\item \textbf{Extra computation due to parallelization}
+\end{itemize}
+
+\noindent
+Due to the above overhead and that certain part of a sequential
+algorithm cannot be parallelized we may not achieve an optimal parallelization.
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Parallelizing a sequential algorithm}
+
+\begin{block}{}
+
+\begin{itemize}
+\item Identify the part(s) of a sequential algorithm that can be  executed in parallel. This is the difficult part,
+
+\item Distribute the global work and data among $P$ processors.
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Bindings to MPI routines}
+
+\begin{block}{}
+
+
+MPI is a message-passing library where all the routines
+have corresponding C/C++-binding
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+   MPI_Command_name
+\end{minted}
+and Fortran-binding (routine names are in uppercase, but can also be in lower case)
+\begin{Verbatim}[numbers=none,fontsize=\fontsize{9pt}{9pt},baselinestretch=0.95]
+   MPI_COMMAND_NAME
+\end{Verbatim}
+The discussion in these slides focuses on the C++ binding.
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Communicator}
+
+\begin{block}{}
+\begin{itemize}
+\item A group of MPI processes with a name (context).
+
+\item Any process is identified by its rank. The rank is only meaningful within a particular communicator.
+
+\item By default communicator $MPI\_COMM\_WORLD$ contains all the MPI processes.
+
+\item Mechanism to identify subset of processes.
+
+\item Promotes modular design of parallel libraries.
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Some of the most  important MPI functions}
+
+\begin{block}{}
+
+
+
+\begin{itemize}
+\item $MPI\_Init$ - initiate an MPI computation
+
+\item $MPI\_Finalize$ - terminate the MPI computation and clean up
+
+\item $MPI\_Comm\_size$ - how many processes participate in a given MPI communicator?
+
+\item $MPI\_Comm\_rank$ - which one am I? (A number between 0 and size-1.)
+
+\item $MPI\_Send$ - send a message to a particular process within an MPI communicator
+
+\item $MPI\_Recv$ - receive a message from a particular process within an MPI communicator
+
+\item $MPI\_reduce$  or $MPI\_Allreduce$, send and receive messages
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{The first MPI C/C++ program}
+
+\begin{block}{}
+
+
+Let every process write "Hello world" (oh not this program again!!) on the standard output. 
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+using namespace std;
+#include <mpi.h>
+#include <iostream>
+int main (int nargs, char* args[])
+{
+int numprocs, my_rank;
+//   MPI initializations
+MPI_Init (&nargs, &args);
+MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+cout << "Hello world, I have  rank " << my_rank << " out of " 
+     << numprocs << endl;
+//  End MPI
+MPI_Finalize ();
+\end{minted}
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{The Fortran program}
+
+\begin{block}{}
+\begin{Verbatim}[numbers=none,fontsize=\fontsize{9pt}{9pt},baselinestretch=0.95]
+PROGRAM hello
+INCLUDE "mpif.h"
+INTEGER:: size, my_rank, ierr
+
+CALL  MPI_INIT(ierr)
+CALL MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierr)
+CALL MPI_COMM_RANK(MPI_COMM_WORLD, my_rank, ierr)
+WRITE(*,*)"Hello world, I've rank ",my_rank," out of ",size
+CALL MPI_FINALIZE(ierr)
+
+END PROGRAM hello
+\end{Verbatim}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Note 1}
+
+\begin{block}{}
+
+\begin{itemize}
+\item The output to screen is not ordered since all processes are trying to write  to screen simultaneously.
+
+\item It is the operating system which opts for an ordering.  
+
+\item If we wish to have an organized output, starting from the first process, we may rewrite our program as in the next example.
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Ordered output with $MPI\_Barrier$}
+
+\begin{block}{}
+
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+int main (int nargs, char* args[])
+{
+ int numprocs, my_rank, i;
+ MPI_Init (&nargs, &args);
+ MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+ MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+ for (i = 0; i < numprocs; i++) {}
+ MPI_Barrier (MPI_COMM_WORLD);
+ if (i == my_rank) {
+ cout << "Hello world, I have  rank " << my_rank << 
+        " out of " << numprocs << endl;}
+      MPI_Finalize ();
+\end{minted}
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Note 2}
+
+\begin{block}{}
+\begin{itemize}
+\item Here we have used the $MPI\_Barrier$ function to ensure that that every process has completed  its set of instructions in  a particular order.
+
+\item A barrier is a special collective operation that does not allow the processes to continue until all processes in the communicator (here $MPI\_COMM\_WORLD$) have called $MPI\_Barrier$. 
+
+\item The barriers make sure that all processes have reached the same point in the code. Many of the collective operations like $MPI\_ALLREDUCE$ to be discussed later, have the same property; that is, no process can exit the operation until all processes have started. 
+\end{itemize}
+
+\noindent
+However, this is slightly more time-consuming since the processes synchronize between themselves as many times as there
+are processes.  In the next Hello world example we use the send and receive functions in order to a have a synchronized
+action.
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Ordered output with $MPI\_Recv$ and $MPI\_Send$}
+
+\begin{block}{}
+
+
+\begin{Verbatim}[numbers=none,fontsize=\fontsize{9pt}{9pt},baselinestretch=0.95]
+.....
+int numprocs, my_rank, flag;
+MPI_Status status;
+MPI_Init (&nargs, &args);
+MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+if (my_rank > 0)
+MPI_Recv (&flag, 1, MPI_INT, my_rank-1, 100, 
+           MPI_COMM_WORLD, &status);
+cout << "Hello world, I have  rank " << my_rank << " out of " 
+<< numprocs << endl;
+if (my_rank < numprocs-1)
+MPI_Send (&my_rank, 1, MPI_INT, my_rank+1, 
+          100, MPI_COMM_WORLD);
+MPI_Finalize ();
+\end{Verbatim}
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Note 3}
+
+\begin{block}{}
+
+
+The basic sending of messages is given by the function $MPI\_SEND$, which in C/C++
+is defined as 
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+int MPI_Send(void *buf, int count, 
+             MPI_Datatype datatype, 
+             int dest, int tag, MPI_Comm comm)}
+\end{minted}
+This single command allows the passing of any kind of variable, even a large array, to any group of tasks. 
+The variable \textbf{buf} is the variable we wish to send while \textbf{count}
+is the  number of variables we are passing. If we are passing only a single value, this should be 1. 
+
+If we transfer an array, it is  the overall size of the array. 
+For example, if we want to send a 10 by 10 array, count would be $10\times 10=100$ 
+since we are  actually passing 100 values.  
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Note 4}
+
+\begin{block}{}
+
+Once you have  sent a message, you must receive it on another task. The function $MPI\_RECV$
+is similar to the send call.
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+int MPI_Recv( void *buf, int count, MPI_Datatype datatype, 
+            int source, 
+            int tag, MPI_Comm comm, MPI_Status *status )
+\end{minted}
+
+The arguments that are different from those in MPI\_SEND are
+\textbf{buf} which  is the name of the variable where you will  be storing the received data, 
+\textbf{source} which  replaces the destination in the send command. This is the return ID of the sender.
+
+Finally,  we have used  $MPI\_Status\_status$,  
+where one can check if the receive was completed.
+
+The output of this code is the same as the previous example, but now
+process 0 sends a message to process 1, which forwards it further
+to process 2, and so forth.
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Numerical integration in parallel}
+
+\begin{block}{Integrating $\pi$ }
+
+\begin{itemize}
+\item The code example computes $\pi$ using the trapezoidal rules.
+
+\item The trapezoidal rule
+\end{itemize}
+
+\noindent
+\[
+   I=\int_a^bf(x) dx\approx h\left(f(a)/2 + f(a+h) +f(a+2h)+\dots +f(b-h)+ f(b)/2\right).
+\]
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Dissection of trapezoidal rule with $MPI\_reduce$}
+
+\begin{block}{}
+
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+//    Trapezoidal rule and numerical integration usign MPI
+using namespace std;
+#include <mpi.h>
+#include <iostream>
+
+//     Here we define various functions called by the main program
+
+double int_function(double );
+double trapezoidal_rule(double , double , int , double (*)(double));
+
+//   Main function begins here
+int main (int nargs, char* args[])
+{
+  int n, local_n, numprocs, my_rank; 
+  double a, b, h, local_a, local_b, total_sum, local_sum;   
+  double  time_start, time_end, total_time;
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Dissection of trapezoidal rule with $MPI\_reduce$}
+
+\begin{block}{}
+
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+  //  MPI initializations
+  MPI_Init (&nargs, &args);
+  MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+  MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+  time_start = MPI_Wtime();
+  //  Fixed values for a, b and n 
+  a = 0.0 ; b = 1.0;  n = 1000;
+  h = (b-a)/n;    // h is the same for all processes 
+  local_n = n/numprocs;  
+  // make sure n > numprocs, else integer division gives zero
+  // Length of each process' interval of
+  // integration = local_n*h.  
+  local_a = a + my_rank*local_n*h;
+  local_b = local_a + local_n*h;
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Integrating with \textbf{MPI}}
+
+\begin{block}{}
+
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+  total_sum = 0.0;
+  local_sum = trapezoidal_rule(local_a, local_b, local_n, 
+                               &int_function); 
+  MPI_Reduce(&local_sum, &total_sum, 1, MPI_DOUBLE, 
+              MPI_SUM, 0, MPI_COMM_WORLD);
+  time_end = MPI_Wtime();
+  total_time = time_end-time_start;
+  if ( my_rank == 0) {
+    cout << "Trapezoidal rule = " <<  total_sum << endl;
+    cout << "Time = " <<  total_time  
+         << " on number of processors: "  << numprocs  << endl;
+  }
+  // End MPI
+  MPI_Finalize ();  
+  return 0;
+}  // end of main program
+\end{minted}
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{How do I use $MPI\_reduce$?}
+
+\begin{block}{}
+
+Here we have used
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+MPI_reduce( void *senddata, void* resultdata, int count, 
+     MPI_Datatype datatype, MPI_Op, int root, MPI_Comm comm)
+\end{minted}
+
+The two variables $senddata$ and $resultdata$ are obvious, besides the fact that one sends the address
+of the variable or the first element of an array.  If they are arrays they need to have the same size. 
+The variable $count$ represents the total dimensionality, 1 in case of just one variable, 
+while $MPI\_Datatype$ 
+defines the type of variable which is sent and received.  
+
+The new feature is $MPI\_Op$. It defines the type
+of operation we want to do. 
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{More on $MPI\_Reduce$}
+
+\begin{block}{}
+In our case, since we are summing
+the rectangle  contributions from every process we define  $MPI\_Op = MPI\_SUM$.
+If we have an array or matrix we can search for the largest og smallest element by sending either $MPI\_MAX$ or 
+$MPI\_MIN$.  If we want the location as well (which array element) we simply transfer 
+$MPI\_MAXLOC$ or $MPI\_MINOC$. If we want the product we write $MPI\_PROD$. 
+
+$MPI\_Allreduce$ is defined as
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+MPI_Allreduce( void *senddata, void* resultdata, int count, 
+          MPI_Datatype datatype, MPI_Op, MPI_Comm comm)        
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Dissection of trapezoidal rule with $MPI\_reduce$}
+
+\begin{block}{}
+
+We use $MPI\_reduce$ to collect data from each process. Note also the use of the function 
+$MPI\_Wtime$. 
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+//  this function defines the function to integrate
+double int_function(double x)
+{
+  double value = 4./(1.+x*x);
+  return value;
+} // end of function to evaluate
+
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Dissection of trapezoidal rule with $MPI\_reduce$}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+//  this function defines the trapezoidal rule
+double trapezoidal_rule(double a, double b, int n, 
+                         double (*func)(double))
+{
+  double trapez_sum;
+  double fa, fb, x, step;
+  int    j;
+  step=(b-a)/((double) n);
+  fa=(*func)(a)/2. ;
+  fb=(*func)(b)/2. ;
+  trapez_sum=0.;
+  for (j=1; j <= n-1; j++){
+    x=j*step+a;
+    trapez_sum+=(*func)(x);
+  }
+  trapez_sum=(trapez_sum+fb+fa)*step;
+  return trapez_sum;
+}  // end trapezoidal_rule 
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Optimization and profiling}
+
+\begin{block}{}
+
+
+Till now we have not paid much attention to speed and possible optimization possibilities
+inherent in the various compilers. We have compiled and linked as
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+mpic++  -c  mycode.cpp
+mpic++  -o  mycode.exe  mycode.o
+\end{minted}
+For Fortran replace with mpif90.
+This is what we call a flat compiler option and should be used when we develop the code.
+It produces normally a very large and slow code when translated to machine instructions.
+We use this option for debugging and for establishing the correct program output because
+every operation is done precisely as the user specified it.
+
+It is instructive to look up the compiler manual for further instructions
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+man mpic++  >  out_to_file
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{More on optimization}
+
+\begin{block}{}
+We have additional compiler options for optimization. These may include procedure inlining where 
+performance may be improved, moving constants inside loops outside the loop, 
+identify potential parallelism, include automatic vectorization or replace a division with a reciprocal
+and a multiplication if this speeds up the code.
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+mpic++  -O3 -c  mycode.cpp
+mpic++  -O3 -o  mycode.exe  mycode.o
+\end{minted}
+This is the recommended option. \textbf{But you must check that you get the same results as previously}.
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Optimization and profiling}
+
+\begin{block}{}
+It is also useful to profile your program under the development stage.
+You would then compile with 
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+mpic++  -pg -O3 -c  mycode.cpp
+mpic++  -pg -O3 -o  mycode.exe  mycode.o
+\end{minted}
+After you have run the code you can obtain the profiling information via
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+gprof mycode.exe >  out_to_profile
+\end{minted}
+When you have profiled properly your code, you must take out this option as it 
+increases your CPU expenditure.
+For memory tests use "valgrind":"http:www.valgrind.org". An excellent GUI is also Qt, with debugging facilities.
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Optimization and profiling}
+
+\begin{block}{}
+Other hints
+\begin{itemize}
+\item avoid if tests or call to functions inside loops, if possible. 
+
+\item avoid multiplication with constants inside loops if possible
+\end{itemize}
+
+\noindent
+Bad code
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+for i = 1:n
+    a(i) = b(i) +c*d
+    e = g(k)
+end
+\end{minted}
+Better code
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+temp = c*d
+for i = 1:n
+    a(i) = b(i) + temp
+end
+e = g(k)
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{What is OpenMP}
+
+\begin{block}{}
+\begin{itemize}
+\item OpenMP provides high-level thread programming
+
+\item Multiple cooperating threads are allowed to run simultaneously
+
+\item Threads are created and destroyed dynamically in a fork-join pattern
+\begin{itemize}
+
+   \item An OpenMP program consists of a number of parallel regions
+
+   \item Between two parallel regions there is only one master thread
+
+   \item In the beginning of a parallel region, a team of new threads is spawned
+
+\end{itemize}
+
+\noindent
+  \item The newly spawned threads work simultaneously with the master thread
+
+  \item At the end of a parallel region, the new threads are destroyed
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Getting started, things to remember}
+
+\begin{block}{}
+\begin{itemize}
+ \item Remember the header file 
+\end{itemize}
+
+\noindent
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#include <omp.h>
+\end{minted}
+\begin{itemize}
+ \item Insert compiler directives in C++ syntax as 
+\end{itemize}
+
+\noindent
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp...
+\end{minted}
+\begin{itemize}
+\item Compile with for example \emph{c++ -fopenmp code.cpp}
+
+\item Execute
+\begin{itemize}
+
+  \item Remember to assign the environment variable \textbf{OMP NUM THREADS}
+
+  \item It specifies the total number of threads inside a parallel region, if not otherwise overwritten
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{General code structure}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#include <omp.h>
+main ()
+{
+int var1, var2, var3;
+/* serial code */
+/* ... */
+/* start of a parallel region */
+#pragma omp parallel private(var1, var2) shared(var3)
+{
+/* ... */
+}
+/* more serial code */
+/* ... */
+/* another parallel region */
+#pragma omp parallel
+{
+/* ... */
+}
+}
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Parallel region}
+
+\begin{block}{}
+\begin{itemize}
+\item A parallel region is a block of code that is executed by a team of threads
+
+\item The following compiler directive creates a parallel region
+\end{itemize}
+
+\noindent
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp parallel { ... }
+\end{minted}
+\begin{itemize}
+\item Clauses can be added at the end of the directive
+
+\item Most often used clauses:
+\begin{itemize}
+
+ \item \textbf{default(shared)} or \textbf{default(none)}
+
+ \item \textbf{public(list of variables)}
+
+ \item \textbf{private(list of variables)}
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Hello world, not again, please!}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#include <omp.h>
+#include <stdio.h>
+int main (int argc, char *argv[])
+{
+int th_id, nthreads;
+#pragma omp parallel private(th_id) shared(nthreads)
+{
+th_id = omp_get_thread_num();
+printf("Hello World from thread %d\n", th_id);
+#pragma omp barrier
+if ( th_id == 0 ) {
+nthreads = omp_get_num_threads();
+printf("There are %d threads\n",nthreads);
+}
+}
+return 0;
+}
+\end{minted}
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Important OpenMP library routines}
+
+\begin{block}{}
+
+\begin{itemize}
+\item \textbf{int omp get num threads ()}, returns the number of threads inside a parallel region
+
+\item \textbf{int omp get thread num ()},  returns the  a thread for each thread inside a parallel region
+
+\item \textbf{void omp set num threads (int)}, sets the number of threads to be used
+
+\item \textbf{void omp set nested (int)},  turns nested parallelism on/off
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Parallel for loop}
+
+\begin{block}{}
+\begin{itemize}
+ \item Inside a parallel region, the following compiler directive can be used to parallelize a for-loop:
+\end{itemize}
+
+\noindent
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp for
+\end{minted}
+\begin{itemize}
+\item Clauses can be added, such as
+\begin{itemize}
+
+  \item \textbf{schedule(static, chunk size)}
+
+  \item \textbf{schedule(dynamic, chunk size)} 
+
+  \item \textbf{schedule(guided, chunk size)} (non-deterministic allocation)
+
+  \item \textbf{schedule(runtime)}
+
+  \item \textbf{private(list of variables)}
+
+  \item \textbf{reduction(operator:variable)}
+
+  \item \textbf{nowait}
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Example code}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#include <omp.h>
+#define CHUNKSIZE 100
+#define N
+1000
+main ()
+{
+int i, chunk;
+float a[N], b[N], c[N];
+for (i=0; i < N; i++)
+a[i] = b[i] = i * 1.0;
+chunk = CHUNKSIZE;
+#pragma omp parallel shared(a,b,c,chunk) private(i)
+{
+#pragma omp for schedule(dynamic,chunk)
+for (i=0; i < N; i++)
+c[i] = a[i] + b[i];
+} /* end of parallel region */
+}
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{More on Parallel for loop}
+
+\begin{block}{}
+\begin{itemize}
+\item The number of loop iterations can not be non-deterministic; break, return, exit, goto not allowed inside the for-loop
+
+\item The loop index is private to each thread
+
+\item A reduction variable is special
+\begin{itemize}
+
+  \item During the for-loop there is a local private copy in each thread
+
+  \item At the end of the for-loop, all the local copies are combined together by the reduction operation
+
+\end{itemize}
+
+\noindent
+\item Unless the nowait clause is used, an implicit barrier synchronization will be added at the end by the compiler
+\end{itemize}
+
+\noindent
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+// #pragma omp parallel and #pragma omp for
+\end{minted}
+can be combined into
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp parallel for
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Inner product}
+
+\begin{block}{}
+\[
+\sum_{i=0}^{n-1} a_ib_i
+\]
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+int i;
+double sum = 0.;
+/* allocating and initializing arrays */
+/* ... */
+#pragma omp parallel for default(shared) private(i) 
+reduction(+:sum)
+for (i=0; i<N; i++)
+sum += a[i]*b[i];
+}
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Different threads do different tasks}
+
+\begin{block}{}
+
+Different threads do different tasks independently, each section is executed by one thread.
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp parallel
+{
+#pragma omp sections
+{
+#pragma omp section
+funcA ();
+#pragma omp section
+funcB ();
+#pragma omp section
+funcC ();
+}
+}
+\end{minted}
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Single execution}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp single { ... }
+\end{minted}
+The code is executed by one thread only, no guarantee which thread
+
+Can introduce an implicit barrier at the end
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp master { ... }
+\end{minted}
+Code executed by the master thread, guaranteed and no implicit barrier at the end.
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Coordination and synchronization}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp barrier
+\end{minted}
+Synchronization, must be encountered by all threads in a team (or none)
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp ordered { a block of codes }
+\end{minted}
+is another form of synchronization (in sequential order).
+The form
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp critical { a block of codes }
+\end{minted}
+and 
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp atomic { single assignment statement }
+\end{minted}
+is  more efficient than 
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp critical
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Data scope}
+
+\begin{block}{}
+\begin{itemize}
+\item OpenMP data scope attribute clauses:
+\begin{itemize}
+
+ \item \textbf{shared}
+
+ \item \textbf{private}
+
+ \item \textbf{firstprivate}
+
+ \item \textbf{lastprivate}
+
+ \item \textbf{reduction}
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+What are the purposes of these attributes
+\begin{itemize}
+\item define how and which variables are transferred to a parallel region (and back)
+
+\item define which variables are visible to all threads in a parallel region, and which variables are privately allocated to each thread
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Some remarks}
+
+\begin{block}{}
+
+\begin{itemize}
+\item When entering a parallel region, the \textbf{private} clause ensures each thread having its own new variable instances. The new variables are assumed to be uninitialized.
+
+\item A shared variable exists in only one memory location and all threads can read and write to that address. It is the programmer's responsibility to ensure that multiple threads properly access a shared variable.
+
+\item The \textbf{firstprivate} clause combines the behavior of the private clause with automatic initialization.
+
+\item The \textbf{lastprivate} clause combines the behavior of the private clause with a copy back (from the last loop iteration or section) to the original variable outside the parallel region.
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Parallelizing nested for-loops}
+
+\begin{block}{}
+
+\begin{itemize}
+ \item Serial code
+\end{itemize}
+
+\noindent
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+for (i=0; i<100; i++)
+for (j=0; j<100; j++)
+a[i][j] = b[i][j] + c[i][j]
+\end{minted}
+
+\begin{itemize}
+\item Parallelization
+\end{itemize}
+
+\noindent
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp parallel for private(j)
+for (i=0; i<100; i++)
+for (j=0; j<100; j++)
+a[i][j] = b[i][j] + c[i][j]
+\end{minted}
+
+\begin{itemize}
+\item Why not parallelize the inner loop? to save overhead of repeated thread forks-joins
+
+\item Why must \textbf{j} be private? To avoid race condition among the threads
+\end{itemize}
+
+\noindent
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Nested parallelism}
+
+\begin{block}{}
+When a thread in a parallel region encounters another parallel construct, it
+may create a new team of threads and become the master of the new
+team.
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp parallel num_threads(4)
+{
+/* .... */
+#pragma omp parallel num_threads(2)
+{
+//  
+}
+}
+\end{minted}
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Parallel tasks}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp task 
+#pragma omp parallel shared(p_vec) private(i)
+{
+#pragma omp single
+{
+for (i=0; i<N; i++) {
+double r = random_number();
+if (p_vec[i] > r) {
+#pragma omp task
+do_work (p_vec[i]);
+\end{minted}
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Common mistakes}
+
+\begin{block}{}
+Race condition
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+int nthreads;
+#pragma omp parallel shared(nthreads)
+{
+nthreads = omp_get_num_threads();
+}
+\end{minted}
+Deadlock
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+#pragma omp parallel
+{
+...
+#pragma omp critical
+{
+...
+#pragma omp barrier
+}
+}
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Matrix-matrix multiplication}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+# include <cstdlib>
+# include <iostream>
+# include <cmath>
+# include <ctime>
+# include <omp.h>
+
+using namespace std;
+
+// Main function
+int main ( )
+{
+// brute force coding of arrays
+  double a[500][500];
+  double angle;
+  double b[500][500];
+  double c[500][500];
+  int i;
+  int j;
+  int k;
+\end{minted}
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Matrix-matrix multiplication}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+  int n = 500;
+  double pi = acos(-1.0);
+  double s;
+  int thread_num;
+  double wtime;
+
+  cout << "\n";
+  cout << "  C++/OpenMP version\n";
+  cout << "  Compute matrix product C = A * B.\n";
+
+  thread_num = omp_get_max_threads ( );
+
+//
+//  Loop 1: Evaluate A.
+//
+  s = 1.0 / sqrt ( ( double ) ( n ) );
+
+  wtime = omp_get_wtime ( );
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Matrix-matrix multiplication}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+# pragma omp parallel shared ( a, b, c, n, pi, s ) 
+private ( angle, i, j, k )
+{
+  # pragma omp for
+  for ( i = 0; i < n; i++ )
+  {
+    for ( j = 0; j < n; j++ )
+    {
+      angle = 2.0 * pi * i * j / ( double ) n;
+      a[i][j] = s * ( sin ( angle ) + cos ( angle ) );
+    }
+  }
+//
+//  Loop 2: Copy A into B.
+//
+  # pragma omp for
+  for ( i = 0; i < n; i++ )
+  {
+    for ( j = 0; j < n; j++ )
+    {
+      b[i][j] = a[i][j];
+    }
+  }
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\begin{frame}[plain,fragile]
+\frametitle{Matrix-matrix multiplication}
+
+\begin{block}{}
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
+//  Loop 3: Compute C = A * B.
+//
+  # pragma omp for
+  for ( i = 0; i < n; i++ )
+  {
+    for ( j = 0; j < n; j++ )
+    {
+      c[i][j] = 0.0;
+      for ( k = 0; k < n; k++ )
+      {
+        c[i][j] = c[i][j] + a[i][k] * b[k][j];
+      }
+    }
+  }
+}
+  wtime = omp_get_wtime ( ) - wtime;
+  cout << "  Elapsed seconds = " << wtime << "\n";
+  cout << "  C(100,100)  = " << c[99][99] << "\n";
+//
+//  Terminate.
+//
+  cout << "\n";
+  cout << "  Normal end of execution.\n";
+  return 0;
+\end{minted}
+
+
+\end{block}
+\end{frame}
+
+\end{document}
