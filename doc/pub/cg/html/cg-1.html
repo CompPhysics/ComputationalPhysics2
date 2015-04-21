@@ -1,0 +1,1271 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="Conjugate gradient methods and other optimization methods">
+
+<title>Conjugate gradient methods and other optimization methods</title>
+
+
+<style type="text/css">
+/* bloodish style */
+
+body {
+  font-family: Helvetica, Verdana, Arial, Sans-serif;
+  color: #404040;
+  background: #ffffff;
+}
+h1 { font-size: 1.8em;  color: #8A0808; }
+h2 { font-size: 1.6em;  color: #8A0808; }
+h3 { font-size: 1.4em;  color: #8A0808; }
+h4 { color: #8A0808; }
+a { color: #8A0808; text-decoration:none; }
+tt { font-family: "Courier New", Courier; }
+/* pre style removed because it will interfer with pygments */
+p { text-indent: 0px; }
+hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+p.caption { width: 80%; font-style: normal; text-align: left; }
+hr.figure { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+.alert-text-small   { font-size: 80%;  }
+.alert-text-large   { font-size: 130%; }
+.alert-text-normal  { font-size: 90%;  }
+.alert {
+  padding:8px 35px 8px 14px; margin-bottom:18px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5);
+  border:1px solid #bababa;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  color: #555;
+  background-color: #f8f8f8;
+  background-position: 10px 5px;
+  background-repeat: no-repeat;
+  background-size: 38px;
+  padding-left: 55px;
+  width: 75%;
+ }
+.alert-block {padding-top:14px; padding-bottom:14px}
+.alert-block > p, .alert-block > ul {margin-bottom:1em}
+.alert li {margin-top: 1em}
+.alert-block p+p {margin-top:5px}
+.alert-notice { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_notice.png); }
+.alert-summary  { background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_summary.png); }
+.alert-warning { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_warning.png); }
+.alert-question {background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_question.png); }
+
+div { text-align: justify; text-justify: inter-word; }
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [(' Conjugate gradient (CG) method ', 2, None, '___sec0'),
+              (' Conjugate gradient method ', 2, None, '___sec1'),
+              (' Simple example and demonstration ', 2, None, '___sec2'),
+              (' Simple example and demonstration ', 2, None, '___sec3'),
+              (' Variance in the simple model ', 2, None, '___sec4'),
+              (' Computing the derivatives ', 2, None, '___sec5'),
+              (' Expressions for finding the derivatives of the local energy ',
+               2,
+               None,
+               '___sec6'),
+              (' Derivatives of the local energy ', 2, None, '___sec7'),
+              (" Conjugate gradient method, Newton's method ",
+               2,
+               None,
+               '___sec8'),
+              (' Simple example and demonstration ', 2, None, '___sec9'),
+              (' Simple example and demonstration ', 2, None, '___sec10'),
+              (' Using the conjugate gradient method ', 2, None, '___sec11'),
+              (' Using the conjugate gradient method ', 2, None, '___sec12'),
+              (' Conjugate gradient method ', 2, None, '___sec13'),
+              (' Conjugate gradient method ', 2, None, '___sec14'),
+              (' Conjugate gradient method ', 2, None, '___sec15'),
+              (' Conjugate gradient method ', 2, None, '___sec16'),
+              (' Conjugate gradient method and iterations ',
+               2,
+               None,
+               '___sec17'),
+              (' Conjugate gradient method ', 2, None, '___sec18'),
+              (' Conjugate gradient method ', 2, None, '___sec19'),
+              (' Conjugate gradient method ', 2, None, '___sec20'),
+              (' Conjugate gradient method, our case ', 2, None, '___sec21'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec22'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec23'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec24'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec25'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec26'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec27'),
+              (' Codes from numerical recipes ', 2, None, '___sec28'),
+              (' What you have to provide ', 2, None, '___sec29'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec30'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec31'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec32'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec33'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec34'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec35'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec36'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec37')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- ------------------- main content ---------------------- -->
+
+
+
+<center><h1>Conjugate gradient methods and other optimization methods</h1></center>  <!-- document title -->
+
+<p>
+<!-- author(s): Morten Hjorth-Jensen, National Superconducting Cyclotron Laboratory and Department of Physics and Astronomy, Michigan State University, East Lansing, MI 48824, USA &amp; Department of Physics, University of Oslo, Oslo, Norway -->
+
+<center>
+<b>Morten Hjorth-Jensen, National Superconducting Cyclotron Laboratory and Department of Physics and Astronomy, Michigan State University, East Lansing, MI 48824, USA &amp; Department of Physics, University of Oslo, Oslo, Norway</b> 
+</center>
+
+<p>
+<!-- institution(s) -->
+<p>
+<center><h4>Spring 2015</h4></center> <!-- date -->
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec0">Conjugate gradient (CG) method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Our aim with this part of the project is to be able to
+
+<ul>
+<li> find an optimal value for the variational parameters using only some few Monte Carlo cycles</li>
+<li> use these optimal values for the variational parameters to perform a large-scale Monte Carlo calculation</li>
+</ul>
+
+To achieve this will look at methods like <em>Steepest descent</em> and the <em>conjugate gradient method</em>. Both these methods allow us to find
+the minima of a multivariable  function like our energy (function of several variational parameters).
+
+<p>
+The success of the CG method  for finding solutions of non-linear problems is based
+on the theory of conjugate gradients for linear systems of equations. It belongs
+to the class of iterative methods for solving problems from linear algebra of the type
+$$
+\begin{equation*}
+  \hat{A}\hat{x} = \hat{b}.
+\end{equation*}
+$$
+
+In the iterative process we end up with a problem like
+
+$$
+\begin{equation*}
+  \hat{r}= \hat{b}-\hat{A}\hat{x},
+\end{equation*}
+$$
+
+where \( \hat{r} \) is the so-called residual or error in the iterative process.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec1">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+The residual is zero when we reach the minimum of the quadratic equation
+$$
+\begin{equation*}
+  P(\hat{x})=\frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T\hat{b},
+\end{equation*}
+$$
+
+with the constraint that the matrix \( \hat{A} \) is positive definite and symmetric.
+If we search for a minimum of the quantum mechanical  variance, then the matrix 
+\( \hat{A} \), which is called the Hessian, is given by the second-derivative of the variance.  This quantity is always positive definite.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec2">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
+For the harmonic oscillator in one-dimension we have a  trial wave function and probability
+$$
+\begin{equation*}
+\psi_T(x) = e^{-\alpha^2 x^2} \qquad P_T(x)dx = \frac{e^{-2\alpha^2 x^2}dx}{\int dx e^{-2\alpha^2 x^2}}
+\end{equation*}
+$$
+
+with \( \alpha \) being the variational parameter. 
+We obtain then the following local energy
+$$
+\begin{equation*}
+E_L[\alpha] = \alpha^2+x^2\left(\frac{1}{2}-2\alpha^2\right),
+\end{equation*}
+$$
+
+which results in the expectation value for the local energy
+$$
+\begin{equation*}
+\langle  E_L[\alpha]\rangle = \frac{1}{2}\alpha^2+\frac{1}{8\alpha^2}
+\end{equation*}
+$$
+
+Repeat these calculations and convince yourself that they are correct.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec3">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The derivative of the energy with respect to \( \alpha \) gives
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
+\end{equation*}
+$$
+
+and a second derivative which is always positive (meaning that we find a minimum)
+$$
+\begin{equation*}
+\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = 1+\frac{3}{4\alpha^4}
+\end{equation*}
+$$
+
+The condition
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
+\end{equation*}
+$$
+
+gives the optimal \( \alpha=1/\sqrt{2} \), as expected.
+Show this.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec4">Variance in the simple model </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We can also minimize the variance. In our simple model the variance is
+$$
+\begin{equation*}
+\sigma^2[\alpha] = \frac{1}{2}\alpha^4-\frac{1}{4}+\frac{1}{32\alpha^4},
+\end{equation*}
+$$
+
+with first derivative
+$$
+\begin{equation*}
+\frac{d \sigma^2[\alpha]}{d\alpha} = 2\alpha^3-\frac{1}{8\alpha^5}
+\end{equation*}
+$$
+
+and a second derivative which is always positive
+$$
+\begin{equation*}
+\frac{d^2\sigma^2[\alpha]}{d\alpha^2} = 6\alpha^2+\frac{5}{8\alpha^6}
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec5">Computing the derivatives </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+In general we end up computing the expectation value of the energy in terms 
+of some parameters \( \alpha_0,\alpha_1,\dots,\alpha_n \)
+and we search for a minimum in this multi-variable parameter space.  
+This leads to an energy minimization problem <em>where we need the derivative of the energy as a function of the variational parameters</em>.
+
+<p>
+In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
+However, in our actual calculations the energy is represented by a multi-dimensional integral with several variational parameters.
+How can we can then obtain the derivatives of the energy with respect to the variational parameters without having 
+to resort to expensive numerical derivations?
+
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec6">Expressions for finding the derivatives of the local energy </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.
+
+<p>
+Let us define 
+$$
+\bar{E}_{\alpha}=\frac{d\langle  E_L[\alpha]\rangle}{d\alpha}.
+$$
+
+as the derivative of the energy with respect to the variational parameter \( \alpha \) (we limit ourselves to one parameter only).
+In the above example this was easy and we obtain a simple expression for the derivative.
+We define also the derivative of the trial function (skipping the subindex \( T \)) as 
+$$
+\bar{\psi}_{\alpha}=\frac{d\psi[\alpha]\rangle}{d\alpha}.
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec7">Derivatives of the local energy </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)
+$$
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+$$
+
+From a computational point of view it means that you need to compute the expectation values of 
+$$
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle,
+$$
+
+and
+$$
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
+$$
+
+We leave it as an exercise to find the corresponding expression for the variance.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec8">Conjugate gradient method, Newton's method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+In Newton's method we set \( \nabla f = 0 \) and we can thus compute the next iteration point
+(here the exact result)
+$$
+\begin{equation*}
+\hat{x}-\hat{x}_i=\hat{A}^{-1}\nabla f(\hat{x}_i).
+\end{equation*}
+$$
+
+Subtracting this equation from that of \( \hat{x}_{i+1} \) we have
+$$
+\begin{equation*}
+\hat{x}_{i+1}-\hat{x}_i=\hat{A}^{-1}(\nabla f(\hat{x}_{i+1})-\nabla f(\hat{x}_i)).
+\end{equation*}
+$$
+
+Concerning the optimization process in connection with the last project, you can easily use Newton's method as well instead of the 
+con
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec9">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+In our case \( f \) can be either the energy or the variance.  If we choose the energy then we have
+$$
+\begin{equation*}
+\hat{\alpha}_{i+1}-\hat{\alpha}_i=\hat{A}^{-1}(\nabla E(\hat{\alpha}_{i+1})-\nabla E(\hat{\alpha}_i)).
+\end{equation*}
+$$
+
+In the simple model gradient and the Hessian \( \hat{A} \) are
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
+\end{equation*}
+$$
+
+and a second derivative which is always positive (meaning that we find a minimum)
+$$
+\begin{equation*}
+\hat{A}= \frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = 1+\frac{3}{4\alpha^4}
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec10">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We get then
+$$
+\begin{equation*}
+\alpha_{i+1}=\frac{4}{3}\alpha_i-\frac{\alpha_i^4}{3\alpha_{i+1}^3},
+\end{equation*}
+$$
+
+which can be rewritten as
+$$
+\begin{equation*}
+\alpha_{i+1}^4-\frac{4}{3}\alpha_i\alpha_{i+1}^4+\frac{1}{3}\alpha_i^4.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec11">Using the conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<ul>
+  <li> Start your program with calling a function which implements for example the  CGM method.</li>
+  <li> This function needs the function for the expectation value of the local energy and the derivative of the local energy.</li>
+  <li> Your function <b>func</b> is now the Metropolis part with a call to the local energy function. For every call to the function <b>func</b> many practitionser use 1000-10000 Monte Carlo cycles for the trial wave function.</li>
+  <li> This gives an expectation value for the energy which is returned by the function <b>func</b>.</li>
+  <li> When one calls the local energy one also computes the first derivative of the expectaction value of the local energy</li>  
+</ul>
+
+$$
+\begin{equation*} \frac{d\langle E_{L}[\alpha] \rangle}{d\alpha}= 2\langle \frac{\bar{\psi_T}_{\alpha}}{\psi_T[\alpha]}\left(E_L[\alpha]-\langle  E_L[\alpha]\rangle\right)\rangle.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec12">Using the conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The expectation value for the local energy of the Helium atom with a simple Slater determinant is given by
+$$
+\begin{equation*}
+\langle E_{L} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
+\end{equation*}
+$$
+
+When implementing the conjugate gradient method, uyou should test your numerical derivative with the derivative of the last expression, that is
+$$
+\begin{equation*}
+\frac{d\langle E_{L}[\alpha] \rangle}{d\alpha} = 2\alpha-2\left(Z-\frac{5}{16}\right).
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec13">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+In the CG method we define so-called conjugate directions and two vectors 
+\( \hat{s} \) and \( \hat{t} \)
+are said to be
+conjugate if
+$$
+\begin{equation*}
+\hat{s}^T\hat{A}\hat{t}= 0.
+\end{equation*}
+$$
+
+The philosophy of the CG method is to perform searches in various conjugate directions
+of our vectors \( \hat{x}_i \) obeying the above criterion, namely
+$$
+\begin{equation*}
+\hat{x}_i^T\hat{A}\hat{x}_j= 0.
+\end{equation*}
+$$
+
+Two vectors are conjugate if they are orthogonal with respect to 
+this inner product. Being conjugate is a symmetric relation: if \( \hat{s} \) is conjugate to \( \hat{t} \), then \( \hat{t} \) is conjugate to \( \hat{s} \).
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec14">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+An example is given by the eigenvectors of the matrix
+$$
+\begin{equation*}
+\hat{v}_i^T\hat{A}\hat{v}_j= \lambda\hat{v}_i^T\hat{v}_j,
+\end{equation*}
+$$
+
+which is zero unless \( i=j \).
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec15">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Assume now that we have a symmetric positive-definite matrix \( \hat{A} \) of size
+\( n\times n \). At each iteration \( i+1 \) we obtain the conjugate direction of a vector
+$$
+\begin{equation*}
+\hat{x}_{i+1}=\hat{x}_{i}+\alpha_i\hat{p}_{i}. 
+\end{equation*}
+$$
+
+We assume that \( \hat{p}_{i} \) is a sequence of \( n \) mutually conjugate directions. 
+Then the \( \hat{p}_{i} \)  form a basis of \( R^n \) and we can expand the solution 
+$  \hat{A}\hat{x} = \hat{b}$ in this basis, namely
+
+$$
+\begin{equation*}
+  \hat{x}  = \sum^{n}_{i=1} \alpha_i \hat{p}_i.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec16">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The coefficients are given by
+$$
+\begin{equation*}
+    \mathbf{A}\mathbf{x} = \sum^{n}_{i=1} \alpha_i \mathbf{A} \mathbf{p}_i = \mathbf{b}.
+\end{equation*}
+$$
+
+Multiplying with \( \hat{p}_k^T \)  from the left gives
+
+$$
+\begin{equation*}
+  \hat{p}_k^T \hat{A}\hat{x} = \sum^{n}_{i=1} \alpha_i\hat{p}_k^T \hat{A}\hat{p}_i= \hat{p}_k^T \hat{b},
+\end{equation*}
+$$
+
+and we can define the coefficients \( \alpha_k \) as
+
+$$
+\begin{equation*}
+    \alpha_k = \frac{\hat{p}_k^T \hat{b}}{\hat{p}_k^T \hat{A} \hat{p}_k}
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec17">Conjugate gradient method and iterations </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+If we choose the conjugate vectors \( \hat{p}_k \) carefully, 
+then we may not need all of them to obtain a good approximation to the solution 
+\( \hat{x} \). 
+So, we want to regard the conjugate gradient method as an iterative method. 
+This also allows us to solve systems where \( n \) is so large that the direct 
+method would take too much time.
+
+<p>
+We denote the initial guess for \( \hat{x} \) as \( \hat{x}_0 \). 
+We can assume without loss of generality that
+
+$$
+\begin{equation*}
+\hat{x}_0=0,
+\end{equation*}
+$$
+
+or consider the system
+$$
+\begin{equation*}
+\hat{A}\hat{z} = \hat{b}-\hat{A}\hat{x}_0,
+\end{equation*}
+$$
+
+instead.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec18">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Important, one can show that the solution \( \hat{x} \) is also the unique minimizer of the quadratic form
+$$
+\begin{equation*}
+  f(\hat{x}) = \frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T \hat{x} , \quad \hat{x}\in\mathbf{R}^n. 
+\end{equation*}
+$$
+
+This suggests taking the first basis vector \( \hat{p}_1 \) 
+to be the gradient of \( f \) at \( \hat{x}=\hat{x}_0 \), 
+which equals
+$$
+\begin{equation*}
+\hat{A}\hat{x}_0-\hat{b},
+\end{equation*}
+$$
+
+and 
+\( \hat{x}_0=0 \) it is equal \( -\hat{b} \).
+The other vectors in the basis will be conjugate to the gradient, 
+hence the name conjugate gradient method.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec19">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Let  \( \hat{r}_k \) be the residual at the \( k \)-th step:
+$$
+\begin{equation*}
+\hat{r}_k=\hat{b}-\hat{A}\hat{x}_k.
+\end{equation*}
+$$
+
+Note that \( \hat{r}_k \) is the negative gradient of \( f \) at 
+\( \hat{x}=\hat{x}_k \), 
+so the gradient descent method would be to move in the direction \( \hat{r}_k \). 
+Here, we insist that the directions \( \hat{p}_k \) are conjugate to each other, 
+so we take the direction closest to the gradient \( \hat{r}_k \)  
+under the conjugacy constraint. 
+This gives the following expression
+$$
+\begin{equation*}
+\hat{p}_{k+1}=\hat{r}_k-\frac{\hat{p}_k^T \hat{A}\hat{r}_k}{\hat{p}_k^T\hat{A}\hat{p}_k} \hat{p}_k.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec20">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We can also  compute the residual iteratively as
+$$
+\begin{equation*}
+\hat{r}_{k+1}=\hat{b}-\hat{A}\hat{x}_{k+1},
+ \end{equation*}
+$$
+
+which equals
+
+$$
+\begin{equation*}
+\hat{b}-\hat{A}(\hat{x}_k+\alpha_k\hat{p}_k),
+ \end{equation*}
+$$
+
+or
+
+$$
+\begin{equation*}
+(\hat{b}-\hat{A}\hat{x}_k)-\alpha_k\hat{A}\hat{p}_k,
+ \end{equation*}
+$$
+
+which gives
+
+$$
+\begin{equation*}
+\hat{r}_{k+1}=\hat{r}_k-\hat{A}\hat{p}_{k},
+ \end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec21">Conjugate gradient method, our case </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+If we consider finding the minimum of a function \( f \) using Newton's method,
+that is search for a zero of the gradient of a function.  Near a point \( x_i \)
+we have to second order
+$$
+\begin{equation*}
+f(\hat{x})=f(\hat{x}_i)+(\hat{x}-\hat{x}_i)\nabla f(\hat{x}_i)
+\frac{1}{2}(\hat{x}-\hat{x}_i)\hat{A}(\hat{x}-\hat{x}_i)
+\end{equation*}
+$$
+
+giving
+$$
+\begin{equation*}
+\nabla f(\hat{x})=\nabla f(\hat{x}_i)+\hat{A}(\hat{x}-\hat{x}_i).
+ \end{equation*}
+$$
+
+In Newton's method we set \( \nabla f = 0 \) and we can thus compute the next iteration point
+(here the exact result)
+$$
+\begin{equation*}
+\hat{x}-\hat{x}_i=\hat{A}^{-1}\nabla f(\hat{x}_i).
+\end{equation*}
+$$
+
+Subtracting this equation from that of \( \hat{x}_{i+1} \) we have
+
+$$
+\begin{equation*}
+\hat{x}_{i+1}-\hat{x}_i=\hat{A}^{-1}(\nabla f(\hat{x}_{i+1})-\nabla f(\hat{x}_i)).
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec22">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #BC7A00">#include &lt;cmath&gt;</span>
+<span style="color: #BC7A00">#include &lt;iostream&gt;</span>
+<span style="color: #BC7A00">#include &lt;fstream&gt;</span>
+<span style="color: #BC7A00">#include &lt;iomanip&gt;</span>
+<span style="color: #BC7A00">#include &quot;vectormatrixclass.h&quot;</span>
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span>  std;
+<span style="color: #408080; font-style: italic">//   Main function begins here</span>
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(<span style="color: #B00040">int</span>  argc, <span style="color: #B00040">char</span> <span style="color: #666666">*</span> argv[]){
+  <span style="color: #B00040">int</span> dim <span style="color: #666666">=</span> <span style="color: #666666">2</span>;
+  Vector x(dim),xsd(dim), b(dim),x0(dim);
+  Matrix A(dim,dim);
+  
+  <span style="color: #408080; font-style: italic">// Set our initial guess</span>
+  x0(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> x0(<span style="color: #666666">1</span>) <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+  <span style="color: #408080; font-style: italic">// Set the matrix  </span>
+  A(<span style="color: #666666">0</span>,<span style="color: #666666">0</span>) <span style="color: #666666">=</span>  <span style="color: #666666">3</span>;    A(<span style="color: #666666">1</span>,<span style="color: #666666">0</span>) <span style="color: #666666">=</span>  <span style="color: #666666">2</span>;   A(<span style="color: #666666">0</span>,<span style="color: #666666">1</span>) <span style="color: #666666">=</span>  <span style="color: #666666">2</span>;   A(<span style="color: #666666">1</span>,<span style="color: #666666">1</span>) <span style="color: #666666">=</span>  <span style="color: #666666">6</span>; 
+  b(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> <span style="color: #666666">2</span>; b(<span style="color: #666666">1</span>) <span style="color: #666666">=</span> <span style="color: #666666">-8</span>;
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec23">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;The Matrix A that we are using: &quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+  A.Print();
+  cout <span style="color: #666666">&lt;&lt;</span> endl;
+  x <span style="color: #666666">=</span> ConjugateGradient(A,b,x0);
+  xsd <span style="color: #666666">=</span> SteepestDescent(A,b,x0);
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;The approximate solution using Conjugate Gradient is: &quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+  x.Print();
+  cout <span style="color: #666666">&lt;&lt;</span> endl;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;The approximate solution using Steepest Descent is: &quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+  xsd.Print();
+  cout <span style="color: #666666">&lt;&lt;</span> endl;
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec24">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">Vector <span style="color: #0000FF">SteepestDescent</span>(Matrix A, Vector b, Vector x0){
+  <span style="color: #B00040">int</span> IterMax, i;
+  <span style="color: #B00040">int</span> dim <span style="color: #666666">=</span> x0.Dimension();
+  <span style="color: #008000; font-weight: bold">const</span> <span style="color: #B00040">double</span> tolerance <span style="color: #666666">=</span> <span style="color: #666666">1.0e-14</span>;
+  Vector x(dim),f(dim),z(dim);
+  <span style="color: #B00040">double</span> c,alpha,d;
+  IterMax <span style="color: #666666">=</span> <span style="color: #666666">30</span>;
+  x <span style="color: #666666">=</span> x0;
+  f <span style="color: #666666">=</span> A<span style="color: #666666">*</span>x<span style="color: #666666">-</span>b;
+  i <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec25">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">  <span style="color: #008000; font-weight: bold">while</span> (i <span style="color: #666666">&lt;=</span> IterMax){
+    z <span style="color: #666666">=</span> A<span style="color: #666666">*</span>f;
+    c <span style="color: #666666">=</span> dot(f,f);
+    alpha <span style="color: #666666">=</span> c<span style="color: #666666">/</span>dot(f,z);
+    x <span style="color: #666666">=</span> x <span style="color: #666666">-</span> alpha<span style="color: #666666">*</span>f;
+    f <span style="color: #666666">=</span>  A<span style="color: #666666">*</span>x<span style="color: #666666">-</span>b;
+    <span style="color: #008000; font-weight: bold">if</span>(sqrt(dot(f,f)) <span style="color: #666666">&lt;</span> tolerance) <span style="color: #008000; font-weight: bold">break</span>;
+    i<span style="color: #666666">++</span>;
+  }
+  <span style="color: #008000; font-weight: bold">return</span> x;
+} 
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec26">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">  Vector <span style="color: #0000FF">ConjugateGradient</span>(Matrix A, Vector b, Vector x0){
+  <span style="color: #B00040">int</span> dim <span style="color: #666666">=</span> x0.Dimension();
+  <span style="color: #008000; font-weight: bold">const</span> <span style="color: #B00040">double</span> tolerance <span style="color: #666666">=</span> <span style="color: #666666">1.0e-14</span>;
+  Vector x(dim),r(dim),v(dim),z(dim);
+  <span style="color: #B00040">double</span> c,t,d;
+
+  x <span style="color: #666666">=</span> x0;
+  r <span style="color: #666666">=</span> b <span style="color: #666666">-</span> A<span style="color: #666666">*</span>x;
+  v <span style="color: #666666">=</span> r;
+  c <span style="color: #666666">=</span> dot(r,r);
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec27">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">  <span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; IterMax <span style="color: #666666">=</span> dim;
+  <span style="color: #008000; font-weight: bold">while</span>(i <span style="color: #666666">&lt;=</span> IterMax){
+    z <span style="color: #666666">=</span> A<span style="color: #666666">*</span>v;
+    t <span style="color: #666666">=</span> c<span style="color: #666666">/</span>dot(v,z);
+    x <span style="color: #666666">=</span> x <span style="color: #666666">+</span> t<span style="color: #666666">*</span>v;
+    r <span style="color: #666666">=</span> r <span style="color: #666666">-</span> t<span style="color: #666666">*</span>z;
+    d <span style="color: #666666">=</span> dot(r,r);
+    <span style="color: #008000; font-weight: bold">if</span>(sqrt(d) <span style="color: #666666">&lt;</span> tolerance)
+      <span style="color: #008000; font-weight: bold">break</span>;
+    v <span style="color: #666666">=</span> r <span style="color: #666666">+</span> (d<span style="color: #666666">/</span>c)<span style="color: #666666">*</span>v;
+    c <span style="color: #666666">=</span> d;  i<span style="color: #666666">++</span>;
+  }
+  <span style="color: #008000; font-weight: bold">return</span> x;
+} 
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec28">Codes from numerical recipes </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The codes are taken from chapter 10.7 of Numerical recipes.  We use the functions
+\( dfpmin \) and \( lnsrch \).  You can load down the package of programs from the webpage of
+the course, see under project 1.  
+The package is called \( NRcgm107.tar.gz \) and contains the files 
+\( dfmin.c \), \( lnsrch.c \), \( nrutil.c \) and \( nrutil.h \). 
+These codes are  written in C.
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #B00040">void</span> dfpmin(<span style="color: #B00040">double</span> p[], <span style="color: #B00040">int</span> n, <span style="color: #B00040">double</span> gtol, <span style="color: #B00040">int</span> <span style="color: #666666">*</span>iter, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>fret,
+<span style="color: #B00040">double</span>(<span style="color: #666666">*</span>func)(<span style="color: #B00040">double</span> []), <span style="color: #B00040">void</span> (<span style="color: #666666">*</span>dfunc)(<span style="color: #B00040">double</span> [], <span style="color: #B00040">double</span> []))
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec29">What you have to provide </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The input to <b>dfpmin</b>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #B00040">void</span> dfpmin(<span style="color: #B00040">double</span> p[], <span style="color: #B00040">int</span> n, <span style="color: #B00040">double</span> gtol, <span style="color: #B00040">int</span> <span style="color: #666666">*</span>iter, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>fret,
+<span style="color: #B00040">double</span>(<span style="color: #666666">*</span>func)(<span style="color: #B00040">double</span> []), <span style="color: #B00040">void</span> (<span style="color: #666666">*</span>dfunc)(<span style="color: #B00040">double</span> [], <span style="color: #B00040">double</span> []))
+</pre></div>
+<p>
+is
+
+<ul>
+  <li> The starting vector \( p \) of length \( n \)</li>
+  <li> The function \( func \) on which minimization is done</li>
+  <li> The function \( dfunc \) where the gradient i calculated</li>
+  <li> The convergence requirement for zeroing the gradient \( gtol \).</li>
+</ul>
+
+It returns in \( p \) the location of the minimum, the number of iterations and 
+the minimum value of the function under study \( fret \).
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec30">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #BC7A00">#include &quot;nrutil.h&quot;</span>
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> std;
+<span style="color: #408080; font-style: italic">//     Here we define various functions called by the main program</span>
+
+<span style="color: #B00040">double</span> <span style="color: #0000FF">E_function</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>x);
+<span style="color: #B00040">void</span>   <span style="color: #0000FF">dE_function</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>x, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>g);
+<span style="color: #B00040">void</span>   <span style="color: #0000FF">dfpmin</span>(<span style="color: #B00040">double</span> p[], <span style="color: #B00040">int</span> n, <span style="color: #B00040">double</span> gtol, <span style="color: #B00040">int</span> <span style="color: #666666">*</span>iter, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>fret,
+	    <span style="color: #B00040">double</span>(<span style="color: #666666">*</span>func)(<span style="color: #B00040">double</span> []), <span style="color: #B00040">void</span> (<span style="color: #666666">*</span>dfunc)(<span style="color: #B00040">double</span> [], <span style="color: #B00040">double</span> []));
+<span style="color: #408080; font-style: italic">//   Main function begins here</span>
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>()
+{
+     <span style="color: #B00040">int</span> n, iter;
+     <span style="color: #B00040">double</span> gtol, fret;
+     <span style="color: #B00040">double</span> alpha;
+     n <span style="color: #666666">=</span> <span style="color: #666666">1</span>;
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Read in guess for alpha&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+     cin <span style="color: #666666">&gt;&gt;</span> alpha;
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec31">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic">//   reserve space in memory for vectors containing the variational</span>
+<span style="color: #408080; font-style: italic">//   parameters</span>
+     <span style="color: #B00040">double</span> <span style="color: #666666">*</span>p <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span> [<span style="color: #666666">2</span>];
+     gtol <span style="color: #666666">=</span> <span style="color: #666666">1.0e-5</span>;
+<span style="color: #408080; font-style: italic">//   now call dfmin and compute the minimum</span>
+     p[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> alpha;
+     dfpmin(p, n, gtol, <span style="color: #666666">&amp;</span>iter, <span style="color: #666666">&amp;</span>fret,<span style="color: #666666">&amp;</span>E_function,<span style="color: #666666">&amp;</span>dE_function);
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of energy minimum = &quot;</span> <span style="color: #666666">&lt;&lt;</span> fret <span style="color: #666666">&lt;&lt;</span> endl;
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Number of iterations = &quot;</span> <span style="color: #666666">&lt;&lt;</span> iter <span style="color: #666666">&lt;&lt;</span> endl;
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of alpha at minimu = &quot;</span> <span style="color: #666666">&lt;&lt;</span> p[<span style="color: #666666">1</span>] <span style="color: #666666">&lt;&lt;</span> endl;
+      <span style="color: #008000; font-weight: bold">delete</span> [] p;
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec32">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic">//  this function defines the Energy function</span>
+<span style="color: #B00040">double</span> <span style="color: #0000FF">E_function</span>(<span style="color: #B00040">double</span> x[])
+{
+  <span style="color: #B00040">double</span> value <span style="color: #666666">=</span> x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*0.5+1.0/</span>(<span style="color: #666666">8*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]);
+  <span style="color: #008000; font-weight: bold">return</span> value;
+} <span style="color: #408080; font-style: italic">// end of function to evaluate</span>
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec33">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic">//  this function defines the derivative of the energy </span>
+<span style="color: #B00040">void</span> <span style="color: #0000FF">dE_function</span>(<span style="color: #B00040">double</span> x[], <span style="color: #B00040">double</span> g[])
+{
+  g[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> x[<span style="color: #666666">1</span>]<span style="color: #666666">-1.0/</span>(<span style="color: #666666">4*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]);
+} <span style="color: #408080; font-style: italic">// end of function to evaluate</span>
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec34">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> std;
+<span style="color: #408080; font-style: italic">//     Here we define various functions called by the main program</span>
+
+<span style="color: #B00040">double</span> <span style="color: #0000FF">E_function</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>x);
+<span style="color: #B00040">void</span>   <span style="color: #0000FF">dE_function</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>x, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>g);
+<span style="color: #B00040">void</span>   <span style="color: #0000FF">dfpmin</span>(<span style="color: #B00040">double</span> p[], <span style="color: #B00040">int</span> n, <span style="color: #B00040">double</span> gtol, <span style="color: #B00040">int</span> <span style="color: #666666">*</span>iter, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>fret,
+	    <span style="color: #B00040">double</span>(<span style="color: #666666">*</span>func)(<span style="color: #B00040">double</span> []), <span style="color: #B00040">void</span> (<span style="color: #666666">*</span>dfunc)(<span style="color: #B00040">double</span> [], <span style="color: #B00040">double</span> []));
+<span style="color: #408080; font-style: italic">//   Main function begins here</span>
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>()
+{
+     <span style="color: #B00040">int</span> n, iter;
+     <span style="color: #B00040">double</span> gtol, fret;
+     <span style="color: #B00040">double</span> alpha;
+     n <span style="color: #666666">=</span> <span style="color: #666666">1</span>;
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Read in guess for alpha&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+     cin <span style="color: #666666">&gt;&gt;</span> alpha;
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec35">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic">//   reserve space in memory for vectors containing the variational</span>
+<span style="color: #408080; font-style: italic">//   parameters</span>
+     <span style="color: #B00040">double</span> <span style="color: #666666">*</span>p <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span> [<span style="color: #666666">2</span>];
+     gtol <span style="color: #666666">=</span> <span style="color: #666666">1.0e-5</span>;
+<span style="color: #408080; font-style: italic">//   now call dfmin and compute the minimum</span>
+     p[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> alpha;
+     dfpmin(p, n, gtol, <span style="color: #666666">&amp;</span>iter, <span style="color: #666666">&amp;</span>fret,<span style="color: #666666">&amp;</span>E_function,<span style="color: #666666">&amp;</span>dE_function);
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of energy minimum = &quot;</span> <span style="color: #666666">&lt;&lt;</span> fret <span style="color: #666666">&lt;&lt;</span> endl;
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Number of iterations = &quot;</span> <span style="color: #666666">&lt;&lt;</span> iter <span style="color: #666666">&lt;&lt;</span> endl;
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of alpha at minimu = &quot;</span> <span style="color: #666666">&lt;&lt;</span> p[<span style="color: #666666">1</span>] <span style="color: #666666">&lt;&lt;</span> endl;
+      <span style="color: #008000; font-weight: bold">delete</span> [] p;
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec36">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic">//  this function defines the Energy function</span>
+<span style="color: #B00040">double</span> <span style="color: #0000FF">E_function</span>(<span style="color: #B00040">double</span> x[])
+{
+
+<span style="color: #408080; font-style: italic">//  Change here by calling your Metropolis function which </span>
+<span style="color: #408080; font-style: italic">//  returns the local energy</span>
+
+  <span style="color: #B00040">double</span> value <span style="color: #666666">=</span> x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*0.5+1.0/</span>(<span style="color: #666666">8*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]);
+  <span style="color: #008000; font-weight: bold">return</span> value;
+} <span style="color: #408080; font-style: italic">// end of function to evaluate</span>
+</pre></div>
+<p>
+You need to change this function so that you call the local energy for your system. I used 1000
+cycles per call to get a new value of \( \langle E_L[\alpha]\rangle \).
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec37">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic">//  this function defines the derivative of the energy </span>
+<span style="color: #B00040">void</span> <span style="color: #0000FF">dE_function</span>(<span style="color: #B00040">double</span> x[], <span style="color: #B00040">double</span> g[])
+{
+<span style="color: #408080; font-style: italic">//  Change here by calling your Metropolis function. </span>
+<span style="color: #408080; font-style: italic">//  I compute both the local energy and its derivative for every call to func</span>
+
+  g[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> x[<span style="color: #666666">1</span>]<span style="color: #666666">-1.0/</span>(<span style="color: #666666">4*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]);
+} <span style="color: #408080; font-style: italic">// end of function to evaluate</span>
+</pre></div>
+<p>
+You need to change this function so that you call the local energy for your system. I used 1000
+cycles per call to get a new value of \( \langle E_L[\alpha]\rangle \).
+When I compute the local energy I also compute its derivative.
+After roughly 10-20 iterations I got a converged result in terms of \( \alpha \).
+</div>
+
+
+<!-- ------------------- end of main content --------------- -->
+
+
+</body>
+</html>
+    
+

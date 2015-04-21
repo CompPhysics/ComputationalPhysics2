@@ -1,0 +1,1236 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="Conjugate gradient methods and other optimization methods">
+
+<title>Conjugate gradient methods and other optimization methods</title>
+
+
+<link href="https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_styles/style_solarized_box/css/solarized_light_code.css" rel="stylesheet" type="text/css" title="light"/>
+<script src="https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_styles/style_solarized_box/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<link href="http://thomasf.github.io/solarized-css/solarized-light.min.css" rel="stylesheet">
+<style type="text/css">
+h1 {color: #b58900;}  /* yellow */
+/* h1 {color: #cb4b16;}  orange */
+/* h1 {color: #d33682;}  magenta, the original choice of thomasf */
+code { padding: 0px; background-color: inherit; }
+pre {
+  border: 0pt solid #93a1a1;
+  box-shadow: none;
+}
+.alert-text-small   { font-size: 80%;  }
+.alert-text-large   { font-size: 130%; }
+.alert-text-normal  { font-size: 90%;  }
+.alert {
+  padding:8px 35px 8px 14px; margin-bottom:18px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5);
+  border:1px solid #93a1a1;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  color: #555;
+  background-color: #eee8d5;
+  background-position: 10px 5px;
+  background-repeat: no-repeat;
+  background-size: 38px;
+  padding-left: 55px;
+  width: 75%;
+ }
+.alert-block {padding-top:14px; padding-bottom:14px}
+.alert-block > p, .alert-block > ul {margin-bottom:1em}
+.alert li {margin-top: 1em}
+.alert-block p+p {margin-top:5px}
+.alert-notice { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_notice.png); }
+.alert-summary  { background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_summary.png); }
+.alert-warning { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_warning.png); }
+.alert-question {background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_question.png); }
+
+div { text-align: justify; text-justify: inter-word; }
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [(' Conjugate gradient (CG) method ', 2, None, '___sec0'),
+              (' Conjugate gradient method ', 2, None, '___sec1'),
+              (' Simple example and demonstration ', 2, None, '___sec2'),
+              (' Simple example and demonstration ', 2, None, '___sec3'),
+              (' Variance in the simple model ', 2, None, '___sec4'),
+              (' Computing the derivatives ', 2, None, '___sec5'),
+              (' Expressions for finding the derivatives of the local energy ',
+               2,
+               None,
+               '___sec6'),
+              (' Derivatives of the local energy ', 2, None, '___sec7'),
+              (" Conjugate gradient method, Newton's method ",
+               2,
+               None,
+               '___sec8'),
+              (' Simple example and demonstration ', 2, None, '___sec9'),
+              (' Simple example and demonstration ', 2, None, '___sec10'),
+              (' Using the conjugate gradient method ', 2, None, '___sec11'),
+              (' Using the conjugate gradient method ', 2, None, '___sec12'),
+              (' Conjugate gradient method ', 2, None, '___sec13'),
+              (' Conjugate gradient method ', 2, None, '___sec14'),
+              (' Conjugate gradient method ', 2, None, '___sec15'),
+              (' Conjugate gradient method ', 2, None, '___sec16'),
+              (' Conjugate gradient method and iterations ',
+               2,
+               None,
+               '___sec17'),
+              (' Conjugate gradient method ', 2, None, '___sec18'),
+              (' Conjugate gradient method ', 2, None, '___sec19'),
+              (' Conjugate gradient method ', 2, None, '___sec20'),
+              (' Conjugate gradient method, our case ', 2, None, '___sec21'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec22'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec23'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec24'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec25'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec26'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec27'),
+              (' Codes from numerical recipes ', 2, None, '___sec28'),
+              (' What you have to provide ', 2, None, '___sec29'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec30'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec31'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec32'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec33'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec34'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec35'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec36'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec37')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- ------------------- main content ---------------------- -->
+
+
+
+<center><h1>Conjugate gradient methods and other optimization methods</h1></center>  <!-- document title -->
+
+<p>
+<!-- author(s): Morten Hjorth-Jensen, National Superconducting Cyclotron Laboratory and Department of Physics and Astronomy, Michigan State University, East Lansing, MI 48824, USA &amp; Department of Physics, University of Oslo, Oslo, Norway -->
+
+<center>
+<b>Morten Hjorth-Jensen, National Superconducting Cyclotron Laboratory and Department of Physics and Astronomy, Michigan State University, East Lansing, MI 48824, USA &amp; Department of Physics, University of Oslo, Oslo, Norway</b> 
+</center>
+
+<p>
+<!-- institution(s) -->
+<p>
+<center><h4>Spring 2015</h4></center> <!-- date -->
+<p>
+<!-- !split -->
+
+<h2 id="___sec0">Conjugate gradient (CG) method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Our aim with this part of the project is to be able to
+
+<ul>
+<li> find an optimal value for the variational parameters using only some few Monte Carlo cycles</li>
+<li> use these optimal values for the variational parameters to perform a large-scale Monte Carlo calculation</li>
+</ul>
+
+To achieve this will look at methods like <em>Steepest descent</em> and the <em>conjugate gradient method</em>. Both these methods allow us to find
+the minima of a multivariable  function like our energy (function of several variational parameters).
+
+<p>
+The success of the CG method  for finding solutions of non-linear problems is based
+on the theory of conjugate gradients for linear systems of equations. It belongs
+to the class of iterative methods for solving problems from linear algebra of the type
+$$
+\begin{equation*}
+  \hat{A}\hat{x} = \hat{b}.
+\end{equation*}
+$$
+
+In the iterative process we end up with a problem like
+
+$$
+\begin{equation*}
+  \hat{r}= \hat{b}-\hat{A}\hat{x},
+\end{equation*}
+$$
+
+where \( \hat{r} \) is the so-called residual or error in the iterative process.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec1">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+The residual is zero when we reach the minimum of the quadratic equation
+$$
+\begin{equation*}
+  P(\hat{x})=\frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T\hat{b},
+\end{equation*}
+$$
+
+with the constraint that the matrix \( \hat{A} \) is positive definite and symmetric.
+If we search for a minimum of the quantum mechanical  variance, then the matrix 
+\( \hat{A} \), which is called the Hessian, is given by the second-derivative of the variance.  This quantity is always positive definite.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec2">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
+For the harmonic oscillator in one-dimension we have a  trial wave function and probability
+$$
+\begin{equation*}
+\psi_T(x) = e^{-\alpha^2 x^2} \qquad P_T(x)dx = \frac{e^{-2\alpha^2 x^2}dx}{\int dx e^{-2\alpha^2 x^2}}
+\end{equation*}
+$$
+
+with \( \alpha \) being the variational parameter. 
+We obtain then the following local energy
+$$
+\begin{equation*}
+E_L[\alpha] = \alpha^2+x^2\left(\frac{1}{2}-2\alpha^2\right),
+\end{equation*}
+$$
+
+which results in the expectation value for the local energy
+$$
+\begin{equation*}
+\langle  E_L[\alpha]\rangle = \frac{1}{2}\alpha^2+\frac{1}{8\alpha^2}
+\end{equation*}
+$$
+
+Repeat these calculations and convince yourself that they are correct.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec3">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The derivative of the energy with respect to \( \alpha \) gives
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
+\end{equation*}
+$$
+
+and a second derivative which is always positive (meaning that we find a minimum)
+$$
+\begin{equation*}
+\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = 1+\frac{3}{4\alpha^4}
+\end{equation*}
+$$
+
+The condition
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
+\end{equation*}
+$$
+
+gives the optimal \( \alpha=1/\sqrt{2} \), as expected.
+Show this.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec4">Variance in the simple model </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We can also minimize the variance. In our simple model the variance is
+$$
+\begin{equation*}
+\sigma^2[\alpha] = \frac{1}{2}\alpha^4-\frac{1}{4}+\frac{1}{32\alpha^4},
+\end{equation*}
+$$
+
+with first derivative
+$$
+\begin{equation*}
+\frac{d \sigma^2[\alpha]}{d\alpha} = 2\alpha^3-\frac{1}{8\alpha^5}
+\end{equation*}
+$$
+
+and a second derivative which is always positive
+$$
+\begin{equation*}
+\frac{d^2\sigma^2[\alpha]}{d\alpha^2} = 6\alpha^2+\frac{5}{8\alpha^6}
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec5">Computing the derivatives </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+In general we end up computing the expectation value of the energy in terms 
+of some parameters \( \alpha_0,\alpha_1,\dots,\alpha_n \)
+and we search for a minimum in this multi-variable parameter space.  
+This leads to an energy minimization problem <em>where we need the derivative of the energy as a function of the variational parameters</em>.
+
+<p>
+In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
+However, in our actual calculations the energy is represented by a multi-dimensional integral with several variational parameters.
+How can we can then obtain the derivatives of the energy with respect to the variational parameters without having 
+to resort to expensive numerical derivations?
+
+
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec6">Expressions for finding the derivatives of the local energy </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.
+
+<p>
+Let us define 
+$$
+\bar{E}_{\alpha}=\frac{d\langle  E_L[\alpha]\rangle}{d\alpha}.
+$$
+
+as the derivative of the energy with respect to the variational parameter \( \alpha \) (we limit ourselves to one parameter only).
+In the above example this was easy and we obtain a simple expression for the derivative.
+We define also the derivative of the trial function (skipping the subindex \( T \)) as 
+$$
+\bar{\psi}_{\alpha}=\frac{d\psi[\alpha]\rangle}{d\alpha}.
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec7">Derivatives of the local energy </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)
+$$
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+$$
+
+From a computational point of view it means that you need to compute the expectation values of 
+$$
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle,
+$$
+
+and
+$$
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
+$$
+
+We leave it as an exercise to find the corresponding expression for the variance.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec8">Conjugate gradient method, Newton's method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+In Newton's method we set \( \nabla f = 0 \) and we can thus compute the next iteration point
+(here the exact result)
+$$
+\begin{equation*}
+\hat{x}-\hat{x}_i=\hat{A}^{-1}\nabla f(\hat{x}_i).
+\end{equation*}
+$$
+
+Subtracting this equation from that of \( \hat{x}_{i+1} \) we have
+$$
+\begin{equation*}
+\hat{x}_{i+1}-\hat{x}_i=\hat{A}^{-1}(\nabla f(\hat{x}_{i+1})-\nabla f(\hat{x}_i)).
+\end{equation*}
+$$
+
+Concerning the optimization process in connection with the last project, you can easily use Newton's method as well instead of the 
+con
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec9">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+In our case \( f \) can be either the energy or the variance.  If we choose the energy then we have
+$$
+\begin{equation*}
+\hat{\alpha}_{i+1}-\hat{\alpha}_i=\hat{A}^{-1}(\nabla E(\hat{\alpha}_{i+1})-\nabla E(\hat{\alpha}_i)).
+\end{equation*}
+$$
+
+In the simple model gradient and the Hessian \( \hat{A} \) are
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
+\end{equation*}
+$$
+
+and a second derivative which is always positive (meaning that we find a minimum)
+$$
+\begin{equation*}
+\hat{A}= \frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = 1+\frac{3}{4\alpha^4}
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec10">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We get then
+$$
+\begin{equation*}
+\alpha_{i+1}=\frac{4}{3}\alpha_i-\frac{\alpha_i^4}{3\alpha_{i+1}^3},
+\end{equation*}
+$$
+
+which can be rewritten as
+$$
+\begin{equation*}
+\alpha_{i+1}^4-\frac{4}{3}\alpha_i\alpha_{i+1}^4+\frac{1}{3}\alpha_i^4.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec11">Using the conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<ul>
+  <li> Start your program with calling a function which implements for example the  CGM method.</li>
+  <li> This function needs the function for the expectation value of the local energy and the derivative of the local energy.</li>
+  <li> Your function <b>func</b> is now the Metropolis part with a call to the local energy function. For every call to the function <b>func</b> many practitionser use 1000-10000 Monte Carlo cycles for the trial wave function.</li>
+  <li> This gives an expectation value for the energy which is returned by the function <b>func</b>.</li>
+  <li> When one calls the local energy one also computes the first derivative of the expectaction value of the local energy</li>  
+</ul>
+
+$$
+\begin{equation*} \frac{d\langle E_{L}[\alpha] \rangle}{d\alpha}= 2\langle \frac{\bar{\psi_T}_{\alpha}}{\psi_T[\alpha]}\left(E_L[\alpha]-\langle  E_L[\alpha]\rangle\right)\rangle.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec12">Using the conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The expectation value for the local energy of the Helium atom with a simple Slater determinant is given by
+$$
+\begin{equation*}
+\langle E_{L} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
+\end{equation*}
+$$
+
+When implementing the conjugate gradient method, uyou should test your numerical derivative with the derivative of the last expression, that is
+$$
+\begin{equation*}
+\frac{d\langle E_{L}[\alpha] \rangle}{d\alpha} = 2\alpha-2\left(Z-\frac{5}{16}\right).
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec13">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+In the CG method we define so-called conjugate directions and two vectors 
+\( \hat{s} \) and \( \hat{t} \)
+are said to be
+conjugate if
+$$
+\begin{equation*}
+\hat{s}^T\hat{A}\hat{t}= 0.
+\end{equation*}
+$$
+
+The philosophy of the CG method is to perform searches in various conjugate directions
+of our vectors \( \hat{x}_i \) obeying the above criterion, namely
+$$
+\begin{equation*}
+\hat{x}_i^T\hat{A}\hat{x}_j= 0.
+\end{equation*}
+$$
+
+Two vectors are conjugate if they are orthogonal with respect to 
+this inner product. Being conjugate is a symmetric relation: if \( \hat{s} \) is conjugate to \( \hat{t} \), then \( \hat{t} \) is conjugate to \( \hat{s} \).
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec14">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+An example is given by the eigenvectors of the matrix
+$$
+\begin{equation*}
+\hat{v}_i^T\hat{A}\hat{v}_j= \lambda\hat{v}_i^T\hat{v}_j,
+\end{equation*}
+$$
+
+which is zero unless \( i=j \).
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec15">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Assume now that we have a symmetric positive-definite matrix \( \hat{A} \) of size
+\( n\times n \). At each iteration \( i+1 \) we obtain the conjugate direction of a vector
+$$
+\begin{equation*}
+\hat{x}_{i+1}=\hat{x}_{i}+\alpha_i\hat{p}_{i}. 
+\end{equation*}
+$$
+
+We assume that \( \hat{p}_{i} \) is a sequence of \( n \) mutually conjugate directions. 
+Then the \( \hat{p}_{i} \)  form a basis of \( R^n \) and we can expand the solution 
+$  \hat{A}\hat{x} = \hat{b}$ in this basis, namely
+
+$$
+\begin{equation*}
+  \hat{x}  = \sum^{n}_{i=1} \alpha_i \hat{p}_i.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec16">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The coefficients are given by
+$$
+\begin{equation*}
+    \mathbf{A}\mathbf{x} = \sum^{n}_{i=1} \alpha_i \mathbf{A} \mathbf{p}_i = \mathbf{b}.
+\end{equation*}
+$$
+
+Multiplying with \( \hat{p}_k^T \)  from the left gives
+
+$$
+\begin{equation*}
+  \hat{p}_k^T \hat{A}\hat{x} = \sum^{n}_{i=1} \alpha_i\hat{p}_k^T \hat{A}\hat{p}_i= \hat{p}_k^T \hat{b},
+\end{equation*}
+$$
+
+and we can define the coefficients \( \alpha_k \) as
+
+$$
+\begin{equation*}
+    \alpha_k = \frac{\hat{p}_k^T \hat{b}}{\hat{p}_k^T \hat{A} \hat{p}_k}
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec17">Conjugate gradient method and iterations </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+If we choose the conjugate vectors \( \hat{p}_k \) carefully, 
+then we may not need all of them to obtain a good approximation to the solution 
+\( \hat{x} \). 
+So, we want to regard the conjugate gradient method as an iterative method. 
+This also allows us to solve systems where \( n \) is so large that the direct 
+method would take too much time.
+
+<p>
+We denote the initial guess for \( \hat{x} \) as \( \hat{x}_0 \). 
+We can assume without loss of generality that
+
+$$
+\begin{equation*}
+\hat{x}_0=0,
+\end{equation*}
+$$
+
+or consider the system
+$$
+\begin{equation*}
+\hat{A}\hat{z} = \hat{b}-\hat{A}\hat{x}_0,
+\end{equation*}
+$$
+
+instead.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec18">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Important, one can show that the solution \( \hat{x} \) is also the unique minimizer of the quadratic form
+$$
+\begin{equation*}
+  f(\hat{x}) = \frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T \hat{x} , \quad \hat{x}\in\mathbf{R}^n. 
+\end{equation*}
+$$
+
+This suggests taking the first basis vector \( \hat{p}_1 \) 
+to be the gradient of \( f \) at \( \hat{x}=\hat{x}_0 \), 
+which equals
+$$
+\begin{equation*}
+\hat{A}\hat{x}_0-\hat{b},
+\end{equation*}
+$$
+
+and 
+\( \hat{x}_0=0 \) it is equal \( -\hat{b} \).
+The other vectors in the basis will be conjugate to the gradient, 
+hence the name conjugate gradient method.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec19">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Let  \( \hat{r}_k \) be the residual at the \( k \)-th step:
+$$
+\begin{equation*}
+\hat{r}_k=\hat{b}-\hat{A}\hat{x}_k.
+\end{equation*}
+$$
+
+Note that \( \hat{r}_k \) is the negative gradient of \( f \) at 
+\( \hat{x}=\hat{x}_k \), 
+so the gradient descent method would be to move in the direction \( \hat{r}_k \). 
+Here, we insist that the directions \( \hat{p}_k \) are conjugate to each other, 
+so we take the direction closest to the gradient \( \hat{r}_k \)  
+under the conjugacy constraint. 
+This gives the following expression
+$$
+\begin{equation*}
+\hat{p}_{k+1}=\hat{r}_k-\frac{\hat{p}_k^T \hat{A}\hat{r}_k}{\hat{p}_k^T\hat{A}\hat{p}_k} \hat{p}_k.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec20">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We can also  compute the residual iteratively as
+$$
+\begin{equation*}
+\hat{r}_{k+1}=\hat{b}-\hat{A}\hat{x}_{k+1},
+ \end{equation*}
+$$
+
+which equals
+
+$$
+\begin{equation*}
+\hat{b}-\hat{A}(\hat{x}_k+\alpha_k\hat{p}_k),
+ \end{equation*}
+$$
+
+or
+
+$$
+\begin{equation*}
+(\hat{b}-\hat{A}\hat{x}_k)-\alpha_k\hat{A}\hat{p}_k,
+ \end{equation*}
+$$
+
+which gives
+
+$$
+\begin{equation*}
+\hat{r}_{k+1}=\hat{r}_k-\hat{A}\hat{p}_{k},
+ \end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec21">Conjugate gradient method, our case </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+If we consider finding the minimum of a function \( f \) using Newton's method,
+that is search for a zero of the gradient of a function.  Near a point \( x_i \)
+we have to second order
+$$
+\begin{equation*}
+f(\hat{x})=f(\hat{x}_i)+(\hat{x}-\hat{x}_i)\nabla f(\hat{x}_i)
+\frac{1}{2}(\hat{x}-\hat{x}_i)\hat{A}(\hat{x}-\hat{x}_i)
+\end{equation*}
+$$
+
+giving
+$$
+\begin{equation*}
+\nabla f(\hat{x})=\nabla f(\hat{x}_i)+\hat{A}(\hat{x}-\hat{x}_i).
+ \end{equation*}
+$$
+
+In Newton's method we set \( \nabla f = 0 \) and we can thus compute the next iteration point
+(here the exact result)
+$$
+\begin{equation*}
+\hat{x}-\hat{x}_i=\hat{A}^{-1}\nabla f(\hat{x}_i).
+\end{equation*}
+$$
+
+Subtracting this equation from that of \( \hat{x}_{i+1} \) we have
+
+$$
+\begin{equation*}
+\hat{x}_{i+1}-\hat{x}_i=\hat{A}^{-1}(\nabla f(\hat{x}_{i+1})-\nabla f(\hat{x}_i)).
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec22">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>#include &lt;cmath&gt;
+#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;iomanip&gt;
+#include &quot;vectormatrixclass.h&quot;
+using namespace  std;
+//   Main function begins here
+int main(int  argc, char * argv[]){
+  int dim = 2;
+  Vector x(dim),xsd(dim), b(dim),x0(dim);
+  Matrix A(dim,dim);
+  
+  // Set our initial guess
+  x0(0) = x0(1) = 0;
+  // Set the matrix  
+  A(0,0) =  3;    A(1,0) =  2;   A(0,1) =  2;   A(1,1) =  6; 
+  b(0) = 2; b(1) = -8;
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec23">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>  cout &lt;&lt; &quot;The Matrix A that we are using: &quot; &lt;&lt; endl;
+  A.Print();
+  cout &lt;&lt; endl;
+  x = ConjugateGradient(A,b,x0);
+  xsd = SteepestDescent(A,b,x0);
+  cout &lt;&lt; &quot;The approximate solution using Conjugate Gradient is: &quot; &lt;&lt; endl;
+  x.Print();
+  cout &lt;&lt; endl;
+  cout &lt;&lt; &quot;The approximate solution using Steepest Descent is: &quot; &lt;&lt; endl;
+  xsd.Print();
+  cout &lt;&lt; endl;
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec24">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>Vector SteepestDescent(Matrix A, Vector b, Vector x0){
+  int IterMax, i;
+  int dim = x0.Dimension();
+  const double tolerance = 1.0e-14;
+  Vector x(dim),f(dim),z(dim);
+  double c,alpha,d;
+  IterMax = 30;
+  x = x0;
+  f = A*x-b;
+  i = 0;
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec25">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>  while (i &lt;= IterMax){
+    z = A*f;
+    c = dot(f,f);
+    alpha = c/dot(f,z);
+    x = x - alpha*f;
+    f =  A*x-b;
+    if(sqrt(dot(f,f)) &lt; tolerance) break;
+    i++;
+  }
+  return x;
+} 
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec26">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>  Vector ConjugateGradient(Matrix A, Vector b, Vector x0){
+  int dim = x0.Dimension();
+  const double tolerance = 1.0e-14;
+  Vector x(dim),r(dim),v(dim),z(dim);
+  double c,t,d;
+
+  x = x0;
+  r = b - A*x;
+  v = r;
+  c = dot(r,r);
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec27">Simple codes for  steepest descent and conjugate gradient </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>  int i = 0; IterMax = dim;
+  while(i &lt;= IterMax){
+    z = A*v;
+    t = c/dot(v,z);
+    x = x + t*v;
+    r = r - t*z;
+    d = dot(r,r);
+    if(sqrt(d) &lt; tolerance)
+      break;
+    v = r + (d/c)*v;
+    c = d;  i++;
+  }
+  return x;
+} 
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec28">Codes from numerical recipes </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The codes are taken from chapter 10.7 of Numerical recipes.  We use the functions
+\( dfpmin \) and \( lnsrch \).  You can load down the package of programs from the webpage of
+the course, see under project 1.  
+The package is called \( NRcgm107.tar.gz \) and contains the files 
+\( dfmin.c \), \( lnsrch.c \), \( nrutil.c \) and \( nrutil.h \). 
+These codes are  written in C.
+<!-- begin verbatim block  cppcod-->
+<pre><code>
+void dfpmin(double p[], int n, double gtol, int *iter, double *fret,
+double(*func)(double []), void (*dfunc)(double [], double []))
+
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec29">What you have to provide </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The input to <b>dfpmin</b>
+<!-- begin verbatim block  cppcod-->
+<pre><code>void dfpmin(double p[], int n, double gtol, int *iter, double *fret,
+double(*func)(double []), void (*dfunc)(double [], double []))
+</code></pre>
+<!-- end verbatim block -->
+is
+
+<ul>
+  <li> The starting vector \( p \) of length \( n \)</li>
+  <li> The function \( func \) on which minimization is done</li>
+  <li> The function \( dfunc \) where the gradient i calculated</li>
+  <li> The convergence requirement for zeroing the gradient \( gtol \).</li>
+</ul>
+
+It returns in \( p \) the location of the minimum, the number of iterations and 
+the minimum value of the function under study \( fret \).
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec30">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>#include &quot;nrutil.h&quot;
+using namespace std;
+//     Here we define various functions called by the main program
+
+double E_function(double *x);
+void   dE_function(double *x, double *g);
+void   dfpmin(double p[], int n, double gtol, int *iter, double *fret,
+	    double(*func)(double []), void (*dfunc)(double [], double []));
+//   Main function begins here
+int main()
+{
+     int n, iter;
+     double gtol, fret;
+     double alpha;
+     n = 1;
+     cout &lt;&lt; &quot;Read in guess for alpha&quot; &lt;&lt; endl;
+     cin &gt;&gt; alpha;
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec31">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>//   reserve space in memory for vectors containing the variational
+//   parameters
+     double *p = new double [2];
+     gtol = 1.0e-5;
+//   now call dfmin and compute the minimum
+     p[1] = alpha;
+     dfpmin(p, n, gtol, &amp;iter, &amp;fret,&amp;E_function,&amp;dE_function);
+     cout &lt;&lt; &quot;Value of energy minimum = &quot; &lt;&lt; fret &lt;&lt; endl;
+     cout &lt;&lt; &quot;Number of iterations = &quot; &lt;&lt; iter &lt;&lt; endl;
+     cout &lt;&lt; &quot;Value of alpha at minimu = &quot; &lt;&lt; p[1] &lt;&lt; endl;
+      delete [] p;
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec32">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>//  this function defines the Energy function
+double E_function(double x[])
+{
+  double value = x[1]*x[1]*0.5+1.0/(8*x[1]*x[1]);
+  return value;
+} // end of function to evaluate
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec33">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>//  this function defines the derivative of the energy 
+void dE_function(double x[], double g[])
+{
+  g[1] = x[1]-1.0/(4*x[1]*x[1]*x[1]);
+} // end of function to evaluate
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec34">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>using namespace std;
+//     Here we define various functions called by the main program
+
+double E_function(double *x);
+void   dE_function(double *x, double *g);
+void   dfpmin(double p[], int n, double gtol, int *iter, double *fret,
+	    double(*func)(double []), void (*dfunc)(double [], double []));
+//   Main function begins here
+int main()
+{
+     int n, iter;
+     double gtol, fret;
+     double alpha;
+     n = 1;
+     cout &lt;&lt; &quot;Read in guess for alpha&quot; &lt;&lt; endl;
+     cin &gt;&gt; alpha;
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec35">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>//   reserve space in memory for vectors containing the variational
+//   parameters
+     double *p = new double [2];
+     gtol = 1.0e-5;
+//   now call dfmin and compute the minimum
+     p[1] = alpha;
+     dfpmin(p, n, gtol, &amp;iter, &amp;fret,&amp;E_function,&amp;dE_function);
+     cout &lt;&lt; &quot;Value of energy minimum = &quot; &lt;&lt; fret &lt;&lt; endl;
+     cout &lt;&lt; &quot;Number of iterations = &quot; &lt;&lt; iter &lt;&lt; endl;
+     cout &lt;&lt; &quot;Value of alpha at minimu = &quot; &lt;&lt; p[1] &lt;&lt; endl;
+      delete [] p;
+</code></pre>
+<!-- end verbatim block -->
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec36">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>//  this function defines the Energy function
+double E_function(double x[])
+{
+
+//  Change here by calling your Metropolis function which 
+//  returns the local energy
+
+  double value = x[1]*x[1]*0.5+1.0/(8*x[1]*x[1]);
+  return value;
+} // end of function to evaluate
+</code></pre>
+<!-- end verbatim block -->
+You need to change this function so that you call the local energy for your system. I used 1000
+cycles per call to get a new value of \( \langle E_L[\alpha]\rangle \).
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec37">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<!-- begin verbatim block  cppcod-->
+<pre><code>//  this function defines the derivative of the energy 
+void dE_function(double x[], double g[])
+{
+//  Change here by calling your Metropolis function. 
+//  I compute both the local energy and its derivative for every call to func
+
+  g[1] = x[1]-1.0/(4*x[1]*x[1]*x[1]);
+} // end of function to evaluate
+</code></pre>
+<!-- end verbatim block -->
+You need to change this function so that you call the local energy for your system. I used 1000
+cycles per call to get a new value of \( \langle E_L[\alpha]\rangle \).
+When I compute the local energy I also compute its derivative.
+After roughly 10-20 iterations I got a converged result in terms of \( \alpha \).
+</div>
+
+
+<!-- ------------------- end of main content --------------- -->
+
+
+</body>
+</html>
+    
+
