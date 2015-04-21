@@ -1,0 +1,6032 @@
+% Slides for fys4411
+
+\documentclass[compress]{beamer}
+
+
+% Try the class options [notes], [notes=only], [trans], [handout],
+% [red], [compress], [draft], [class=article] and see what happens!
+
+% For a green structure color use %\colorlet{structure}{green!50!black}
+
+\mode<article> % only for the article version
+{
+  \usepackage{beamerbasearticle}
+  \usepackage{fullpage}
+  \usepackage{hyperref}
+}
+
+\beamertemplateshadingbackground{red!10}{blue!10}
+
+%\usetheme{Hannover}
+
+\setbeamertemplate{footline}[page number]
+
+
+%\usepackage{beamerthemeshadow}
+
+
+
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage[latin1]{inputenc}
+\usepackage{colortbl}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{shadow}
+\lstset{language=c++}
+\lstset{alsolanguage=[90]Fortran}
+\lstset{basicstyle=\small}
+%\lstset{backgroundcolor=\color{white}}
+%\lstset{frame=single}
+\lstset{stringstyle=\ttfamily}
+%\lstset{keywordstyle=\color{red}\bfseries}
+%\lstset{commentstyle=\itshape\color{blue}}
+\lstset{showspaces=false}
+\lstset{showstringspaces=false}
+\lstset{showtabs=false}
+\lstset{breaklines}
+\usepackage{times}
+
+% Use some nice templates
+\beamertemplatetransparentcovereddynamic
+
+% own commands
+
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+%\newcommand{\bra}[1]{\left\langle #1 \right|}
+%\newcommand{\ket}[1]{\left| # \right\rangle}
+\newcommand{\braket}[2]{\left\langle #1 \right| #2 \right\rangle}
+\newcommand{\OP}[1]{{\bf\widehat{#1}}}
+\newcommand{\matr}[1]{{\bf \cal{#1}}}
+\newcommand{\beN}{\begin{equation*}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\beaN}{\begin{eqnarray*}}
+\newcommand{\eeN}{\end{equation*}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\eeaN}{\end{eqnarray*}}
+\newcommand{\bdm}{\begin{displaymath}}
+\newcommand{\edm}{\end{displaymath}}
+\newcommand{\bsubeqs}{\begin{subequations}}
+\newcommand{\esubeqs}{\end{subequations}}
+\def\psii{\psi_{i}}
+\def\psij{\psi_{j}}
+\def\psiij{\psi_{ij}}
+\def\psisq{\psi^2}
+\def\psisqex{\langle \psi^2 \rangle}
+\def\psiR{\psi({\bf R})}
+\def\psiRk{\psi({\bf R}_k)}
+\def\psiiRk{\psi_{i}(\Rveck)}
+\def\psijRk{\psi_{j}(\Rveck)}
+\def\psiijRk{\psi_{ij}(\Rveck)}
+\def\ranglep{\rangle_{\psisq}}
+\def\Hpsibypsi{{H \psi \over \psi}}
+\def\Hpsiibypsi{{H \psii \over \psi}}
+\def\HmEpsibypsi{{(H-E) \psi \over \psi}}
+\def\HmEpsiibypsi{{(H-E) \psii \over \psi}}
+\def\HmEpsijbypsi{{(H-E) \psij \over \psi}}
+\def\psiibypsi{{\psii \over \psi}}
+\def\psijbypsi{{\psij \over \psi}}
+\def\psiijbypsi{{\psiij \over \psi}}
+\def\psiibypsiRk{{\psii(\Rveck) \over \psi(\Rveck)}}
+\def\psijbypsiRk{{\psij(\Rveck) \over \psi(\Rveck)}}
+\def\psiijbypsiRk{{\psiij(\Rveck) \over \psi(\Rveck)}}
+\def\EL{E_{\rm L}}
+\def\ELi{E_{{\rm L},i}}
+\def\ELj{E_{{\rm L},j}}
+\def\ELRk{E_{\rm L}(\Rveck)}
+\def\ELiRk{E_{{\rm L},i}(\Rveck)}
+\def\ELjRk{E_{{\rm L},j}(\Rveck)}
+\def\Ebar{\bar{E}}
+\def\Ei{\Ebar_{i}}
+\def\Ej{\Ebar_{j}}
+\def\Ebar{\bar{E}}
+\def\Rvec{{\bf R}}
+\def\Rveck{{\bf R}_k}
+\def\Rvecl{{\bf R}_l}
+\def\NMC{N_{\rm MC}}
+\def\sumMC{\sum_{k=1}^{\NMC}}
+\def\MC{Monte Carlo}
+\def\adiag{a_{\rm diag}}
+\def\tcorr{T_{\rm corr}}
+\def\intR{{\int {\rm d}^{3N}\!\!R\;}}
+
+\def\ul{\underline}
+\def\beq{\begin{eqnarray}}
+\def\eeq{\end{eqnarray}}
+
+\newcommand{\eqbrace}[4]{\left\{
+\begin{array}{ll}
+#1 & #2 \\[0.5cm]
+#3 & #4
+\end{array}\right.}
+\newcommand{\eqbraced}[4]{\left\{
+\begin{array}{ll}
+#1 & #2 \\[0.5cm]
+#3 & #4
+\end{array}\right\}}
+\newcommand{\eqbracetriple}[6]{\left\{
+\begin{array}{ll}
+#1 & #2 \\
+#3 & #4 \\
+#5 & #6
+\end{array}\right.}
+\newcommand{\eqbracedtriple}[6]{\left\{
+\begin{array}{ll}
+#1 & #2 \\
+#3 & #4 \\
+#5 & #6
+\end{array}\right\}}
+
+\newcommand{\mybox}[3]{\mbox{\makebox[#1][#2]{$#3$}}}
+\newcommand{\myframedbox}[3]{\mbox{\framebox[#1][#2]{$#3$}}}
+
+%% Infinitesimal (and double infinitesimal), useful at end of integrals
+%\newcommand{\ud}[1]{\mathrm d#1}
+\newcommand{\ud}[1]{d#1}
+\newcommand{\udd}[1]{d^2\!#1}
+
+%% Operators, algebraic matrices, algebraic vectors
+
+%% Operator (hat, bold or bold symbol, whichever you like best):
+\newcommand{\op}[1]{\widehat{#1}}
+%\newcommand{\op}[1]{\mathbf{#1}}
+%\newcommand{\op}[1]{\boldsymbol{#1}}
+
+%% Vector:
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+
+%% Matrix symbol:
+%\newcommand{\matr}[1]{\boldsymbol{#1}}
+%\newcommand{\bb}[1]{\mathbb{#1}}
+
+%% Determinant symbol:
+\renewcommand{\det}[1]{|#1|}
+
+%% Means (expectation values) of varius sizes
+\newcommand{\mean}[1]{\langle #1 \rangle}
+\newcommand{\meanb}[1]{\big\langle #1 \big\rangle}
+\newcommand{\meanbb}[1]{\Big\langle #1 \Big\rangle}
+\newcommand{\meanbbb}[1]{\bigg\langle #1 \bigg\rangle}
+\newcommand{\meanbbbb}[1]{\Bigg\langle #1 \Bigg\rangle}
+
+%% Shorthands for text set in roman font
+\newcommand{\prob}[0]{\mathrm{Prob}} %probability
+\newcommand{\cov}[0]{\mathrm{Cov}}   %covariance
+\newcommand{\var}[0]{\mathrm{Var}}   %variancd
+
+%% Big-O (typically for specifying the speed scaling of an algorithm)
+\newcommand{\bigO}{\mathcal{O}}
+
+%% Real value of a complex number
+\newcommand{\real}[1]{\mathrm{Re}\!\left\{#1\right\}}
+
+%% Quantum mechanical state vectors and matrix elements (of different sizes)
+%\newcommand{\bra}[1]{\langle #1 |}
+\newcommand{\bfv}[1]{\boldsymbol{#1}}                     % vector written as a boldface symbol
+\newcommand{\Div}[1]{\nabla \bullet \vbf{#1}}           % define divergence
+\newcommand{\Grad}[1]{\boldsymbol{\nabla}{#1}}
+
+%%% DEFINITIOS FOR QUANTUM MECHANICS %%%
+\newcommand{\Op}[1]{{\bf\widehat{#1}}}                    % define operator
+\newcommand{\Obs}[1]{\langle{\Op{#1}\rangle}}             % define observable
+\newcommand{\be}{\begin{equation}}                        % begin equation
+\newcommand{\ee}{\end{equation}}                          % end equation
+\newcommand{\PsiT}{\bfv{\Psi_T}(\bfv{R})}                       % symbol for trial wave function
+\newcommand{\braket}[2]{\langle{#1}|\Op{#2}|{#1}\rangle}
+\newcommand{\Det}[1]{{|\bfv{#1}|}}
+
+\newcommand{\brab}[1]{\big\langle #1 \big|}
+\newcommand{\brabb}[1]{\Big\langle #1 \Big|}
+\newcommand{\brabbb}[1]{\bigg\langle #1 \bigg|}
+\newcommand{\brabbbb}[1]{\Bigg\langle #1 \Bigg|}
+%\newcommand{\ket}[1]{| #1 \rangle}
+\newcommand{\ketb}[1]{\big| #1 \big\rangle}
+\newcommand{\ketbb}[1]{\Big| #1 \Big\rangle}
+\newcommand{\ketbbb}[1]{\bigg| #1 \bigg\rangle}
+\newcommand{\ketbbbb}[1]{\Bigg| #1 \Bigg\rangle}
+\newcommand{\overlap}[2]{\langle #1 | #2 \rangle}
+\newcommand{\overlapb}[2]{\big\langle #1 \big| #2 \big\rangle}
+\newcommand{\overlapbb}[2]{\Big\langle #1 \Big| #2 \Big\rangle}
+\newcommand{\overlapbbb}[2]{\bigg\langle #1 \bigg| #2 \bigg\rangle}
+\newcommand{\overlapbbbb}[2]{\Bigg\langle #1 \Bigg| #2 \Bigg\rangle}
+\newcommand{\bracket}[3]{\langle #1 | #2 | #3 \rangle}
+\newcommand{\bracketb}[3]{\big\langle #1 \big| #2 \big| #3 \big\rangle}
+\newcommand{\bracketbb}[3]{\Big\langle #1 \Big| #2 \Big| #3 \Big\rangle}
+\newcommand{\bracketbbb}[3]{\bigg\langle #1 \bigg| #2 \bigg| #3 \bigg\rangle}
+\newcommand{\bracketbbbb}[3]{\Bigg\langle #1 \Bigg| #2 \Bigg| #3 \Bigg\rangle}
+\newcommand{\projection}[2]
+{| #1 \rangle \langle  #2 |}
+\newcommand{\projectionb}[2]
+{\big| #1 \big\rangle \big\langle #2 \big|}
+\newcommand{\projectionbb}[2]
+{ \Big| #1 \Big\rangle \Big\langle #2 \Big|}
+\newcommand{\projectionbbb}[2]
+{ \bigg| #1 \bigg\rangle \bigg\langle #2 \bigg|}
+\newcommand{\projectionbbbb}[2]
+{ \Bigg| #1 \Bigg\rangle \Bigg\langle #2 \Bigg|}
+
+
+%% If you run out of greek symbols, here's another one you haven't
+%% thought of:
+\newcommand{\Feta}{\hspace{0.6ex}\begin{turn}{180}
+        {\raisebox{-\height}{\parbox[c]{1mm}{F}}}\end{turn}}
+\newcommand{\feta}{\hspace{-1.6ex}\begin{turn}{180}
+        {\raisebox{-\height}{\parbox[b]{4mm}{f}}}\end{turn}}
+
+
+
+
+\title[FYS4411]{FYS4411/FYS9411 Computational Physics II\\ University of Oslo, Norway}
+\author[Computational Physics II]{%
+  Morten Hjorth-Jensen}
+\institute[University of Oslo and Michigan State University]{
+  \inst{1}
+  Department of Physics,\\
+  University of Oslo, N-0316 Oslo, Norway\\ National Superconducting Cyclotron Laboratory and Department of Astronomy and Physics,\\ Michigan State University, East Lansing, Michigan, USA }
+
+  
+\date[UiO]{Spring  2014}
+\subject{FYS4411/FYS9411 Computational Physics II, Computational Quantum Mechanics}
+
+
+\pgfdeclareimage[width=6cm,angle=270]{pi}{pi}
+\pgfdeclareimage[width=4cm,angle=270]{gropp}{gropp}
+\pgfdeclareimage[width=5cm,angle=270]{rothman}{rothman}
+\pgfdeclareimage[width=4cm,angle=270]{thijssen}{thijssen}
+
+\begin{document}
+
+
+
+\frame{\titlepage}
+
+
+
+
+\section[Week 3]{Week 3}
+\frame
+{
+  \frametitle{Topics for Week 3, January 13-17}
+  \begin{block}{Introduction, discussion of project  and definitions}
+\begin{itemize}
+\item Presentation of topics to be covered and definitions
+\item Discussion of the project and first steps
+\item Reading assignment for next week: study chapter 4 of Thijssen's text and chapter 7 of lectures notes of MHJ
+\item Computational assignment: solve numerically the  one-body hydrogen-like problem (this week and next week).
+\item Form as soon as possible collaboration groups of 2-3 participants.
+\end{itemize}
+  \end{block}
+} 
+
+
+
+\frame
+{
+  \frametitle{January 13 - May 31}
+  \begin{block}{Course overview, Aims and Computational aspects}
+\begin{itemize}
+\item The aim is to use the Hartree-Fock method to study atoms and molecules
+\item The results can be used to provide potentials and charge distributions for molecular dynamics simulations
+\item Eigenvalue solvers, efficient computations of integrals
+\item Iterative methods for solutions of non-linear equations
+\item Object orientation and efficient parallelization
+\item The first part of the project (ready by March 7) deals with Hartree-Fock calculations of closed-shell atoms like He, Be and Ne using standard hydrogen-like single-particle state functions.
+\item The second part includes optimized single-particle state functions and computations of both atoms and molecules
+\end{itemize}
+  \end{block}
+} 
+
+
+
+\frame
+{
+  \frametitle{January 13 - May 31}
+  \begin{block}{Projects, deadlines and oral exam}
+\begin{enumerate}
+\item Deadline part 1: March  7
+\item Deadline full project: 31 May
+\item Oral exam: To be settled
+\end{enumerate}
+The oral exam is based on your presentation of the project.
+  \end{block}
+} 
+
+
+\frame
+{
+  \frametitle{January 13 - May 31}
+  \begin{block}{More on projects}
+\begin{enumerate}
+\item Keep  a logbook, important for keeping track of all your changes etc etc.
+\item The project should be written as a regular scientific article, with introduction, formalism, codes which have been developed and discussion of results.
+Conclusions and references should also be included.  An example can be found on the webpage of the course.  
+%\item The link with the article example  contains also an article on how to use latex and write good scientific articles!
+\end{enumerate}
+The methods are relevant for 
+atomic, molecular,solid state, materials science, lief science, nanotechnology, quantum chemistry  and nuclear physics. 
+
+
+  \end{block}
+} 
+
+
+
+
+
+
+
+\frame
+{
+  \frametitle{Lectures and ComputerLab}
+  \begin{block}{}
+\begin{itemize}
+\item Lectures: Thursday (14.15-16, room FV329)
+       \item Detailed lecture notes, all programs presented and projects
+can be found at the homepage of the course.
+       \item Computerlab: 16-19 thursday, room FV329
+       \item Weekly plans and relevant information are on the official webpage.
+\item Chapters 7 and 16 of the FYS3150 lecture notes give a good 
+starting point.   Chapter 16 will also be revised. 
+We recommend also J.~M.~Thijssen  text {\em Computational Physics}, chapters 3-6.
+For MPI we recommend Gropp, Lusk and Sjellum's text.
+\end{itemize}
+  \end{block}
+}
+
+
+
+
+\frame
+{
+  \frametitle{Thijssen's text}
+\begin{columns}
+\column{5.5cm}
+%\begin{center}
+\begin{pgfpicture}{-2.25cm}{0.5cm}{5cm}{0.5cm}
+   {\pgfbox[center,center]{\pgfuseimage{thijssen}}}
+\end{pgfpicture}
+%\begin{figure}
+%\includegraphics[scale=0.3]{he6}
+%\end{figure}
+%\end{center}
+\column{4.5cm}
+  \begin{block}{J.~M.~Thijssen's text}
+\begin{itemize}
+\item Computational  Physics
+\item Chapters 3-6
+\item see \url{http://www.tn.tudelft.nl/tn/People/Staff/Thijssen/comphybook.html}
+\end{itemize}
+  \end{block}
+\end{columns}
+}
+
+
+
+
+
+
+\frame
+{
+  \frametitle{MPI text}
+\begin{columns}
+\column{5.5cm}
+%\begin{center}
+\begin{pgfpicture}{-2.25cm}{0.5cm}{5cm}{0.5cm}
+   {\pgfbox[center,center]{\pgfuseimage{gropp}}}
+\end{pgfpicture}
+%\begin{figure}
+%\includegraphics[scale=0.3]{he6}
+%\end{figure}
+%\end{center}
+\column{4.5cm}
+  \begin{block}{Gropp, Lusk and Sjellum}
+\begin{itemize}
+\item Using MPI
+\item Chapters 1-5 
+\item see \url{http://mitpress.mit.edu/catalog/item/default.asp?ttype=2&tid=10761}
+\end{itemize}
+  \end{block}
+\end{columns}
+}
+
+
+
+\frame
+{
+  \frametitle<presentation>{Selected Texts and lectures on C/C++}
+ \begin{small}
+ {\scriptsize
+
+  \beamertemplatebookbibitems
+
+  \begin{thebibliography}{10}
+   \bibitem{ref1} J.~J.~Barton and L.~R.~Nackman,{\em Scientific and Engineering C++}, Addison Wesley, 3rd edition 2000.
+   \bibitem{ref2} B.~Stoustrup, {\em The C++ programming language}, Pearson, 1997. 
+   \bibitem{ref3}George Em Karniadakis and Robert M. Kirby II, {\em Parallel Scientific Computing in C++ and MPI}  \url{http://www.cambridge.org/catalogue/catalogue.asp?isbn=9780521520805}
+   \bibitem{ref4} D.~Yang, {\em C++ and Object-oriented Numeric Computing for
+Scientists and Engineers}, Springer 2000.
+\bibitem{ref5} More books reviewed at \url{http:://www.accu.org/} and 
+\url{http://www.comeaucomputing.com/booklist/}
+\end{thebibliography}
+ }
+ \end{small}
+}
+
+
+\frame
+{
+\frametitle{Definitions}
+The quantum mechanical wave function of a given state with quantum numbers $\lambda$ (encompassing all quantum numbers needed to specify the system), ignoring time, is with $N$ particles (electrons in our case)
+\[
+\Psi_{\lambda}=\Psi_{\lambda}(x_1,x_2,\dots,x_N),
+\]
+with $x_i=({\bf r}_i,\sigma_i)$ and the projection of $\sigma_i$ takes the values
+$\{-1/2,+1/2\}$ for fermions with spin $1/2$. 
+We will hereafter always refer to $\Psi_{\lambda}$ as the exact wave function, and if the ground state is not degenerate we label it as 
+\[
+\Psi_0=\Psi_0(x_1,x_2,\dots,x_N).
+\]
+
+}
+
+
+\frame
+{
+\frametitle{Definitions}
+Since the solution $\Psi_{\lambda}$ seldomly can be found in closed form, approximations are sought. In these slides  we define an approximative wave function or an ansatz to the exact wave function as 
+\[
+\Phi_{\lambda}=\Phi_{\lambda}(x_1,x_2,\dots,x_N),
+\]
+with 
+\[
+\Phi_0=\Phi_0(x_1,x_2,\dots,x_N),
+\]
+being the ansatz to the ground state.  
+}
+
+
+\frame
+{
+\frametitle{Definitions}
+The wave function $\Psi_{\lambda}$ is sought in the Hilbert space of either symmetric or anti-symmetric $N$-body functions, namely
+\[
+\Psi_{\lambda}\in {\cal H}_N:= {\cal H}_1\oplus{\cal H}_1\oplus\dots\oplus{\cal H}_1,
+\]
+where the single-particle Hilbert space ${\cal H}_1$ is the space of square integrable functions over
+$\in {\mathbb{R}}^{d}\oplus (\sigma)$
+resulting in
+\[
+{\cal H}_1:= L^2(\mathbb{R}^{d}\oplus (\sigma)).
+\]
+}
+
+
+
+
+
+
+
+
+\frame
+{
+\frametitle{Definitions}
+Our Hamiltonian is invariant under the permutation (interchange) of two fermions.
+Since we deal with fermions however, the total wave function is antisymmetric.
+Let $\hat{P}$ be an operator which interchanges two fermions.
+Due to the symmetries we have ascribed to our Hamiltonian, this operator commutes with the total Hamiltonian,
+\[
+[\hat{H},\hat{P}] = 0,
+\]
+meaning that $\Psi_{\lambda}(x_1, x_2, \dots , x_N)$ is an eigenfunction of 
+$\hat{P}$ as well, that is
+\[
+\hat{P}_{ij}\Psi_{\lambda}(x_1, x_2, \dots,x_i,\dots,x_j,\dots,x_N)=
+\beta\Psi_{\lambda}(x_1, x_2, \dots,x_j,\dots,x_i,\dots,x_N),
+\]
+where $\beta$ is the eigenvalue of $\hat{P}$. We have introduced the suffix $ij$ in order to indicate that we permute fermions $i$ and $j$.
+The Pauli principle tells us that the total wave function for a system of fermions
+has to be antisymmetric, resulting in the eigenvalue $\beta = -1$.   
+
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+The Schr\"odinger equation reads 
+\begin{equation}
+\hat{H}(x_1, x_2, \dots , x_N) \Psi_{\lambda}(x_1, x_2, \dots , x_N) = 
+E_\lambda  \Psi_\lambda(x_1, x_2, \dots , x_N), 
+\label{eq:basicSE1}
+\end{equation}
+where the vector $x_i$ represents the coordinates (spatial and spin) of particle $i$, $\lambda$ stands  for all the quantum
+numbers needed to classify a given $N$-particle  state and $\Psi_{\lambda}$ is the pertaining eigenfunction.  Throughout this course,
+$\Psi$ refers to the exact eigenfunction, unless otherwise stated.
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+We write the Hamilton operator, or Hamiltonian,  in a generic way 
+\[
+	\hat{H} = \hat{T} + \hat{V} 
+\]
+where $\hat{T}$  represents the kinetic energy of the system
+\[
+	\hat{T} = \sum_{i=1}^N \frac{\mathbf{p}_i^2}{2m_i} = \sum_{i=1}^N \left( -\frac{\hbar^2}{2m_i} \mathbf{\nabla_i}^2 \right) =
+		\sum_{i=1}^N t(x_i)
+\]
+while the operator $\hat{V}$ for the potential energy is given by
+\begin{equation}
+	\hat{V} = \sum_{i=1}^N \hat{u}_{\mathrm{ext}}(x_i) + \sum_{ji=1}^N v(x_i,x_j)+\sum_{ijk=1}^Nv(x_i,x_j,x_k)+\dots
+\label{eq:firstv}
+\end{equation}
+Hereafter we use natural units, viz.~$\hbar=c=e=1$, with $e$ the elementary charge and $c$ the speed of light. This means that momenta and masses
+have dimension energy. 
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+If one does quantum chemistry or atomic physics as we do here, after having introduced the  Born-Oppenheimer approximation which effectively freezes out the nucleonic degrees
+of freedom, the Hamiltonian for $N=n_e$ electrons takes the following form 
+\[
+  \hat{H} = \sum_{i=1}^{n_e} t(x_i) 
+  - \sum_{i=1}^{n_e} k\frac{Z}{r_i} + \sum_{i<j}^{n_e} \frac{k}{r_{ij}},
+\]
+with $k=1.44$ eVnm
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+ We can rewrite this as
+\begin{equation}
+    \hat{H} = \hat{H_0} + \hat{H_I} 
+    = \sum_{i=1}^{n_e}\hat{h}_0(x_i) + \sum_{i<j=1}^{n_e}\frac{1}{r_{ij}},
+\label{H1H2}
+\end{equation}
+where  we have defined $r_{ij}=| {\bf r}_i-{\bf r}_j|$ and
+\begin{equation}
+  \hat{h}_0(x_i) =  \hat{t}(x_i) - \frac{Z}{x_i}.
+\label{hi}
+\end{equation}
+The first term of eq.~(\ref{H1H2}), $H_0$, is the sum of the $N$
+\emph{one-body} Hamiltonians $\hat{h}_0$. Each individual
+Hamiltonian $\hat{h}_0$ contains the kinetic energy operator of an
+electron and its potential energy due to the attraction of the
+nucleus. The second term, $H_I$, is the sum of the $n_e(n_e-1)/2$
+two-body interactions between each pair of electrons. Note that the double sum carries a restriction $i<j$.
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+The potential energy term due to the attraction of the nucleus defines the one-body field $u_i=u_{\mathrm{ext}}(x_i)$ of Eq.~(\ref{eq:firstv}).
+We have moved this term into the $\hat{H}_0$ part of the Hamiltonian, instead of keeping  it in $\hat{V}$ as in  Eq.~(\ref{eq:firstv}).
+The reason is that we will hereafter treat $\hat{H}_0$ as our non-interacting  Hamiltonian. For a many-body wavefunction $\Phi_{\lambda}$ defined by an  
+appropriate single-particle basis, we may solve exactly the non-interacting eigenvalue problem 
+\[
+\hat{H}_0\Phi_{\lambda}= w_{\lambda}\Phi_{\lambda},
+\]
+with $w_{\lambda}$ being the non-interacting energy. This energy is defined by the sum over single-particle energies to be defined below.
+For atoms the single-particle energies could be the hydrogen-like single-particle energies corrected for the charge $Z$. For nuclei and quantum
+dots, these energies could be given by the harmonic oscillator in three and two dimensions, respectively.
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+We will assume that the interacting part of the Hamiltonian
+can be approximated by a two-body interaction.
+This means that our Hamiltonian is written as 
+\begin{equation}
+    \hat{H} = \hat{H_0} + \hat{H_I} 
+    = \sum_{i=1}^N \hat{h}_0(x_i) + \sum_{i<j=1}^N \hat{v}(x_{ij}),
+\label{Hnuclei}
+\end{equation}
+with 
+\begin{equation}
+  H_0=\sum_{i=1}^N \hat{h}_0(x_i) =  \sum_{i=1}^N\left(\hat{t}(x_i) + \hat{u}_{\mathrm{ext}}(x_i)\right).
+\label{hinuclei}
+\end{equation}
+The one-body part $u_{\mathrm{ext}}(x_i)$ is normally approximated by a harmonic oscillator potential or the Coulomb interaction an electron feels from the nucleus. However, other potentials are fully possible, such as 
+one derived from the self-consistent solution of the Hartree-Fock equations or so-called Woods-Saxon potentials used in nuclear physics.
+}
+\end{small}
+}
+
+
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+Our Hamiltonian is invariant under the permutation (interchange) of two fermions. % (exercise here, prove it)
+Since we deal with fermions, the total wave function is antisymmetric.
+Let $\hat{P}$ be an operator which interchanges two fermions.
+Due to the symmetries we have ascribed to our Hamiltonian, this operator commutes with the total Hamiltonian,
+\[
+[\hat{H},\hat{P}] = 0,
+\]
+meaning that $\Psi_{\lambda}(x_1, x_2, \dots , x_N)$ is an eigenfunction of 
+$\hat{P}$ as well, that is
+\[
+\hat{P}_{ij}\Psi_{\lambda}(x_1, x_2, \dots,x_i,\dots,x_j,\dots,x_N)=
+\beta\Psi_{\lambda}(x_1, x_2, \dots,x_i,\dots,x_j,\dots,x_N),
+\]
+where $\beta$ is the eigenvalue of $\hat{P}$. We have introduced the suffix $ij$ in order to indicate that we permute fermions $i$ and $j$.
+The Pauli principle tells us that the total wave function for a system of fermions
+has to be antisymmetric, resulting in the eigenvalue $\beta = -1$.   
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+In our case we assume that  we can approximate the exact eigenfunction with a Slater determinant
+\be
+   \Phi(x_1, x_2,\dots ,x_N,\alpha,\beta,\dots, \sigma)=\frac{1}{\sqrt{N!}}
+\left| \begin{array}{ccccc} \psi_{\alpha}(x_1)& \psi_{\alpha}(x_2)& \dots & \dots & \psi_{\alpha}(x_N)\\
+                            \psi_{\beta}(x_1)&\psi_{\beta}(x_2)& \dots & \dots & \psi_{\beta}(x_N)\\  
+                            \dots & \dots & \dots & \dots & \dots \\
+                            \dots & \dots & \dots & \dots & \dots \\
+                     \psi_{\sigma}(x_1)&\psi_{\sigma}(x_2)& \dots & \dots & \psi_{\sigma}(x_N)\end{array} \right|, 
+\label{HartreeFockDet}
+\ee 
+where  $x_i$  stand for the coordinates and spin values of a particle $i$ and $\alpha,\beta,\dots, \gamma$ 
+are quantum numbers needed to describe remaining quantum numbers.  
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+Let us denote the ground state energy by $E_0$. According to the
+variational principle we have
+\begin{equation*}
+  E_0 \le E[\Phi] = \int \Phi^*\hat{H}\Phi d\mathbf{\tau}
+\end{equation*}
+where $\Phi$ is a trial function which we assume to be normalized
+\begin{equation*}
+  \int \Phi^*\Phi d\mathbf{\tau} = 1,
+\end{equation*}
+where we have used the shorthand $d\mathbf{\tau}=d\mathbf{x}_1d\mathbf{x}_2\dots d\mathbf{x}_N$.
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+In the Hartree-Fock method the trial function is the Slater
+determinant of Eq.~(\ref{HartreeFockDet}) which can be rewritten as 
+\begin{equation}
+  \Phi(x_1,x_2,\dots,x_N,\alpha,\beta,\dots,\nu) = \frac{1}{\sqrt{N!}}\sum_{P} (-)^P\hat{P}\psi_{\alpha}(x_1)
+    \psi_{\beta}(x_2)\dots\psi_{\nu}(x_N)=\sqrt{N!}{\cal A}\Phi_H,
+\label{HartreeFockPermutation}
+\end{equation}
+where we have introduced the antisymmetrization operator ${\cal A}$ defined by the 
+summation over all possible permutations of two fermions.
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+Before we proceed, we need to discuss the single-particle states which enter the definition of the Slater determinant. We will start with hydrogen-like orbits and write a small program which diagonalizes the hydrogen-like problem. To achieve this, we need to refresh our knowledge about the Schr\"odinger equation for the hydrogen atom.
+
+To solve the Schr\"odinger equation as a matrix diagonalization problem,
+let us study the radial part of the Schr\"odinger equation. 
+The radial part of the wave function, $R(r)$, is a solution to  
+%
+\[
+  -\frac{\hbar^2}{2 m} \left ( \frac{1}{r^2} \frac{d}{dr} r^2
+  \frac{d}{dr} - \frac{l (l + 1)}{r^2} \right )R(r) 
+     + V(r) R(r) = E R(r).
+\]
+In our case $V(r) = -Z/r$.
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+%
+Then we substitute $R(r) = (1/r) u(r)$ and obtain
+%
+\[
+  -\frac{\hbar^2}{2 m} \frac{d^2}{dr^2} u(r) 
+       + \left ( V(r) + \frac{l (l + 1)}{r^2}\frac{\hbar^2}{2 m}
+                                    \right ) u(r)  = E u(r) .
+\]
+%
+We introduce a dimensionless variable $\rho = (1/\alpha) r$
+where $\alpha$ is a constant with dimension length and get
+% 
+\[
+  -\frac{\hbar^2}{2 m \alpha^2} \frac{d^2}{d\rho^2} u(\rho) 
+       + \left ( V(\rho) + \frac{l (l + 1)}{\rho^2}
+         \frac{\hbar^2}{2 m\alpha^2} \right ) u(\rho)  = E u(\rho) .
+\]
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+%
+We replace $\rho$ with $x$, take away the 
+centrifugal barrier (that is setting $l=0$) term and set the potential equal to
+\[
+   V(x)=-\frac{kZ}{x\alpha},
+\]
+with  $k=1.44$ eVnm being a constant. We multiply with $m \alpha^2/\hbar^2$ and since $\alpha$ is just a constant, we fix it by requiring that
+\[
+\frac{kZm \alpha}{\hbar^2}=1,
+\]
+giving 
+\[
+\alpha = \frac{\hbar^2}{kZm},
+\]
+which is the Bohr radius and leads to a natural length scale.
+This leads to the equation
+\[
+  -\frac{1}{2} \frac{d^2}{dx^2} u(x) -\frac{1}{x}u(x)  = \lambda u(x),
+\]
+with 
+\[
+\lambda = \frac{E m \alpha^2}{\hbar^2}. 
+\]
+}
+\end{small}
+}
+
+
+%
+
+
+
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+Let us now see how we can rewrite this equation as a matrix eigenvalue problem.
+First we need to compute  the second derivative. We use here the
+following expression for the second derivative of a function $f$
+\[
+    f''=\frac{f(x+h) -2f(x) +f(x-h)}{h^2} +O(h^2),
+\]
+where $h$ is our step.
+Next we define minimum and maximum values for the variable $x$,
+$R_{\mathrm{min}}$  and $R_{\mathrm{max}}$, respectively.
+With a given number of steps, $N_{\mathrm{step}}$, we then 
+define the step $h$ as
+\[
+  h=\frac{R_{\mathrm{max}}-R_{\mathrm{min}} }{N_{\mathrm{step}}}.
+\]
+
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+We discretize  $x$ as 
+\[
+    x_i= R_{\mathrm{min}} + ih \hspace{1cm} i=1,2,\dots , N_{\mathrm{step}}-1
+\]
+we can rewrite the Schr\"odinger equation for $x_i$ as
+\[
+-\frac{1}{2}\frac{u(x_k+h) -2u(x_k) +u(x_k-h)}{h^2}-\frac{1}{x_k}u(x_k)  = \lambda u(x_k),
+\]
+or in  a more compact way
+\[
+-\frac{1}{2}\frac{u_{k+1} -2u_k +u_{k-1}}{h^2}-\frac{1}{x_k}u_k=-\frac{1}{2}\frac{u_{k+1} -2u_k +u_{k-1} }{h^2}+V_ku_k  = \lambda u_k,
+\]
+where $u_k=u(x_k)$, $u_{k\pm 1}=u(x_k\pm h)$ and $V_k=-1/x_k$, the given potential.
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+Let us see how this recipe may lead to a matrix reformulation of the 
+Schr\"odinger equation.
+Define first the diagonal matrix element
+\[
+   d_k=\frac{1}{h^2}+V_k,
+\]
+and the non-diagonal matrix element 
+\[
+   e_k=-\frac{1}{2h^2}.
+\]
+In this case the non-diagonal matrix elements are given by a mere constant.
+{\em All non-diagonal matrix elements are equal}.
+With these definitions the Schr\"odinger equation takes the following form
+\[
+d_ku_k+e_{k-1}u_{k-1}+e_{k+1}u_{k+1}  = \lambda u_k,
+\]
+where $u_k$ is unknown.
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+ Since we have $N_{\mathrm{step}}$ values of $k$ we can write the 
+latter equation as a matrix eigenvalue problem 
+\begin{equation}
+    \left( \begin{array}{ccccccc} d_1 & e_1 & 0   & 0    & \dots  &0     & 0 \\
+                                e_1 & d_2 & e_2 & 0    & \dots  &0     &0 \\
+                                0   & e_2 & d_3 & e_3  &0       &\dots & 0\\
+                                \dots  & \dots & \dots & \dots  &\dots      &\dots & \dots\\
+                                0   & \dots & \dots & \dots  &\dots       &d_{N_{\mathrm{step}}-1} & e_{N_{\mathrm{step}}-1}\\
+                                0   & \dots & \dots & \dots  &\dots       &e_{N_{\mathrm{step}}-1} & d_{N_{\mathrm{step}}}
+
+             \end{array} \right)      \left( \begin{array}{c} u_{1} \\
+                                                              u_{2} \\
+                                                              \dots\\ \dots\\ \dots\\
+                                                              u_{N_{\mathrm{step}}}
+             \end{array} \right)=\lambda \left( \begin{array}{c} u_{1} \\
+                                                              u_{2} \\
+                                                              \dots\\ \dots\\ \dots\\
+                                                              u_{N_{\mathrm{step}}}
+             \end{array} \right) 
+      \label{eq:sematrix}
+\end{equation} 
+When setting up the matrix, be careful with the endpoints. Our wave function has the values $u(0) =u(\infty)=0$ and you don't need to include these points in the equations.
+}
+\end{small}
+}
+
+
+
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+This is a matrix problem with a tridiagonal matrix of dimension 
+$N_{\mathrm{step}} \times N_{\mathrm{step}}$ and will thus yield 
+$N_{\mathrm{step}}$ eigenvalues. 
+
+The algorithm for solving this problem  may take the following 
+form 
+\begin{itemize}
+  \item Define values for $N_{\mathrm{step}}$, $R_{\mathrm{min}}$ and $R_{\mathrm{max}}$.
+        These values define in turn the step size $h$. Typical values for
+        $R_{\mathrm{max}}$ and $R_{\mathrm{min}}$ could be $0$ and $10$ respectively for the lowest-lying states.  
+        The number of mesh points $N_{\mathrm{step}}$ could be in the range 100 to some
+        thousands. You can check the stability of the results as functions of 
+        $N_{\mathrm{step}}$ and $R_{\mathrm{max}}$ and $R_{\mathrm{min}}$
+        against the exact solutions. 
+  \item Construct then two one-dimensional arrays which contain all values of $x_k$ 
+        and the potential $V_k$. For the latter it can be convenient to write a
+        small function which sets up the potential as function of $x_k$. For 
+        the three-dimensional case you may also need to include 
+        the centrifugal potential. 
+\end{itemize} 
+
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+\begin{itemize}
+  \item Construct thereafter the one-dimensional vectors $d$ and $e$, where 
+        $d$ stands for the diagonal matrix elements and $e$ the non-diagonal ones.
+        Be careful with the endpoints, since we know the wave function $u$ at both ends of the
+        chosen grid.   
+  \item We are now ready to obtain the eigenvalues by calling the function {\em tqli }
+        which can be found on the web page of the course FYS3150, see fall 2013.
+        Calling {\em tqli}, you have to transfer the 
+        vectors  $d$ and $e$ and their dimension
+        dimension $n=N_{\mathrm{step}}$ and a matrix $z$ of dimension
+        $N_{\mathrm{step}}1\times N_{\mathrm{step}}$ which returns the eigenfunctions.
+        On return, the array $d$ contains the 
+        eigenvalues. If $z$ is given as the unity matrix on input, it returns the 
+       eigenvectors. For a given eigenvalue $k$, the eigenvector is given by the column
+       $k$ in $z$, that is z[][k] in C, or z(:,k) in Fortran.
+\end{itemize} 
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+\begin{itemize}
+   \item TQLI does however not return an ordered sequence of eigenvalues. You may
+         then need to sort them as e.g., an ascending series of numbers.
+         The program we provide includes a sorting function as well. 
+\end{itemize} 
+This program is discussed in chapter 7 of the FYS3150 Lecture notes. 
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definition and notations}
+\begin{small}
+{\scriptsize
+\begin{itemize}
+   \item Your task this week and next week is to set up a 
+program which solves the above problem.
+\item The program TQLI can be found in the lib.cpp (use also the lib.h file) at the webpage
+of FYS3150, click on the program link of the Fall 2013 version of the course.
+Read also chapter 7 of the FYS3150 Lectures.
+\item The eigenvalue for the lowest state should be $-1/2$ for the hydrogen-like problem. You should also plot the eigenvector.
+Compute also the second $l=0$ state, both its energy and its eigenfuntion.
+\item Try also to include the centrifugal barrier and find the lowest eigenstate and eigenvector for $l=1$ and comment your results.
+\item At the lab, we will also discuss how to use armadillo instead of the standard memory allocation done in chapter 7.
+\end{itemize} 
+}
+\end{small}
+}
+
+
+
+
+
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+It is defined as
+\begin{equation}
+  {\cal A} = \frac{1}{N!}\sum_{p} (-)^p\hat{P},
+\label{antiSymmetryOperator}
+\end{equation}
+with $p$ standing for the number of permutations. We have introduced for later use the so-called
+Hartree-function, defined by the simple product of all possible single-particle functions
+\begin{equation*}
+  \Phi_H(x_1,x_2,\dots,x_N,\alpha,\beta,\dots,\nu) =
+  \psi_{\alpha}(x_1)
+    \psi_{\beta}(x_2)\dots\psi_{\nu}(x_N).
+\end{equation*}
+
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+Both $\hat{H_0}$ and $\hat{\hat{H}_I}$ are invariant under all possible permutations of any two fermions
+and hence commute with ${\cal A}$
+\begin{equation}
+  [H_0,{\cal A}] = [H_I,{\cal A}] = 0.
+  \label{cummutionAntiSym}
+\end{equation}
+Furthermore, ${\cal A}$ satisfies
+\begin{equation}
+  {\cal A}^2 = {\cal A},
+  \label{AntiSymSquared}
+\end{equation}
+since every permutation of the Slater
+determinant reproduces it. 
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+The expectation value of $\hat{H_0}$ 
+\[
+  \int \Phi^*\hat{H_0}\Phi d\mathbf{\tau} 
+  = N! \int \Phi_H^*{\cal A}\hat{H_0}{\cal A}\Phi_H d\mathbf{\tau}
+\]
+is readily reduced to
+\[
+  \int \Phi^*\hat{H_0}\Phi d\mathbf{\tau} 
+  = N! \int \Phi_H^*\hat{H_0}{\cal A}\Phi_H d\mathbf{\tau},
+\]
+where we have used eqs.~(\ref{cummutionAntiSym}) and
+(\ref{AntiSymSquared}). The next step is to replace the antisymmetrization
+operator by its definition Eq.~(\ref{HartreeFockPermutation}) and to
+replace $\hat{H_0}$ with the sum of one-body operators
+\[
+  \int \Phi^*\hat{H_0}\Phi  d\mathbf{\tau}
+  = \sum_{i=1}^N \sum_{p} (-)^p\int 
+  \Phi_H^*\hat{h}_0\hat{P}\Phi_H d\mathbf{\tau}.
+\]
+
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+The integral vanishes if two or more fermions are permuted in only one
+of the Hartree-functions $\Phi_H$ because the individual single-particle wave functions are
+orthogonal. We obtain then
+\[
+  \int \Phi^*\hat{H}_0\Phi  d\mathbf{\tau}= \sum_{i=1}^N \int \Phi_H^*\hat{h}_0\Phi_H  d\mathbf{\tau}.
+\]
+Orthogonality of the single-particle functions allows us to further simplify the integral, and we
+arrive at the following expression for the expectation values of the
+sum of one-body Hamiltonians 
+\begin{equation}
+  \int \Phi^*\hat{H}_0\Phi  d\mathbf{\tau}
+  = \sum_{\mu=1}^N \int \psi_{\mu}^*(\mathbf{x})\hat{h}_0\psi_{\mu}(\mathbf{x})
+  d\mathbf{x}.
+  \label{H1Expectation}
+\end{equation}
+
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+We introduce the following shorthand for the above integral
+\[
+\langle \mu | \hat{h}_0 | \mu \rangle = \int \psi_{\mu}^*(\mathbf{x})\hat{h}_0\psi_{\mu}(\mathbf{x})d\mathbf{x}.,
+\]
+and rewrite Eq.~(\ref{H1Expectation}) as
+\begin{equation}
+  \int \Phi^*\hat{H_0}\Phi  d\mathbf{\tau}
+  = \sum_{\mu=1}^N \langle \mu | \hat{h}_0 | \mu \rangle.
+  \label{H1Expectation1}
+\end{equation}
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+The expectation value of the two-body part of the Hamiltonian (assuming a two-body Hamiltonian at most) is obtained in a
+similar manner. We have
+\begin{equation*}
+  \int \Phi^*\hat{H_I}\Phi d\mathbf{\tau} 
+  = N! \int \Phi_H^*{\cal A}\hat{H_I}{\cal A}\Phi_H d\mathbf{\tau},
+\end{equation*}
+which reduces to
+\begin{equation*}
+ \int \Phi^*\hat{H_I}\Phi d\mathbf{\tau} 
+  = \sum_{i\le j=1}^N \sum_{p} (-)^p\int 
+  \Phi_H^*\hat{v}(x_{ij})\hat{P}\Phi_H d\mathbf{\tau},
+\end{equation*}
+by following the same arguments as for the one-body
+Hamiltonian. 
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+Because of the dependence on the inter-particle distance $r_{ij}$,  permutations of
+any two fermions no longer vanish, and we get
+\begin{equation*}
+  \int \Phi^*\hat{H_I}\Phi d\mathbf{\tau} 
+  = \sum_{i < j=1}^N \int  
+  \Phi_H^*\hat{v}(x_{ij})(1-P_{ij})\Phi_H d\mathbf{\tau}.
+\end{equation*}
+where $P_{ij}$ is the permutation operator that interchanges
+particle $i$ and particle $j$. Again we use the assumption that the single-particle wave functions
+are orthogonal. 
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+We obtain
+\begin{equation}
+\begin{split}
+  \int \Phi^*\hat{H_I}\Phi d\mathbf{\tau} 
+  = \frac{1}{2}\sum_{\mu=1}^N\sum_{\nu=1}^N
+    &\left[ \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)\hat{v}(x_{ij})\psi_{\mu}(x_i)\psi_{\nu}(x_j)
+    dx_idx_j \right.\\
+  &\left.
+  - \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)
+  \hat{v}(x_{ij})\psi_{\nu}(x_i)\psi_{\mu}(x_j)
+  dx_idx_j
+  \right]. \label{H2Expectation}
+\end{split}
+\end{equation}
+The first term is the so-called direct term. In Hartree-Fock theory it leads to the so-called Hartree term, 
+while the second is due to the Pauli principle and is called
+the exchange term and in Hartree-Fock theory it defines the so-called Fock term.
+The factor  $1/2$ is introduced because we now run over
+all pairs twice. 
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+The last equation allows us to  introduce some further definitions.  
+The single-particle wave functions $\psi_{\mu}({\bf x})$, defined by the quantum numbers $\mu$ and ${\bf x}$
+(recall that ${\bf x}$ also includes spin degree, later we will also add isospin)   are defined as the overlap 
+\[
+   \psi_{\alpha}(x)  = \langle x | \alpha \rangle .
+\]
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+We introduce the following shorthands for the above two integrals
+\[
+\langle \mu\nu|V|\mu\nu\rangle =  \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)\hat{v}(x_{ij})\psi_{\mu}(x_i)\psi_{\nu}(x_j)
+    dx_idx_j,
+\]
+and 
+\[
+\langle \mu\nu|V|\nu\mu\rangle = \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)
+  \hat{v}(x_{ij})\psi_{\nu}(x_i)\psi_{\mu}(x_j)
+  dx_idx_j.  
+\]
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+The direct and exchange matrix elements can be  brought together if we define the antisymmetrized matrix element
+\[
+\langle \mu\nu|V|\mu\nu\rangle_{\mathrm{AS}}= \langle \mu\nu|V|\mu\nu\rangle-\langle \mu\nu|V|\nu\mu\rangle,
+\]
+or for a general matrix element  
+\[
+\langle \mu\nu|V|\sigma\tau\rangle_{\mathrm{AS}}= \langle \mu\nu|V|\sigma\tau\rangle-\langle \mu\nu|V|\tau\sigma\rangle.
+\]
+It has the symmetry property
+\[
+\langle \mu\nu|V|\sigma\tau\rangle_{\mathrm{AS}}= -\langle \mu\nu|V|\tau\sigma\rangle_{\mathrm{AS}}=-\langle \nu\mu|V|\sigma\tau\rangle_{\mathrm{AS}}.
+\]
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+The antisymmetric matrix element is also hermitian, implying 
+\[
+\langle \mu\nu|V|\sigma\tau\rangle_{\mathrm{AS}}= \langle \sigma\tau|V|\mu\nu\rangle_{\mathrm{AS}}.
+\]
+
+With these notations we rewrite Eq.~(\ref{H2Expectation}) as 
+\begin{equation}
+  \int \Phi^*\hat{H_I}\Phi d\mathbf{\tau} 
+  = \frac{1}{2}\sum_{\mu=1}^N\sum_{\nu=1}^N \langle \mu\nu|V|\mu\nu\rangle_{\mathrm{AS}}.
+\label{H2Expectation2}
+\end{equation}
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Definitions and notations}
+\begin{small}
+{\scriptsize
+Combining Eqs.~(\ref{H1Expectation1}) and
+(\ref{H2Expectation2}) we obtain the energy functional 
+\begin{equation}
+  E[\Phi] 
+  = \sum_{\mu=1}^N \langle \mu | \hat{h}_0 | \mu \rangle +
+  \frac{1}{2}\sum_{{\mu}=1}^N\sum_{{\nu}=1}^N \langle \mu\nu|V|\mu\nu\rangle_{\mathrm{AS}}.
+\label{FunctionalEPhi}
+\end{equation}
+This equation is very useful, in particular if we only look at the unperturbed part $H_0$. This part can be represented by closed form expressions that can be used to check our algorithms.
+}
+\end{small}
+}
+
+
+\section[Week 4]{Week 4}
+
+\frame
+{
+  \frametitle{Topics for Week 4, January 20-24}
+  \begin{block}{Hartree-Fock theory}
+\begin{itemize}
+\item Repetition from last week
+\item Derivation of the Hartree-Fock equations by varying the single-particle functions or the coefficients of the 
+single-particle equations (to be continued next week)
+\item Reading assignment for next week: chapter 3 (background) and chapter 4.1-4.4 of Thijssen.
+The link to the text has been sent to you by email.
+\end{itemize}
+See also suggested exercises this week. 
+  \end{block}
+} 
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock: our  many-body approach in this course}
+\begin{small}
+{\scriptsize
+HF theory is an algorithm for a finding an approximative expression for the ground state of a given
+Hamiltonian. The basic ingredients are
+\begin{itemize}
+\item Define a single-particle basis $\{\psi_{\alpha}\}$ so that
+\[ \hat{h}^{\mathrm{HF}}\psi_{\alpha} = \varepsilon_{\alpha}\psi_{\alpha}\]
+with 
+\[
+\hat{h}^{\mathrm{HF}}=\hat{t}+\hat{u}_{\mathrm{ext}}+\hat{u}^{\mathrm{HF}}
+\]
+\item where $\hat{u}^{\mathrm{HF}}$ is a single-particle potential to be determined by the HF algorithm.
+\item The HF algorithm means to choose $\hat{u}^{\mathrm{HF}}$ in order to have 
+\[ \langle \hat{H} \rangle = E^{\mathrm{HF}}= \langle \Phi_0 | \hat{H}|\Phi_0 \rangle\]
+a local minimum with $\Phi_0$ being the SD ansatz for the ground state. 
+\item The variational principle ensures that $E^{\mathrm{HF}} \ge \tilde{E}_0$, $\tilde{E}_0$ the exact ground state energy.
+\end{itemize}
+
+ }
+ \end{small}
+ }
+
+
+\frame
+{
+  \frametitle{How to solve Schr\"odinger's equation for single-particle potentials}
+\begin{small}
+{\scriptsize
+Last week we showed that we rewrite the SE as an eigenvalue problem
+\begin{equation}
+    \left( \begin{array}{ccccccc} d_1 & e_1 & 0   & 0    & \dots  &0     & 0 \\
+                                e_1 & d_2 & e_2 & 0    & \dots  &0     &0 \\
+                                0   & e_2 & d_3 & e_3  &0       &\dots & 0\\
+                                \dots  & \dots & \dots & \dots  &\dots      &\dots & \dots\\
+                                0   & \dots & \dots & \dots  &\dots       &d_{N_{\mathrm{step}}-1} & e_{N_{\mathrm{step}}-1}\\
+                                0   & \dots & \dots & \dots  &\dots       &e_{N_{\mathrm{step}}-1} & d_{N_{\mathrm{step}}}
+
+             \end{array} \right)      \left( \begin{array}{c} u_{1} \\
+                                                              u_{2} \\
+                                                              \dots\\ \dots\\ \dots\\
+                                                              u_{N_{\mathrm{step}}}
+             \end{array} \right)=\lambda \left( \begin{array}{c} u_{1} \\
+                                                              u_{2} \\
+                                                              \dots\\ \dots\\ \dots\\
+                                                              u_{N_{\mathrm{step}}}
+             \end{array} \right) 
+      \label{eq:sematrix}
+\end{equation} 
+}
+\end{small}
+}
+
+
+
+\frame
+{
+  \frametitle{How to solve Schr\"odinger's equation for single-particle potentials}
+\begin{small}
+{\scriptsize
+This is a matrix problem with a tridiagonal matrix of dimension 
+$N_{\mathrm{step}} \times N_{\mathrm{step}}$ and will thus yield 
+$N_{\mathrm{step}}$ eigenvalues. 
+
+The algorithm for solving this problem  may take the following 
+form 
+\begin{itemize}
+  \item Define values for $N_{\mathrm{step}}$, $R_{\mathrm{min}}$ and $R_{\mathrm{max}}$.
+        These values define in turn the step size $h$. Typical values for
+        $R_{\mathrm{max}}$ and $R_{\mathrm{min}}$ could be $0$ and $10$ respectively for the lowest-lying states.  
+        The number of mesh points $N_{\mathrm{step}}$ could be in the range 100 to some
+        thousands. You can check the stability of the results as functions of 
+        $N_{\mathrm{step}}$ and $R_{\mathrm{max}}$ and $R_{\mathrm{min}}$
+        against the exact solutions. 
+  \item Construct then two one-dimensional arrays which contain all values of $x_k$ 
+        and the potential $V_k$. For the latter it can be convenient to write a
+        small function which sets up the potential as function of $x_k$. For 
+        the three-dimensional case you may also need to include 
+        the centrifugal potential. 
+\end{itemize} 
+
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{How to solve Schr\"odinger's equation for single-particle potentials}
+\begin{small}
+{\scriptsize
+\begin{itemize}
+  \item Construct thereafter the one-dimensional vectors $d$ and $e$, where 
+        $d$ stands for the diagonal matrix elements and $e$ the non-diagonal ones.
+        Be careful with the endpoints, since we know the wave function $u$ at both ends of the
+        chosen grid.   
+  \item We are now ready to obtain the eigenvalues by calling the function {\em tqli }, see the code examples
+        at the webpage.
+        Calling {\em tqli}, you have to transfer the 
+        vectors  $d$ and $e$ and their dimension
+        dimension $n=N_{\mathrm{step}}$ and a matrix $z$ of dimension
+        $N_{\mathrm{step}}1\times N_{\mathrm{step}}$ which returns the eigenfunctions.
+        On return, the array $d$ contains the 
+        eigenvalues. If $z$ is given as the unity matrix on input, it returns the 
+       eigenvectors. For a given eigenvalue $k$, the eigenvector is given by the column
+       $k$ in $z$, that is z[][k] in C, or z(:,k) in Fortran. Alternatively, if you use armadillo, see below, you would call one of the armadillo functions or lapack functions.
+\end{itemize} 
+
+}
+\end{small}
+}
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Example of c++ code for solving Schr\"odinger's equation and read and write to file}
+\begin{small}
+{\scriptsize
+We are using armadillo here. For standard c++, see the code example on the webpage. Idem for the Fortran code.
+\begin{lstlisting}
+/*
+  Solves the one-particle Schrodinger equation
+  for a potential specified in function
+  potential(). This example is for the harmonic oscillator
+  compile as c++ -O3 -o ho3d.x ho3d.cpp -larmadillo -llapack -lblas
+*/
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <armadillo>
+using namespace  std;
+using namespace arma;
+// output file as global variable
+ofstream ofile;  
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Example of c++ code for solving Schr\"odinger's equation and read and write to file}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+// function declarations 
+double Potential(double);
+// Main program starts here
+int main(int argc, char* argv[])
+{
+  int       i, j, MaxStep, OrbL;
+  double    Rmax, Step, Const1, Const2, OrbitalFactor ;
+  char *outfilename;
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Example of c++ code for solving Schr\"odinger's equation and read and write to file}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+  // Read in output file, abort if there are too few command-line arguments
+  if( argc <= 4 ){
+    cout << "Bad Usage: " << argv[0] << 
+      " read also output file on same line, Rmax, Orbital momentum and Max steps" << endl;
+    exit(1);
+  }
+  else{
+    outfilename=argv[1];
+    Rmax = atof(argv[2]);
+    OrbL = atoi(argv[3]);
+    MaxStep = atoi(argv[4]);
+  }
+  ofile.open(outfilename); 
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Example of c++ code for solving Schr\"odinger's equation and read and write to file}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+  // initialise constants assuming Rmin = 0.0;
+  Step    = Rmax / (MaxStep+1); 
+  Const2 = -0.5 / (Step * Step);   Const1 = 1.0 / (Step * Step);
+  OrbitalFactor = OrbL * (OrbL + 1);
+  //  set up r, diagonal and non-diagonal elements 
+  vec r(MaxStep+1), d(MaxStep-1), e(MaxStep-1);
+  for(i = 0; i < MaxStep-1; i++) {
+    r(i) = (i+1) * Step;   // avoid r = 0 and infty, known values
+    d(i) = Const1+ Potential(r(i)) + 0.5*OrbitalFactor / (r(i) * r(i));
+  }
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Example of c++ code for solving Schr\"odinger's equation and read and write to file}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+  e = Const2;
+  mat A(MaxStep-1,MaxStep-1);
+  // Set up matrix
+  for(i = 0; i < MaxStep-1; i++) {
+    // Diagonal elements
+    A(i,i) = d(i);
+    // Non-diagonal elements
+    if (i < MaxStep - 2) {
+      A(i,i + 1) = Const2;
+      A(i + 1,i) = Const2;
+    }
+  }
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Example of c++ code for solving Schr\"odinger's equation and read and write to file}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+  vec eigval(MaxStep-1);
+  mat eigvec(MaxStep-1,MaxStep-1);
+  //  The eigenvectors are normalized
+  eig_sym(eigval, eigvec, A);
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Example of c++ code for solving Schr\"odinger's equation and read and write to file}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+  // print results
+  ofile << "RESULTS:" << endl;
+  ofile << setiosflags(ios::showpoint | ios::uppercase);
+  ofile <<"R_max = " << setw(15) << setprecision(8) << Rmax << endl;  
+  ofile <<"Number of steps = " << setw(15) << MaxStep << endl;  
+  ofile << "Lowest eigenvalue:" << endl;
+  ofile << setw(15) << setprecision(8) << eigval(0) << endl;
+  for(i = 0; i < MaxStep-1; i++) {
+    ofile << setw(15) << setprecision(8) << r(i);
+    //    ofile << setw(15) << setprecision(8) << 2*exp(-r(i)*r(i)*0.5)/pow(acos(-1.0),0.25);
+    ofile << setw(15) << setprecision(8) << eigvec(i,0)*eigvec(i,0) << endl;
+  }
+  ofile.close();  // close 
+  return 0;
+} // End: function main() 
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Example of c++ code for solving Schr\"odinger's equation and read and write to file}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+/*
+  The function potential()
+  calculates and return the value of the 
+  potential for a given argument x.
+  The potential here is the harmonic oscillator
+*/        
+double Potential(double x)
+{
+  return 0.5*x*x;
+
+} // End: function potential()  
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+
+\frame
+{
+  \frametitle{Programming exercise week 4}
+  \begin{block}{Hydrogen-like SE}
+This exercise is meant to get you started with programming and you are to solve the 
+above described single-particle problem numerically. You can use 
+the codes on the webpage as examples or simply write you own code.
+\begin{itemize}
+\item Compute the lowest eigenvalue for hydrogen-like atoms (replace the harmonic oscillator potential with an attractive Coulomb interaction $-Z/r$. Compare with the exact values
+\item Add also a centrifugal barrier and compute the eigenvalues for $2p$ state. 
+\item Plot the wave functions for the $1s$, $2s$ and $2p$ states and comment your results.
+\end{itemize}
+  \end{block}
+} 
+
+
+\frame
+{
+  \frametitle{Paper and pencil exercises week 4 and 5}
+  \begin{block}{Slater determinants}
+\begin{small}
+{\scriptsize
+For a two-electron system, the wave function can be written as 
+\begin{equation}
+ \Psi(\mathbf{x}_1, \mathbf{x}_2) = \Phi(\mathbf{r}_1, \mathbf{r}_2) \cdot \chi(s_1, s_2)
+\end{equation}
+Because the wave function $\Psi$ is antisymmetric under particle exchange, we may take $\Phi$ symmetric in $1$ and $2$ and $\chi$ antisymmetric, or vice versa.
+
+We construct the wave function $\Phi$ and $\chi$ from the orthonormal spatial orbitals $\phi_1(\mathbf{r})$, $\phi_2(\mathbf{r})$ and the spin-up and -down functions $\alpha(s)$ and $\beta(s)$ respectively. 
+
+\begin{enumerate}
+ \item Write down the antisymmetric wave functions which can be constructed in this way.
+ 
+ \item Write down all possible Slater determinants which can be built from the one-electron spin-orbitals consisting of a product of one of the spatial orbitals $\phi_1$ and $\phi_2$ and a spin-up or -down spinor.
+ 
+\end{enumerate}
+ }
+ \end{small}
+
+  \end{block}
+} 
+
+
+
+
+\frame
+{
+  \frametitle{Paper and pencil exercises week 4 and 5}
+  \begin{block}{Slater determinants}
+\begin{small}
+{\scriptsize
+
+Consider a Slater determinant;
+
+\begin{equation}
+\label{eq:det}
+\Psi_{AS} = \frac{1}{\sqrt{N!}} \left| 
+\begin{array}{ccccc} \psi_{1}({\bf x}_1)& \psi_{1}({\bf x}_2)& 					     \dots & \dots & \psi_{1}({\bf x}_N)\\
+		      \psi_{2}({\bf x}_1)&\psi_{2}({\bf x}_2)& \dots & \dots & \psi_{2}({\bf x}_N)\\  
+		      \dots & \dots & \dots & \dots & \dots \\
+		      \dots & \dots & \dots & \dots & \dots \\
+		    \psi_{N}({\bf x}_1)&\psi_{N}({\bf x}_2)& \dots & \dots & \psi_{N}({\bf x}_N)
+		    \end{array} 
+\right|, 
+\end{equation}
+where $\psi_k(\mathbf{x})$ are orthonormal single-particle states. 
+
+
+\begin{enumerate}
+ \item Show that the Slater determinant is normalized.
+ \item Show that the density of electrons with coordinates $\mathbf{x}$, is given by
+ 
+\begin{equation}
+  n(\mathbf{x}) = N \int d\mathbf{x}_2 \dots d\mathbf{x}_N |\Psi_{AS}(\mathbf{x},\mathbf{x}_2,\dots,\mathbf{x}_N)|^2 
+\end{equation}
+can be written in terms of the $\psi_k$ as 
+
+\begin{equation}
+ n(\mathbf{x}) = \sum_k|\psi_k(\mathbf{x})|^2.
+\end{equation}
+\end{enumerate}
+ }
+ \end{small}
+
+  \end{block}
+} 
+
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+The calculus of variations involves 
+problems where the quantity to be minimized or maximized is an integral. 
+
+In the general case we have an integral of the type
+\[ E[\Phi]= \int_a^b f(\Phi(x),\frac{\partial \Phi}{\partial x},x)dx,\]
+where $E$ is the quantity which is sought minimized or maximized.
+The problem is that although $f$ is a function of the variables $\Phi$, $\partial \Phi/\partial x$ and $x$, the exact dependence of
+$\Phi$ on $x$ is not known.  This means again that even though the integral has fixed limits $a$ and $b$, the path of integration is
+not known. In our case the unknown quantities are the single-particle wave functions and we wish to choose an integration path which makes
+the functional $E[\Phi]$ stationary. This means that we want to find minima, or maxima or saddle points. In physics we search normally for minima.
+Our task is therefore to find the minimum of $E[\Phi]$ so that its variation $\delta E$ is zero  subject to specific
+constraints. In our case the constraints appear as the integral which expresses the orthogonality of the  single-particle wave functions.
+The constraints can be treated via the technique of Lagrangian multipliers
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Euler-Lagrange equations}
+\begin{small}
+{\scriptsize
+We assume the existence of an optimum path, that is a path for which $E[\Phi]$ is stationary. There are infinitely many such paths.
+The difference between two paths $\delta\Phi$ is called the variation of $\Phi$.
+
+We call the variation $\eta(x)$  and it is scaled by a factor $\alpha$.  The function $\eta(x)$ is arbitrary except
+for 
+\[ 
+\eta(a)=\eta(b)=0,
+\]
+and we assume that we can model the change in $\Phi$ as 
+\[
+\Phi(x,\alpha) = \Phi(x,0)+\alpha\eta(x),
+\]
+and 
+\[
+\delta\Phi = \Phi(x,\alpha) -\Phi(x,0)=\alpha\eta(x).
+\]
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Euler-Lagrange equations}
+\begin{small}
+{\scriptsize
+We choose $\Phi(x,\alpha=0)$ as the unkonwn path  that will minimize $E$.  The value 
+$\Phi(x,\alpha\ne 0)$  describes a neighbouring path. 
+ 
+We have
+\[ E[\Phi(\alpha)]= \int_a^b f(\Phi(x,\alpha),\frac{\partial \Phi(x,\alpha)}{\partial x},x)dx.\] 
+In the slides I will use  the shorthand
+\[
+\Phi_x(x,\alpha) = \frac{\partial \Phi(x,\alpha)}{\partial x}.
+\]
+In our case $a=0$ and $b=\infty$ and we know the value of the wave function.
+ }
+ \end{small}
+ }
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Euler-Lagrange equations}
+\begin{small}
+{\scriptsize
+The condition for an extreme of
+\[ E[\Phi(\alpha)]= \int_a^b f(\Phi(x,\alpha),\Phi_x(x,\alpha),x)dx,\]
+is
+\[
+\left[\frac{\partial  E[\Phi(\alpha)]}{\partial x}\right]_{\alpha=0} =0.\]
+The $\alpha$ dependence is contained in $\Phi(x,\alpha)$ and $\Phi_x(x,\alpha)$ meaning that
+\[
+\left[\frac{\partial  E[\Phi(\alpha)]}{\partial \alpha}\right]=\int_a^b \left( \frac{\partial f}{\partial \Phi}\frac{\partial \Phi}{\partial \alpha}+\frac{\partial f}{\partial \Phi_x}\frac{\partial \Phi_x}{\partial \alpha}        \right)dx.\]
+We have defined 
+\[
+\frac{\partial \Phi(x,\alpha)}{\partial \alpha}=\eta(x)
+\]
+and thereby 
+\[
+\frac{\partial \Phi_x(x,\alpha)}{\partial \alpha}=\frac{d(\eta(x))}{dx}.
+\]
+
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Euler-Lagrange equations}
+\begin{small}
+{\scriptsize
+Using
+\[
+\frac{\partial \Phi(x,\alpha)}{\partial \alpha}=\eta(x),
+\]
+and 
+\[
+\frac{\partial \Phi_x(x,\alpha)}{\partial \alpha}=\frac{d(\eta(x))}{dx},
+\]
+in the integral gives 
+\[
+\left[\frac{\partial  E[\Phi(\alpha)]}{\partial \alpha}\right]=\int_a^b \left( \frac{\partial f}{\partial \Phi}\eta(x)+\frac{\partial f}{\partial \Phi_x}\frac{d(\eta(x))}{dx}        \right)dx.\]
+Integrate the second term by parts
+
+\[
+\int_a^b \frac{\partial f}{\partial \Phi_x}\frac{d(\eta(x))}{dx}dx =\eta(x)\frac{\partial f}{\partial \Phi_x}|_a^b-
+\int_a^b \eta(x)\frac{d}{dx}\frac{\partial f}{\partial \Phi_x}dx, 
+\]
+and since the first term dissappears due to $\eta(a)=\eta(b)=0$, we obtain
+\[
+\left[\frac{\partial  E[\Phi(\alpha)]}{\partial \alpha}\right]=\int_a^b \left( \frac{\partial f}{\partial \Phi}-\frac{d}{dx}\frac{\partial f}{\partial \Phi_x}
+\right)\eta(x)dx=0.\]
+
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Euler-Lagrange equations}
+\begin{small}
+{\scriptsize
+\[
+\left[\frac{\partial  E[\Phi(\alpha)]}{\partial \alpha}\right]=\int_a^b \left( \frac{\partial f}{\partial \Phi}-\frac{d}{dx}\frac{\partial f}{\partial \Phi_x}
+\right)\eta(x)dx=0,\]
+can also be written as 
+\[
+\alpha\left[\frac{\partial  E[\Phi(\alpha)]}{\partial \alpha}\right]_{\alpha=0}=\int_a^b \left( \frac{\partial f}{\partial \Phi}-\frac{d}{dx}\frac{\partial f}{\partial \Phi_x}
+\right)\delta\Phi(x)dx=\delta E = 0.\]
+
+The condition for a stationary value is thus a partial differential equation
+\[
+\frac{\partial f}{\partial \Phi}-\frac{d}{dx}\frac{\partial f}{\partial \Phi_x}=0,\]
+known as Euler's equation.
+Can easily be generalized to more variables.
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Lagrangian Multipliers}
+\begin{small}
+{\scriptsize
+Consider a function of three independent variables $f(x,y,z)$ . For the function $f$ to be an 
+extreme we have
+\[
+df=0.
+\]
+A necessary and sufficient condition is
+\[
+\frac{\partial f}{\partial x} =\frac{\partial f}{\partial y}=\frac{\partial f}{\partial z}=0,
+\]
+due to 
+\[
+df = \frac{\partial f}{\partial x}dx+\frac{\partial f}{\partial y}dy+\frac{\partial f}{\partial z}dz.
+\]
+In physical problems the variables $x,y,z$ are often subject to constraints (in our case $\Phi$ and the orthogonality constraint)
+so that they are no longer all independent. It is possible at least in principle to use each constraint to eliminate one variable
+and to proceed with a new and smaller set of independent varables.
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Lagrangian Multipliers}
+\begin{small}
+{\scriptsize
+The use of so-called Lagrangian  multipliers is an alternative technique  when the elimination of
+of variables is incovenient or undesirable.  Assume that we have an equation of constraint on the variables $x,y,z$
+\[
+\phi(x,y,z) = 0,
+\]
+ resulting in
+\[
+d\phi = \frac{\partial \phi}{\partial x}dx+\frac{\partial \phi}{\partial y}dy+\frac{\partial \phi}{\partial z}dz =0.
+\]
+Now we cannot set anymore 
+\[
+\frac{\partial f}{\partial x} =\frac{\partial f}{\partial y}=\frac{\partial f}{\partial z}=0,
+\]
+if $df=0$ is wanted 
+because there are now only two independent variables!  Assume $x$ and $y$ are the independent variables.
+Then $dz$ is no longer arbitrary. 
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Lagrangian Multipliers}
+\begin{small}
+{\scriptsize
+However, we can add to
+\[
+df = \frac{\partial f}{\partial x}dx+\frac{\partial f}{\partial y}dy+\frac{\partial f}{\partial z}dz,
+\]
+a multiplum of $d\phi$, viz. $\lambda d\phi$, resulting  in
+
+\[
+df+\lambda d\phi = (\frac{\partial f}{\partial z}+\lambda\frac{\partial \phi}{\partial x})dx+(\frac{\partial f}{\partial y}+\lambda\frac{\partial \phi}{\partial y})dy+
+(\frac{\partial f}{\partial z}+\lambda\frac{\partial \phi}{\partial z})dz =0.
+\]
+Our multiplier is chosen so that
+\[
+\frac{\partial f}{\partial z}+\lambda\frac{\partial \phi}{\partial z} =0.
+\]
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Lagrangian Multipliers}
+\begin{small}
+{\scriptsize
+However, we took $dx$ and $dy$ as to be arbitrary and thus we must have
+\[
+\frac{\partial f}{\partial x}+\lambda\frac{\partial \phi}{\partial x} =0,
+\]
+and
+\[
+\frac{\partial f}{\partial y}+\lambda\frac{\partial \phi}{\partial y} =0.
+\]
+When all these equations are satisfied, $df=0$.  We have four unknowns, $x,y,z$ and
+$\lambda$. Actually we want only $x,y,z$, $\lambda$ need not to be determined, it is therefore often called
+Lagrange's undetermined multiplier. 
+If we have a set of constraints $\phi_k$ we have the equations
+\[
+\frac{\partial f}{\partial x_i}+\sum_k\lambda_k\frac{\partial \phi_k}{\partial x_i} =0.
+\]
+ }
+ \end{small}
+ }
+
+
+
+
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Variational Calculus and Lagrangian Multipliers}
+\begin{small}
+{\scriptsize
+Let us specialize to the expectation value of the energy for one particle in three-dimensions.
+This expectation value reads
+\[
+  E=\int dxdydz \psi^*(x,y,z) \hat{H} \psi(x,y,z),
+\]
+with the constraint
+\[
+ \int dxdydz \psi^*(x,y,z) \psi(x,y,z)=1,
+\]
+and a Hamiltonian
+\[
+\hat{H}=-\frac{1}{2}\nabla^2+\hat{v}(x,y,z).
+\]
+I will skip the variables $x,y,z$ below, and write for example $\hat{v}(x,y,z)=V$.
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+The integral involving the kinetic energy can be written as, if we assume periodic boundary conditions or that the function $\psi$ vanishes
+strongly for large values of $x,y,z$, 
+ \[
+  \int dxdydz \psi^* \left(-\frac{1}{2}\nabla^2\right) \psi dxdydz = -\psi^*\nabla\psi|+\int dxdydz\frac{1}{2}\nabla\psi^*\nabla\psi.
+\]
+Inserting this expression into the expectation value for the energy and taking the variational minimum  we obtain
+\[
+\delta E = \delta \left\{\int dxdydz\left( \frac{1}{2}\nabla\psi^*\nabla\psi+V\psi^*\psi\right)\right\} = 0.
+\]
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+The constraint appears in integral form as 
+\[
+ \int dxdydz \psi^* \psi=\mathrm{constant},
+\]
+and multiplying with a Lagrangian multiplier $\lambda$ and taking the variational minimum we obtain the final variational equation
+\[
+\delta \left\{\int dxdydz\left( \frac{1}{2}\nabla\psi^*\nabla\psi+V\psi^*\psi-\lambda\psi^*\psi\right)\right\} = 0.
+\]
+Introducing the function  $f$
+\[
+  f =  \frac{1}{2}\nabla\psi^*\nabla\psi+V\psi^*\psi-\lambda\psi^*\psi=
+\frac{1}{2}(\psi^*_x\psi_x+\psi^*_y\psi_y+\psi^*_z\psi_z)+V\psi^*\psi-\lambda\psi^*\psi,
+\]
+where we have skipped the dependence on $x,y,z$ and introduced the shorthand $\psi_x$, $\psi_y$ and $\psi_z$  for the various derivatives.
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Background material: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+For $\psi^*$ the Euler  equation results in
+\[
+\frac{\partial f}{\partial \psi^*}- \frac{\partial }{\partial x}\frac{\partial f}{\partial \psi^*_x}-\frac{\partial }{\partial y}\frac{\partial f}{\partial \psi^*_y}-\frac{\partial }{\partial z}\frac{\partial f}{\partial \psi^*_z}=0,
+\] 
+which yields 
+\[
+    -\frac{1}{2}(\psi_{xx}+\psi_{yy}+\psi_{zz})+V\psi=\lambda \psi.
+\]
+We can then identify the  Lagrangian multiplier as the energy of the system. Then the last equation is 
+nothing but the standard 
+Schr\"odinger equation and the variational  approach discussed here provides 
+a powerful method for obtaining approximate solutions of the wave function.
+
+ }
+ \end{small}
+ }
+
+
+
+\section[Week 5]{Week 5}
+
+\frame
+{
+  \frametitle{Topics for Week 5, January 27-31}
+  \begin{block}{Hartree-Fock theory}
+\begin{itemize}
+\item Repetition from last week
+\item Derivation of the Hartree-Fock equations by varying the single-particle functions or the coefficients of the 
+single-particle equations (continued from last week)
+\item See updated project and discussion of a Hartree-Fock code
+\item Next week we will discuss how to introduce classes and object orientation for the Hartree-Fock project.
+\end{itemize}
+  \end{block}
+} 
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Finding the Hartree-Fock functional $E[\Phi]$}
+\begin{small}
+{\scriptsize
+We have the Hamiltonian
+\[
+    \hat{H} = \hat{H_0} + \hat{H_I} 
+    = \sum_{i=1}^A\hat{h_0}(x_i) + \sum_{i<j=1}^A\hat{v}(r_{ij}),
+\]
+with the one-body Hamiltonian given as
+\[
+  \hat{h}_0(x_i) = - \frac{1}{2} \nabla^2_i -\frac{Z}{r_i}.
+\]
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Finding the Hartree-Fock functional $E[\Phi]$}
+\begin{small}
+{\scriptsize
+Let us denote the ground state energy by $E_0$. According to the
+variational principle we have
+\begin{equation*}
+  E_0 \le E[\Phi] = \int \Phi^*\hat{H}\Phi d\mathbf{\tau}
+\end{equation*}
+where $\Phi$ is a trial function which we assume to be normalized
+\begin{equation*}
+  \int \Phi^*\Phi d\mathbf{\tau} = 1,
+\end{equation*}
+where we have used the shorthand $d\mathbf{\tau}=dx_1dx_2\dots dx_N$.
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Finding the Hartree-Fock functional $E[\Phi]$}
+\begin{small}
+{\scriptsize
+In the Hartree-Fock method the trial function is the Slater
+determinant which can be rewritten as 
+\[
+  \Psi(x_1,x_2,\dots,x_N,\alpha,\beta,\dots,\nu) = \frac{1}{\sqrt{N!}}\sum_{P} (-)^PP\psi_{\alpha}(x_1)
+    \psi_{\beta}(x_2)\dots\psi_{\nu}(x_N)=\sqrt{N!}{\cal A}\Phi_H,
+\]
+where we have introduced the anti-symmetrization operator ${\cal A}$ defined by the 
+summation over all possible permutations of two fermions.
+It is defined as
+\[
+  {\cal A} = \frac{1}{N!}\sum_{P} (-)^PP,
+\]
+with the the Hartree-function given by the simple product of all possible single-particle function
+\[
+  \Phi_H(x_1,x_2,\dots,x_N,\alpha,\beta,\dots,\nu) =
+  \psi_{\alpha}(x_1)
+    \psi_{\beta}(x_2)\dots\psi_{\nu}(x_N).
+\]
+
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Finding the Hartree-Fock functional $E[\Phi]$}
+\begin{small}
+{\scriptsize
+Both $\hat{H_0}$ and $\hat{H_I}$ are invariant under 
+permutations of fermions, and hence commute with ${\cal A}$
+\[
+  [H_0,{\cal A}] = [H_I,{\cal A}] = 0.
+\]
+Furthermore, ${\cal A}$ satisfies
+\[
+  {\cal A}^2 = {\cal A},
+\]
+since every permutation of the Slater
+determinant reproduces it.
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Variational Calculus and Lagrangian Multiplier, back to Hartree-Fock}
+\begin{small}
+{\scriptsize
+Our functional for $N$ electrons is then
+\[
+  E[\Phi] = \sum_{\mu=1}^N \int \psi_{\mu}^*(x_i)\hat{h}_0(x_i)\psi_{\mu}(x_i) dx_i 
+  + \frac{1}{2}\sum_{\mu=1}^N\sum_{\nu=1}^N
+   \left[ \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)\hat{v}(r_{ij})\psi_{\mu}(x_i)\psi_{\nu}(x_j)
+    dx_idx_j \right.
+\]
+\[ \left.
+  - \int \psi_{\mu}^*(x_i)\psi_{\nu}^*(x_j)\hat{v}(r_{ij})\psi_{\nu}(x_i)\psi_{\mu}(x_j)
+  dx_idx_j\right]
+\]
+The more compact version is
+\[
+  E[\Phi] 
+  = \sum_{\mu=1}^N \langle \mu | \hat{h}_0 | \mu\rangle+ \frac{1}{2}\sum_{\mu=1}^N\sum_{\nu=1}^N\left[\langle \mu\nu |\hat{v}(r_{ij})|\mu\nu\rangle-\langle \mu\nu |\hat{v}(r_{ij})|\nu\mu\rangle\right].
+\]
+ }
+ \end{small}
+ }
+
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+If we generalize the Euler-Lagrange equations to more variables 
+and introduce $A^2$ Lagrange multipliers which we denote by 
+$\epsilon_{\mu\nu}$, we can write the variational equation for the functional of $E$
+\[
+  \delta E - \sum_{{\mu}=1}^N\sum_{{\nu}=1}^N \epsilon_{\mu\nu} \delta
+  \int \psi_{\mu}^* \psi_{\nu} = 0.
+\]
+For the orthogonal wave functions $\psi_{\mu}$ this reduces to
+\[
+  \delta E - \sum_{{\mu}=1}^N \epsilon_{\mu} \delta
+  \int \psi_{\mu}^* \psi_{\mu} = 0.
+\]
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+Variation with respect to the single-particle wave functions $\psi_{\mu}$ yields then
+
+\begin{equation*}
+\begin{split}
+  \sum_{\mu=1}^N \int \delta\psi_{\mu}^*\hat{h_0}(x_i)\psi_{\mu}
+  dx_i  
+  +\sum_{{\mu}=1}^N\sum_{{\nu}=1}^N \left[ \int
+  \delta\psi_{\mu}^*\psi_{\nu}^*\hat{v}(r_{ij})\psi_{\mu}\psi_{\nu} dx_idx_j- \int
+  \delta\psi_{\mu}^*\psi_{\nu}^*\frac{1}{r_{ij}}\psi_{\nu}\psi_{\mu}
+  dx_idx_j \right] & \\
+  + \sum_{\mu=1}^N \int \psi_{\mu}^*\hat{h_0}(x_i)\delta\psi_{\mu}
+  dx_i 
+  + \sum_{{\mu}=1}^N\sum_{{\nu}=1}^N \left[ \int
+  \psi_{\mu}^*\psi_{\nu}^*\frac{1} 
+  {r_{ij}}\delta\psi_{\mu}\psi_{\nu} dx_idx_j- \int
+  \psi_{\mu}^*\psi_{\nu}^*\hat{v}(r_{ij})\psi_{\nu}\delta\psi_{\mu}
+  dx_idx_j \right] & \\
+  -  \sum_{{\mu}=1}^N E_{\mu} \int \delta\psi_{\mu}^*
+  \psi_{\mu}dx_i
+  -  \sum_{{\mu}=1}^N E_{\mu} \int \psi_{\mu}^*
+  \delta\psi_{\mu}dx_i & = 0.
+\end{split}
+\end{equation*}
+
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+Although the variations $\delta\psi$ and $\delta\psi^*$ are not
+independent, they may in fact be treated as such, so that the 
+terms dependent on either $\delta\psi$ and $\delta\psi^*$ individually 
+may be set equal to zero. To see this, simply 
+replace the arbitrary variation $\delta\psi$ by $i\delta\psi$, so that
+$\delta\psi^*$ is replaced by $-i\delta\psi^*$, and combine the two
+equations. We thus arrive at the Hartree-Fock equations
+\[
+  \begin{split}
+    \left[ -\frac{1}{2}\nabla_i^2-u_{\mathrm{ext}}(x_i) + \sum_{{\nu}=1}^N
+      \int \psi_{\nu}^*(x_j)\hat{v}(r_{ij})
+      \psi_{\nu}(x_j)dx_j \right]
+    \psi_{\mu}(x_i)  & \\
+    - \left[ \sum_{{\nu}=1}^N \int
+      \psi_{\nu}^*(x_j) \hat{v}(r_{ij})\psi_{\mu}(x_j) dx_j
+      \right] \psi_{\nu}(x_i)  & 
+  = \epsilon_{\mu} \psi_{\mu}(x_i).
+  \end{split}
+\]
+Notice that the integration $\int dx_j$ implies an
+integration over the spatial coordinates $\mathbf{r_j}$ and a summation
+over the spin-coordinate of fermion $j$.
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+The two first terms are the expectation value of the one-body operator. The third or
+\emph{direct} term is the averaged field set up by all other electrons.
+As written, the
+term includes the 'self-interaction' of 
+electrons when $i=j$. The self-interaction is cancelled in the fourth
+term, or the \emph{exchange} term. The exchange term results from our
+inclusion of the Pauli principle and the assumed determinantal form of
+the wave-function. The effect of exchange is for electrons of
+equal single-particle quantum numbers to avoid each other.
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+  A theoretically convenient form of the
+Hartree-Fock equation is to regard the direct and exchange operator
+defined through 
+\begin{equation*}
+  V_{\mu}^{d}(x_i) = \int \psi_{\mu}^*(x_j)\psi_{\mu}(x_j)\hat{v}(r_{ij}) dx_j
+\end{equation*}
+and
+\begin{equation*}
+  V_{\mu}^{ex}(x_i) g(x_i) 
+  = \left(\int \psi_{\mu}^*(x_j)\hat{v}(r_{ij})g(x_j) dx_j
+  \right)\psi_{\mu}(x_i),
+\end{equation*}
+respectively. 
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+The function $g(x_i)$ is an arbitrary function,
+and by the substitution $g(x_i) = \psi_{\nu}(x_i)$
+we get
+\begin{equation*}
+  V_{\mu}^{ex}(x_i) \psi_{\nu}(x_i) 
+  = \left(\int \psi_{\mu}^*(x_j) 
+  \hat{v}(r_{ij})\psi_{\nu}(x_j)
+  dx_j\right)\psi_{\mu}(x_i).
+\end{equation*}
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock: Variational Calculus and Lagrangian Multiplier}
+\begin{small}
+{\scriptsize
+We may then rewrite the Hartree-Fock equations as
+\[
+  \hat{h}^{HF}(x_i) \psi_{\nu}(x_i) = \epsilon_{\nu}\psi_{\nu}(x_i),
+\]
+with
+\[
+  \hat{h}^{HF}(x_i)= \hat{h}_0(x_i) + \sum_{\mu=1}^NV_{\mu}^{d}(x_i) -
+  \sum_{\mu=1}^NV_{\mu}^{ex}(x_i),
+\]
+and where $\hat{h}_0(i)$ is the one-body part. The latter is normally chosen as a part which yields solutions in closed form. The harmonic oscilltor is a classical problem thereof.
+We normally rewrite the last equation as
+\[
+  \hat{h}^{HF}(x_i)= \hat{h}_0(x_i) + \hat{u}^{HF}(x_i). 
+\]
+ }
+ \end{small}
+ }
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+
+Another possibility is to expand the single-particle functions in a known basis  and vary the coefficients, 
+that is, the new single-particle wave function is written as a linear expansion
+in terms of a fixed chosen orthogonal basis (for example harmonic oscillator, Laguerre polynomials etc)
+\be
+\psi_p^{HF}  = \sum_{\lambda} C_{p\lambda}\psi_{\lambda}.
+\label{eq:newbasis}
+\ee
+In this case we vary the coefficients $C_{a\lambda}$. If the basis has infinitely many solutions, we need
+to truncate the above sum.  In all our equations we assume a truncation has been made.
+
+The single-particle wave functions $\psi_{\lambda}({\bf r})$, defined by the quantum numbers $\lambda$ and ${\bf r}$
+are defined as the overlap 
+\[
+   \psi_{\lambda}({\bf r})  = \langle {\bf r} | \lambda \rangle .
+\]
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+We will omit the radial dependence of the wave functions and 
+introduce first the following shorthands for the direct and exchange part
+\[
+\langle \mu\nu|V|\mu\nu\rangle =  \int \psi_{\mu}^*(\mathbf{r}_i)\psi_{\nu}^*(\mathbf{r}_j)V(r_{ij})\psi_{\mu}(\mathbf{r}_i)\psi_{\nu}(\mathbf{r}_j)
+    d\mathbf{r}_id\mathbf{r}_j,
+\]
+and 
+\[
+\langle \mu\nu|V|\nu\mu\rangle = \int \psi_{\mu}^*(\mathbf{r}_i)\psi_{\nu}^*(\mathbf{r}_j)
+  V(r_{ij})\psi_{\nu}(\mathbf{r}_i)\psi_{\mu}(\mathbf{r}_i)
+  d\mathbf{r}_id\mathbf{r}_j.  
+\]
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+Since the interaction is invariant under the interchange of two particles it means for example that we have
+\[
+\langle \mu\nu|V|\mu\nu\rangle =  \langle \nu\mu|V|\nu\mu\rangle,  
+\]
+or in the more general case
+\[
+\langle \mu\nu|V|\sigma\tau\rangle =  \langle \nu\mu|V|\tau\sigma\rangle.  
+\]
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+The direct and exchange matrix elements can be  brought together if we define the antisymmetrized matrix element
+\[
+\langle \mu\nu|V|\mu\nu\rangle_{AS}= \langle \mu\nu|V|\mu\nu\rangle-\langle \mu\nu|V|\nu\mu\rangle,
+\]
+or for a general matrix element  
+\[
+\langle \mu\nu|V|\sigma\tau\rangle_{AS}= \langle \mu\nu|V|\sigma\tau\rangle-\langle \mu\nu|V|\tau\sigma\rangle.
+\]
+It has the symmetry property
+\[
+\langle \mu\nu|V|\sigma\tau\rangle_{AS}= -\langle \mu\nu|V|\tau\sigma\rangle_{AS}=-\langle \nu\mu|V|\sigma\tau\rangle_{AS}.
+\]
+The antisymmetric matrix element is also hermitian, implying 
+\[
+\langle \mu\nu|V|\sigma\tau\rangle_{AS}= \langle \sigma\tau|V|\mu\nu\rangle_{AS}.
+\]
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+We have for the interaction part
+\begin{equation}
+  \int \Phi^*\hat{H_1}\Phi d\mathbf{\tau} 
+  = \frac{1}{2}\sum_{\mu=1}^N\sum_{\nu=1}^N \langle \mu\nu|V|\mu\nu\rangle_{AS}.
+\label{H2Expectation2}
+\end{equation}
+Combining Eqs.~(\ref{H1Expectation1}) and
+(\ref{H2Expectation2}) we obtain the energy functional 
+\begin{equation}
+  E[\Phi] 
+  = \sum_{\mu=1}^N \langle \mu | \hat{h}_0 | \mu \rangle +
+  \frac{1}{2}\sum_{{\mu}=1}^N\sum_{{\nu}=1}^N \langle \mu\nu|V|\mu\nu\rangle_{AS}.
+\label{FunctionalEPhi}
+\end{equation}
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+If we vary the above energy functional with respect to the basis functions $|\mu \rangle$, this corresponds to 
+what was done in the previous case. We are however interested in defining a new basis defined in terms of
+a chosen basis as defined in Eq.~(\ref{eq:newbasis}). We can then rewrite the energy functional as
+\begin{equation}
+  E[\Phi^{\mathrm{HF}}] 
+  = \sum_{i=1}^N \langle i | \hat{h}_0 | i \rangle +
+  \frac{1}{2}\sum_{ij=1}^N\langle ij|V|ij\rangle_{AS},
+\label{FunctionalEPhi2}
+\end{equation}
+where $\Phi^{\mathrm{HF}}$ is the new Slater determinant defined by the new basis of Eq.~(\ref{eq:newbasis}). 
+
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+Using Eq.~(\ref{eq:newbasis}) we can rewrite Eq.~(\ref{FunctionalEPhi2}) as 
+\begin{equation}
+  E[\Phi^{\mathrm{HF}}] 
+  = \sum_{i=1}^N \sum_{\alpha\beta} C^*_{i\alpha}C_{i\beta}\langle \alpha | h | \beta \rangle +
+  \frac{1}{2}\sum_{ij=1}^N\sum_{{\alpha\beta\gamma\delta}} C^*_{i\alpha}C^*_{j\beta}C_{i\gamma}C_{j\delta}\langle \alpha\beta|V|\gamma\delta\rangle_{AS}.
+\label{FunctionalEPhi3}
+\end{equation}
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+We wish now to minimize the above functional. We introduce again a set of Lagrange multipliers, noting that
+since $\langle i | j \rangle = \delta_{i,j}$ and $\langle \alpha | \beta \rangle = \delta_{\alpha,\beta}$, 
+the coefficients $C_{i\gamma}$ obey the relation
+\[
+ \langle i | j \rangle=\delta_{i,j}=\sum_{\alpha\beta} C^*_{i\alpha}C_{i\beta}\langle \alpha | \beta \rangle=
+\sum_{\alpha} C^*_{i\alpha}C_{i\alpha},
+\]
+which allows us to define a functional to be minimized that reads
+\begin{equation}
+ F[\Phi^{\mathrm{HF}}]= E[\Phi^{\mathrm{HF}}] - \sum_{i=1}^N\epsilon_i\sum_{\alpha} C^*_{i\alpha}C_{i\alpha}.
+\end{equation}
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+Minimizing with respect to $C^*_{i\alpha}$, remembering that $C^*_{i\alpha}$ and $C_{i\alpha}$
+are independent, we obtain
+\be
+\frac{d}{dC^*_{i\alpha}}\left[  E[\Phi^{\mathrm{HF}}] - \sum_{j}^{A}\epsilon_j\sum_{\alpha} C^*_{j\alpha}C_{j\alpha}\right]=0,
+\ee
+which yields for every single-particle state $i$ the following Hartree-Fock equations
+\be
+\sum_{\gamma} C_{i\gamma}\langle \alpha | \hat{h}_0 | \gamma \rangle+
+\sum_{j=1}^N\sum_{\beta\gamma\delta} C^*_{j\beta}C_{j\delta}C_{i\gamma}\langle \alpha\beta|V|\gamma\delta\rangle_{AS}=\epsilon_kC_{i\alpha}.
+\ee
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize We can rewrite this equation as \be \sum_{\beta}
+  \left\{\langle \alpha | \hat{h}_0 | \beta \rangle+
+  \sum_{j}^N\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle
+  \alpha\gamma|V|\beta\delta\rangle_{AS}\right\}C_{i\beta}=\epsilon_i^{\mathrm{HF}}C_{i\alpha}.
+  \ee Note that the sums over greek indices run over the number of
+  basis set functions (in principle an infinite number).  }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+Defining 
+\[
+h_{\alpha\beta}^{HF}=\langle \alpha | \hat{h}_0 | \beta \rangle+
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS},
+\]
+we can rewrite the new equations as 
+\be
+\sum_{\beta}h_{\alpha\beta}^{HF}C_{i\beta}=\epsilon_i^{\mathrm{HF}}C_{i\alpha}.
+\label{eq:newhf}
+\ee
+Note again that the sums over greek indices run over the number of basis set functions (in principle an infinite number).
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Rewriting the energy functional}
+\begin{small}
+{\scriptsize
+The equation 
+\[
+  \hat{h}^{HF}(x_i)= \hat{h}_0(x_i) + \hat{u}^{HF}(x_i), 
+\]
+allows us to rewrite the ground state energy (adding and subtracting $\hat{u}^{HF}(x_i)$) 
+\[
+  E_0^{HF} =\langle \Phi_0 | \hat{H} | \Phi_0\rangle = 
+\sum_{i\le F}^N \langle i | \hat{h}_0 +\hat{u}^{HF}| i\rangle+ \frac{1}{2}\sum_{i\le F}^N\sum_{j \le F}^N\left[\langle ij |\hat{v}|ij \rangle-\langle ij|\hat{v}|ji\rangle\right]-\sum_{i\le F}^N \langle i |\hat{u}^{HF}| i\rangle,
+\]
+as
+\[
+  E_0^{HF}
+  = \sum_{i\le F}^N \varepsilon_i + \frac{1}{2}\sum_{i\le F}^N\sum_{j \le F}^N\left[\langle ij |\hat{v}|ij \rangle-\langle ij|\hat{v}|ji\rangle\right]-\sum_{i\le F}^N \langle i |\hat{u}^{HF}| i\rangle,
+\]
+which is nothing but
+\[
+  E_0^{HF}
+  = \sum_{i\le F}^N \varepsilon_i - \frac{1}{2}\sum_{i\le F}^N\sum_{j \le F}^N\left[\langle ij |\hat{v}|ij \rangle-\langle ij|\hat{v}|ji\rangle\right].
+\]
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock by varying the coefficients of a wave function expansion}
+\begin{small}
+{\scriptsize
+Our Hartree-Fock matrix  is thus
+\[
+\hat{h}_{\alpha\beta}^{HF}=\langle \alpha | \hat{h}_0 | \beta \rangle+
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+\]
+The Hartree-Fock are solved in an iterative waym starting with a guess for the coefficients $C_{j\gamma}=\delta_{j,\gamma}$ and solving the equations by diagonalization till the new single-particle energies
+$\epsilon_i^{\mathrm{HF}}$ do not change anymore by a prefixed quantity. 
+
+Normally we assume that the single-particle basis $|\beta\rangle$ forms an eigenbasis for the operator
+$\hat{h}_0$, meaning that the Hartree-Fock matrix becomes  
+\[
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+\]
+
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock algorithm}
+\begin{small}
+{\scriptsize
+
+Our Hartree-Fock matrix  is thus
+\[
+\hat{h}_{\alpha\beta}^{HF}=\langle \alpha | \hat{h}_0 | \beta \rangle+
+\sum_{j=1}^A\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+\]
+Normally we assume that the single-particle basis $|\beta\rangle$ forms an eigenbasis for the operator
+$\hat{h}_0$, meaning that the Hartree-Fock matrix becomes  
+\[
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{j=1}^A\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+\]
+The Hartree-Fock eigenvalue problem
+\[
+\sum_{\beta}\hat{h}_{\alpha\beta}^{HF}C_{i\beta}=\epsilon_i^{\mathrm{HF}}C_{i\alpha},
+\]
+can be written out in a more compact form as
+\[
+\hat{h}^{HF}\hat{C}=\epsilon^{\mathrm{HF}}\hat{C}. 
+\]
+
+
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock algorithm}
+\begin{small}
+{\scriptsize
+The Hartree-Fock equations are, in their simplest form, solved in an iterative way, starting with a guess for the
+coefficients $C_{i\alpha}$. We label the coefficients as $C_{i\alpha}^{(n)}$, where the subscript $n$ stands for iteration $n$.
+To set up the algorithm we can proceed as follows:
+\begin{enumerate}
+\item We start with a guess $C_{i\alpha}^{(0)}=\delta_{i,\alpha}$. Alternatively, we could have used random starting values as long as the vectors are normalized. Another possibility is to give states below the Fermi level a larger weight.
+\item The Hartree-Fock matrix simplifies then to
+\[
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}^{(0)}C_{j\delta}^{(0)}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+\]
+Solving the Hartree-Fock eigenvalue problem yields then new eigenvectors $C_{i\alpha}^{(1)}$ and eigenvalues
+$\epsilon_i^{\mathrm{HF}}^{(1)}$. 
+\end{enumerate}
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock algorithm}
+\begin{small}
+{\scriptsize
+
+\begin{enumerate}
+\item With the new eigenvalues we can set up a new Hartree-Fock potential 
+\[
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}^{(1)}C_{j\delta}^{(1)}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+\]
+The diagonalization with the new Hartree-Fock potential yields new eigenvectors and eigenvalues.
+This process is continued till for example
+\[
+\frac{\sum_{p} |\epsilon_i^{\mathrm{HF}}^{(n)}-\epsilon_i^{\mathrm{HF}}^{(n-1)}|}{m}\le \lambda,  
+\]
+where $\lambda$ is a user prefixed quantity ($\lambda \sim 10^{-8}$ or smaller) and $p$ runs over all calculated single-particle
+energies and $m$ is the number of single-particle states.
+\end{enumerate}
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock code}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+void hartreeFock::run() {
+    double interaction;
+    // --------------- Setting up the HF-hamiltinian using C = 1 ---------------
+    mat H;
+    vec E = zeros(nStates, 1);
+    vec ePrev = zeros(nStates, 1);
+    mat C = eye(nStates, nStates);
+    vec diff;
+
+    // Hartree-Fock loop
+    int hfIt = 0;
+    while (hfIt < HFIterations) {
+        cout << "iteration = " << hfIt << endl;
+
+        H = zeros(nStates, nStates);
+\end{lstlisting}
+
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock code}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+        for (int alpha = 0; alpha < nStates; alpha++) {
+            for (int gamma = 0; gamma < nStates; gamma++) {
+                interaction = 0;
+                for (int p = 0; p < nParticles; p++) {
+                    for (int beta = 0; beta < nStates; beta++) {
+                        for (int delta = 0; delta < nStates; delta++) {
+                            interaction += C.at(p, beta) * C.at(p, delta) * matrixElement(alpha, beta, gamma, delta);
+                        }
+                    }
+                }
+\end{lstlisting}
+
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Hartree-Fock code}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+                H(alpha, gamma) = H(gamma, alpha) = h0(alpha, gamma) + interaction;
+            }
+        }
+        //Computing the HF one-body energies
+        eig_sym(E, C, H);
+        C = trans(C);
+        hfIt++;
+        // Convergence test
+        diff = E - ePrev;
+        if (abs(diff.max()) < threshold)
+            break;
+        ePrev = E;
+    }
+    double E0 = calcEnergy(C);
+    cout << "Final energy E = " << E0 << " after " << hfIt << " iterations, error < " << threshold << endl;
+}
+\end{lstlisting}
+
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Koopman's theorem and interpretation of the Hartree-Fock energies}
+\begin{small}
+{\scriptsize
+We have defined 
+\[
+  E[\Phi^{\mathrm{HF}}(N)] 
+  = \sum_{i=1}^N \langle i | \hat{h}_0 | i \rangle +
+  \frac{1}{2}\sum_{ij=1}^N\langle ij|V|ij\rangle_{AS},
+\]
+where $\Phi^{\mathrm{HF}}(A)$ is the new Slater determinant defined by the new basis of Eq.~(\ref{eq:newbasis})
+for $N$ electrons (same $Z$).  If we assume that the single-particle wave functions in the new basis do not change 
+when we remove one electron or add one electron, we can then define the corresponding energy for the $N-1$ systems as 
+\[
+  E[\Phi^{\mathrm{HF}}(N-1)] 
+  = \sum_{i=1; i\ne k}^N \langle i | \hat{h}_0 | i \rangle +
+  \frac{1}{2}\sum_{ij=1;i,j\ne k}^N\langle ij|V|ij\rangle_{AS},
+\]
+where we have removed a single-particle state $k\le F$, that is a state below the Fermi level.  
+ }
+ \end{small}
+ }
+
+\frame[containsverbatim]
+{
+  \frametitle{Koopman's theorem and interpretation of the Hartree-Fock energies}
+\begin{small}
+{\scriptsize
+Calculating the difference 
+\[
+  E[\Phi^{\mathrm{HF}}(N)]-   E[\Phi^{\mathrm{HF}}(N-1)] 
+  = \langle k | \hat{h}_0 | k \rangle +
+  \frac{1}{2}\sum_{i=1;i\ne k}^N\langle ik|V|ik\rangle_{AS}  \frac{1}{2}\sum_{j=1;j\ne k}^N\langle kj|V|kj\rangle_{AS},
+\]
+which becomes 
+\[
+  E[\Phi^{\mathrm{HF}}(N)]-   E[\Phi^{\mathrm{HF}}(N-1)] 
+  = \langle k | \hat{h}_0 | k \rangle +
+  \frac{1}{2}\sum_{j=1}^N\langle kj|V|kj\rangle_{AS}
+\]
+which is just our definition of the Hartree-Fock single-particle energy
+\[
+  E[\Phi^{\mathrm{HF}}(N)]-   E[\Phi^{\mathrm{HF}}(N-1)] 
+  = \epsilon_k^{\mathrm{HF}} 
+\]
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Koopman's theorem and interpretation of the Hartree-Fock energies}
+\begin{small}
+{\scriptsize
+Similarly, we can now compute the difference (we label the single-particle states above the Fermi level as $abcd > F$)
+\[
+  E[\Phi^{\mathrm{HF}}(N+1)]-   E[\Phi^{\mathrm{HF}}(N)]= \epsilon_a^{\mathrm{HF}}. 
+\]
+This equation and the one on the previous slide, are linked to Koopman's theorem.
+In atomic physics it is used to define the electron ionization or affinity energies. 
+Koopman's theorem states that the ionization energy of closed-shell systems is given by the energy of the highest occupied single-particle state.
+ }
+ \end{small}
+ }
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Discussion of the project}
+\begin{small}
+{\scriptsize
+We will now set up the Hartree-Fock program by using
+  hydrogen-like single-particle functions for the $1s$, $2s$ and $3s$
+  orbitals.  We will apply these basis functions only to the helium
+  and beryllium atoms.  For all other systems, we will use so-called
+  Gaussian type of orbitals (GTO).  These will be introduced after we
+  have set up our first Hartree-Fock programs. For Hydrogen
+  like-orbitals, the matrix elements involving the Coulomb
+  interaction, can all be evaluated in a closed form, see the table
+  below for all integrals involving these orbitals.
+Your first step is to write a function which reads in these integrals and sets up the antisymmetrized matrix elements.
+(Hint: the table lists only the integrals, there is no spin). 
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Discussion of the project}
+\begin{small}
+{\scriptsize
+The table contains the matrix elements for the radial integrals to be used for the direct part and the exchange part. You will need these integrals in solving the Hartree-Fock equations for the helium and beryllium atoms when using hydrogen-like single-particle states. The table lists only the integrals, no spin is included!
+\[
+\int \psi_{\mu}^*(\mathbf{r}_i)\psi_{\nu}^*(\mathbf{r}_j)V(r_{ij})\psi_{\mu}(\mathbf{r}_i)\psi_{\nu}(\mathbf{r}_j)d\mathbf{r}_id\mathbf{r}_j,
+\]
+
+
+\begin{table}[htbp]
+\caption{Closed form expressions for the Coulomb matrix elements (see project for all elements). The nomenclature is $1=1s$, $2=2s$ and $3=3s$, with no
+spin degrees of freedom. \label{tab:mtxlisting}}
+\begin{tabular} {|cr|cr|} \hline 
+$\langle 11|V|11\rangle  =$& $ (5Z)/8 $ &$\langle 11|V|12\rangle  =$& $ (4096\sqrt{2}Z)/64827$ \\
+$\langle 11|V|13\rangle  =$& $ (1269\sqrt{3}Z)/50000$ &$\langle 11|V|21\rangle  =$& $ (4096\sqrt{2}Z)/64827$ \\
+$\langle 11|V|22\rangle  =$& $ (16Z)/729$ & $\langle 11|V|23\rangle  =$& $ (110592\sqrt{6}Z)/24137569$ \\
+$\langle 11|V|31\rangle  =$& $ (1269\sqrt{3}Z)/50000$ &$\langle 11|V|32\rangle  =$& $ (110592\sqrt{6}Z)/24137569$ \\
+$\langle 11|V|33\rangle  =$& $ (189Z)/32768$ & $\langle 12|V|11\rangle  =$& $ (4096\sqrt{2}Z)/64827$ \\
+$\dots$&$\dots$ &$\dots$ & $\dots$\\ 
+$\langle 33|V|33\rangle  =$& $ (17Z)/256$ & & \\ \hline
+\end{tabular}
+\end{table}
+ }
+ \end{small}
+ }
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Discussion of the project}
+\begin{small}
+{\scriptsize
+Set up the Hartree-Fock equations for the ground states of helium and beryllium
+with the electrons  occupying
+the respective 'hydrogen-like' orbitals $1s$, $2s$ and $3s$.
+There is no spin-orbit part in the two-body Hamiltonian.  Find also the total binding ground state energy and compare this to the energy obtaining without performing the Hartree-Fock calculations. The experimental values are $-2.904$ atomic units (a.u.) and
+$-14.67$ a.u. for the helium and beryllium atoms, respectively. 
+
+In setting up the equations make sure your Hartree-Fock matrix is block diagonal in the spin quantum numbers. Since there is no
+spin-dependent part in the Hamiltonian, states with the same $l$ and $n$ will be degenerate in energy with respect to the spin
+projections. 
+
+The code you develop here will serve as a starting point for the inclusion of GTOs later in this course.
+We will discuss object orientation next week.
+ }
+ \end{small}
+ }
+
+\section[Week 8]{Week 8}
+
+\frame
+{
+  \frametitle{Topics for Week 8, February 17-21}
+  \begin{block}{Classes and object orientation in C++}
+\begin{itemize}
+\item Simple classes in C++
+\item Templates
+\item How to object orient the Hartree-Fock program
+\item Next week we will discuss new orbital functions, the so-called Gaussian-type orbitals
+\end{itemize}
+  \end{block}
+} 
+
+\frame[containsverbatim]
+{
+  \frametitle{Object orientation}
+\begin{small}
+{\scriptsize
+Why object orientation? 
+\begin{itemize}
+\item Three main topics: objects, class hierarchies and polymorphism
+\item The aim here is to  be to be able to write a more general code which can easily be tailored
+to new situations. 
+\item {\bf Polymorphism} is a term used in software development to describe a variety of 
+techniques employed by programmers to create flexible and reusable software components. The term is Greek and it loosely translates to "many forms".
+\end{itemize}
+Strategy: try to single out the variables needed to describe a given system and those needed to describe a given solver.
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Object orientation}
+\begin{small}
+{\scriptsize
+In programming languages, a polymorphic object is an entity, such as a variable or a procedure, that can hold or operate on values of differing types during the program's execution. Because a polymorphic object can operate on a variety of values and types, it can also be used in a variety of programs, sometimes with little or no change by the programmer. The idea of write once, run many, also known as code reusability, is an important characteristic to the programming paradigm known as Object-Oriented Programming (OOP).
+
+OOP describes an approach to programming where a program is viewed as a collection of interacting, but mostly independent software components. These software components are known as objects in OOP and they are typically implemented in a programming language as an entity that encapsulates both data and procedures.
+
+}
+\end{small}
+}
+
+
+
+%\section{Programming classes and templates}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+In Fortran a vector or matrix start with $1$, but it is easy 
+to change a vector so that it starts with zero or even a negative number.
+If we have a double precision Fortran vector  which starts at $-10$ and ends at $10$, we could declare it as 
+\lstinline{REAL(KIND=8) ::  vector(-10:10)}. Similarly, if we want to start at zero and end at 10 we could write
+\lstinline{REAL(KIND=8) ::  vector(0:10)}.  
+We have also seen that Fortran  allows us to write a matrix addition ${\bf A} = {\bf B}+{\bf C}$ as
+\lstinline{A = B + C}.  This means that we have overloaded the addition operator so that it translates this operation into
+two loops and an addition of two matrix elements $a_{ij} = b_{ij}+c_{ij}$.
+}
+\end{small}
+}
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+The way the matrix addition is written is very close to the way we express this relation mathematically. The benefit for the 
+programmer is that our code is easier to read. Furthermore, such a way of coding makes it  more likely  to spot eventual 
+errors as well.  
+
+
+In Ansi C and C++ arrays start by default from $i=0$.  Moreover, if we  wish to add two matrices we need to explicitely write out
+the two loops as
+\lstset{language=c++}  
+\begin{lstlisting}
+   for(i=0 ; i < n ; i++) {  
+      for(j=0 ; j < n ; j++) {
+         a[i][j]=b[i][j]+c[i][j]
+      }
+   }  
+\end{lstlisting} 
+
+}
+\end{small}
+}
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+However, 
+the strength of C++ is the possibility 
+to define new data types, tailored to some particular problem.
+Via new data types and overloading of operations such as addition and subtraction, we can easily define 
+sets of operations and data types which allow us to write a matrix addition in exactly the same
+way as we would do in Fortran.  We could also change the way we declare a C++ matrix elements $a_{ij}$, from  $a[i][j]$ 
+to say $a(i,j)$, as we would do in Fortran. Similarly, we could also change the default range from $0:n-1$ to $1:n$. 
+
+To achieve this we need to introduce two important entities in C++ programming, classes and templates.        
+}
+\end{small}
+}
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+The function and class declarations are fundamental concepts within C++.  Functions are abstractions
+which encapsulate an algorithm or parts of it and perform specific tasks in a program. 
+We have already met several examples on how to use  functions. 
+Classes can be defined as abstractions which encapsulate
+data and operations on these data. 
+The data can be very complex data structures  and the class can contain particular functions
+which operate on these data. Classes allow therefore for a higher level of abstraction in computing.
+The elements (or components) of the data
+type are the class data members, and the procedures are the class
+member functions. 
+}
+\end{small}
+}
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Classes are user-defined tools used to create multi-purpose software which can be reused by other classes or functions.
+These user-defined data types contain data (variables) and 
+functions operating on the data.  
+
+A simple example is that of a point in two dimensions.  
+The data could be the $x$ and $y$ coordinates of a given  point. The functions
+we define could be simple read and write functions or the possibility to compute the distance between two points.
+}
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+C++ has a class complex in its standard
+template library (STL). The standard usage in a given function could then look like 
+\begin{lstlisting}
+// Program to calculate addition and multiplication of two complex numbers
+using namespace std;
+#include <iostream>
+#include <cmath>
+#include <complex>
+int main()
+{
+  complex<double> x(6.1,8.2), y(0.5,1.3);
+  // write out x+y
+  cout << x + y << x*y  << endl;
+  return 0;
+}
+\end{lstlisting}
+where we add and multiply two complex numbers $x=6.1+\imath 8.2$ and $y=0.5+\imath 1.3$ with the obvious results
+$z=x+y=6.6+\imath 9.5$ and $z=x\cdot y= -7.61+\imath 12.03$. 
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+We proceed by  splitting our task in three files.  
+
+We define first a header file complex.h  which contains the declarations of
+the class. The header file contains the class declaration (data and
+functions), declaration of stand-alone functions, and all inlined
+functions, starting as follows
+\begin{lstlisting}
+#ifndef Complex_H
+#define Complex_H
+//   various include statements and definitions
+#include <iostream>          // Standard ANSI-C++ include files
+#include <new>
+#include ....
+
+class Complex
+{...
+definition of variables and their character
+};
+//   declarations of various functions used by the class
+...
+#endif
+\end{lstlisting}
+
+}
+\end{small}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+Next we provide a file complex.cpp where the code and algorithms of different functions  (except inlined functions) 
+declared within the class are written.
+The files complex.h and complex.cpp are normally placed in a directory with other classes and libraries we have 
+defined.  
+
+Finally,we discuss here an example of a main program which uses this particular class.
+An example of a program which uses our complex class is given below. In particular we would like our class to
+perform tasks like declaring complex variables, writing out the real and imaginary part and performing 
+algebraic operations such as adding or multiplying two complex numbers.
+}
+\end{small}
+}
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+#include "Complex.h"
+...  other include and declarations
+int main ()
+{
+  Complex a(0.1,1.3);    // we declare a complex variable a
+  Complex b(3.0), c(5.0,-2.3);  // we declare  complex variables b and c
+  Complex d = b;         //  we declare  a new complex variable d 
+  cout << "d=" << d << ", a=" << a << ", b=" << b << endl;
+  d = a*c + b/a;  //   we add, multiply and divide two complex numbers 
+  cout << "Re(d)=" << d.Re() << ", Im(d)=" << d.Im() << endl;  // write out of the real and imaginary parts
+}
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+We include the header file complex.h and define four different complex variables. These
+are $a=0.1+\imath 1.3$, $b=3.0+\imath 0$ (note that if you don't define a value for the imaginary part  this is set to
+zero), $c=5.0-\imath 2.3$ and $d=b$.  Thereafter we have defined standard algebraic operations and the member functions
+of the class which allows us to print out the real and imaginary part of a given variable.
+}
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+class Complex
+{
+private:
+   double re, im; // real and imaginary part
+public:
+   Complex ();                              // Complex c;
+   Complex (double re, double im = 0.0); // Definition of a complex variable;
+   Complex (const Complex& c);              // Usage: Complex c(a);   // equate two complex variables
+   Complex& operator= (const Complex& c); // c = a;   //  equate two complex variables, same as previous
+....
+
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{small}
+{\scriptsize
+\begin{lstlisting}
+  ~Complex () {}                        // destructor
+   double   Re () const;        // double real_part = a.Re();
+   double   Im () const;        // double imag_part = a.Im();
+   double   abs () const;       // double m = a.abs(); // modulus
+   friend Complex operator+ (const Complex&  a, const Complex& b);
+   friend Complex operator- (const Complex&  a, const Complex& b);
+   friend Complex operator* (const Complex&  a, const Complex& b);
+   friend Complex operator/ (const Complex&  a, const Complex& b);
+};
+\end{lstlisting}
+}
+\end{small}
+}
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+The class is defined via the statement \lstinline{class Complex}. We must first use the key word 
+\lstinline{class}, which in turn is followed by the user-defined variable name  \lstinline{Complex}. 
+The body of the class, data and functions, is encapsulated  within the parentheses $\{...\};$.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Data and specific functions can be private, which means that they cannot be accessed from outside the class.
+This means also that access cannot be inherited by other functions outside the class. If we use \lstinline{protected}
+instead of \lstinline{private}, then data and functions can be inherited outside the class.
+
+}
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+The key word \lstinline{public} means  that data and functions can be accessed from outside the class.
+Here we have defined several functions  which can be accessed by functions outside the class.
+The declaration \lstinline{friend} means that stand-alone functions can work on privately declared  variables  of the type
+\lstinline{(re, im)}.  Data members of a class should be declared as private variables.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+The first public function we encounter is a so-called   
+constructor, which  tells how we declare a variable of type \lstinline{Complex} 
+and how this variable is initialized. We have chose  three possibilities in the example above:
+\begin{itemize}
+\item A declaration like \lstinline{Complex c;} calls the member function \lstinline{Complex()}
+which can have the following implementation 
+\begin{lstlisting}
+Complex:: Complex ()   { re = im = 0.0; }
+\end{lstlisting}
+meaning that it sets the real and imaginary parts to zero.  Note the way a member function is defined.
+The constructor is the first function that is called when an object is instantiated.
+\end{itemize}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{itemize}
+\item Another possibility  is 
+\begin{lstlisting}
+Complex:: Complex ()   {}
+\end{lstlisting}
+which means that there is no initialization of the real and imaginary parts.  The drawback is that a given compiler
+can then assign random values to a given variable.
+\item  A call like \lstinline{Complex a(0.1,1.3);} means that we could call the member function 
+\lstinline{Complex(double, double)}as 
+\begin{lstlisting}
+Complex:: Complex (double re_a, double im_a)
+{ re = re_a; im = im_a; }
+\end{lstlisting}
+\end{itemize}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+The simplest member function are those we defined to extract 
+the real and imaginary part of a variable. Here you have to recall that these are private data,
+that is they invisible for users of the class.  We obtain a copy of these variables by defining the 
+functions
+\begin{lstlisting}
+double Complex:: Re () const { return re; }} //  getting the real part
+double Complex:: Im () const { return im; }  //   and the imaginary part
+\end{lstlisting}
+Note that we have introduced   the declaration  \lstinline{const}.  What does it mean? 
+This declaration means that a variabale cannot be changed within  a called function.
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+If we define a variable as 
+\lstinline{const double p = 3;} and then try to change its value, we will get an error when we
+compile our program. This means that constant arguments in functions cannot be changed.
+\begin{lstlisting}
+// const arguments (in functions) cannot be changed:
+void myfunc (const Complex& c)
+{ c.re = 0.2; /* ILLEGAL!! compiler error... */  }
+\end{lstlisting}
+If we declare the function and try to change the value to $0.2$, the compiler will complain by sending
+an error message. 
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+If we define a function to compute the absolute value of complex variable like
+\begin{lstlisting}
+double Complex:: abs ()  { return sqrt(re*re + im*im);}
+\end{lstlisting}
+without the constant declaration  and define thereafter a function 
+\lstinline{myabs} as
+\begin{lstlisting}
+double myabs (const Complex& c)
+{ return c.abs(); }   // Not ok because c.abs() is not a const func.
+\end{lstlisting}
+the compiler would not allow the c.abs() call in myabs
+since \lstinline{Complex::abs} is not a constant member function. 
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Constant functions cannot change the object's state.
+To avoid this we declare the function \lstinline{abs} as
+\begin{lstlisting}
+double Complex:: abs () const { return sqrt(re*re + im*im); } 
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+C++ (and Fortran) allow  for overloading of operators. That means we can define algebraic operations
+on for example vectors or any arbitrary object.   
+As an example, a vector addition of the type  ${\bf c} = {\bf a} + {\bf b}$
+means that we need to write   a small part of code with a for-loop over the dimension of the array.
+We would rather like to write this statement as \lstinline{c = a+b;} as this makes the code much more
+readable and close to eventual equations we want to code.  To achieve this we need to extend the definition of operators.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Let us study the declarations in our complex class.
+In our main function we have a statement like \lstinline{d = b;}, which means
+that we call \lstinline{d.operator= (b)} and we have defined a so-called assignment operator
+as a part of the class defined as
+\begin{lstlisting}
+Complex& Complex:: operator= (const Complex& c)
+{
+   re = c.re;
+   im = c.im;
+   return *this;
+}
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+With this function, statements like
+\lstinline{Complex d = b;} or \lstinline{Complex d(b);}
+make a new object $d$, which becomes a copy of $b$. 
+We can make simple implementations in terms of the assignment
+\begin{lstlisting}
+Complex:: Complex (const Complex& c)
+{ *this = c; }
+\end{lstlisting}
+which  is a pointer to "this object", \lstinline{*this} is the present object,
+so \lstinline{*this = c;} means setting the present object equal to $c$, that is
+\lstinline{this->operator= (c);}.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+The meaning of the addition operator $+$ for Complex objects is defined in the
+function
+\lstinline{Complex operator+ (const Complex& a, const Complex& b); // a+b}
+The compiler translates \lstinline{c = a + b;} into \lstinline{c = operator+ (a, b);}. 
+Since this implies the call to function, it brings in an additional overhead. If speed
+is crucial and this function call is performed inside a loop, then it is more difficult for a 
+given compiler to perform optimizations of a loop.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+The solution to this is to inline functions.   We discussed inlining in chapter 
+2 of the lecture notes.
+Inlining means that the function body is copied directly into
+the calling code, thus avoiding calling the function.
+Inlining is enabled by the inline keyword
+\begin{lstlisting}
+inline Complex operator+ (const Complex& a, const Complex& b)
+{ return Complex (a.re + b.re, a.im + b.im); }
+\end{lstlisting}
+Inline functions, with complete bodies must be written in the header file  complex.h.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Consider  the case \lstinline{c = a + b;}
+that is,  \lstinline{c.operator= (operator+ (a,b));}
+If \lstinline{operator+}, \lstinline{operator=} and the constructor \lstinline{Complex(r,i)} all
+are inline functions, this transforms to
+\begin{lstlisting}
+c.re = a.re + b.re;
+c.im = a.im + b.im;
+\end{lstlisting}
+by the compiler, i.e., no function calls
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+The stand-alone function \lstinline{operator+} is a friend of the Complex  class
+\begin{lstlisting}
+class Complex
+{
+   ...
+   friend Complex operator+ (const Complex& a, const Complex& b);
+   ...
+};
+\end{lstlisting}
+so it can read (and manipulate) the private data parts $re$ and
+$im$ via
+\begin{lstlisting}
+inline Complex operator+ (const Complex& a, const Complex& b)
+{ return Complex (a.re + b.re, a.im + b.im); }
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Since we do not need to alter the re and im variables, we can
+get the values by Re() and Im(), and there is no need to be a
+friend function
+\begin{lstlisting}
+inline Complex operator+ (const Complex& a, const Complex& b)
+{ return Complex (a.Re() + b.Re(), a.Im() + b.Im()); }
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+The multiplication functionality can now be extended to imaginary numbers by the following code
+\begin{lstlisting}
+inline Complex operator* (const Complex& a, const Complex& b)
+{
+  return Complex(a.re*b.re - a.im*b.im, a.im*b.re + a.re*b.im);
+}
+\end{lstlisting}
+It will be convenient to inline all functions used by this operator.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+To inline the complete expression \lstinline{a*b;}, the constructors and
+\lstinline{operator=}  must also be inlined.  This can be achieved via the following piece of code
+\begin{lstlisting}
+inline Complex:: Complex () { re = im = 0.0; }
+inline Complex:: Complex (double re_, double im_)
+{ ... }
+inline Complex:: Complex (const Complex& c)
+{ ... }
+inline Complex:: operator= (const Complex& c)
+{ ... }
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+\begin{lstlisting}
+// e, c, d are complex
+e = c*d;
+// first compiler translation:
+e.operator= (operator* (c,d));
+// result of nested inline functions
+// operator=, operator*, Complex(double,double=0):
+e.re = c.re*d.re - c.im*d.im;
+e.im = c.im*d.re + c.re*d.im;
+\end{lstlisting}
+The definitions \lstinline{operator-} and \lstinline{operator/} follow the same set up.
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Finally, if we wish to write to file or another device a complex number using the simple syntax
+\lstinline{cout << c;}, we obtain this by defining
+the effect of $<<$ for a Complex object as 
+\begin{lstlisting}
+ostream& operator<< (ostream& o, const Complex& c)
+{ o << "(" << c.Re() << "," << c.Im() << ") "; return o;}
+\end{lstlisting}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes, templates}
+What if we wanted to make a class which takes integers
+or floating point numbers with single precision?
+A simple way to achieve this is copy and paste our class and replace \lstinline{double} with for
+example \lstinline{int}.
+
+C++  allows us to do this automatically via the usage of templates, which 
+are the C++ constructs for parameterizing parts of
+classes. Class templates  is a template for producing classes. The declaration consists
+of the keyword \lstinline{template} followed by a list of template arguments enclosed in brackets.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+We can therefore make a more general class by rewriting our original example as
+\begin{lstlisting}
+template<class T>
+class Complex
+{
+private:
+   T re, im; // real and imaginary part
+public:
+   Complex ();                              // Complex c;
+   Complex (T re, T im = 0); // Definition of a complex variable;
+   Complex (const Complex& c);              // Usage: Complex c(a);   // equate two complex variables
+   Complex& operator= (const Complex& c); // c = a;   //  equate two complex variables, same as previous
+
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+We can therefore make a more general class by rewriting our original example as
+\begin{lstlisting}
+  ~Complex () {}                        // destructor
+   T   Re () const;        // T real_part = a.Re();
+   T   Im () const;        // T imag_part = a.Im();
+   T   abs () const;       // T m = a.abs(); // modulus
+   friend Complex operator+ (const Complex&  a, const Complex& b);
+   friend Complex operator- (const Complex&  a, const Complex& b);
+   friend Complex operator* (const Complex&  a, const Complex& b);
+   friend Complex operator/ (const Complex&  a, const Complex& b);
+};
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+What it says is that \lstinline{Complex} is a parameterized type with $T$ as a parameter and $T$ has to be a type such as double
+or float. 
+The class complex is now a class template
+and we would define variables in a code as 
+\begin{lstlisting}
+Complex<double> a(10.0,5.1);
+Complex<int> b(1,0);
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Member functions of our class are defined by preceding the name of the function with the \lstinline{template} keyword. 
+Consider the function we defined as \lstinline{Complex:: Complex (double re_a, double im_a)}.
+We would rewrite this function as 
+\begin{lstlisting}
+template<class T>
+Complex<T>:: Complex (T re_a, T im_a)
+{ re = re_a; im = im_a; }
+\end{lstlisting}
+The member functions  are otherwise defined following ordinary member function definitions.
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+Here follows a very simple first class
+\begin{lstlisting}
+// Class to compute the square of a number
+class Squared{
+  public:
+    // Default constructor, not used here
+    Squared(){}
+    
+    // Overload the function operator()
+    double operator()(double x){
+      return x*x;
+    }
+};	
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{Programming classes}
+and we would use it as 
+\begin{lstlisting}
+#include <iostream>
+using namespace std;
+
+int main(){
+  Squared s;
+  cout << s(3) << endl;
+}
+\end{lstlisting}
+}
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code}
+It can be useful to split the code in a system and a solver part, where the system part contains
+information about various quantum numbers, the interaction elements such as the expectation value of the 
+one-body and two-body interactions and other properties pertinent to a given system. The solver part
+needs only to deal with the explicit solution algorithm and takes as input for example only indices
+relevant to a given single-particle system.  Here's an example which contains 
+\begin{itemize}
+\item A basis class
+\item An interaction class, the Coulomb interaction here
+\item And a solver class, which here contains only the Hartree-Fock method
+\end{itemize}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: the main program}
+\begin{lstlisting}
+#include <cstdlib>
+#include <stdio>
+#include <cmath>
+#include <iostream>
+#include <armadillo>
+#include "coulomb.h"
+#include "basis.h"
+#include "hartreeFock.h"
+#include <map>
+
+using namespace arma;
+using namespace std;
+
+\end{lstlisting}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: the main program}
+\begin{lstlisting}
+//  The main program
+int main(int argc, char** argv) {
+    int nParticles = 4;
+    int dim = 3;
+    int n = 20; // number of single-particle states
+    double w = 1;
+    double threshold = 1e-4;
+    int HFIterations = 30;
+    
+    // Setting up the basis
+    basis harm = basis(dim, n, w);
+    harm.createBasis();
+    harm.generateInteractionElements();
+    vector<vec> states = harm.getSPS();
+    map<double, vec> intE = harm.getInt();
+    
+    // Running Hartree-Fock calculations
+    hartreeFock HF = hartreeFock(states, nParticles, intE);
+    HF.run();
+    ...   // more statements, print etc    
+    return 0;
+}
+\end{lstlisting}
+}
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: the basis class}
+\begin{lstlisting}
+ #ifndef BASIS_H
+#define	BASIS_H
+#include <cstdlib>
+#include <stdio>
+#include <iostream>
+#include <armadillo>
+#include <vector>
+#include <map>
+
+using namespace std;
+using namespace arma;
+
+\end{lstlisting}
+}
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: the basis class}
+\begin{lstlisting}
+class basis {
+public:
+    basis();
+    basis(int dim, int n, double w);
+    basis(const basis& orig);
+    virtual ~basis();
+    void createBasis();
+    void generateInteractionElements();
+    vector<vec> getSPS() {
+        return states;
+    };    
+    vector<vec> getIE() {
+        return states;
+    };
+    
+    map<double, vec>  getInt() {
+        return ie;
+    };
+    
+
+\end{lstlisting}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: the basis class}
+\begin{lstlisting}
+private:
+    string basisName;
+    int dim;
+    int n;
+    double w;
+    int maxRange;
+    vector<vec> states;
+    vector<vec> interactionElements;
+    map<double, vec> ie;
+    
+};
+#endif	/* BASIS_H */
+
+
+\end{lstlisting}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: the basis class and specific functions}
+\begin{lstlisting}
+...// more statements
+basis::basis(int dim, int n, double w) : dim(dim), n(n), w(w) {
+}
+
+void basis::createBasis() {
+
+    // Generating all single particle states and energies            
+    vec state(4);
+    int counter = 0;
+    // specific case
+    for (int k = 0; k <= n; k++) {
+        for (int i = 0; i <= floor(k / 2); i++) {
+            for (int l = -k; l <= k; l++) {
+                if ((2 * i + abs(l) + 1) == k) {
+
+                    // Spin up
+                    state(0) = counter;
+                    state(1) = i;
+                    state(2) = l;
+                    state(3) = 1;
+                    states.push_back(state);
+                    counter++;
+
+                    // Spin down
+                    state(0) = counter;
+                    state(1) = i;
+                    state(2) = l;
+                    state(3) = -1;
+                    states.push_back(state);
+                    counter++;
+                }
+            }
+        }
+    }
+}
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: the basis class and specific functions}
+\begin{lstlisting}
+.....
+void basis::generateInteractionElements() {
+    double E;
+    int n1, l1,s1, n2, l2, s2, n3, l3, s3, n4, l4, s4;
+    int nInteractions = 0;
+    int nStates = states.size();
+    ... // statements specific to the function to compute 
+
+}
+
+basis::~basis() {
+}
+
+
+\end{lstlisting}
+}
+
+
+
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: The solver class}
+\begin{lstlisting}
+#ifndef HARTREEFOCK_H
+#define	HARTREEFOCK_H
+
+#include <cstdlib>
+#include <stdio>
+#include <iostream>
+#include <armadillo>
+#include <vector>
+#include "coulomb.h"
+#include <map>
+
+using namespace std;
+using namespace arma;
+
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: The solver class}
+\begin{lstlisting}
+class hartreeFock {
+public:
+    hartreeFock();
+    hartreeFock(vector<vec> sps, int nParticles);
+    hartreeFock(vector<vec> sps, int nParticles, map<double, vec> intE);
+    hartreeFock(const hartreeFock& orig);
+    virtual ~hartreeFock();
+    
+    void run();
+    double h0(int state1, int state2);
+    double matrixElement(int a, int b, int i, int j);
+    double calcEnergy(const mat &C);
+private:
+    vector<vec> sps;
+    map<double, vec> intE;
+    int nStates;
+    int nParticles;
+    double threshold;
+    int HFIterations;
+};
+#endif	/* HARTREEFOCK_H */
+
+\end{lstlisting}
+}
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: The solver class}
+\begin{lstlisting}
+#include "hartreeFock.h"
+#include <complex>
+#include <map>
+
+hartreeFock::hartreeFock() {
+}
+
+hartreeFock::hartreeFock(vector<vec> sps, int nParticles) : sps(sps), nStates(sps.size()), nParticles(nParticles), threshold(threshold), HFIterations(HFIterations) {
+}
+
+hartreeFock::hartreeFock(vector<vec> sps, int nParticles, map<double, vec> intE) : sps(sps), nStates(sps.size()), nParticles(nParticles), threshold(threshold), HFIterations(HFIterations), intE(intE) {
+}
+
+hartreeFock::hartreeFock(const hartreeFock& orig) {
+}
+
+hartreeFock::~hartreeFock() {
+}
+
+\end{lstlisting}
+}
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: The solver class}
+\begin{lstlisting}
+// Single particle energy
+
+double hartreeFock::h0(int a, int b) {
+    double E = 0;
+    if (a == b) {
+        int n = sps[a][1];
+        int l = sps[a][2];
+        E = //  given by specific problem
+    }
+    return E;
+}
+
+\end{lstlisting}
+}
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: The solver class}
+\begin{lstlisting}
+double hartreeFock::matrixElement(int a, int b, int i, int j) {
+    double E = 0;
+    if (sps[a][3] == sps[i][3] && sps[b][3] == sps[j][3]) {
+        E += coulomb(sps[a][1], sps[a][2], sps[b][1], sps[b][2], sps[j][1], sps[j][2], sps[i][1], sps[i][2]);
+    }
+
+    if (sps[a][3] == sps[j][3] && sps[b][3] == sps[i][3]) {
+        E -= coulomb(sps[a][1], sps[a][2], sps[b][1], sps[b][2], sps[i][1], sps[i][2], sps[j][1], sps[j][2]);
+    }
+
+    return E;
+}
+
+\end{lstlisting}
+}
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code, specific tasks this and next week}
+Rewrite your code for the helium and beryllium atoms in terms of classes and try to write general classes which reflect system specific parts and solver specific parts. You could then have 
+\begin{itemize}
+\item A basis class where you code in the quantum numbers for various systems
+\item An interaction class for different types of systems
+\item And a solver class, which here contains only the Hartree-Fock method
+\end{itemize}
+The two first classes would be system specific ones while the last one is solver specific. You could even attempt to write a general system class with specific subclasses for atoms, molecules, quantum dots, nuclei etc which contain information about the various quantum numbers and interactions.
+Literature: Thijssen chapter 4 and slides by Helgaker sent to you.
+}
+
+
+\section[Week 9]{Week 9}
+
+\frame
+{
+  \frametitle{Topics for Week 9, February 24-28}
+  \begin{block}{Gaussian type orbitals}
+\begin{itemize}
+\item Repetition from last week and more on object orientation
+\item Basic definitions of Gaussian type orbitals (GTO)
+\item Integrals to be calculated and Boyd integrals
+\item How to program them (next week)
+\end{itemize}
+The aim now is to move away from hydrogen-like state functions and use a more optimal basis, in our case GTOs. This involves coding of various integrals. With this, we can attack almost any kind of atomic and molecular systems.
+  \end{block}
+} 
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: Main program in short}
+\begin{lstlisting}
+
+#include <iostream>
+#include<HartreeFock.h>
+
+using namespace std;
+
+int main()
+{
+    cout << "-----Hartree-Fock-----" << endl;
+    // Running Hartree-Fock calculations
+    hartreeFock HF = hartreeFock(states, nParticles, intE);
+    HF.run();
+    ...   // more statements, print etc    
+    return 0;
+}
+
+\end{lstlisting}
+}
+
+
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: The Hartree-Fock solver}
+\begin{lstlisting}
+#include "hartreefocksolver.h"
+
+HartreeFockSolver::HartreeFockSolver(ElectronSystem *electronSystem):
+    m_electronSystem(electronSystem)
+{
+    int dim = ... //given by the basis
+    m_Q.set_size(dim, dim);
+    for(int i = 0; i < dim; i++){
+        for(int j = 0; j < dim; j++){
+            m_Q(i,j) = zeros(dim, dim);
+        }
+    }
+    //Usage: m_Q(p,q)(r,s)
+}
+\end{lstlisting}
+}
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: The Hartree-Fock solver}
+\begin{lstlisting}
+void HartreeFockSolver::solve()
+{
+    setupS();
+    setuph();
+    setupQ();
+
+    ...
+ while(energyDiff > HFSOLVERTOLERANCE){
+        ...
+        calculateF();
+        solveSingle();
+        energyDiff = ...
+        ...
+    }
+
+}
+\end{lstlisting}
+}
+\frame[containsverbatim]
+{
+  \frametitle{The Hartree-Fock code: The Hartree-Fock solver}
+\begin{lstlisting}
+void HartreeFockSolver::solveSingle()
+{
+    //Solve the eigenvalue problem
+
+}
+\end{lstlisting}
+Plus many more functions
+}
+
+\frame
+{ 
+  \frametitle{Possible code structure linked with GTOs}
+%\vspace{-10cm}
+\begin{figure}
+\includegraphics[scale=0.55]{hartreefock.pdf}
+\end{figure}
+} 
+
+\frame
+{
+  \frametitle{Basic definitions and motivation}
+\begin{small}
+{\scriptsize
+In this course the final aim is to develop a Hartree-Fock code which can be used to study properties of
+both atoms and molecules.
+
+For a molecular system, the eigenfunctions of the Hartree-Fock equations are called
+\emph{molecular orbitals} (MOs). It is important to distinguish these
+from the perhaps more familiar \emph{atomic orbitals}, where we can think of (as we have done till now)
+that the electrons occupy some well-defined hydrogen-like states.
+
+An example like the $H_2$-molecule may suffice.
+In the ground state the electrons are not occupying the 1$s$-orbitals of atomic Hydrogen. The
+molecular system is entirely different from the atomic one, with an entirely different Hamiltonian,
+and the eigenstates of the Hartree-Fock equations will therefore also be different.
+}
+\end{small}
+}
+
+
+
+
+\frame
+{
+  \frametitle{Basic definitions and motivation}
+\begin{small}
+{\scriptsize
+In order to solve the Hartree-Fock equations, we need to expand the molecular orbitals in a known
+set of basis functions
+\begin{equation}
+ \phi_k(\vec r) = \sum_{\mu=1}^M\chi_{\mu k}(\vec r).
+\end{equation}
+The question we then need to answer is how to choose basis functions $\chi_{\mu k}$? The answer to this
+is primarily dictated by the following three criteria:
+\begin{enumerate}
+ \item The functions should make physically sense, i.e., they should have a large probability where
+  the electrons are likely to be and small elsewhere.
+ \item It should be possible to integrate the functions efficiently.
+ \item The solution of the Hartree-Fock equations should converge towards the Hartree-Fock limit
+       as the number of basis functions increases.
+\end{enumerate}
+The first point suggests that we choose atomic orbitals as basis functions,  which is often
+referred to as ``linear combination of atomic orbitals'' (LCAO). In the project we will use the various atomic nuclei as mass centers which the electrons orbit around. However, this is not strictly required since the
+atomic orbitals are merely being used as basis functions, and they are not to be thought of
+as orbitals occupied by electrons. 
+}
+\end{small}
+}
+
+
+
+
+
+\frame
+{
+  \frametitle{Basic definitions, Slater orbitals}
+\begin{small}
+{\scriptsize
+A much set of state functions are the so-called 
+Slater type orbitals (STO), defined as
+\begin{equation}
+ \chi^{STO}(r,\theta,\phi,n,l,m) = \frac{(2a)^{n+1/2}}{[(2n)!]^{1/2}}r^{n-1}\exp(-a r) Y^m_l(\theta,\phi),
+\end{equation}
+where $n$ is the principal quantum number, $l$ and $m$ are the orbital momentum quantum numbers,
+$Y^m_l(\theta,\phi)$ are the spherical harmonics familiar from the solution of the Schr\"odinger
+equation for the Hydrogen atom, and $a$ is an exponent which determines the radial decay of the
+function. The main attractive features of the STOs are that they have the correct exponential decay with
+increasing $r$ and that the orbital components are hydrogenic. 
+Furthermore, they can be used to represent in a better way weakly bound states or even resonances. The hydrogen-like state functions 
+represent only bound states.
+STOs are mainly 
+used in atomic Hartree-Fock calculations. When doing molecular calculations, however, they have the
+disadvantage that the two-particle integrals $\bra{\mu\sigma}g\ket{\nu\lambda}$ need to compute 
+an anti-symmetrized matrix interaction element have no known closed form expression. This is because integrals of products
+of exponentials centered on different nuclei are difficult to handle. They can of course be calculated
+numerically, but for large molecules this is very time consuming.
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Basic definitions}
+\begin{small}
+{\scriptsize
+A clever trick which makes multiple center integrals easier to handle is to replace the exponential
+term $\exp(-a r)$ with $\exp(-a r^2)$, that is, to functions proportional with Gaussians. This simplifies 
+considerably the integrals to evaluate since the product of two Gaussians centered on nuclei with positions
+$\vec A$ and $\vec B$ is equal to \emph{one} Gaussian centered on some point $\vec P$ on
+the line between them:
+\begin{equation}
+\label{eq:gaussian_product}
+ \exp(-a|\vec r - \vec A|^2)\cdot \exp(-b|\vec r - \vec B|^2) = K_{AB}\,\exp(-p|\vec r - \vec P|^2),
+\end{equation}
+where
+\begin{eqnarray}
+ K_{AB} & = & \exp\Big(-\frac{ab}{a + b}|\vec A - \vec B|^2\Big), \\
+ \vec P & = & \frac{a \vec A + b \vec B}{a + b}, \\
+ p & = & a + b.
+\end{eqnarray}
+This is the so-called \emph{Gaussian product theorem}.
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Basic definitions}
+\begin{small}
+{\scriptsize
+The general functional form of a normalised Gaussian type orbital 
+centered at $\vec A$ is given by
+\begin{equation}
+ G_{ijk}(a, \vec r_A) = \Big(\frac{2a}{\pi}\Big)^{3/4}\Big[\frac{(8a)^{i+j+k}\,i!\,j!\,k!}{(2i)!\,(2j)!\,(2k)!}\Big]x_A^i\,y_A^j\,z_A^k\,\exp(-a r_A^2),
+\end{equation}
+where $\vec r_A = \vec r - \vec A$ and the integers $i$, $j$, $k$ determine the orbital momentum quantum number $l=i+j+k$. 
+
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Disadvantages}
+\begin{small}
+{\scriptsize
+The greatest drawback with GTOs is that they do not have the proper exponential radial decay. This can be fixed by forming linear combinations of GTOs
+to resemble the STOs
+\begin{equation}
+ \chi^{CGTO}(\vec r_A,i,j,k) = \sum_{p=1}^L d_p G_{ijk}(a_p, \vec r_A).
+\end{equation}
+These are called STO-LG basis functions, where L refers to the number of Gaussians used in the linear combination.
+The individual Gaussians are called \emph{primitive} basis functions and the linear combinations are called \emph{contracted} basis functions, hence the label
+CGTO (Contracted Gaussian Type Orbital). These are the functions we will employ in this project.
+
+A very common choice for the STO-LG basis sets is $L=3$. 
+It is important to note that the parameters $(a_p,d_p)$ are static and that the linear combination of Gaussians constitute \emph{one single}
+basis function. With the wording ``basis function'', we  will refer to a contracted basis function.
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Basic definitions}
+\begin{small}
+{\scriptsize
+The STO-LG basis sets belong to the family of \emph{minimal basis sets}.
+It means that there is one and only one basis function per atomic orbital.
+The STO-LG basis sets for the Hydrogen and Helium atoms, for example, contain only one basis
+function for the 1$s$ atomic orbital. This basis function is, as explained above, composed of
+a linear combination of L primitives. For the atoms Lithium through Neon the STO-LG basis
+sets contain 5 basis functions; one for each of the atomic orbitals
+$1s$, $2s$, $2p_x$, $2p_y$ and $2p_z$.
+
+\begin{table}
+ \begin{center}
+ \caption{Coefficients and exponents used in the STO-3G basis used to reproduce the $1s$ STO for hydrogen $\exp{(-r)}$ using
+$\sum_{i=1}^3d_i\exp{(-\alpha_ir^2})$.}
+ \label{tab:STO3G}
+  \begin{tabular}{|c|c|c|c|}\hline
+   $p$        &  1  &  2  &   3 \\ \hline
+   $d_p$      &  0.1543   & 0.5353    & 0.4446  \\ \hline
+   $a_p$ &  3.4252   & 0.6239    & 0.1688  \\ \hline
+  \end{tabular}
+ \end{center}
+\end{table}
+
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Cartesian Gaussians and how to compute integrals}
+\begin{small}
+{\scriptsize
+Using GTOs as basis functions improves the speed of the integrations which must be done when setting up 
+for example the Fock matrix.
+The Cartesian Gaussian functions centered at $\vec A$ are given by
+\begin{equation}
+ G_{ijk}(a, \vec r_A) = x^i_A\,y^j_A\,z^k_A\,\exp(-a r^2_A),
+\end{equation}
+where $\vec r_A = \vec r - \vec A$. These will be our so-called primitive basis functions (see also the flow chart of Hartree-Fock code). 
+They factorize in the Cartesian components
+\begin{equation}
+ G_{ijk}(a, \vec r_A) = G_i(a, x_A)\,G_j(a, y_A)\,G_k(a, z_A),
+\end{equation}
+where
+\begin{equation}
+ G_i(a, x_A) = x^i_A\,\exp(-a x^2_A),
+\end{equation}
+and the other factors are defined similarly. Each of the components obey the simple recurrence relation
+\begin{equation}
+ x_A\,G_i = G_{i+1}.
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+We introduce  shorthand notation
+\begin{align}
+  G_a(\vec r) & = G_{ikm}(a, \vec r_A), \\
+  G_b(\vec r) & = G_{jln}(b, \vec r_B),
+\end{align}
+and define the overlap distribution  as
+\begin{equation}
+ \Omega_{ab}(\vec r) = G_a(\vec r)\,G_b(\vec r).
+\end{equation}
+Using the Gaussian product theorem (\ref{eq:gaussian_product}) this can be written as
+\begin{equation}
+ \Omega_{ab}(\vec r) = K_{AB}\,x^i_A\,x^j_B\,y^k_A\,y^l_B\,z^m_A\,z^n_B\,\exp(-p\,r^2_P),
+\end{equation}
+where
+\begin{equation}
+ \begin{split}
+  K_{AB}  = & \exp\Big(-\frac{ab}{a + b}R^2_{AB}\Big) \\
+  \vec R_{AB} = &  \vec A - \vec B \\
+  p = & a + b\\
+  \vec r_P = & \vec r - \vec P \\
+  \vec P = & \frac{a\vec A + b\vec B}{a + b}.
+ \end{split}
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+Because the Gaussians $G_a$ and $G_b$ factorize in their Cartesian components, such a factorization applies to the overlap distribution
+as well, namely
+\begin{equation}
+ \Omega_{ab}(\vec r) = \Omega_{ij}(x)\,\Omega_{kl}(y)\,\Omega_{mn}(z),
+\end{equation}
+where
+\begin{equation}
+ \Omega_{ij} = K^x_{AB}\,x^i_A\,x^j_B\,\exp(-px^2_P)
+\end{equation}
+and
+\begin{equation}
+\begin{split}
+ K^x_{AB} = & \exp\Big(-\frac{ab}{a + b}X^2_{AB}\Big) \\
+   X_{AB} = & A_x - B_x.
+\end{split}
+\end{equation}
+The distributions $\Omega_{kl}(y)$ and $\Omega_{mn}(z)$ are defined similarly.
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+A very useful representation of the Cartesian GTOs is given by the so-called Hermite Gaussians. These functions simplify 
+the integrations significantly. The Hermite Gaussians centered at $\vec P$ are defined by
+\begin{equation}
+ \Lambda_{tuv}(p, \vec r_p) = \Big(\frac{\partial}{\partial P_x}\Big)^t \Big(\frac{\partial}{\partial P_y}\Big)^u \Big(\frac{\partial}{\partial P_z}\Big)^v \exp(-p\, r^2_P),
+\end{equation}
+where $\vec r_p = \vec r - \vec P$. They factorize as (like the cartesian GTOs also do)
+\begin{equation}
+ \Lambda_{tuv}(p, \vec r_P) = \Lambda_t(p,x_P)\,\Lambda_u(p,y_P)\,\Lambda_v(p,z_P),
+\end{equation}
+where
+\begin{equation}
+\label{eq:HermiteGaussian_x}
+ \Lambda_t(p,x_P) = \Big(\frac{\partial}{\partial P_x}\Big)^t \exp(-p\,x^2_P),
+\end{equation}
+and the other factors are defined similarly. 
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+However, their recurrence relation is quite different from that of the Cartesian Gaussians:
+\begin{equation}
+\begin{split}
+ \Lambda_{t+1}(p,x_P) & = \Big(\frac{\partial}{\partial P_x}\Big)^t \frac{\partial}{\partial P_x}\exp(-px^2_P) \\
+                      & = \Big(\frac{\partial}{\partial P_x}\Big)^t 2px_P \exp(-px^2_P)  \\
+                      & = 2p[-t\Big(\frac{\partial}{\partial P_x}\Big)^{t-1} + x_P \Big(\frac{\partial}{\partial P_x}\Big)^t] \exp(-px^2_P) \\
+                      & = 2p[-t\Lambda_{t-1} + x_P \Lambda_t],
+\end{split}
+\end{equation}
+where we have used that
+\begin{equation}
+\label{eq:derivation_rule}
+ \Big(\frac{\partial}{\partial x}\Big)^t x f(x) = t\Big(\frac{\partial}{\partial x}\Big)^{t-1}f(x) + x\Big(\frac{\partial}{\partial x}\Big)^t f(x).
+\end{equation}
+The recurrence relation reads
+\begin{equation}
+\label{eq:hermite_gaussian_recurrence}
+ x_P \Lambda_t = \frac{1}{2p}\Lambda_{t+1} + t\Lambda_{t-1}.
+\end{equation}
+
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+Our first goal is to compute the overlap integral
+\begin{equation}
+S_{ab}  = \langle G_a|G_b\rangle = \int d\vec r \,\Omega_{ab}(\vec r)
+\end{equation}
+between two Gaussians centered at the points $\vec A$ and $\vec B$.
+Since the overlap distribution $\Omega_{ab}$ factorizes in the Cartesian components, the integrals over $x$, $y$ and $z$ can be calculated independently of each other
+\begin{equation}
+\begin{split}
+ S_{ab} = & \langle G_i|G_j\rangle \langle G_k|G_l\rangle \langle G_m|G_n\rangle \\
+        = & S_{ij}\,S_{kl}\,S_{mn}.
+\end{split}
+\end{equation}
+The $x$ component of the overlap integral, for example, is given by
+\begin{equation}
+\label{eq:intG_ij}
+\begin{split}
+ S_{ij} = & \int dx \,\Omega_{ij}(x) \\
+        = & K_{AB}^x\int dx \,x_A^ix_B^j\exp(-px_P^2),
+\end{split}
+\end{equation}
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+In equation (\ref{eq:intG_ij}) the two-center GTOs have been reduced to a one-center Gaussian.
+However, the integral is still not straightforward to calculate because of the powers $x_A^i$ and $x_B^j$. A smart way to deal with this is to express the Cartesian Gaussian
+in terms of the Hermite Gaussians. Note that (\ref{eq:HermiteGaussian_x}) is a polynomial of order $t$ in $x$ multiplied by the exponential function. In equation (\ref{eq:intG_ij}) the polynomial
+is of order $i+j$. This means that we can express the overlap distribution $\Omega_{ij}(x)$ in equation (\ref{eq:intG_ij}) in terms of the Hermite Gaussians in (\ref{eq:HermiteGaussian_x}) in the following way:
+\begin{equation}
+\label{eq:LinCombOfHermGauss}
+ \Omega_{ij}(x) = \sum_{t=0}^{i+j} E^{ij}_t \Lambda_t(p, x_P),
+\end{equation}
+where $E^{ij}_t$ are constants.
+Note that the sum is over $t$ only. The indices $i$ and $j$ are static and are determined from the powers of $x$ in $G_i$ and $G_j$.
+We use them as labels on the coefficients $E^{ij}_t$ because different sets of indices will lead to different sets of coefficients.
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+To get the overlap integral in the $x$-direction we integrate (\ref{eq:LinCombOfHermGauss}) over $\mathbb{R}$, which now turns out to be extremely easy;
+the only term that survives the integration is the term for $t=0$:
+\begin{eqnarray}
+ \int dx\,\Lambda_t(p,x_P) & = & \int dx\,\Big(\frac{\partial}{\partial P_x}\Big)^t\exp(-p\,x^2_P), \\
+                           & = & \Big(\frac{\partial}{\partial P_x}\Big)^t \int dx\,\exp(-p\,x^2_P), \\
+                           & = & \sqrt{\frac{\pi}{p}}\,\delta_{t0}.
+\end{eqnarray}
+We have used Leibniz' rule, which says that the differentiation of an integrand with respect to a variable which is not an integration variable can
+be moved outside the integral. Thus the integral in (\ref{eq:intG_ij}) is simply
+\begin{equation}
+ S_{ij} = E^{ij}_0\,\sqrt{\frac{\pi}{p}}.
+\end{equation}
+
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+The same procedure can be used for the integrals with respect to $y$ and $z$, which means that the total overlap integral is
+\begin{equation}
+ S_{ab} = E^{ij}_0\,E^{kl}_0\,E^{mn}_0\,\Big(\frac{\pi}{p}\Big)^{3/2}.
+\end{equation}
+We need thereafter to determine the coefficients $E^{ij}_t$. When $i=j=0$ in equation (\ref{eq:LinCombOfHermGauss})
+we have
+\begin{equation}
+ E^{0,0}_0 = K_{AB}^x.
+\end{equation}
+The other coefficients are found via the following recurrence relations
+\begin{equation}
+\label{eq:E_recurrence}
+\begin{split}
+ E^{i+1,j}_t & = \frac{1}{2p}E^{ij}_{t-1} + X_{PA}E^{ij}_t + (t+1)E^{ij}_{t+1} \\
+ E^{i,j+1}_t & = \frac{1}{2p}E^{ij}_{t-1} + X_{PB}E^{ij}_t + (t+1)E^{ij}_{t+1}.
+\end{split}
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations}
+\begin{small}
+{\scriptsize
+Analogous expressions hold for the coefficients $E^{kl}_u$ and $E^{mn}_v$. The first equation in (\ref{eq:E_recurrence}) 
+can be derived by comparing two equivalent ways of expanding the product $G_{i+1}G_j$
+in Hermite Gaussians. The first way is
+\begin{equation}
+ G_{i+1}\,G_j= \sum_{t=0}^{i+j+1}E^{i+1,j}_t \Lambda_t,
+\end{equation}
+and the second way is
+\begin{equation}
+\label{eq:derivation_E_coeffs}
+\begin{split}
+ G_{i+1}\,G_j & = x_A G_i\,G_j \\
+              & = [(x - P_x) + (P_x - A_x)]\sum_{t=0}^{i+j} E^{ij}_t \Lambda_t\\
+              & = \sum_{t=0}^{i+j}[x_P + X_{PA}] E^{ij}_t \Lambda_t \\
+              & = \sum_{t=0}^{i+j}[\frac{1}{2p}\Lambda_{t+1} + t\Lambda_{t-1} + X_{PA}\Lambda_t]E^{ij}_t \\
+              & = \sum_{t=0}^{i+j}[\frac{1}{2p}E^{ij}_{t-1} + X_{PA}E^{ij}_t + (t+1)E^{ij}_{t+1}] \Lambda_t,
+\end{split}
+\end{equation}
+where we have used the recurrence relation (\ref{eq:hermite_gaussian_recurrence}) on the fourth line and changed the 
+summation indices on the fifth line. 
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Integral evaluations, kinetic energy}
+\begin{small}
+{\scriptsize
+Note that the change in summation indices in equation (\ref{eq:derivation_E_coeffs}) implies that we must define
+\begin{equation}
+ E^{ij}_t = 0, \qquad \text{if }t<0\text{ or }t > i + j.
+\end{equation}
+
+Next we turn to the evaluation of the kinetic integral:
+\begin{equation}
+\begin{split}
+T_{ab} & = -\frac{1}{2}\bra{G_a}\nabla^2\ket{G_b} \\
+       & = -\frac{1}{2}\bra{G_{ikm}(a, \vec r_A)}\nabla^2\ket{G_{jln}(b, \vec r_B)} \\
+       & = -\frac{1}{2}(T_{ij}\,S_{kl}\,S_{mn} + S_{ij}\,T_{kl}\,S_{mn} + S_{ij}\,S_{kl}\,T_{mn}),
+\end{split}
+\end{equation}
+where
+\begin{equation}
+ T_{ij} = \int dx \,G_i(a,x_A)\frac{\partial^2}{\partial x^2}G_j(b,x_B),
+\end{equation}
+and the other factors are defined in the same way. Performing the differentiation yields
+\begin{equation}
+ T_{ij} = 4b^2\,S_{i,j+2} - 2b(2j + 1)S_{i,j} + j(j-1)S_{i,j-2}.
+\end{equation}
+Thus we see that the kinetic integrals are calculated easily as products of the overlap integrals.
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, one-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+We now turn to the Coulomb integral due to the interaction between the electrons and the atomic nuclei
+\begin{equation}
+ V_{ab} = \bra{G_a}\frac{1}{r_C}\ket{G_b},
+\end{equation}
+where $r_C = |\vec r - \vec C|$. As before, the overlap distribution is expanded in terms of  Hermite Gaussians
+\begin{equation}
+\begin{split}
+ V_{ab} & = \int d\vec r \,\frac{\Omega_{ab}(\vec r)}{r_C} \\
+        & = \sum_{tuv}E^{ij}_t E^{kl}_u E^{mn}_v\int d\vec r \, \frac{\Lambda_{tuv}(p,\vec r_P)}{r_C} \\
+        & = \sum_{tuv}E^{ab}_{tuv}\int d\vec r \, \frac{\Lambda_{tuv}(p,\vec r_P)}{r_C}. \\
+\end{split}
+\end{equation}
+Here we have used the shorthand notation
+\begin{equation}
+ E^{ab}_{tuv} = E^{ij}_t E^{kl}_u E^{mn}_v.
+\end{equation}
+In this integral other terms besides $\Lambda_{000}$ will survive due to the factor $1/r_C$. Let us nonetheless start by evaluating this term
+\begin{equation}
+ V_p = \int d\vec r \, \frac{\Lambda_{000}(p,\vec r_P)}{r_C} = \int d\vec r\, \frac{\exp(-p\,r_P^2)}{r_C}.
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, one-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+We will show that this three-dimensional integral can actually be converted to a one-dimensional one. The trick is to observe that the factor $1/r_C$ can be replaced by the integral
+\begin{equation}
+ \frac{1}{r_C} = \frac{1}{\sqrt{\pi}}\int_{-\infty}^\infty dt\,\exp(-r^2_C\,t^2).
+\end{equation}
+Inserting this into $V_p$ and using the Gaussian product theorem gives
+\begin{eqnarray}
+ V_p & = & \int \exp(-p\,r_P^2)\Big(\frac{1}{\sqrt{\pi}}\int_{-\infty}^\infty\exp(-r^2_C\,t^2)\,dt\Big)\,d\vec r \\
+     & = & \frac{1}{\sqrt{\pi}}\int_{-\infty}^\infty\int\exp\Big(-\frac{pt^2}{p + t^2}R^2_{PC}\Big)\,\exp[-(p + t^2)r^2_S] d\vec r\, dt,
+\end{eqnarray}
+where $\vec R_{PC} = \vec P - \vec C$ and $\vec r_S = \vec r - \vec S$ for some point $\vec S$. Doing the integral over the spatial coordinates reveals that the specific value of $\vec S$ is not relevant
+\begin{eqnarray}
+ V_p & = & \frac{1}{\sqrt{\pi}}\int_{-\infty}^\infty\exp\Big(-\frac{pt^2}{p + t^2}R^2_{PC}\Big)\Big(\frac{\pi}{p + t^2}\Big)^{3/2}\,dt \\
+     & = & 2\pi\int_0^\infty\exp\Big(-\frac{pt^2}{p + t^2}R^2_{PC}\Big)\frac{dt}{(p + t^2)^{3/2}}.
+\end{eqnarray}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, one-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+Next we change integration variable from $t$ to $u$ by defining
+\begin{equation}
+ u^2 = \frac{t^2}{p + t^2}.
+\end{equation}
+This will change the range of integration from $[0,\infty\rangle$ to $[0,1]$. This is beneficial because the final integral at which we arrive will be calculated numerically.
+The change of variables leads to
+\begin{align}
+\label{eq:V_p}
+ V_p & = \frac{2\pi}{p}\int_0^1\exp(-p\,R^2_{PC}\,u^2)\,du \\
+     & = \frac{2\pi}{p}F_0(p\,R^2_{PC}),
+\end{align}
+where $F_0(x)$ is a special instance of the Boys function $F_n(x)$ which is defined as
+\begin{equation}
+ F_n(x) = \int_0^1\exp(-xt^2)\,t^{2n}\,dt.
+\end{equation}
+We will discuss the Boys functions below
+}
+\end{small}
+}
+
+
+
+
+\frame
+{
+  \frametitle{Integral evaluations, one-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+We have now a  simplified way of calculating the integral of $\Lambda_{000}/r_C$. However, we need to integrate $\Lambda_{tuv}/r_C$ for general values of $t$, $u$ and $v$.
+These integrals are actually not that hard to do once the Boys function is calculated:
+\begin{align}
+ V_{ab} & = \frac{2\pi}{p}\sum_{tuv}E^{ab}_{tuv}\int d\vec r \, \frac{\Lambda_{tuv}(p,\vec r_p)}{r_C} \\
+        & = \frac{2\pi}{p}\sum_{tuv}E^{ab}_{tuv} \frac{\partial^{t+u+v} F_0(p R^2_{PC})}{\partial P_x^t \partial P_y^u \partial P_z^v} \\
+        & = \frac{2\pi}{p}\sum_{tuv}E^{ab}_{tuv} R_{tuv}(p,\vec R_{PC}), \label{eq:V_ab}
+\end{align}
+where we have defined
+\begin{equation}
+ R_{tuv}(p,\vec R_{PC}) = \frac{\partial^{t+u+v} F_0(p R^2_{PC})}{\partial P_x^t \partial P_y^u \partial P_z^v}.
+\end{equation}
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Integral evaluations, one-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+We need to calculate derivatives of the function $F_0$. Note first that
+\begin{equation}
+ \frac{d}{dx}F_n(x) = -F_{n+1}(x).
+\end{equation}
+This means that it is possible to derive analytical expressions for the Coulomb term $V_{ab}$. However, in practice they are calculated recursively in a manner similar to the way we calculate
+the coefficients $E^{ij}_t$. Before presenting the recursion relations, we introduce the so-called auxiliary Hermite integrals
+\begin{equation}
+ R^n_{tuv}(p,\vec R_{PC}) = (-2p)^n\,\frac{\partial^{t+u+v} F_n(p R^2_{PC})}{\partial P_x^t \partial P_y^u \partial P_z^v}.
+\end{equation}
+}
+\end{small}
+}
+
+
+
+
+\frame
+{
+  \frametitle{Integral evaluations, one-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+By starting with the source terms $R^n_{000}(p,\vec R_{PC}) = (-2p)^n\,F_n(p R^2_{PC})$ we can reach the targets $R^0_{tuv}(p,\vec R_{PC}) = R_{tuv}(p,\vec R_{PC})$ through the following
+recurrence relations
+\begin{equation}
+\label{eq:R_recurrence}
+ \begin{split}
+  R^n_{t+1,u,v} & = tR^{n+1}_{t-1,u,v} + X_{PC} R^{n+1}_{tuv} \\
+  R^n_{t,u+1,v} & = uR^{n+1}_{t,u-1,v} + Y_{PC} R^{n+1}_{tuv} \\
+  R^n_{t,u,v+1} & = vR^{n+1}_{t,u,v-1} + Z_{PC} R^{n+1}_{tuv}.
+ \end{split}
+\end{equation}
+The first of these are derived as follows
+\begin{align}
+ R^{n}_{t+1,u,v} & = (-2p)^n\frac{\partial^{t+u+v}}{\partial P_x^t \partial P_y^u \partial P_z^v} [2pX_{PC}F'_n(pR_{PC}^2)] \\
+                 & = (-2p)^{n+1}\frac{\partial^{t+u+v}}{\partial P_x^t\partial P_y^u \partial P_z^v}\Big[X_{PC}F_{n+1}(pR_{PC}^2)\Big] \\
+                 & = (-2p)^{n+1}\frac{\partial^{u+v}}{\partial P_y^u \partial P_z^v}\Big[t\frac{\partial^{t-1}}{\partial P_x^{t-1}} + X_{PC}\frac{\partial^t}{\partial P_x^t}\Big]F_{n+1}(pR_{PC}^2) \\
+                 & = tR^{n+1}_{t-1,u,v} + X_{PC}R^{n+1}_{tuv},
+\end{align}
+where we have used equation (\ref{eq:derivation_rule}) and the fact that $F'_n(x) = -F_{n+1}(x)$.
+}
+\end{small}
+}
+
+
+
+\frame
+{
+  \frametitle{Integral evaluations, two-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+Finally we show how to calculate the Coulomb integral due to the interaction between the electrons. It is given by
+\begin{equation}
+\begin{split}
+  g_{acbd} & = \bra{G_a G_c}\frac{1}{r_{12}}\ket{G_b G_d} \\
+           & = \int\int \frac{\Omega_{ab}(\vec r_1)\Omega_{cd}(\vec r_2)}{r_{12}} d\vec r_1 d\vec r_2 \\
+           & = \sum_{tuv}\sum_{\tau\nu\phi}E^{ab}_{tuv}E^{cd}_{\tau\nu\phi}\int\int\frac{\Lambda_{tuv}(p,\vec r_{1P})\Lambda_{\tau\nu\phi}(q,\vec r_{2Q})}{r_{12}}d \vec r_1 d\vec r_2 \\
+           & = \sum_{tuv}\sum_{\tau\nu\phi}E^{ab}_{tuv}E^{cd}_{\tau\nu\phi}\frac{\partial^{t+u+v}}{\partial P_x^t \partial P_y^u \partial P_z^v}
+                \frac{\partial^{\tau+\nu+\phi}}{\partial Q_x^\tau \partial Q_y^\nu \partial Q_z^\phi} \\
+           &    \hspace{30mm} \int\int\frac{\exp(-pr^2_{1P})\exp(-qr^2_{2Q})}{r_{12}}d \vec r_1 d\vec r_2,
+\end{split}
+\end{equation}
+where, similar to $p$ and $\vec r_{1P}$, we have defined 
+\begin{equation}
+ \begin{split}
+    q = & c + d\\
+  \vec r_{2Q} = & \vec r_2 - \vec Q \\
+  \vec Q = & \frac{c\,\vec C + d\,\vec D}{c + d}.
+ \end{split}
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, two-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+Thus we need to evaluate the integral
+\begin{equation}
+ V_{pq} = \int\int\frac{\exp(-pr^2_{1P})\exp(-qr^2_{2Q})}{r_{12}}d \vec r_1 d\vec r_2.
+\end{equation}
+By first integrating over $\vec r_1$ and using equation (\ref{eq:V_p}) this can be written as
+\begin{equation}
+ V_{pq} = \int\Big(\frac{2\pi}{p}\int_0^1\exp(-p\,r^2_{2P}\,u^2)\,du\Big)\exp(-qr^2_{2Q}) d \vec r_2.
+\end{equation}
+Next we change the order of integration and use the Gaussian product theorem to get
+\begin{equation}
+\begin{split}
+ V_{pq} & = \frac{2\pi}{p}\int_0^1\int\exp(-\frac{pqu^2}{pu^2+q}R^2_{PQ})\exp[-(pu^2+q)r_{2S}^2] d\vec r_2 du \\
+        & = \frac{2\pi}{p}\int_0^1\exp(-\frac{pqu^2}{pu^2+q}R^2_{PQ})\Big(\frac{\pi}{pu^2+q}\Big)^{3/2} du.
+\end{split}
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, two-body Coulomb interaction}
+\begin{small}
+{\scriptsize
+Again, the value of $\vec S$ in $\vec r_{2S} = \vec r_2 - \vec S$ is not relevant. If we now make the change of variables
+\begin{equation}
+ \frac{v^2}{p+q} = \frac{u^2}{pu^2+q},
+\end{equation}
+we get the result
+\begin{equation}
+ V_{pq} = \frac{2\pi^{5/2}}{pq\sqrt{p+q}}F_0\Big(\frac{pq}{p+q}R^2_{PQ}\Big).
+\end{equation}
+From this we get the final answer
+\begin{equation}
+\begin{split}
+ g_{acbd} & = \frac{2\pi^{5/2}}{pq\sqrt{p+q}}\sum_{tuv}\sum_{\tau\nu\phi}(-1)^{\tau+\nu+\phi}E^{ab}_{tuv}E^{cd}_{\tau\nu\phi} \\
+          & \hspace{40mm} \frac{\partial^{t+u+v+\tau+\nu+\phi}}{\partial P_x^{t+\tau} \partial P_y^{u+\nu} \partial P_z^{v+\phi}}F_0\Big(\frac{pq}{p+q}R^2_{PQ}\Big) \\
+          & = \frac{2\pi^{5/2}}{pq\sqrt{p+q}}\sum_{tuv}\sum_{\tau\nu\phi}(-1)^{\tau+\nu+\phi}E^{ab}_{tuv}E^{cd}_{\tau\nu\phi}R_{t+\tau,u+\nu,v+\phi}(\alpha,\vec R_{PQ}),
+\end{split}
+\end{equation}
+where $\alpha = pq/(p+q)$. The term $(-)^{\tau+\nu+\phi}$ arises due to the fact that
+\begin{equation}
+\frac{\partial}{\partial Q_x} F_0\Big(\frac{pq}{p+q}R^2_{PQ}\Big) = - \frac{\partial}{\partial P_x} F_0\Big(\frac{pq}{p+q}R^2_{PQ}\Big).
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, two-body Coulomb interaction and Boys function}
+\begin{small}
+{\scriptsize
+Calculating the Coulomb integrals boils down to evaluating the Boys function
+\begin{equation}
+ F_n(x) = \int_0^1\exp(-xt^2)\,t^{2n}\,dt.
+\end{equation}
+Doing this by standard numerical procedures is computationally
+expensive and should therefore be avoided. Here we describe a possible way to calculate the Boys function efficiently.
+
+First note that if $x$ is very large, the function value will hardly be affected by changing the upper limit of the integral from $1$ to $\infty$. Doing this is useful
+since the integral can be calculated exactly. Thus, we have the following approximation for the Boys function for large $x$:
+\begin{equation}
+ F_n(x) \approx \frac{(2n-1)!!}{2^{n+1}}\sqrt{\frac{\pi}{x^{2n+1}}}. \hspace{15mm} (x\hspace{2mm}\mathrm{large})
+\end{equation}
+For small values of $x$ there seems to be no escape from numerical calculation. However, instead of doing the integral real time, it can be tabulated for regular values of $x$.
+For values between the tabulated ones, the function can be calculated by a Taylor expansion centered at the nearest tabulated point $x_t$:
+\begin{equation}
+ F_n(x_t+\Delta x) = \sum_{k=0}^\infty\frac{F_{n+k}(x_t) (-\Delta x)^k}{k!}. \hspace{15mm} (x\hspace{2mm}\mathrm{small})
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, two-body Coulomb interaction and Boys function}
+\begin{small}
+{\scriptsize
+The computational cost can be reduced even further by calculating the Boys function according to the description above only for the highest values of $n$ needed; for lower values of $n$ the function
+can be found via the recursion relation
+\begin{equation}
+ F_n(x) = \frac{2xF_{n+1}(x)+e^{-x}}{2n+1},
+\end{equation}
+which can be shown by integrating the function by parts.
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, summarizing}
+\begin{small}
+{\scriptsize
+The Gaussian functions are given by
+\begin{equation}
+ \begin{split}
+  G_a(\vec r) & = G_{ikm}(a, \vec r_A) = x^i_A\,y^j_A\,z^k_A\exp(-a r^2_A), \\
+  G_b(\vec r) & = G_{jln}(b, \vec r_B) = x^i_B\,y^j_B\,z^k_B\exp(-b r^2_B),
+ \end{split}
+\end{equation}
+where $\vec r_A = \vec r - \vec A$ and $\vec r_B = \vec r - \vec B$. We further define
+\begin{equation}
+\begin{split}
+  p & = a + b, \\
+ \vec P & = \frac{a\vec A + b\vec B}{a + b}.
+\end{split}
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, summarizing}
+\begin{small}
+{\scriptsize
+The overlap integral
+\begin{equation}
+ S_{ab} = \langle G_a|G_b\rangle
+\end{equation}
+is calculated as
+\begin{equation}
+ S_{ab} = E^{ij}_0\,E^{kl}_0\,E^{mn}_0\,\Big(\frac{\pi}{p}\Big)^{3/2},
+\end{equation}
+where
+\begin{equation}
+ E^{i=0,j=0}_0 = \exp(-\frac{ab}{a+b}X_{AB}^2),
+\end{equation}
+and the desired coefficients are found via
+\begin{equation}
+\begin{split}
+ E^{i+1,j}_t & = \frac{1}{2p}E^{ij}_{t-1} + X_{PA}E^{ij}_t + (t+1)E^{ij}_{t+1}, \\
+ E^{i,j+1}_t & = \frac{1}{2p}E^{ij}_{t-1} + X_{PB}E^{ij}_t + (t+1)E^{ij}_{t+1}.
+\end{split}
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, summarizing}
+\begin{small}
+{\scriptsize
+The kinetic integral is calculated as
+\begin{equation}
+ T_{ab} = -\frac{1}{2}(T_{ij}\,S_{kl}\,S_{mn} + S_{ij}\,T_{kl}\,S_{mn} + S_{ij}\,S_{kl}\,T_{mn}),
+\end{equation}
+where
+\begin{equation}
+ T_{ij} = 4b^2\,S_{i,j+2} - 2b(2j + 1)S_{i,j} + j(j-1)S_{i,j-2}.
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, summarizing}
+\begin{small}
+{\scriptsize
+The Coulomb integral
+\begin{equation}
+ V_{ab} = \bra{G_a}\frac{1}{r_C}\ket{G_b}
+\end{equation}
+is calculated as
+\begin{equation}
+ V_{ab} = \frac{2\pi}{p}\sum_{tuv}E^{ab}_{tuv} R_{tuv}(p,\vec R_{PC}),
+\end{equation}
+where
+\begin{equation}
+ E^{ab}_{tuv} = E^{ij}_t\,E^{kl}_u\,E^{mn}_v,
+\end{equation}
+and $R_{tuv}(p,\vec R_{PC})$ is found by first calculating the source term
+\begin{equation}
+ R^n_{000}(p,\vec R_{PC}) = (-2p)^n\,F_n(p R^2_{PC})
+\end{equation}
+and then iterating towards the target $R^0_{tuv}(p,\vec R_{PC}) = R_{tuv}(p,\vec R_{PC})$ via the recurrence relations
+\begin{equation}
+ \begin{split}
+  R^n_{t+1,u,v} & = tR^{n+1}_{t-1,u,v} + X_{PC} R^{n+1}_{tuv}, \\
+  R^n_{t,u+1,v} & = uR^{n+1}_{t,u-1,v} + Y_{PC} R^{n+1}_{tuv}, \\
+  R^n_{t,u,v+1} & = vR^{n+1}_{t,u,v11} + Z_{PC} R^{n+1}_{tuv}.
+ \end{split}
+\end{equation}
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{Integral evaluations, summarizing}
+\begin{small}
+{\scriptsize
+The Coulomb integral
+\begin{equation}
+ g_{acbd} = \bra{G_a G_c}\frac{1}{r_{12}}\ket{G_b G_d}
+\end{equation}
+is calculated as
+\begin{equation}
+ g_{acbd} = \frac{2\pi^{5/2}}{pq\sqrt{p+q}}\sum_{tuv}\sum_{\tau\nu\phi}(-1)^{\tau+\nu+\phi}E^{ab}_{tuv}E^{cd}_{\tau\nu\phi}R_{t+\tau,u+\nu,v+\phi}(\alpha,\vec R_{PQ}),
+\end{equation}
+where
+\begin{equation}
+  \alpha = \frac{pq}{p + q}.
+\end{equation}
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{New tasks}
+How to proceed:
+\begin{itemize}
+\item First, try to object orient your program, as discussed during last week's lectures
+\item Thereafter, implement GTOs for the helium and beryllium atoms using three and five primitive functions, a so-called STO-3G and STO-5L basis.
+\item The next step is to use an STO-5L basis and perform restricted Hartree-Fock calculations for the neon atom.
+\end{itemize}
+}
+
+\section[Weeks 10 and 11]{Weeks 10, 11 and 12}
+
+\frame
+{
+  \frametitle{Topics for Weeks 10-12, March 3-21}
+  \begin{block}{Gaussian type orbitals}
+\begin{itemize}
+\item Discussion of code structure
+\item Rewrite of Hartree-Fock equations by explicit inclusion of spin
+\item Integrals and storage of integrals
+\end{itemize}
+  \end{block}
+} 
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+Till now we have mainly dealt with the Hartree-Fock equations using anti-symmetrized matrix elements. Since the Hamiltonian does not 
+contain operators acting on the spin states, it is common to write out the spin-degrees of freedom in an explicit way.
+
+We wrote the Hartree-Fock equations as
+\[
+  \hat{h}^{HF}(x_i) \psi_{p}(x_i) = \epsilon_{p}\psi_{p}(x_i),
+\]
+with
+\[
+  \hat{h}^{HF}(x_i)= \hat{h}_0(x_i) + \sum_{j=1}^NV_{j}^{d}(x_i) -
+  \sum_{j=1}^NV_{j}^{ex}(x_i),
+\]
+and where $\hat{h}_0(i)$ is the one-body part.
+In this equations we include both spin and spatial degrees of freedom.
+
+The direct part is defined as 
+\begin{equation*}
+  V_{p}^{d}(x_i) = \int \psi_{p}^*(x_j)\psi_{p}(x_j)\hat{v}(r_{ij}) dx_j
+\end{equation*}
+while the exchange operator (or Fock operator) is
+\begin{equation*}
+  V_{p}^{ex}(x_i) \psi_{q}(x_i) 
+  = \left(\int \psi_{p}^*(x_j) 
+  \hat{v}(r_{ij})\psi_{q}(x_j)
+  dx_j\right)\psi_{p}(x_i).
+\end{equation*}
+
+}
+\end{small}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+If now deal explicitely with the spin degrees of freedom, we can write the single-particle state
+\[
+\psi_{p}(x_i) = \phi_{p}({\bf r}_i)\xi_{\sigma_i},
+\]
+where $\xi_{\sigma_i}$ is a standard Pauli spinor. Since we have only two possible spin values, the direct terms reduces then to
+(recall that we have defined $\int dx_j = \sum_{\sigma_j} \int d{\bf r}_j$)
+\begin{equation*}
+  V_{p}^{d}({\bf r}_i)\phi_{q}({\bf r}_i) = 2\int \phi_{p}^*({\bf r}_j)\phi_{p}({\bf r}_i)\hat{v}(r_{ij}) d{\bf r}_j\phi_{q}({\bf r}_i)
+\end{equation*}
+while the exchange operator (or Fock operator) is
+\begin{equation*}
+  V_{p}^{ex}({\bf r}_i) \phi_{q}({\bf r}_i) 
+  = \left(\int \phi_{p}^*({\bf r}_j) 
+  \hat{v}(r_{ij})\phi_{q}({\bf r}_j)
+  d{\bf r}_j\right)\phi_{p}({\bf r}_i).
+\end{equation*}
+}
+\end{small}
+}
+
+
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+In our Hartree-Fock calculation we expand the single-particle functions in terms of known basis functions (hydrogen-like one, STOs, GTOs etc), namely
+\[
+\phi_{p}({\bf r}_i) = \sum_{k=1}^{d}C_{pk}\chi_k({\bf r}_i),
+\]
+$d$ is the number of basis functions $\chi_k({\bf r}_i)$. The Hartree-Fock equations become then
+\[
+\hat{h}^{HF}\hat{C}_p=\epsilon^{HF}\hat{S}\hat{C}_p,
+\]
+where $\hat{S}$ is the overlap matrix needed in case the basis functions $\chi_k({\bf r}_i)$ are not normalized (typically, GTOs are not). 
+Our Hartree-Fock Hamiltonian leads then to matrix elements (in a bra-ket notation)
+\[
+\langle p | \hat{h}^{HF} | q \rangle = \langle p|\hat{h}_0|q\rangle +\sum_{k\le F}\sum_{rs}C_{kr}^*C_{ks}\left(2\langle pr | \hat{v}|qs\rangle-\langle pr | \hat{v}|sq\rangle\right),
+\]
+with 
+\[
+\langle p|\hat{h}_0|q\rangle = \int \chi_{p}^*({\bf r}_j)\left(-\frac{1}{2}\nabla^2-\frac{Z}{{\bf r}_j}  \right)\chi_{q}({\bf r}_j)
+  d{\bf r}_j.
+\]
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+The other integrals are
+\[
+\langle pr | \hat{v}|qs\rangle = \int\int \chi_{p}^*({\bf r}_i)\chi_{q}^*({\bf r}_j)\hat{v}(r_{ij})\chi_{r}({\bf r}_i)\chi_{s}({\bf r}_j)
+  d{\bf r}_id{\bf r}_j.
+\]
+If we then introduce the density matrix defined as 
+\[
+D_{pq}=\sum_{k\le F}C_{kp}C_{kq}^*,
+\]
+we can rewrite the Hartree-Fock matrix elements as
+\[
+\langle p | \hat{h}^{HF} | q \rangle = \langle p|\hat{h}_0|q\rangle +\sum_{rs}D_{rs}\left(2\langle pr | \hat{v}|qs\rangle-\langle pr | \hat{v}|sq\rangle\right),
+\]
+meaning that the only quantity we need to calculate at every
+interation is the density matrix, which is evaluated using the eigenvector 
+obtained from the diagonalization of the Hartree-Fock matrix.
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+From an algorithmic point of view, we see now that we need, with our GTO basis, to evaluate 
+\begin{enumerate}
+\item The overlap matrix $\hat{S}$.
+\item The kinetic energy and one-body interaction matrix elements $\langle p|hat{h}_0|q\rangle $ and finally the
+\item two-body interaction matrix elements $\langle pr | \hat{v}|qs\rangle$.
+\end{enumerate}
+All these elements can be computed once and for all and stored in
+memory. The overlap matrix $S$ and the one-body matrix elements
+$\langle p|\hat{h}_0|q\rangle $ can be stored as simple
+one-dimensional arrays, or alternatively as matrices of small
+dimensions.  The time-consuming part in the Hartree-Fock calculations
+involves the calculation of the two-body matrix. Furthermore, the
+storage of these matrix elements plays also an important role, in
+particular we wish to access the table of matrix elements as fast as
+possible.  
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+In a brute force algorithm for storing the matrix elements, if we have $d$ basis functions, we end up with the need of storing 
+$d^4$ matrix elements. We can reduce this considerably by the following considerations.
+In the calculation of the two-body matrix elements $\langle pr | \hat{v}|qs\rangle$ we have the following symmetries
+\begin{enumerate}
+\item Invariance under permutations, that is
+\[
+\langle pr | \hat{v}|qs\rangle = \langle rp | \hat{v}|sq\rangle.
+\]
+\item  The functions entering the evaluation of the integrals are all real, meaning that if we interchange $p\leftrightarrow q$ or 
+$r\leftrightarrow s$, we end up with the same matrix element.
+\end{enumerate}
+This reduces by a factor of eight the total number of matrix elements to be stored. 
+}
+\end{small}
+}
+
+
+
+
+
+
+
+
+
+
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+Furthermore, in setting up a table for the two-body matrix elements we can convert the need of using four indices $pqrs$ of 
+$\langle pr | \hat{v}|qs\rangle$, which in a brute forces way could be coded as a four-dimensional array, to 
+a two-dimensional array $V_{lm}$, where $l$ and $m$ stand for all possible two-body configurations $pq$.
+ 
+Each number $l$ and $m$ in $V_{lm}$  should then point to a set of single-particle  states $(p,q)$ and $(r,s)$.  
+
+In our case, since we have 
+symmetries which allow us to set $p\le q$, we have, with $d$ single particle states a total of $d(d+1)/2$ two-body configurations.
+How do we store such a matrix? The simplest thing to do is to convert it into a one-dimensional array. How do we achieve that? 
+}
+\end{small}
+}
+
+
+
+
+
+
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+We now have a matrix $V$ of dimension $n\times n$ and we want to store the elements $V_{lm}$ as a one-dimensional array $A$ using
+$0 \le l \le m \le n-1$. For
+\begin{itemize}
+\item $l=0$ we have $n$ elements
+\item $l=1$ we have $n-1$ elements
+\item $\dots$
+\item $l=\nu$ we have $n-\nu$ elements
+\item $\dots$
+\item $l=n-1$ we have $1$ element,
+\end{itemize}  
+and the total number is  
+\[
+\sum_{\nu =0}^{n-1}\left(n-\nu\right)=\frac{n(n+1)}{2}.
+\] 
+}
+\end{small}
+}
+
+
+
+\frame
+{
+  \frametitle{Hartree-Fock equations with spin degrees of freedom}
+\begin{small}
+{\scriptsize
+To find the number ($\mathrm{number}(l,m)$) in a one-dimensional array $A$ which corresponds to a matrix element $V_{lm}$, we note that
+\[
+\mathrm{number}(l,m)=\sum_{\nu =0}^{l-1}\left(n-\nu\right)+m-l=\frac{l(2n-l-1)}{2}+m.
+\] 
+The first matrix element $V(0,0)$ is obviously given by the element $A(0)$. 
+
+We have thus reduced a four dimensional array to a one-dimensional array, where the given pairs $(p,q)$ and $(r,s)$ point to the matrix indices $l$
+and $m$, respectively. The latter are used to find the explicit number $\mathrm{number}(l,m)$ which points to the desired matrix element stored 
+in a one-dimensional array.
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Hartree-Fock steps for the next three-four weeks}
+\begin{small}
+{\scriptsize
+\begin{itemize}
+\item Create class HartreeFockSolver
+\item Create class Primitive for the Gaussian type orbitals
+\item Create class Integrator which will calculate all the integrals needed. Each function in
+the integrator should receive primitive objects as parameters.
+\item You will also need to  write a function to compute the overlaps  $S_{ab} = \langle G_a|G_b\rangle$.
+\item Write a function setupHermiteCoefficients ($E^{ij}_t$-factors)
+\item Calculate general overlap integrals. 
+\end{itemize}  
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Hartree-Fock steps for the next three-four weeks}
+\begin{small}
+{\scriptsize
+\begin{itemize}
+\item Write a function to compute the kinetic energy.
+\item Create class BoysFunction
+\item Write function setupHermiteIntegrals ($R_{tuv}$-factors)
+\item Write function nucleiElectronIntegral
+\item Write function electronElectronIntegral
+\item Create class ElectronSystem
+\item Write function nucleiInteractionEnergy
+\end{itemize}  
+}
+\end{small}
+}
+
+
+\section[Week 13]{Week 13}
+
+\frame
+{
+  \frametitle{Topics for Week 13, March 24-28}
+  \begin{block}{Hartree-Fock theory for molecules}
+\begin{itemize}
+\item Repetition from previous weeks and discussion of where we are
+\item Next steps, calculation of the hydrogen (H$_2$) and the Beryllium (Be$_2$) molecules
+\item Computational issues
+\end{itemize}
+  \end{block}
+} 
+
+
+
+
+
+\frame
+{
+  \frametitle{The hydrogen molecule, our next step}
+\begin{small}
+{\scriptsize
+The 
+H$_2$ molecule consists of two protons and two electrons 
+with a ground state energy $E=-31.949$ eV or $-1.175$ a.u. and the 
+equilibrium distance between the two hydrogen atoms
+of $r_0=1.40$ Bohr radii (recall that a Bohr radius is $0.05\times 10^{-9}$m.
+
+
+We define our systems using the following variables.
+You can choose origo is chosen to be halfway between the two protons (this is just one possibility). The distance from 
+proton 1 is then defined as 
+$-{\bf R}/2$ whereas proton 2 has a distance ${\bf R}/2$.
+Calculations are performed for fixed distances ${\bf R}$ between the two protons.
+We will need here GTOs with two centers.
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{The hydrogen molecule, our next step}
+\begin{small}
+{\scriptsize
+Electron 1 has a distance $r_1$ from the chose origo, while  electron $2$
+has a distance $r_2$. 
+The kinetic energy operator becomes then
+\[
+   -\frac{\nabla_1^2}{2}-\frac{\nabla_2^2}{2}.
+\]
+The distance between the two electrons is
+$r_{12}=|{\bf r}_1-{\bf r}_2|$. 
+The repulsion between the two electrons results in a potential energy term given by
+\[
+               +\frac{1}{r_{12}}.
+\]
+In a similar way we obtain a repulsive contribution from the interaction between the two 
+protons given by
+\[
+               +\frac{1}{|{\bf R}|},
+\]
+where ${\bf R}$ is the distance between the two protons.
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{The hydrogen molecule, our next step}
+\begin{small}
+{\scriptsize
+To obtain the final potential energy we need to include the attraction the electrons feel from the protons.
+To model this, we need to define the distance between the electrons and the two protons.
+If we model this along a 
+chosen $z$-akse with electron 1 placed at a distance 
+${\bf r}_1$ from a chose origo, one proton at $-{\bf R}/2$
+and the other at  ${\bf R}/2$, 
+the distance from proton 1 to electron 1 becomes
+\[
+{\bf r}_{1p1}={\bf r}_1+ {\bf R}/2,
+\]
+and
+\[
+{\bf r}_{1p2}={\bf r}_1- {\bf R}/2,
+\]
+from proton 2.
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{The hydrogen molecule, our next step}
+\begin{small}
+{\scriptsize
+Similarly, for electron 2 we obtain
+\[
+{\bf r}_{2p1}={\bf r}_2+{\bf R}/2,
+\]
+and
+\[
+{\bf r}_{2p2}={\bf r}_2-{\bf R}/2.
+\]
+These four distances define the attractive contributions to the potential energy
+\[
+   -\frac{1}{r_{1p1}}-\frac{1}{r_{1p2}}-\frac{1}{r_{2p1}}-\frac{1}{r_{2p2}}.
+\]
+We can then write the total Hamiltonian as 
+\[
+   \OP{H}=-\frac{\nabla_1^2}{2}-\frac{\nabla_2^2}{2}
+   -\frac{1}{r_{1p1}}-\frac{1}{r_{1p2}}-\frac{1}{r_{2p1}}-\frac{1}{r_{2p2}}
+               +\frac{1}{r_{12}}+\frac{1}{|{\bf R}|}.
+\]
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{The hydrogen molecule, our next step}
+\begin{small}
+{\scriptsize
+If we use standard hydrogen-like wave functions, one can make an ansatz for the 
+Slater determinant by using the following single-particle states
+\[
+   \psi({\bf r}_1,{\bf R})=\left(\exp{(-\alpha r_{1p1})}
+      +\exp{(-\alpha r_{1p2})}\right),
+\]
+for electron 1 and
+\[
+   \psi({\bf r}_2,{\bf R})=\left(\exp{(-\alpha r_{2p1})}
+      +\exp{(-\alpha r_{2p2})}\right),
+\]
+for electron 2, with
+$\alpha$ being a variational parameter to be optimized. 
+We will use GTOs with two centers, corresponding to the atomic nuclei of the hydrogen molecules.
+}
+\end{small}
+}
+\frame
+{
+  \frametitle{The Be$_2$ molecule, the next step}
+\begin{small}
+{\scriptsize
+The next step consists in estimating the binding energy of the Be$_2$ molecule.
+Useful references are then
+\begin{enumerate}
+\item Moskowitz and Kalos, Int.~Journal of Quantum Chemistry {\bf XX}, 1107 (1981).
+Results for He and H$_2$.
+\item Filippi, Singh and Umrigar, J.~Chemical Physics {\bf 105}, 123 (1996).   Useful results on
+Be$_2$.
+\item J\o rgen H\o gberget, Master of Science thesis University of Oslo, 2013.
+\end{enumerate}
+With a functioning code for the H$_2$ and Be$_2$ molecules we will next move over to calculations
+of closed shell atoms like Ne and Ar and molecules like H$_2$O and SiO$_2$. 
+For the latter systems we need also to perform a so-called unrestricted Hartree-Fock calculation.
+}
+\end{small}
+}
+
+\frame
+{
+  \frametitle{Density distribution}
+\begin{small}
+{\scriptsize
+An important quantity which can be related to the charge distribution of electrons,
+is the so-called density distribution  (multiplying with the electrical charge gives the charge distribution) defined as
+\[
+\rho({\bf r})=\rho({\bf r}_1) = \int d{\bf r}_2\dots d{\bf r}_N \left| \Psi({\bf r}_1,{\bf r}_2\dots {\bf r}_N)\right|^2, 
+\]
+which in a Hartree-Fock based approach becomes 
+\[
+\rho({\bf r})=\sum_{i=1}^{N}\left| \psi_i({\bf r})\right|^2,
+\]
+with $\psi$ the single-particle wave functions (our best basis).  A useful check that the numerics works properly is 
+to  integrate the density distributions since it has to give us the total number of electrons in the system, that is
+\[
+N=\int d{\bf r}\rho({\bf r}).
+\]
+This is a useful test of the numerics. 
+}
+\end{small}
+}
+
+
+\frame
+{
+  \frametitle{Steps before Easter}
+\begin{small}
+{\scriptsize
+The aims before Easter is to 
+\begin{itemize}
+\item Finalize the implementation of GTOs
+\item Have a working code for the He and Be atoms and the H$_2$ and Be$_2$ molecules with GTOs.
+\end{itemize}
+After Easter, the final aims are to implement the calculation of the distribution probability, implement an unrestricted Hartree-Fock calculations and perform calculations for the Ne and Ar atoms and the H$_2$O and SiO$_2$ molecules.
+These will be the final calculations to perform and to include in the final report. An updated and final project text will be provided after Easter. 
+There are no lectures on Thursday April 3. The next lectures is in week 15, Thursday April 10.  
+}
+\end{small}
+}
+
+
+\end{document}
+
+
+\documentclass[]{report}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\hypersetup{
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={My title},    % title
+    pdfauthor={Author},     % author
+    pdfsubject={Subject},   % subject of the document
+    pdfcreator={Creator},   % creator of the document
+    pdfproducer={Producer}, % producer of the document
+    pdfkeywords={keyword1} {key2} {key3}, % list of keywords
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\definecolor{listingsstringcolor}{rgb}{0,0.5,0}
+\definecolor{listingskeywordcolor}{rgb}{0.5,0.5,0.0}
+\definecolor{listingsbasiccolor}{rgb}{0.0,0.0,0.0}
+% \definecolor{listingskeywordcolor}{rgb}{0.0,0.0,0.7}
+\definecolor{listingsnumbercolor}{rgb}{0.0,0.0,1.0}
+\definecolor{listingscommentcolor}{rgb}{0.4,0.4,0.4}
+\definecolor{listingsbackgroundcolor}{rgb}{0.975,0.975,0.975}
+\definecolor{listingsrulecolor}{rgb}{0.86,0.86,0.86}
+\definecolor{listingsidentifiercolor}{rgb}{0.5,0.0,0.5}
+% \definecolor{listingsvariablecolor}{rgb}{0.5,0.0,0.5}
+
+\renewcommand{\thesection}{\arabic{section}}
+
+\lstset {
+  language=c++,
+  numbers=none,
+  breaklines=true,
+  tabsize=2,
+  backgroundcolor=\color{listingsbackgroundcolor},
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  %   numbers=left,                    % where to put the line-numbers; possible values are (none, 
+  %%left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  frame=lrtb,                    % adds a frame around the code
+  framexleftmargin=7pt,
+  framexrightmargin=7pt,
+  framextopmargin=7pt,
+  framexbottommargin=7pt,
+  xleftmargin=18pt,
+  xrightmargin=18pt,
+  rulecolor=\color{listingsrulecolor},
+  tabsize=2,                       % sets default tabsize to 2 spaces
+  literate={å}{{\aa}}1 {æ}{{\ae}}1 {ø}{{\oslash}}1,
+  showstringspaces=false,
+  captionpos=b,
+  basicstyle=\color{listingsbasiccolor}\footnotesize\sffamily,
+  keywordstyle=\color{listingskeywordcolor}\footnotesize\sffamily,
+  stringstyle=\color{listingsstringcolor}\footnotesize\sffamily,
+  commentstyle=\color{listingscommentcolor}\footnotesize\sffamily,
+  numberstyle=\color{listingsnumbercolor}\footnotesize\sffamily,
+  identifierstyle=\color{listingsidentifiercolor}\footnotesize\sffamily,
+}
+
+\newfontfamily\listingsfont[Scale=0.85]{Droid Sans Mono}
+\lstset {
+  basicstyle=\color{listingsbasiccolor}\footnotesize\listingsfont,
+  keywordstyle=\color{listingskeywordcolor}\footnotesize\listingsfont,
+  stringstyle=\color{listingsstringcolor}\footnotesize\listingsfont,
+  commentstyle=\color{listingscommentcolor}\footnotesize\listingsfont,
+  numberstyle=\color{listingsnumbercolor}\footnotesize\listingsfont,
+  identifierstyle=\color{listingsidentifiercolor}\footnotesize\listingsfont,
+}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+\chapter*{Week 11-12}
+
+In the coming weeks, we are focusing on implementing a Hartree-Fock solver for Gaussian Type 
+Orbitals (GTOs) in FYS4411. This will allow you to calculate the energies (and other observables) 
+for much larger systems, such as complex molecules, or simply the molecular orbitals of systems 
+such as H$_{2}$O:
+%
+\begin{center}
+\includegraphics[width=0.6\textwidth]{mo_h2o.pdf}
+\end{center}
+%
+This document is written to give you some helpful hints about how you could move forward, but the 
+final sections are not yet complete, so expect some updates as we progress.
+
+\section{Create class HartreeFockSolver}
+Hopefully most of you have a working Hartree-Fock solver for atoms with hydrogenic basis functions.
+Now we need to generalize this solver to larger systems. The first step is to create a class
+HartreeFockSolver that may contain your currect code or act as a skeleton for the code to come.
+
+\section{Create class Primitive}
+To get you started we will give you a complete example of how class Primitive can be written.
+The header file is:
+\begin{lstlisting}
+#ifndef PRIMITIVE_H
+#define PRIMITIVE_H
+
+#include <armadillo>
+
+using namespace arma;
+
+class Primitive
+{
+public:
+    explicit Primitive(double weight, int xExponent,
+                       int yExponent, int zExponent, double exponent,
+                       vec nucleusPosition);
+
+    double exponent() const;
+    int zExponent() const;
+    int yExponent() const;
+    int xExponent() const;
+    double weight() const;
+    const vec& nucleusPosition() const;
+
+private:
+    double m_weight;
+    int m_xExponent;
+    int m_yExponent;
+    int m_zExponent;
+    double m_exponent;
+    vec m_nucleusPosition;
+};
+
+#endif // PRIMITIVE_H
+\end{lstlisting}
+and the .cpp file is:
+\begin{lstlisting}
+#include "primitive.h"
+
+Primitive::Primitive(double weight,
+                     int xExponent, int yExponent, int zExponent, 
+                     double exponent, vec nucleusPosition) :
+    m_weight(weight),
+    m_xExponent(xExponent),
+    m_yExponent(yExponent),
+    m_zExponent(zExponent),
+    m_exponent(exponent),
+    m_nucleusPosition(nucleusPosition)
+{
+		// If you haven't seen the above way of doing initilization, check out
+    // http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=172
+}
+
+double Primitive::exponent() const
+{
+    return m_exponent;
+}
+
+int Primitive::zExponent() const
+{
+    return m_zExponent;
+}
+
+int Primitive::yExponent() const
+{
+    return m_yExponent;
+}
+
+int Primitive::xExponent() const
+{
+    return m_xExponent;
+}
+
+double Primitive::weight() const
+{
+    return m_weight;
+}
+
+const vec& Primitive::nucleusPosition() const
+{
+    return m_nucleusPosition;
+}
+\end{lstlisting}
+
+\section{Create class Integrator}
+Create the skeleton of class Integrator, which will calculate all the integrals. Each function in
+the integrator should receive primitive objects as parameters.
+
+\section{Write function overlap}
+The simplest function in class Integrator is the overlap integral between two primitives:
+\begin{equation}
+S_{ab} = \langle G_a|G_b\rangle,
+\end{equation}
+where
+\begin{equation}
+\begin{split}
+G_a & = G_{ikm}(a, \mathbf r_A) = x_A^i y_A^k z_A^m \exp(-a r_A^2) \\
+G_b & = G_{jln}(b, \mathbf r_B) = x_B^j y_B^l z_B^n \exp(-b r_B^2).
+\end{split}
+\end{equation}
+To do this integral you have to calculate the coefficients $E^{ij}_0$, $E^{kl}_0$ and $E^{mn}_0$
+by recursion:
+\begin{equation}
+S_{ab} = E^{ij}_0 E^{kl}_0 E^{mn}_0\left(\frac{\pi}{p}\right)^{3/2},
+\end{equation}
+where
+\begin{equation}
+E^{i=0,j=0}_0 = \exp\left(-\frac{ab}{a+b}X_{AB}^2\right),
+\end{equation}
+and equivalently for the other two directions.
+
+\subsection{Calculate simple overlap}
+In the simplest case when both primitives are s-type Gaussians, that is, when all exponents
+are equal to zero ($i=j=k=l=m=n=0$), you don't need to do any recursion. You can use this to
+start doing simple tests with different primitives.
+%TODO Give values to check against
+
+\subsection{Write function setupHermiteCoefficients ($E^{ij}_t$-factors)}
+To the general integrals you have to calculate all the Hermite coefficients ($E^{ij}_t$-factors),
+see for example Helgaker's slides page 16.
+
+\subsection{Calculate general overlap integrals}
+Once you have the function setupHermiteCoefficients, you are ready to calculate the general overlap
+integrals.
+
+We have selected three values that you may test against using 
+\href{http://www.uio.no/studier/emner/matnat/fys/FYS4411/v14/guides/unit-tests/index.html}{UnitTest++}:
+\begin{lstlisting}
+// PrimitiveA
+a = 0.2;
+weight = 1;
+i = k = m = 0;
+A = {1.2, 2.3, 3.4};
+
+// PrimitiveB
+b = 0.3;
+weight = 1;
+j = l = n = 0;
+B = {-1.3, 1.4, -2.4};
+
+Primitive primitiveA(weight,i,k,m,a,A);
+Primitive primitiveB(weight,j,l,n,b,B);
+
+CHECK_CLOSE(1.191723635809e-01, integrator.overlapIntegral(primitiveA, primitiveB), 1e-5);
+\end{lstlisting}
+\begin{lstlisting}
+// PrimitiveA:
+a = 0.2;
+weight = 1;
+i = m = 0;
+k = 1;
+A = {1.2, 2.3, 3.4};
+
+// PrimitiveB:
+b = 0.3;
+weight = 1;
+j = 0;
+l = n = 1;
+B = {-1.3, 1.4, -2.4};
+
+Primitive primitiveA(weight,i,k,m,a,A);
+Primitive primitiveB(weight,j,l,n,b,B);
+
+CHECK_CLOSE(2.227321941537e-01, integrator.overlapIntegral(primitiveA, primitiveB), 1e-5);
+\end{lstlisting}
+\begin{lstlisting}
+// PrimitiveA:
+a = 0.2;
+weight = 1;
+i = m = 0;
+k = 2;
+A = {1.2, 2.3, 3.4};
+
+// PrimitiveB:
+b = 0.3;
+weight = 1;
+j = l = 1;
+n = 0;
+B = {-1.3, 1.4, -2.4};
+
+Primitive primitiveA(weight,i,k,m,a,A);
+Primitive primitiveB(weight,j,l,n,b,B);
+
+CHECK_CLOSE(-7.329386373895e-02, integrator.overlapIntegral(primitiveA, primitiveB), 1e-5); 
+\end{lstlisting}
+
+\section{Write function kinetic}
+The kinetic integrals are given as simple products of overlap integrals:
+\begin{equation}
+T_{ab} = -\frac{1}{2}(T_{ij}S_{kl}S_{mn} + S_{ij}T_{kl}S_{mn} + S_{ij}S_{kl}T_{mn}),
+\end{equation}
+where
+\begin{equation}
+T_{ij} = 4b^2S_{i,j+2} - 2b(2j+1)S_{ij} + j(j-1)S_{i,j-2}.
+\end{equation}
+Here are some tests that you may run to check that your kinetic integrator works. 
+\begin{lstlisting}
+// PrimitiveA
+a = 0.2;
+weight = 1;
+i = k = m = 0;
+A = {1.2, 2.3, 3.4};
+
+// PrimitiveB
+b = 0.3;
+weight = 1;
+j = l = n = 0;
+B = {-1.3, 1.4, -2.4};
+
+Primitive primitiveA(weight,i,k,m,a,A);
+Primitive primitiveB(weight,j,l,n,b,B);
+
+CHECK_CLOSE(-9.678702680582e-02, integrator.kineticIntegral(primitiveA, primitiveB), 1e-5); 
+\end{lstlisting}
+\begin{lstlisting}
+// PrimitiveA:
+a = 0.2;
+weight = 1;
+i = m = 0;
+k = 1;
+A = {1.2, 2.3, 3.4};
+
+// PrimitiveB:
+b = 0.3;
+weight = 1;
+j = 0;
+l = n = 1;
+B = {-1.3, 1.4, -2.4};
+
+Primitive primitiveA(weight,i,k,m,a,A);
+Primitive primitiveB(weight,j,l,n,b,B);
+
+CHECK_CLOSE(-8.688217105502e-02, integrator.kineticIntegral(primitiveA, primitiveB), 1e-5); 
+\end{lstlisting}
+\begin{lstlisting}
+// PrimitiveA:
+a = 0.2;
+weight = 1;
+i = m = 0;
+k = 2;
+A = {1.2, 2.3, 3.4};
+
+// PrimitiveB:
+b = 0.3;
+weight = 1;
+j = l = 1;
+n = 0;
+B = {-1.3, 1.4, -2.4};
+
+Primitive primitiveA(weight,i,k,m,a,A);
+Primitive primitiveB(weight,j,l,n,b,B);
+
+CHECK_CLOSE(-1.598401092187e-02, integrator.kineticIntegral(primitiveA, primitiveB), 1e-5); 
+\end{lstlisting}
+To obtain more tests, you may calculate some new integrals numerically using for instance Python, 
+Matlab or your own C++ code.
+
+\chapter*{Week 13-14}
+\section{Create class BoysFunction}
+For your convenience we have created a class BoysFunction that you can used. It is defined as:
+\begin{lstlisting}
+#ifndef BOYSFUNCTION_H
+#define BOYSFUNCTION_H
+
+#include <armadillo>
+
+using namespace arma;
+
+
+class BoysFunction
+{
+public:
+    BoysFunction(int angMomMax);
+    void setx(double x);
+    double returnValue(int n);
+private:
+    double tabulated(int n, double x);
+    double asymptotic(int n, double x);
+    double factorial2(int n);
+
+    mat m_Ftabulated;
+    vec m_F;
+    int m_nMax;
+};
+
+#endif // BOYSFUNCTION_H
+\end{lstlisting}
+with the following implementation:
+\begin{lstlisting}
+#include "boysfunction.h"
+
+BoysFunction::BoysFunction(int angMomMax)
+{
+    m_nMax = 4*angMomMax;
+    m_F = zeros<vec>(4*angMomMax+1);
+    m_Ftabulated.load("boys_tabulated.dat");
+}
+
+double BoysFunction::returnValue(int n)
+{
+    return m_F(n);
+}
+
+void BoysFunction::setx(double x)
+{
+    if (x <= 50){
+        m_F(m_nMax) = tabulated(m_nMax, x);
+    } else {
+        m_F(m_nMax) = asymptotic(m_nMax, x);
+    }
+
+    double ex = exp(-x);
+
+    for(int n = m_nMax; n > 0; n--){
+        m_F(n-1) = (2*x*m_F(n) + ex)/(2*n - 1);
+    }
+}
+
+double BoysFunction::tabulated(int n, double x)
+{
+    int nxVals = m_Ftabulated.n_rows;
+    double dx = 50.0/(nxVals - 1); // x-spacing in tabulated values
+    int xIndex = int ((x + 0.5*dx)/dx);
+    double xt = xIndex*dx;     // tabulated x-value
+    double Dx = x - xt;        // difference between actual and tabulated x-value
+
+    double value = 0;
+    double factorial = 1;
+
+    for(int k = 0; k < 7; k++){
+        if(k != 0){
+            factorial *= k;
+        }
+        value += m_Ftabulated(xIndex, n+k)*pow(-Dx,k)/factorial;
+    }
+
+    return value;
+}
+
+double BoysFunction::asymptotic(int n, double x)
+{
+    return factorial2(n)*sqrt(M_PI/(pow(x,2*n+1)))/(pow(2,n+1));
+}
+
+double BoysFunction::factorial2(int n)
+{
+    double value = 1;
+    double i = 1;
+
+    while(i < 2*n - 1){
+        i += 2;
+        value *= i;
+    }
+    return value;
+}
+\end{lstlisting}
+This class uses a file named boys\_tabulated.dat which you can find \href{http://www.uio.no/studier/emner/matnat/fys/FYS4411/v14/guides/gto/boys_tabulated.dat}{here}.
+Use this class in the following way:
+\begin{lstlisting}
+ BoysFunction boys(2); // Boys function for system with l <= 2
+                       // This will allow calculations up to F_8(x)
+ boys.setx(1.4); // Will evaluate the Boys function for x = 1.4
+ cout << "F_0 (1.4) = " << boys.returnValue(0) << endl;
+ cout << "F_3 (1.4) = " << boys.returnValue(3) << endl;
+\end{lstlisting}
+
+
+\section{Write function setupHermiteIntegrals ($R_{tuv}$-factors)}
+This function should be implemented in class Integrator.
+Make a function which calulates the Hermite integrals $R_{tuv}$ using the recursioin relations
+from the slides. These integrals may be stored in an armadillo object:
+\begin{lstlisting}
+field<mat> R;
+R.set_size(4);
+for(int n = 0; n < 4; n++){
+    R(n) = zeros(4, 4, 4);
+} // R is now 4x4x4x4
+\end{lstlisting}
+
+
+\section{Write function nucleiElectronIntegral}
+This function should be implemented in class Integrator.
+Make a function that recieves two primitives and the nucleus position and returns the value of the integral.
+Alternatively (as is shown in the test below) you may have functions such as setPrimitiveA etc. in the integrator class.
+The result must be multiplied by the charge and coefficients of the primitives the function. Here are some tests you can use:
+\begin{lstlisting}
+ TEST(GTOnuclearAttractionIntegral)
+{
+    /*
+     * test case:   electron-nucleus integral
+     * max angular momentum:    2
+     *
+     * source:
+     *      numerical integration
+     *      python scripts
+     * */
+
+    Integrator integrator;
+
+    rowvec posA = {1.2, 2.3, 3.4};
+    rowvec posB = {-1.3, 1.4, -2.4};
+    rowvec posC = {2.3, 0.9, 3.2};
+
+
+    PrimitiveGTO primitiveA(0.2, 1.0);
+    PrimitiveGTO primitiveB(0.3, 1.0);
+
+
+    integrator.setNucleusPosition(posC);
+    
+    
+    primitiveA.setPowers({0,0,0}); primitiveB.setPowers({0,0,0});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(2.788948987251e-02, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({0,0,0}); primitiveB.setPowers({0,0,1});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(6.971203468743e-02, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({0,0,0}); primitiveB.setPowers({0,0,2});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(2.024071525839e-01, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({0,0,0}); primitiveB.setPowers({0,1,0});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(8.727033700014e-03, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({0,0,0}); primitiveB.setPowers({0,1,1});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(2.134361291529e-02, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({0,0,0}); primitiveB.setPowers({0,2,0});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(2.921666495443e-02, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({2,0,0}); primitiveB.setPowers({0,2,0});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(8.419480232293e-02, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({2,0,0}); primitiveB.setPowers({1,0,0});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(1.481688684288e-02, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({2,0,0}); primitiveB.setPowers({1,0,1});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(3.878852644576e-02, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({2,0,0}); primitiveB.setPowers({1,1,0});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(4.176920693786e-03, integrator.nuclearAttractionIntegral(), 1e-5);
+
+    primitiveA.setPowers({2,0,0}); primitiveB.setPowers({2,0,0});
+integrator.setPrimitiveA(primitiveA);integrator.setPrimitiveB(primitiveB);
+    CHECK_CLOSE(6.422210627967e-02, integrator.nuclearAttractionIntegral(), 1e-5);
+
+} 
+\end{lstlisting}
+This code will not compile as written, but should give you some values to check against.
+
+\section{Write function electronElectronIntegral}
+This function should be implemented in class Integrator. Make a function that receives four primitives
+and returns the value of the integral.
+
+
+\section{Create class ElectronSystem}
+
+\section{Write function nucleiInteractionEnergy}
+
+
+\chapter{Week 15-16}
+
+
+\end{document}

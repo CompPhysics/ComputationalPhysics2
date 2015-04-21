@@ -1,0 +1,1261 @@
+!split
+===== Conjugate gradient (CG) method ===== 
+!bblock
+
+The success of the CG method  for finding solutions of non-linear problems is based
+on the theory of conjugate gradients for linear systems of equations. It belongs
+teo the class of iterative methods for solving problems from linear algebra of the type
+
+!bt
+\begin{equation*}
+  \hat{_A_}\hat_{x_} = \hat_{b_}.
+\end{equation*}
+!et
+In the iterative process we end up with a problem like
+
+!bt
+\begin{equation*}
+  \hat_{r_}= \hat_{b_}-\hat{_A_}\hat_{x_},
+\end{equation*}
+!et
+where $\hat_{r_}$ is the so-called residual or error in the iterative process.
+!eblock
+
+
+!split
+===== Conjugate gradient method ===== 
+
+
+The residual is zero when we reach the minimum of the quadratic equation
+
+!bt
+\begin{equation*}
+  P(\hat_{x_})=\frac{1}{2}\hat_{x_}^T\hat{_A_}\hat_{x_} - \hat_{x_}^T\hat_{b_},
+\end{equation*}
+!et
+with the constraint that the matrix $\hat{_A_}$ is positive definite and symmetric.
+If we search for a minimum of the quantum mechanical  variance, then the matrix 
+$\hat{_A_}$, which is called the Hessian, is given by the second-derivative of the variance.  This quantity is always positive definite. If we vary the energy, the Hessian may not always be positive definite. 
+}
+
+}
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and demonstration ===== 
+
+
+For the harmonic oscillator in one-dimension with a trial wave function and probability
+
+!bt
+\begin{equation*}
+\psi_T(x) = e^{-\alpha^2 x^2} \qquad ,P_T(x)dx = \frac{e^{-2\alpha^2 x^2}dx}{\int dx e^{-2\alpha^2 x^2}}
+\end{equation*}
+!et
+with $\alpha$ as the variational parameter. 
+We have the following local energy
+
+!bt
+\begin{equation*}
+E_L[\alpha] = \alpha^2+x^2\left(\frac{1}{2}-2\alpha^2\right),
+\end{equation*}
+!et
+which results in the expectation value
+
+!bt
+\begin{equation*}
+\langle  E_L[\alpha]\rangle = \frac{1}{2}\alpha^2+\frac{1}{8\alpha^2}
+\end{equation*}
+!et
+}
+
+}
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and demonstration ===== 
+
+
+The derivative of the energy with respect to $\alpha$ gives
+
+!bt
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
+\end{equation*}
+!et
+and a second derivative which is always positive (meaning that we find a minimum)
+
+!bt
+\begin{equation*}
+\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = 1+\frac{3}{4\alpha^4}
+\end{equation*}
+!et
+The condition
+
+!bt
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
+\end{equation*}
+!et
+gives the optimal $\alpha=1/\sqrt{2}$.
+}
+
+}
+
+
+
+
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and demonstration ===== 
+
+
+In general we end up computing the expectation value of the energy in terms 
+of some parameters $\mathbf{\alpha}=\{\alpha_0,\alpha_1,\dots,\alpha_n\right})$
+and we search for a minimum in parameter space.  
+This leads to an energy minimization problem.
+
+The elements of the gradient are ($Ei$ 
+is the first derivative wrt to the variational parameter $\alpha_i$)
+
+!bt
+\begin{equation}
+\Ei
+&\!\!=&\!\! \left\langle \psiibypsi \EL + { H \psii \over \psi}
+-2 \Ebar \psiibypsi \right\rangle
+label{first_deriv_nonherm}
+\\
+&\!\!=&\!\! 2\left\langle \psiibypsi (\EL - \Ebar) \right\rangle
+\;\;\;\; {\rm (by\;Hermiticity)}.
+label{first_deriv}
+\end{equation}
+!et
+For our simple model we get the same expression for the first 
+derivative (check it!).
+}
+
+}
+
+!split[containsverbatim]
+{
+  ===== Simple example and demonstration ===== 
+
+
+Taking the second derivative the Hessian is
+
+!bt
+\begin{equation}
+\Ebar_{ij}
+&= 2 \Bigg[
+\left\langle \left( \psiijbypsi + {\psii\psij\over \psisq} \right) (\EL-\Ebar) \right\rangle \nonumber \\
+&&
+-\left\langle \psiibypsi \right\rangle \Ej
+-\left\langle \psijbypsi \right\rangle \Ei
++ \left\langle \psiibypsi \ELj \right\rangle \Bigg].
+label{rappe}
+\end{equation}
+!et
+Note that many conjugate gradient approaches do need the Hessian (the functions to be discussed next week are examples of this)!
+}
+
+}
+
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and demonstration ===== 
+
+
+We can also minimize the variance. In our simple model the variance is
+
+!bt
+\begin{equation*}
+\sigma^2[\alpha] = \frac{1}{2}\alpha^4-\frac{1}{4}+\frac{1}{32\alpha^4},
+\end{equation*}
+!et
+with first derivative
+
+!bt
+\begin{equation*}
+\frac{d \sigma^2[\alpha]}{d\alpha} = 2\alpha^3-\frac{1}{8\alpha^5}
+\end{equation*}
+!et
+and a second derivative which is always positive
+
+!bt
+\begin{equation*}
+\frac{d^2\sigma^2[\alpha]}{d\alpha^2} = 6\alpha^2+\frac{5}{8\alpha^6}
+\end{equation*}
+!et
+Some professional codes include both a variance and an energy variation.
+}
+
+
+}
+
+
+
+
+!split
+{
+  ===== Conjugate gradient method, our case ===== 
+
+
+In Newton's method we set $\nabla f = 0$ and we can thus compute the next iteration point
+(here the exact result)
+
+!bt
+\begin{equation*}
+\hat_{x_}-\hat_{x_}_i=\hat_{A_}^{-1}\nabla f(\hat_{x_}_i).
+\end{equation*}
+!et
+Subtracting this equation from that of $\hat_{x_}_{i+1}$ we have
+
+!bt
+\begin{equation*}
+\hat_{x_}_{i+1}-\hat_{x_}_i=\hat_{A_}^{-1}(\nabla f(\hat_{x_}_{i+1})-\nabla f(\hat_{x_}_i)).
+\end{equation*}
+!et
+}
+
+}
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and demonstration ===== 
+
+
+In our case $f$ can be either the energy or the variance.  If we choose the energy then we have
+
+!bt
+\begin{equation*}
+\hat_{\alpha_}_{i+1}-\hat_{\alpha_}_i=\hat_{A_}^{-1}(\nabla E(\hat_{\alpha_}_{i+1})-\nabla E(\hat_{\alpha_}_i)).
+\end{equation*}
+!et
+In the simple model gradient and the Hessian $\hat_A_}$ are
+
+!bt
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
+\end{equation*}
+!et
+and a second derivative which is always positive (meaning that we find a minimum)
+
+!bt
+\begin{equation*}
+\hat_A_}= \frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = 1+\frac{3}{4\alpha^4}
+\end{equation*}
+!et
+}
+
+}
+
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and demonstration ===== 
+
+
+We get then
+
+!bt
+\begin{equation*}
+\alpha_{i+1}=\frac{4}{3}\alpha_i-\frac{\alpha_i^4}{3\alpha_{i+1}^3},
+\end{equation*}
+!et
+which can be rewritten as
+
+!bt
+\begin{equation*}
+\alpha_{i+1}^4-\frac{4}{3}\alpha_i\alpha_{i+1}^4+\frac{1}{3}\alpha_i^4.
+\end{equation*}
+!et
+}
+
+}
+
+
+
+
+!split
+{
+  ===== Using the conjugate gradient method ===== 
+
+
+
+  * Start your program with calling a function which implements for example the  CGM method %(function $dfpmin$).
+
+  * This function needs the function for the expectation value of the local energy and the derivative of the local energy.
+
+  * Your function $func$ is now the Metropolis part with a call to the local energy function. For every call to the function $func$ many practitionser use 1000-10000 Monte Carlo cycles for the trial wave function.
+
+  * This gives an expectation value for the energy which is returned by the function $func$.
+
+  * When one calls the local energy one also computes the first derivative of the expectaction value of the local energy  !bt \begin{equation*} \frac{d\langle E_{L}[\alpha] \rangle}{d\alpha}= 2\left\langle \psiibypsi (E_{L}[\alpha] - \langle E_{L}[\alpha] \rangle) \right\rangle.
+
+\end{equation*}
+!et
+
+}
+
+}
+
+
+
+!split
+{
+  ===== Using the conjugate gradient method ===== 
+
+
+The expectation value for the local energy of the Helium atom with a simple Slater determinant is given by
+
+!bt
+\begin{equation*}
+\langle E_{L} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
+\end{equation*}
+!et
+When implementing the conjugate gradient method, uyou should test your numerical derivative with the derivative of the last expression, that is
+
+!bt
+\begin{equation*}
+\frac{d\langle E_{L}[\alpha] \rangle}{d\alpha} = 2\alpha-2\left(Z-\frac{5}{16}\right).
+\end{equation*}
+!et
+}
+
+}
+
+!split
+{
+  ===== Conjugate gradient method ===== 
+
+
+In the CG method we define so-called conjugate directions and two vectors 
+$\hat_{s_}$ and $\hat_{t_}$
+are said to be
+conjugate if
+
+!bt
+\begin{equation*}
+\hat_{s_}^T\hat{_A_}\hat_{t_}= 0.
+\end{equation*}
+!et
+The philosophy of the CG method is to perform searches in various conjugate directions
+of our vectors $\hat{_x_}_i$ obeying the above criterion, namely
+
+!bt
+\begin{equation*}
+\hat_{x_}_i^T\hat{_A_}\hat_{x_}_j= 0.
+\end{equation*}
+!et
+Two vectors are conjugate if they are orthogonal with respect to 
+this inner product. Being conjugate is a symmetric relation: if $\hat_{s_}$ is conjugate to $\hat_{t_}$, then $\hat_{t_}$ is conjugate to $\hat_{s_}$.
+}
+
+}
+
+
+!split
+{
+  ===== Conjugate gradient method ===== 
+
+
+An example is given by the eigenvectors of the matrix
+
+!bt
+\begin{equation*}
+\hat_{v_}_i^T\hat{_A_}\hat_{v_}_j= \lambda\hat_{v_}_i^T\hat_{v_}_j,
+\end{equation*}
+!et
+which is zero unless $i=j$. 
+
+}
+
+}
+
+
+!split
+{
+  ===== Conjugate gradient method ===== 
+
+
+Assume now that we have a symmetric positive-definite matrix $\hat_{A_}$ of size
+$n\times n$. At each iteration $i+1$ we obtain the conjugate direction of a vector
+
+!bt
+\begin{equation*}
+\hat_{x_}_{i+1}=\hat_{x_}_{i}+\alpha_i\hat_{p_}_{i}. 
+\end{equation*}
+!et
+We assume that $\hat_{p_}_{i}$ is a sequence of $n$ mutually conjugate directions. 
+Then the $\hat_{p_}_{i}$  form a basis of $R^n$ and we can expand the solution 
+$  \hat{_A_}\hat_{x_} = \hat_{b_}$ in this basis, namely
+
+!bt
+\begin{equation*}
+  \hat_{x_}  = \sum^{n}_{i=1} \alpha_i \hat_{p_}_i.
+\end{equation*}
+!et
+}
+
+}
+
+!split
+{
+  ===== Conjugate gradient method ===== 
+
+
+The coefficients are given by
+
+!bt
+\begin{equation*}
+    \mathbf{A}\mathbf{x} = \sum^{n}_{i=1} \alpha_i \mathbf{A} \mathbf{p}_i = \mathbf{b}.
+\end{equation*}
+!et
+Multiplying with $\hat_{p_}_k^T$  from the left gives
+
+!bt
+\begin{equation*}
+  \hat_{p_}_k^T \hat_{A_}\hat_{x_} = \sum^{n}_{i=1} \alpha_i\hat_{p_}_k^T \hat_{A_}\hat_{p_}_i= \hat_{p_}_k^T \hat_{b_},
+\end{equation*}
+!et
+and we can define the coefficients $\alpha_k$ as
+
+!bt
+\begin{equation*}
+    \alpha_k = \frac{\hat_{p_}_k^T \hat_{b_}}{\hat_{p_}_k^T \hat_{A_} \hat_{p_}_k}
+\end{equation*}
+!et 
+}
+
+}
+
+!split
+{
+  ===== Conjugate gradient method and iterations ===== 
+
+
+If we choose the conjugate vectors $\hat_{p_}_k$ carefully, 
+then we may not need all of them to obtain a good approximation to the solution 
+$\hat_{x_}$. 
+So, we want to regard the conjugate gradient method as an iterative method. 
+This also allows us to solve systems where $n$ is so large that the direct 
+method would take too much time.
+
+We denote the initial guess for $\hat_{x_}$ as $\hat_{x_}_0$. 
+We can assume without loss of generality that
+
+!bt
+\begin{equation*}
+\hat_{x_}_0=0,
+\end{equation*}
+!et
+or consider the system
+
+!bt
+\begin{equation*}
+\hat_{A_}\hat_{z_} = \hat_{b_}-\hat_{A_}\hat_{x_}_0,
+\end{equation*}
+!et
+instead.
+}
+
+}
+
+
+!split
+{
+  ===== Conjugate gradient method ===== 
+
+
+Important, one can show that the solution $\hat_{x_}$ is also the unique minimizer of the quadratic form
+
+!bt
+\begin{equation*}
+  f(\hat_{x_}) = \frac{1}{2}\hat_{x_}^T\hat_{A_}\hat_{x_} - \hat_{x_}^T \hat_{x_} , \quad \hat_{x_}\in\mathbf{R}^n. 
+\end{equation*}
+!et
+This suggests taking the first basis vector $\hat_{p_}_1$ 
+to be the gradient of $f$ at $\hat_{x_}=\hat_{x_}_0$, 
+which equals
+
+!bt
+\begin{equation*}
+\hat_{A_}\hat_{x_}_0-\hat_{b_},
+\end{equation*}
+!et
+and 
+$\hat_{x_}_0=0$ it is equal $-\hat_{b_}$.
+The other vectors in the basis will be conjugate to the gradient, 
+hence the name conjugate gradient method.
+}
+
+}
+
+
+!split
+{
+  ===== Conjugate gradient method ===== 
+
+
+Let  $\hat_{r_}_k$ be the residual at the $k$-th step:
+
+!bt
+\begin{equation*}
+\hat_{r_}_k=\hat_{b_}-\hat_{A_}\hat_{x_}_k.
+\end{equation*}
+!et
+
+Note that $\hat_{r_}_k$ is the negative gradient of $f$ at 
+$\hat_{x_}=\hat_{x_}_k$, 
+so the gradient descent method would be to move in the direction $\hat_{r_}_k$. 
+Here, we insist that the directions $\hat_{p_}_k$ are conjugate to each other, 
+so we take the direction closest to the gradient $\hat_{r_}_k$  
+under the conjugacy constraint. 
+This gives the following expression
+
+!bt
+\begin{equation*}
+\hat_{p_}_{k+1}=\hat_{r_}_k-\frac{\hat_{p_}_k^T \hat_{A_}\hat_{r_}_k}{\hat_{p_}_k^T\hat_{A_}\hat_{p_}_k} \hat_{p_}_k.
+\end{equation*}
+!et
+}
+
+}
+
+!split
+{
+  ===== Conjugate gradient method ===== 
+
+
+We can also  compute the residual iteratively as
+
+!bt
+\begin{equation*}
+\hat_{r_}_{k+1}=\hat_{b_}-\hat_{A_}\hat_{x_}_{k+1},
+ \end{equation*}
+!et
+which equals
+
+!bt
+\begin{equation*}
+\hat_{b_}-\hat_{A_}(\hat_{x_}_k+\alpha_k\hat_{p_}_k),
+ \end{equation*}
+!et
+or
+
+!bt
+\begin{equation*}
+(\hat_{b_}-\hat_{A_}\hat_{x_}_k)-\alpha_k\hat_{A_}\hat_{p_}_k,
+ \end{equation*}
+!et
+which gives
+
+!bt
+\begin{equation*}
+\hat_{r_}_{k+1}=\hat_{r_}_k-\hat_{A_}\hat_{p_}_{k},
+ \end{equation*}
+!et
+}
+
+}
+
+
+
+!split
+{
+  ===== Conjugate gradient method, our case ===== 
+
+
+If we consider finding the minimum of a function $f$ using Newton's method,
+that is search for a zero of the gradient of a function.  Near a point $x_i$
+we have to second order
+
+!bt
+\begin{equation*}
+f(\hat_{x_})=f(\hat_{x_}_i)+(\hat_{x_}-\hat_{x_}_i)\nabla f(\hat_{x_}_i)
+\frac{1}{2}(\hat_{x_}-\hat_{x_}_i)\hat_{A_}(\hat_{x_}-\hat_{x_}_i)
+\end{equation*}
+!et
+giving
+
+!bt
+\begin{equation*}
+\nabla f(\hat_{x_})=\nabla f(\hat_{x_}_i)+\hat_{A_}(\hat_{x_}-\hat_{x_}_i).
+ \end{equation*}
+!et
+In Newton's method we set $\nabla f = 0$ and we can thus compute the next iteration point
+(here the exact result)
+
+!bt
+\begin{equation*}
+\hat_{x_}-\hat_{x_}_i=\hat_{A_}^{-1}\nabla f(\hat_{x_}_i).
+\end{equation*}
+!et
+Subtracting this equation from that of $\hat_{x_}_{i+1}$ we have
+
+!bt
+\begin{equation*}
+\hat_{x_}_{i+1}-\hat_{x_}_i=\hat_{A_}^{-1}(\nabla f(\hat_{x_}_{i+1})-\nabla f(\hat_{x_}_i)).
+\end{equation*}
+!et
+}
+
+}
+
+
+!split
+{
+  ===== The simple model ===== 
+# # #if FORMAT in ("latex", "pdflatex")
+\vspace{-3cm}
+# #endif
+      \begin{figure}[htp]
+        \includegraphics[width=0.8\textwidth]{pxy.png}
+      \end{figure}
+}
+
+
+!split
+{
+  ===== The simple model, contour plots}
+# # #if FORMAT in ("latex", "pdflatex")
+\vspace{-3cm}
+# #endif
+      \begin{figure}[htp]
+        \includegraphics[width=0.8\textwidth]{contours.png}
+      \end{figure}
+}
+
+
+!split
+{
+  ===== The simple model, the derivatives}
+# # #if FORMAT in ("latex", "pdflatex")
+\vspace{-3cm}
+# #endif
+      \begin{figure}[htp]
+        \includegraphics[width=0.8\textwidth]{derivatives.png}
+      \end{figure}
+}
+
+
+!split
+{
+  ===== The simple model, steepest descent steps}
+# # #if FORMAT in ("latex", "pdflatex")
+\vspace{-3cm}
+# #endif
+      \begin{figure}[htp]
+        \includegraphics[width=0.8\textwidth]{directions.png}
+      \end{figure}
+}
+
+
+
+!split[containsverbatim]
+{
+  ===== Simple codes for  steepest descent and conjugate gradient ===== 
+
+
+
+!bc
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include "vectormatrixclass.h"
+using namespace  std;
+//   Main function begins here
+int main(int  argc, char * argv[]){
+  int dim = 2;
+  Vector x(dim),xsd(dim), b(dim),x0(dim);
+  Matrix A(dim,dim);
+  
+  // Set our initial guess
+  x0(0) = x0(1) = 0;
+  // Set the matrix  
+  A(0,0) =  3;    A(1,0) =  2;   A(0,1) =  2;   A(1,1) =  6; 
+  b(0) = 2; b(1) = -8;
+!ec
+}
+
+}
+
+
+!split[containsverbatim]
+{
+  ===== Simple codes for  steepest descent and conjugate gradient }
+
+
+
+!bc
+  cout << "The Matrix A that we are using: " << endl;
+  A.Print();
+  cout << endl;
+
+
+  x = ConjugateGradient(A,b,x0);
+
+  xsd = SteepestDescent(A,b,x0);
+  
+  cout << "The approximate solution using Conjugate Gradient is: " << endl;
+  x.Print();
+  cout << endl;
+
+  cout << "The approximate solution using Steepest Descent is: " << endl;
+  xsd.Print();
+  cout << endl;
+}
+!ec
+}
+
+}
+
+
+!split[containsverbatim]
+{
+  ===== Simple codes for  steepest descent and conjugate gradient }
+
+
+
+!bc
+Vector SteepestDescent(Matrix A, Vector b, Vector x0){
+  int IterMax, i;
+  int dim = x0.Dimension();
+  const double tolerance = 1.0e-14;
+  Vector x(dim),f(dim),z(dim);
+  double c,alpha,d;
+  IterMax = 30;
+  x = x0;
+  f = A*x-b;
+  i = 0;
+!ec
+}
+
+}
+
+
+
+!split[containsverbatim]
+{
+  ===== Simple codes for  steepest descent and conjugate gradient }
+
+
+
+!bc
+  while (i <= IterMax){
+    z = A*f;
+    c = dot(f,f);
+    alpha = c/dot(f,z);
+    x = x - alpha*f;
+    f =  A*x-b;
+    if(sqrt(dot(f,f)) < tolerance) break;
+    i++;
+  }
+  return x;
+} 
+!ec
+}
+
+}
+
+
+
+!split[containsverbatim]
+{
+  ===== Simple codes for  steepest descent and conjugate gradient }
+
+
+
+!bc
+  Vector ConjugateGradient(Matrix A, Vector b, Vector x0){
+  int dim = x0.Dimension();
+  const double tolerance = 1.0e-14;
+  Vector x(dim),r(dim),v(dim),z(dim);
+  double c,t,d;
+
+  x = x0;
+  r = b - A*x;
+  v = r;
+  c = dot(r,r);
+!ec
+}
+
+}
+
+
+
+!split[containsverbatim]
+{
+  ===== Simple codes for  steepest descent and conjugate gradient }
+
+
+
+!bc
+  int i = 0; IterMax = dim;
+  while(i <= IterMax){
+    z = A*v;
+    t = c/dot(v,z);
+    x = x + t*v;
+    r = r - t*z;
+    d = dot(r,r);
+    if(sqrt(d) < tolerance)
+      break;
+    v = r + (d/c)*v;
+    c = d;  i++;
+  }
+  return x;
+} 
+!ec
+}
+
+}
+
+
+
+
+
+
+!split[containsverbatim]
+{
+  ===== Codes from numerical recipes}
+
+
+The codes are taken from chapter 10.7 of Numerical recipes.  We use the functions
+$dfpmin$ and $lnsrch$.  You can load down the package of programs from the webpage of
+the course, see under project 1.  
+The package is called $NRcgm107.tar.gz$ and contains the files 
+$dfmin.c$, $lnsrch.c$, $nrutil.c$ and $nrutil.h$. 
+These codes are  written in C.
+
+!bc
+
+void dfpmin(double p[], int n, double gtol, int *iter, double *fret,
+double(*func)(double []), void (*dfunc)(double [], double []))
+
+!ec
+}
+
+}
+
+
+
+!split[containsverbatim]
+{
+  ===== What you have to provide}
+
+
+The input to $dfpmin$
+
+!bc
+
+void dfpmin(double p[], int n, double gtol, int *iter, double *fret,
+double(*func)(double []), void (*dfunc)(double [], double []))
+
+!ec
+is
+
+  * The starting vector $p$ of length $n$
+
+  * The function $func$ on which minimization is done
+
+  * The function $dfunc$ where the gradient i calculated
+
+  * The convergence requirement for zeroing the gradient $gtol$.
+
+
+It returns in $p$ the location of the minimum, the number of iterations and 
+the minimum value of the function under study $fret$.
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and code (model.cpp on webpage)}
+
+
+
+!bc
+#include "nrutil.h"
+using namespace std;
+//     Here we define various functions called by the main program
+
+double E_function(double *x);
+void   dE_function(double *x, double *g);
+void   dfpmin(double p[], int n, double gtol, int *iter, double *fret,
+	    double(*func)(double []), void (*dfunc)(double [], double []));
+//   Main function begins here
+int main()
+{
+     int n, iter;
+     double gtol, fret;
+     double alpha;
+     n = 1;
+     cout << "Read in guess for alpha" << endl;
+     cin >> alpha;
+!ec
+}
+
+}
+
+!split[containsverbatim]
+{
+  ===== Simple example and code (model.cpp on webpage)}
+
+
+
+!bc
+//   reserve space in memory for vectors containing the variational
+//   parameters
+     double *p = new double [2];
+     gtol = 1.0e-5;
+//   now call dfmin and compute the minimum
+     p[1] = alpha;
+     dfpmin(p, n, gtol, &iter, &fret,&E_function,&dE_function);
+     cout << "Value of energy minimum = " << fret << endl;
+     cout << "Number of iterations = " << iter << endl;
+     cout << "Value of alpha at minimu = " << p[1] << endl;
+      delete [] p;
+!ec
+}
+
+}
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and code (model.cpp on webpage)}
+
+
+
+!bc
+//  this function defines the Energy function
+double E_function(double x[])
+{
+  double value = x[1]*x[1]*0.5+1.0/(8*x[1]*x[1]);
+  return value;
+} // end of function to evaluate
+!ec
+}
+
+}
+
+!split[containsverbatim]
+{
+  ===== Simple example and code (model.cpp on webpage)}
+
+
+
+!bc
+//  this function defines the derivative of the energy 
+void dE_function(double x[], double g[])
+{
+  g[1] = x[1]-1.0/(4*x[1]*x[1]*x[1]);
+} // end of function to evaluate
+!ec
+}
+
+}
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and code (model.cpp on webpage)}
+
+
+
+!bc
+using namespace std;
+//     Here we define various functions called by the main program
+
+double E_function(double *x);
+void   dE_function(double *x, double *g);
+void   dfpmin(double p[], int n, double gtol, int *iter, double *fret,
+	    double(*func)(double []), void (*dfunc)(double [], double []));
+//   Main function begins here
+int main()
+{
+     int n, iter;
+     double gtol, fret;
+     double alpha;
+     n = 1;
+     cout << "Read in guess for alpha" << endl;
+     cin >> alpha;
+!ec
+}
+
+}
+
+!split[containsverbatim]
+{
+  ===== Simple example and code (model.cpp on webpage)}
+
+
+
+!bc
+//   reserve space in memory for vectors containing the variational
+//   parameters
+     double *p = new double [2];
+     gtol = 1.0e-5;
+//   now call dfmin and compute the minimum
+     p[1] = alpha;
+     dfpmin(p, n, gtol, &iter, &fret,&E_function,&dE_function);
+     cout << "Value of energy minimum = " << fret << endl;
+     cout << "Number of iterations = " << iter << endl;
+     cout << "Value of alpha at minimu = " << p[1] << endl;
+      delete [] p;
+!ec
+}
+
+}
+
+
+!split[containsverbatim]
+{
+  ===== Simple example and code (model.cpp on webpage)}
+
+
+
+!bc
+//  this function defines the Energy function
+double E_function(double x[])
+{
+
+//  Change here by calling your Metropolis function which 
+//  returns the local energy
+
+  double value = x[1]*x[1]*0.5+1.0/(8*x[1]*x[1]);
+
+
+
+  return value;
+} // end of function to evaluate
+!ec
+You need to change this function so that you call the local energy for your system. I used 1000
+cycles per call to get a new value of $\langle E_L[\alpha]\rangle$.
+
+}
+
+}
+
+!split[containsverbatim]
+{
+  ===== Simple example and code (model.cpp on webpage)}
+
+
+
+!bc
+//  this function defines the derivative of the energy 
+void dE_function(double x[], double g[])
+{
+
+//  Change here by calling your Metropolis function. 
+//  I compute both the local energy and its derivative for every call to func
+
+  g[1] = x[1]-1.0/(4*x[1]*x[1]*x[1]);
+} // end of function to evaluate
+!ec
+You need to change this function so that you call the local energy for your system. I used 1000
+cycles per call to get a new value of $\langle E_L[\alpha]\rangle$.
+When I compute the local energy I also compute its derivative.
+After roughly 10-20 iterations I got a converged result in terms of $\alpha$.
+}
+
+}
+
+
+!split
+{
+  ===== The hydrogen molecule, our next step}
+
+
+The 
+H$_2$ molecule consists of two protons and two electrons 
+with a ground state energy $E=-31.949$ eV or $-1.175$ a.u. and the 
+equilibrium distance between the two hydrogen atoms
+of $r_0=1.40$ Bohr radii (recall that a Bohr radius is $0.05\times 10^{-9}$m.
+
+
+We define our systems using the following variables.
+Origo is chosen to be halfway between the two protons. The distance from 
+proton 1 is defined as 
+$-_R_/2$ whereas proton 2 has a distance $_R_/2$.
+Calculations are performed for fixed distances $_R_$ between the two protons.
+
+}
+
+}
+
+
+!split
+{
+  ===== The hydrogen molecule, our next step}
+
+
+Electron 1 has a distance $r_1$ from the chose origo, while  electron $2$
+has a distance $r_2$. 
+The kinetic energy operator becomes then
+
+!bt
+\begin{equation*}
+   -\frac{\nabla_1^2}{2}-\frac{\nabla_2^2}{2}.
+\end{equation*}
+!et
+The distance between the two electrons is
+$r_{12}=|_r__1-_r__2|$. 
+The repulsion between the two electrons results in a potential energy term given by
+
+!bt
+\begin{equation*}
+               +\frac{1}{r_{12}}.
+\end{equation*}
+!et
+In a similar way we obtain a repulsive contribution from the interaction between the two 
+protons given by
+
+!bt
+\begin{equation*}
+               +\frac{1}{|_R_|},
+\end{equation*}
+!et
+where $_R_$ is the distance between the two protons.
+}
+
+}
+
+
+!split
+{
+  ===== The hydrogen molecule, our next step}
+
+
+To obtain the final potential energy we need to include the attraction the electrons feel from the protons.
+To model this, we need to define the distance between the electrons and the two protons.
+If we model this along a 
+chosen $z$-akse with electron 1 placed at a distance 
+$_r__1$ from a chose origo, one proton at $-_R_/2$
+and the other at  $_R_/2$, 
+the distance from proton 1 to electron 1 becomes
+
+!bt
+\begin{equation*}
+_r__{1p1}=_r__1+ _R_/2,
+\end{equation*}
+!et
+and
+
+!bt
+\begin{equation*}
+_r__{1p2}=_r__1- _R_/2,
+\end{equation*}
+!et
+from proton 2.
+}
+
+}
+
+
+!split
+{
+  ===== The hydrogen molecule, our next step}
+
+
+Similarly, for electron 2 we obtain
+
+!bt
+\begin{equation*}
+_r__{2p1}=_r__2+_R_/2,
+\end{equation*}
+!et
+and
+
+!bt
+\begin{equation*}
+_r__{2p2}=_r__2-_R_/2.
+\end{equation*}
+!et
+These four distances define the attractive contributions to the potential energy
+
+!bt
+\begin{equation*}
+   -\frac{1}{r_{1p1}}-\frac{1}{r_{1p2}}-\frac{1}{r_{2p1}}-\frac{1}{r_{2p2}}.
+\end{equation*}
+!et
+We can then write the total Hamiltonian as
+
+!bt
+\begin{equation*}
+   \OP{H}=-\frac{\nabla_1^2}{2}-\frac{\nabla_2^2}{2}
+   -\frac{1}{r_{1p1}}-\frac{1}{r_{1p2}}-\frac{1}{r_{2p1}}-\frac{1}{r_{2p2}}
+               +\frac{1}{r_{12}}+\frac{1}{|_R_|}.
+\end{equation*}
+!et
+}
+
+}
+!split
+{
+  ===== The hydrogen molecule, our next step}
+
+
+We will use a trial wave function of the form
+
+!bt
+\begin{equation*}
+   \psi_{T}(_r_1_,_r_2_, _R_) =
+   \psi(_r__1,_R_)\psi(_r__2,_R_)
+   \exp{\left(\frac{r_{12}}{2(1+\beta r_{12})}\right)},
+\end{equation*}
+!et
+with the following trial wave function
+
+!bt
+\begin{equation*}
+   \psi(_r__1,_R_)=\left(\exp{(-\alpha r_{1p1})}
+      +\exp{(-\alpha r_{1p2})}\right),
+\end{equation*}
+!et
+for electron 1 and
+
+!bt
+\begin{equation*}
+   \psi(_r__2,_R_)=\left(\exp{(-\alpha r_{2p1})}
+      +\exp{(-\alpha r_{2p2})}\right).
+\end{equation*}
+!et
+The variational parameters are $\alpha$ and $\beta$.
+
+}
+
+}
+!split
+{
+  ===== The Be$_2$ molecule, our final step}
+
+
+Our final step consists in estimating the binding energy of the Be$_2$ molecule.
+Useful references are then
+
+  * Moskowitz and Kalos, Int. Journal of Quantum Chemistry _XX_, 1107 (1981). Results for He and H$_2$.
+
+  * Filippi, Singh and Umrigar, J. Chemical Physics _105_, 123 (1996).   Useful results on Be$_2$ to which you can benchmark your results against.
+
+
