@@ -58,6 +58,22 @@ final,                   % or draft (marks overfull hboxes, figures with paths)
 \clubpenalty = 10000
 \widowpenalty = 10000
 
+\newenvironment{doconceexercise}{}{}
+\newcounter{doconceexercisecounter}
+
+
+% ------ header in subexercises ------
+%\newcommand{\subex}[1]{\paragraph{#1}}
+%\newcommand{\subex}[1]{\par\vspace{1.7mm}\noindent{\bf #1}\ \ }
+\makeatletter
+% 1.5ex is the spacing above the header, 0.5em the spacing after subex title
+\newcommand\subex{\@startsection{paragraph}{4}{\z@}%
+                  {1.5ex\@plus1ex \@minus.2ex}%
+                  {-0.5em}%
+                  {\normalfont\normalsize\bfseries}}
+\makeatother
+
+
 % --- end of standard preamble for documents ---
 
 
@@ -109,7 +125,7 @@ Spring 2015
 
 
 % !split
-\subsection{Conjugate gradient (CG) method}
+\subsection{Motivation}
 
 % --- begin paragraph admon ---
 \paragraph{}
@@ -123,39 +139,9 @@ Our aim with this part of the project is to be able to
 \noindent
 To achieve this will look at methods like \emph{Steepest descent} and the \emph{conjugate gradient method}. Both these methods allow us to find
 the minima of a multivariable  function like our energy (function of several variational parameters). 
-
-The success of the CG method  for finding solutions of non-linear problems is based
-on the theory of conjugate gradients for linear systems of equations. It belongs
-to the class of iterative methods for solving problems from linear algebra of the type
-\begin{equation*}
-  \hat{A}\hat{x} = \hat{b}.
-\end{equation*}
-In the iterative process we end up with a problem like
-
-\begin{equation*}
-  \hat{r}= \hat{b}-\hat{A}\hat{x},
-\end{equation*}
-where $\hat{r}$ is the so-called residual or error in the iterative process.
+Alternatively, you can always use Newton's method. In particular, since we will only have one variational parameter,
+Newton's method can be easily used in finding the minimum of the local energy.
 % --- end paragraph admon ---
-
-
-
-
-% !split
-\subsection{Conjugate gradient method}
-
-% --- begin paragraph admon ---
-\paragraph{}
-
-The residual is zero when we reach the minimum of the quadratic equation
-\begin{equation*}
-  P(\hat{x})=\frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T\hat{b},
-\end{equation*}
-with the constraint that the matrix $\hat{A}$ is positive definite and symmetric.
-If we search for a minimum of the quantum mechanical  variance, then the matrix 
-$\hat{A}$, which is called the Hessian, is given by the second-derivative of the variance.  This quantity is always positive definite.
-% --- end paragraph admon ---
-
 
 
 
@@ -178,8 +164,9 @@ which results in the expectation value for the local energy
 \begin{equation*}
 \langle  E_L[\alpha]\rangle = \frac{1}{2}\alpha^2+\frac{1}{8\alpha^2}
 \end{equation*}
-Repeat these calculations and convince yourself that they are correct.
 % --- end paragraph admon ---
+
+
 
 
 
@@ -201,9 +188,30 @@ The condition
 \frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
 \end{equation*}
 gives the optimal $\alpha=1/\sqrt{2}$, as expected.
-Show this.
 % --- end paragraph admon ---
 
+
+
+% !split
+
+
+% --- begin exercise ---
+\begin{doconceexercise}
+\refstepcounter{doconceexercisecounter}
+
+\subsection*{Exercise \thedoconceexercisecounter: Find the local energy for the harmonic oscillator}
+
+
+
+\subex{a)}
+Derive the local energy for the harmonic oscillator in one dimension and find its expectation value.
+
+\subex{b)}
+Show also that the optimal value of optimal $\alpha=1/\sqrt{2}$.
+
+
+\end{doconceexercise}
+% --- end exercise ---
 
 
 % !split
@@ -288,7 +296,105 @@ and
 \[
 \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
 \]
-We leave it as an exercise to find the corresponding expression for the variance.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+
+
+% --- begin exercise ---
+\begin{doconceexercise}
+\refstepcounter{doconceexercisecounter}
+
+\subsection*{Exercise \thedoconceexercisecounter: General expression for the derivative of the energy}
+
+
+
+\subex{a)}
+Show that 
+\[
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+\]
+
+\subex{b)}
+Find the corresponding expression for the variance.
+
+
+\end{doconceexercise}
+% --- end exercise ---
+
+
+% !split
+
+
+% --- begin exercise ---
+\begin{doconceexercise}
+\refstepcounter{doconceexercisecounter}
+
+\subsection*{Exercise \thedoconceexercisecounter: Helium atom and hydrogen-like functions}
+
+
+
+\subex{a)}
+The expectation value for the local energy of the Helium atom with a simple Slater determinant is given by (project 1)
+\[
+\langle E_{L} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
+\]
+Show that its derivative is 
+\begin{equation*}
+\frac{d\langle E_{L}[\alpha] \rangle}{d\alpha} = 2\alpha-2\left(Z-\frac{5}{16}\right).
+\end{equation*}
+
+\subex{b)}
+Use result when you test your numerical derivative, user either the steepest descent method, Newton's method or the conjugate
+gradient method.
+
+
+
+
+\end{doconceexercise}
+% --- end exercise ---
+
+
+% !split
+\subsection{Conjugate gradient (CG) method}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The success of the CG method  for finding solutions of non-linear problems is based
+on the theory of conjugate gradients for linear systems of equations. It belongs
+to the class of iterative methods for solving problems from linear algebra of the type
+\begin{equation*}
+  \hat{A}\hat{x} = \hat{b}.
+\end{equation*}
+In the iterative process we end up with a problem like
+
+\begin{equation*}
+  \hat{r}= \hat{b}-\hat{A}\hat{x},
+\end{equation*}
+where $\hat{r}$ is the so-called residual or error in the iterative process.
+
+When we have found the exact solution, $\hat{r}=0$.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Conjugate gradient method}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+The residual is zero when we reach the minimum of the quadratic equation
+\begin{equation*}
+  P(\hat{x})=\frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T\hat{b},
+\end{equation*}
+with the constraint that the matrix $\hat{A}$ is positive definite and symmetric.
+If we search for a minimum of the quantum mechanical  variance, then the matrix 
+$\hat{A}$, which is called the Hessian, is given by the second-derivative of the variance.  This quantity is always positive definite.
 % --- end paragraph admon ---
 
 
@@ -296,13 +402,15 @@ We leave it as an exercise to find the corresponding expression for the variance
 
 
 
+
 % !split
-\subsection{Conjugate gradient method, Newton's method}
+\subsection{Conjugate gradient method, Newton's method first}
 
 % --- begin paragraph admon ---
 \paragraph{}
+We seek the minimum of the energy or the variance as function of various variational parameters. 
+In our case we have thus a function $f$ whose minimum we are seeking.
 In Newton's method we set $\nabla f = 0$ and we can thus compute the next iteration point
-(here the exact result)
 \begin{equation*}
 \hat{x}-\hat{x}_i=\hat{A}^{-1}\nabla f(\hat{x}_i).
 \end{equation*}
@@ -310,8 +418,6 @@ Subtracting this equation from that of $\hat{x}_{i+1}$ we have
 \begin{equation*}
 \hat{x}_{i+1}-\hat{x}_i=\hat{A}^{-1}(\nabla f(\hat{x}_{i+1})-\nabla f(\hat{x}_i)).
 \end{equation*}
-Concerning the optimization process in connection with the last project, you can easily use Newton's method as well instead of the 
-con
 % --- end paragraph admon ---
 
 
@@ -321,8 +427,7 @@ con
 
 % --- begin paragraph admon ---
 \paragraph{}
-
-In our case $f$ can be either the energy or the variance.  If we choose the energy then we have
+The function $f$ can be either the energy or the variance.  If we choose the energy then we have
 \begin{equation*}
 \hat{\alpha}_{i+1}-\hat{\alpha}_i=\hat{A}^{-1}(\nabla E(\hat{\alpha}_{i+1})-\nabla E(\hat{\alpha}_i)).
 \end{equation*}
@@ -378,22 +483,6 @@ which can be rewritten as
 % --- end paragraph admon ---
 
 
-
-
-% !split
-\subsection{Using the conjugate gradient method}
-
-% --- begin paragraph admon ---
-\paragraph{}
-The expectation value for the local energy of the Helium atom with a simple Slater determinant is given by
-\begin{equation*}
-\langle E_{L} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
-\end{equation*}
-When implementing the conjugate gradient method, uyou should test your numerical derivative with the derivative of the last expression, that is
-\begin{equation*}
-\frac{d\langle E_{L}[\alpha] \rangle}{d\alpha} = 2\alpha-2\left(Z-\frac{5}{16}\right).
-\end{equation*}
-% --- end paragraph admon ---
 
 
 
@@ -985,7 +1074,6 @@ cycles per call to get a new value of $\langle E_L[\alpha]\rangle$.
 When I compute the local energy I also compute its derivative.
 After roughly 10-20 iterations I got a converged result in terms of $\alpha$.
 % --- end paragraph admon ---
-
 
 
 

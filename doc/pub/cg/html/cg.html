@@ -60,10 +60,13 @@ div { text-align: justify; text-justify: inter-word; }
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [(' Conjugate gradient (CG) method ', 2, None, '___sec0'),
-              (' Conjugate gradient method ', 2, None, '___sec1'),
+ 'sections': [(' Motivation  ', 2, None, '___sec0'),
+              (' Simple example and demonstration ', 2, None, '___sec1'),
               (' Simple example and demonstration ', 2, None, '___sec2'),
-              (' Simple example and demonstration ', 2, None, '___sec3'),
+              (' Exercise 1: Find the local energy for the harmonic oscillator ',
+               2,
+               None,
+               '___sec3'),
               (' Variance in the simple model ', 2, None, '___sec4'),
               (' Computing the derivatives ', 2, None, '___sec5'),
               (' Expressions for finding the derivatives of the local energy ',
@@ -71,38 +74,35 @@ div { text-align: justify; text-justify: inter-word; }
                None,
                '___sec6'),
               (' Derivatives of the local energy ', 2, None, '___sec7'),
-              (" Conjugate gradient method, Newton's method ",
+              (' Exercise 2: General expression for the derivative of the energy ',
                2,
                None,
                '___sec8'),
-              (' Simple example and demonstration ', 2, None, '___sec9'),
-              (' Simple example and demonstration ', 2, None, '___sec10'),
-              (' Using the conjugate gradient method ', 2, None, '___sec11'),
-              (' Using the conjugate gradient method ', 2, None, '___sec12'),
-              (' Conjugate gradient method ', 2, None, '___sec13'),
-              (' Conjugate gradient method ', 2, None, '___sec14'),
-              (' Conjugate gradient method ', 2, None, '___sec15'),
+              (' Exercise 3: Helium atom and hydrogen-like functions ',
+               2,
+               None,
+               '___sec9'),
+              (' Conjugate gradient (CG) method ', 2, None, '___sec10'),
+              (' Conjugate gradient method ', 2, None, '___sec11'),
+              (" Conjugate gradient method, Newton's method first ",
+               2,
+               None,
+               '___sec12'),
+              (' Simple example and demonstration ', 2, None, '___sec13'),
+              (' Simple example and demonstration ', 2, None, '___sec14'),
+              (' Using the conjugate gradient method ', 2, None, '___sec15'),
               (' Conjugate gradient method ', 2, None, '___sec16'),
+              (' Conjugate gradient method ', 2, None, '___sec17'),
+              (' Conjugate gradient method ', 2, None, '___sec18'),
+              (' Conjugate gradient method ', 2, None, '___sec19'),
               (' Conjugate gradient method and iterations ',
                2,
                None,
-               '___sec17'),
-              (' Conjugate gradient method ', 2, None, '___sec18'),
-              (' Conjugate gradient method ', 2, None, '___sec19'),
-              (' Conjugate gradient method ', 2, None, '___sec20'),
-              (' Conjugate gradient method, our case ', 2, None, '___sec21'),
-              (' Simple codes for  steepest descent and conjugate gradient ',
-               2,
-               None,
-               '___sec22'),
-              (' Simple codes for  steepest descent and conjugate gradient ',
-               2,
-               None,
-               '___sec23'),
-              (' Simple codes for  steepest descent and conjugate gradient ',
-               2,
-               None,
-               '___sec24'),
+               '___sec20'),
+              (' Conjugate gradient method ', 2, None, '___sec21'),
+              (' Conjugate gradient method ', 2, None, '___sec22'),
+              (' Conjugate gradient method ', 2, None, '___sec23'),
+              (' Conjugate gradient method, our case ', 2, None, '___sec24'),
               (' Simple codes for  steepest descent and conjugate gradient ',
                2,
                None,
@@ -115,20 +115,20 @@ div { text-align: justify; text-justify: inter-word; }
                2,
                None,
                '___sec27'),
-              (' Codes from numerical recipes ', 2, None, '___sec28'),
-              (' What you have to provide ', 2, None, '___sec29'),
-              (' Simple example and code (model.cpp on webpage) ',
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec28'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec29'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
                2,
                None,
                '___sec30'),
-              (' Simple example and code (model.cpp on webpage) ',
-               2,
-               None,
-               '___sec31'),
-              (' Simple example and code (model.cpp on webpage) ',
-               2,
-               None,
-               '___sec32'),
+              (' Codes from numerical recipes ', 2, None, '___sec31'),
+              (' What you have to provide ', 2, None, '___sec32'),
               (' Simple example and code (model.cpp on webpage) ',
                2,
                None,
@@ -148,7 +148,19 @@ div { text-align: justify; text-justify: inter-word; }
               (' Simple example and code (model.cpp on webpage) ',
                2,
                None,
-               '___sec37')]}
+               '___sec37'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec38'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec39'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec40')]}
 end of tocinfo -->
 
 <body>
@@ -190,7 +202,7 @@ MathJax.Hub.Config({
 <p>
 <!-- !split -->
 
-<h2 id="___sec0">Conjugate gradient (CG) method </h2>
+<h2 id="___sec0">Motivation  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -202,56 +214,18 @@ Our aim with this part of the project is to be able to
 </ul>
 
 To achieve this will look at methods like <em>Steepest descent</em> and the <em>conjugate gradient method</em>. Both these methods allow us to find
-the minima of a multivariable  function like our energy (function of several variational parameters).
+the minima of a multivariable  function like our energy (function of several variational parameters). 
+Alternatively, you can always use Newton's method. In particular, since we will only have one variational parameter,
+Newton's method can be easily used in finding the minimum of the local energy.
 
-<p>
-The success of the CG method  for finding solutions of non-linear problems is based
-on the theory of conjugate gradients for linear systems of equations. It belongs
-to the class of iterative methods for solving problems from linear algebra of the type
-$$
-\begin{equation*}
-  \hat{A}\hat{x} = \hat{b}.
-\end{equation*}
-$$
 
-In the iterative process we end up with a problem like
-
-$$
-\begin{equation*}
-  \hat{r}= \hat{b}-\hat{A}\hat{x},
-\end{equation*}
-$$
-
-where \( \hat{r} \) is the so-called residual or error in the iterative process.
 </div>
 
 
 <p>
 <!-- !split -->
 
-<h2 id="___sec1">Conjugate gradient method </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-
-<p>
-The residual is zero when we reach the minimum of the quadratic equation
-$$
-\begin{equation*}
-  P(\hat{x})=\frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T\hat{b},
-\end{equation*}
-$$
-
-with the constraint that the matrix \( \hat{A} \) is positive definite and symmetric.
-If we search for a minimum of the quantum mechanical  variance, then the matrix 
-\( \hat{A} \), which is called the Hessian, is given by the second-derivative of the variance.  This quantity is always positive definite.
-</div>
-
-
-<p>
-<!-- !split -->
-
-<h2 id="___sec2">Simple example and demonstration </h2>
+<h2 id="___sec1">Simple example and demonstration </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -277,15 +251,13 @@ $$
 \langle  E_L[\alpha]\rangle = \frac{1}{2}\alpha^2+\frac{1}{8\alpha^2}
 \end{equation*}
 $$
-
-Repeat these calculations and convince yourself that they are correct.
 </div>
 
 
 <p>
 <!-- !split -->
 
-<h2 id="___sec3">Simple example and demonstration </h2>
+<h2 id="___sec2">Simple example and demonstration </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -311,9 +283,27 @@ $$
 $$
 
 gives the optimal \( \alpha=1/\sqrt{2} \), as expected.
-Show this.
 </div>
 
+
+<p>
+<!-- !split -->
+
+<p>
+<!-- --- begin exercise --- -->
+
+<h2 id="___sec3">Exercise 1: Find the local energy for the harmonic oscillator </h2>
+
+<p>
+<b>a)</b>
+Derive the local energy for the harmonic oscillator in one dimension and find its expectation value.
+
+<p>
+<b>b)</b>
+Show also that the optimal value of optimal \( \alpha=1/\sqrt{2} \).
+
+<p>
+<!-- --- end exercise --- -->
 
 <p>
 <!-- !split -->
@@ -414,20 +404,124 @@ and
 $$
 \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
 $$
-
-We leave it as an exercise to find the corresponding expression for the variance.
 </div>
 
 
 <p>
 <!-- !split -->
 
-<h2 id="___sec8">Conjugate gradient method, Newton's method </h2>
+<p>
+<!-- --- begin exercise --- -->
+
+<h2 id="___sec8">Exercise 2: General expression for the derivative of the energy </h2>
+
+<p>
+<b>a)</b>
+Show that 
+$$
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+$$
+
+<p>
+<b>b)</b>
+Find the corresponding expression for the variance.
+
+<p>
+<!-- --- end exercise --- -->
+
+<p>
+<!-- !split -->
+
+<p>
+<!-- --- begin exercise --- -->
+
+<h2 id="___sec9">Exercise 3: Helium atom and hydrogen-like functions </h2>
+
+<p>
+<b>a)</b>
+The expectation value for the local energy of the Helium atom with a simple Slater determinant is given by (project 1)
+$$
+\langle E_{L} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
+$$
+
+Show that its derivative is 
+$$
+\begin{equation*}
+\frac{d\langle E_{L}[\alpha] \rangle}{d\alpha} = 2\alpha-2\left(Z-\frac{5}{16}\right).
+\end{equation*}
+$$
+
+<p>
+<b>b)</b>
+Use result when you test your numerical derivative, user either the steepest descent method, Newton's method or the conjugate
+gradient method.
+
+<p>
+<!-- --- end exercise --- -->
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec10">Conjugate gradient (CG) method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
+The success of the CG method  for finding solutions of non-linear problems is based
+on the theory of conjugate gradients for linear systems of equations. It belongs
+to the class of iterative methods for solving problems from linear algebra of the type
+$$
+\begin{equation*}
+  \hat{A}\hat{x} = \hat{b}.
+\end{equation*}
+$$
+
+In the iterative process we end up with a problem like
+
+$$
+\begin{equation*}
+  \hat{r}= \hat{b}-\hat{A}\hat{x},
+\end{equation*}
+$$
+
+where \( \hat{r} \) is the so-called residual or error in the iterative process.
+
+<p>
+When we have found the exact solution, \( \hat{r}=0 \).
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec11">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+The residual is zero when we reach the minimum of the quadratic equation
+$$
+\begin{equation*}
+  P(\hat{x})=\frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T\hat{b},
+\end{equation*}
+$$
+
+with the constraint that the matrix \( \hat{A} \) is positive definite and symmetric.
+If we search for a minimum of the quantum mechanical  variance, then the matrix 
+\( \hat{A} \), which is called the Hessian, is given by the second-derivative of the variance.  This quantity is always positive definite.
+</div>
+
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec12">Conjugate gradient method, Newton's method first </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We seek the minimum of the energy or the variance as function of various variational parameters. 
+In our case we have thus a function \( f \) whose minimum we are seeking.
 In Newton's method we set \( \nabla f = 0 \) and we can thus compute the next iteration point
-(here the exact result)
 $$
 \begin{equation*}
 \hat{x}-\hat{x}_i=\hat{A}^{-1}\nabla f(\hat{x}_i).
@@ -440,22 +534,17 @@ $$
 \hat{x}_{i+1}-\hat{x}_i=\hat{A}^{-1}(\nabla f(\hat{x}_{i+1})-\nabla f(\hat{x}_i)).
 \end{equation*}
 $$
-
-Concerning the optimization process in connection with the last project, you can easily use Newton's method as well instead of the 
-con
 </div>
 
 
 <p>
 <!-- !split -->
 
-<h2 id="___sec9">Simple example and demonstration </h2>
+<h2 id="___sec13">Simple example and demonstration </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
-
-<p>
-In our case \( f \) can be either the energy or the variance.  If we choose the energy then we have
+The function \( f \) can be either the energy or the variance.  If we choose the energy then we have
 $$
 \begin{equation*}
 \hat{\alpha}_{i+1}-\hat{\alpha}_i=\hat{A}^{-1}(\nabla E(\hat{\alpha}_{i+1})-\nabla E(\hat{\alpha}_i)).
@@ -481,7 +570,7 @@ $$
 <p>
 <!-- !split -->
 
-<h2 id="___sec10">Simple example and demonstration </h2>
+<h2 id="___sec14">Simple example and demonstration </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -504,7 +593,7 @@ $$
 <p>
 <!-- !split -->
 
-<h2 id="___sec11">Using the conjugate gradient method </h2>
+<h2 id="___sec15">Using the conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -527,30 +616,7 @@ $$
 <p>
 <!-- !split -->
 
-<h2 id="___sec12">Using the conjugate gradient method </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-The expectation value for the local energy of the Helium atom with a simple Slater determinant is given by
-$$
-\begin{equation*}
-\langle E_{L} \rangle = \alpha^2-2\alpha\left(Z-\frac{5}{16}\right)
-\end{equation*}
-$$
-
-When implementing the conjugate gradient method, uyou should test your numerical derivative with the derivative of the last expression, that is
-$$
-\begin{equation*}
-\frac{d\langle E_{L}[\alpha] \rangle}{d\alpha} = 2\alpha-2\left(Z-\frac{5}{16}\right).
-\end{equation*}
-$$
-</div>
-
-
-<p>
-<!-- !split -->
-
-<h2 id="___sec13">Conjugate gradient method </h2>
+<h2 id="___sec16">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -580,7 +646,7 @@ this inner product. Being conjugate is a symmetric relation: if \( \hat{s} \) is
 <p>
 <!-- !split -->
 
-<h2 id="___sec14">Conjugate gradient method </h2>
+<h2 id="___sec17">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -598,7 +664,7 @@ which is zero unless \( i=j \).
 <p>
 <!-- !split -->
 
-<h2 id="___sec15">Conjugate gradient method </h2>
+<h2 id="___sec18">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -625,7 +691,7 @@ $$
 <p>
 <!-- !split -->
 
-<h2 id="___sec16">Conjugate gradient method </h2>
+<h2 id="___sec19">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -657,7 +723,7 @@ $$
 <p>
 <!-- !split -->
 
-<h2 id="___sec17">Conjugate gradient method and iterations </h2>
+<h2 id="___sec20">Conjugate gradient method and iterations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -694,7 +760,7 @@ instead.
 <p>
 <!-- !split -->
 
-<h2 id="___sec18">Conjugate gradient method </h2>
+<h2 id="___sec21">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -724,7 +790,7 @@ hence the name conjugate gradient method.
 <p>
 <!-- !split -->
 
-<h2 id="___sec19">Conjugate gradient method </h2>
+<h2 id="___sec22">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -753,7 +819,7 @@ $$
 <p>
 <!-- !split -->
 
-<h2 id="___sec20">Conjugate gradient method </h2>
+<h2 id="___sec23">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -793,7 +859,7 @@ $$
 <p>
 <!-- !split -->
 
-<h2 id="___sec21">Conjugate gradient method, our case </h2>
+<h2 id="___sec24">Conjugate gradient method, our case </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -835,7 +901,7 @@ $$
 <p>
 <!-- !split -->
 
-<h2 id="___sec22">Simple codes for  steepest descent and conjugate gradient </h2>
+<h2 id="___sec25">Simple codes for  steepest descent and conjugate gradient </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -865,7 +931,7 @@ int main(int  argc, char * argv[]){
 <p>
 <!-- !split -->
 
-<h2 id="___sec23">Simple codes for  steepest descent and conjugate gradient </h2>
+<h2 id="___sec26">Simple codes for  steepest descent and conjugate gradient </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -889,7 +955,7 @@ int main(int  argc, char * argv[]){
 <p>
 <!-- !split -->
 
-<h2 id="___sec24">Simple codes for  steepest descent and conjugate gradient </h2>
+<h2 id="___sec27">Simple codes for  steepest descent and conjugate gradient </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -912,7 +978,7 @@ int main(int  argc, char * argv[]){
 <p>
 <!-- !split -->
 
-<h2 id="___sec25">Simple codes for  steepest descent and conjugate gradient </h2>
+<h2 id="___sec28">Simple codes for  steepest descent and conjugate gradient </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -936,7 +1002,7 @@ int main(int  argc, char * argv[]){
 <p>
 <!-- !split -->
 
-<h2 id="___sec26">Simple codes for  steepest descent and conjugate gradient </h2>
+<h2 id="___sec29">Simple codes for  steepest descent and conjugate gradient </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -959,7 +1025,7 @@ int main(int  argc, char * argv[]){
 <p>
 <!-- !split -->
 
-<h2 id="___sec27">Simple codes for  steepest descent and conjugate gradient </h2>
+<h2 id="___sec30">Simple codes for  steepest descent and conjugate gradient </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -986,7 +1052,7 @@ int main(int  argc, char * argv[]){
 <p>
 <!-- !split -->
 
-<h2 id="___sec28">Codes from numerical recipes </h2>
+<h2 id="___sec31">Codes from numerical recipes </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1009,7 +1075,7 @@ double(*func)(double []), void (*dfunc)(double [], double []))
 <p>
 <!-- !split -->
 
-<h2 id="___sec29">What you have to provide </h2>
+<h2 id="___sec32">What you have to provide </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1036,7 +1102,7 @@ the minimum value of the function under study \( fret \).
 <p>
 <!-- !split -->
 
-<h2 id="___sec30">Simple example and code (model.cpp on webpage) </h2>
+<h2 id="___sec33">Simple example and code (model.cpp on webpage) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1066,7 +1132,7 @@ int main()
 <p>
 <!-- !split -->
 
-<h2 id="___sec31">Simple example and code (model.cpp on webpage) </h2>
+<h2 id="___sec34">Simple example and code (model.cpp on webpage) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1090,7 +1156,7 @@ int main()
 <p>
 <!-- !split -->
 
-<h2 id="___sec32">Simple example and code (model.cpp on webpage) </h2>
+<h2 id="___sec35">Simple example and code (model.cpp on webpage) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1109,7 +1175,7 @@ double E_function(double x[])
 <p>
 <!-- !split -->
 
-<h2 id="___sec33">Simple example and code (model.cpp on webpage) </h2>
+<h2 id="___sec36">Simple example and code (model.cpp on webpage) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1127,7 +1193,7 @@ void dE_function(double x[], double g[])
 <p>
 <!-- !split -->
 
-<h2 id="___sec34">Simple example and code (model.cpp on webpage) </h2>
+<h2 id="___sec37">Simple example and code (model.cpp on webpage) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1156,7 +1222,7 @@ int main()
 <p>
 <!-- !split -->
 
-<h2 id="___sec35">Simple example and code (model.cpp on webpage) </h2>
+<h2 id="___sec38">Simple example and code (model.cpp on webpage) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1180,7 +1246,7 @@ int main()
 <p>
 <!-- !split -->
 
-<h2 id="___sec36">Simple example and code (model.cpp on webpage) </h2>
+<h2 id="___sec39">Simple example and code (model.cpp on webpage) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1205,7 +1271,7 @@ cycles per call to get a new value of \( \langle E_L[\alpha]\rangle \).
 <p>
 <!-- !split -->
 
-<h2 id="___sec37">Simple example and code (model.cpp on webpage) </h2>
+<h2 id="___sec40">Simple example and code (model.cpp on webpage) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
