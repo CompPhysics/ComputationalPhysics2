@@ -341,7 +341,7 @@ Show that its derivative is
 \end{equation*}
 
 \subex{b)}
-Use result when you test your numerical derivative, user either the steepest descent method, Newton's method or the conjugate
+Use this result when you test your numerical derivative, using either the steepest descent method, Newton's method or the conjugate
 gradient method.
 
 
@@ -383,7 +383,7 @@ The residual is zero when we reach the minimum of the quadratic equation
 \end{equation*}
 with the constraint that the matrix $\hat{A}$ is positive definite and symmetric.
 If we search for a minimum of the quantum mechanical  variance, then the matrix 
-$\hat{A}$, which is called the Hessian, is given by the second-derivative of the variance.  This quantity is always positive definite.
+$\hat{A}$, which is called the Hessian, is given by the second-derivative of the function we want to minimize.  This quantity is always positive definite.  In our case this corresponds normally to the second derivative of the energy.  
 \end{block}
 \end{frame}
 
@@ -412,7 +412,7 @@ The function $f$ can be either the energy or the variance.  If we choose the ene
 \begin{equation*}
 \hat{\alpha}_{i+1}-\hat{\alpha}_i=\hat{A}^{-1}(\nabla E(\hat{\alpha}_{i+1})-\nabla E(\hat{\alpha}_i)).
 \end{equation*}
-In the simple model gradient and the Hessian $\hat{A}$ are
+In the simple harmonic oscillator model, the gradient and the Hessian $\hat{A}$ are
 \begin{equation*}
 \frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
 \end{equation*}
@@ -434,28 +434,6 @@ We get then
 which can be rewritten as
 \begin{equation*}
 \alpha_{i+1}^4-\frac{4}{3}\alpha_i\alpha_{i+1}^4+\frac{1}{3}\alpha_i^4.
-\end{equation*}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Using the conjugate gradient method}
-
-\begin{block}{}
-\begin{itemize}
-  \item Start your program with calling a function which implements for example the  CGM method.
-
-  \item This function needs the function for the expectation value of the local energy and the derivative of the local energy.
-
-  \item Your function \textbf{func} is now the Metropolis part with a call to the local energy function. For every call to the function \textbf{func} many practitionser use 1000-10000 Monte Carlo cycles for the trial wave function.
-
-  \item This gives an expectation value for the energy which is returned by the function \textbf{func}.
-
-  \item When one calls the local energy one also computes the first derivative of the expectaction value of the local energy  
-\end{itemize}
-
-\noindent
-\begin{equation*} \frac{d\langle E_{L}[\alpha] \rangle}{d\alpha}= 2\langle \frac{\bar{\psi_T}_{\alpha}}{\psi_T[\alpha]}\left(E_L[\alpha]-\langle  E_L[\alpha]\rangle\right)\rangle.
 \end{equation*}
 \end{block}
 \end{frame}
@@ -541,13 +519,12 @@ and we can define the coefficients $\alpha_k$ as
 If we choose the conjugate vectors $\hat{p}_k$ carefully, 
 then we may not need all of them to obtain a good approximation to the solution 
 $\hat{x}$. 
-So, we want to regard the conjugate gradient method as an iterative method. 
-This also allows us to solve systems where $n$ is so large that the direct 
+We want to regard the conjugate gradient method as an iterative method. 
+This will us to solve systems where $n$ is so large that the direct 
 method would take too much time.
 
 We denote the initial guess for $\hat{x}$ as $\hat{x}_0$. 
 We can assume without loss of generality that
-
 \begin{equation*}
 \hat{x}_0=0,
 \end{equation*}
@@ -563,7 +540,7 @@ instead.
 \frametitle{Conjugate gradient method}
 
 \begin{block}{}
-Important, one can show that the solution $\hat{x}$ is also the unique minimizer of the quadratic form
+One can show that the solution $\hat{x}$ is also the unique minimizer of the quadratic form
 \begin{equation*}
   f(\hat{x}) = \frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T \hat{x} , \quad \hat{x}\in\mathbf{R}^n. 
 \end{equation*}
@@ -610,12 +587,10 @@ We can also  compute the residual iteratively as
 \hat{r}_{k+1}=\hat{b}-\hat{A}\hat{x}_{k+1},
  \end{equation*}
 which equals
-
 \begin{equation*}
 \hat{b}-\hat{A}(\hat{x}_k+\alpha_k\hat{p}_k),
  \end{equation*}
 or
-
 \begin{equation*}
 (\hat{b}-\hat{A}\hat{x}_k)-\alpha_k\hat{A}\hat{p}_k,
  \end{equation*}
@@ -628,35 +603,31 @@ which gives
 \end{frame}
 
 \begin{frame}[plain,fragile]
-\frametitle{Conjugate gradient method, our case}
+\frametitle{Using the conjugate gradient method}
 
 \begin{block}{}
-If we consider finding the minimum of a function $f$ using Newton's method,
-that is search for a zero of the gradient of a function.  Near a point $x_i$
-we have to second order
-\begin{equation*}
-f(\hat{x})=f(\hat{x}_i)+(\hat{x}-\hat{x}_i)\nabla f(\hat{x}_i)
-\frac{1}{2}(\hat{x}-\hat{x}_i)\hat{A}(\hat{x}-\hat{x}_i)
-\end{equation*}
-giving
-\begin{equation*}
-\nabla f(\hat{x})=\nabla f(\hat{x}_i)+\hat{A}(\hat{x}-\hat{x}_i).
- \end{equation*}
-In Newton's method we set $\nabla f = 0$ and we can thus compute the next iteration point
-(here the exact result)
-\begin{equation*}
-\hat{x}-\hat{x}_i=\hat{A}^{-1}\nabla f(\hat{x}_i).
-\end{equation*}
-Subtracting this equation from that of $\hat{x}_{i+1}$ we have
+\begin{itemize}
+  \item Start your program with calling a function which implements for example the  CG method  or the steepest descent method. 
 
-\begin{equation*}
-\hat{x}_{i+1}-\hat{x}_i=\hat{A}^{-1}(\nabla f(\hat{x}_{i+1})-\nabla f(\hat{x}_i)).
+  \item This function needs a function for the expectation value of the local energy and the derivative of the local energy.
+
+  \item Your function \textbf{func} is now the Metropolis part with a call to the local energy function. For every call to the function \textbf{func} many practitionser use 1000-10000 Monte Carlo cycles for the trial wave function.
+
+  \item This gives an expectation value for the energy which is returned by the function \textbf{func}.
+
+  \item When one calls the local energy one also computes the first derivative of the expectaction value of the local energy  
+\end{itemize}
+
+\noindent
+\begin{equation*} \frac{d\langle E_{L}[\alpha] \rangle}{d\alpha}= 2\langle \frac{\bar{\psi_T}_{\alpha}}{\psi_T[\alpha]}\left(E_L[\alpha]-\langle  E_L[\alpha]\rangle\right)\rangle.
 \end{equation*}
+The following two codes, to be found in the \href{{https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/cg/programs/c%2B%2B}}{programs folder} as well, implement first the conjugate gradient and steepest descent method to a simple $2\times 2$ problem. Finally, we include a program based on a more advanced version of the conjugate gradient method.
+
 \end{block}
 \end{frame}
 
 \begin{frame}[plain,fragile]
-\frametitle{Simple codes for  steepest descent and conjugate gradient}
+\frametitle{Simple codes for  steepest descent and conjugate gradient using a $2\times 2$ matrix}
 
 \begin{block}{}
 \begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
@@ -677,15 +648,6 @@ int main(int  argc, char * argv[]){
   // Set the matrix  
   A(0,0) =  3;    A(1,0) =  2;   A(0,1) =  2;   A(1,1) =  6; 
   b(0) = 2; b(1) = -8;
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Simple codes for  steepest descent and conjugate gradient}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
   cout << "The Matrix A that we are using: " << endl;
   A.Print();
   cout << endl;
@@ -697,12 +659,13 @@ int main(int  argc, char * argv[]){
   cout << "The approximate solution using Steepest Descent is: " << endl;
   xsd.Print();
   cout << endl;
+}
 \end{minted}
 \end{block}
 \end{frame}
 
 \begin{frame}[plain,fragile]
-\frametitle{Simple codes for  steepest descent and conjugate gradient}
+\frametitle{The routine for the steepest descent method}
 
 \begin{block}{}
 \begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
@@ -716,15 +679,6 @@ Vector SteepestDescent(Matrix A, Vector b, Vector x0){
   x = x0;
   f = A*x-b;
   i = 0;
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Simple codes for  steepest descent and conjugate gradient}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
   while (i <= IterMax){
     z = A*f;
     c = dot(f,f);
@@ -741,7 +695,7 @@ Vector SteepestDescent(Matrix A, Vector b, Vector x0){
 \end{frame}
 
 \begin{frame}[plain,fragile]
-\frametitle{Simple codes for  steepest descent and conjugate gradient}
+\frametitle{Simple implementation of the Conjugate gradient algorithm}
 
 \begin{block}{}
 \begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
@@ -755,15 +709,6 @@ Vector SteepestDescent(Matrix A, Vector b, Vector x0){
   r = b - A*x;
   v = r;
   c = dot(r,r);
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Simple codes for  steepest descent and conjugate gradient}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
   int i = 0; IterMax = dim;
   while(i <= IterMax){
     z = A*v;
@@ -786,61 +731,25 @@ Vector SteepestDescent(Matrix A, Vector b, Vector x0){
 \frametitle{Codes from numerical recipes}
 
 \begin{block}{}
-The codes are taken from chapter 10.7 of Numerical recipes.  We use the functions
-$dfpmin$ and $lnsrch$.  You can load down the package of programs from the webpage of
-the course, see under project 1.  
-The package is called $NRcgm107.tar.gz$ and contains the files 
-$dfmin.c$, $lnsrch.c$, $nrutil.c$ and $nrutil.h$. 
-These codes are  written in C.
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
-
-void dfpmin(double p[], int n, double gtol, int *iter, double *fret,
-double(*func)(double []), void (*dfunc)(double [], double []))
-
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{What you have to provide}
-
-\begin{block}{}
-The input to \textbf{dfpmin}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
-void dfpmin(double p[], int n, double gtol, int *iter, double *fret,
-double(*func)(double []), void (*dfunc)(double [], double []))
-\end{minted}
-is
+You can however use codes we have adapted from the text \href{{http://www.nr.com/}}{Numerical Recipes in C++}, see chapter 10.7.  
+Here we present a program, which you also can find at the webpage of the course we use the functions \textbf{dfpmin} and \textbf{lnsrch}.  
 
 \begin{itemize}
-  \item The starting vector $p$ of length $n$
+\item The program uses the harmonic oscillator in one dimensions as example.
 
-  \item The function $func$ on which minimization is done
-
-  \item The function $dfunc$ where the gradient i calculated
-
-  \item The convergence requirement for zeroing the gradient $gtol$.
+\item The program does not use armadillo to handle vectors and matrices, but employs rather my own vector-matrix class. These auxiliary functions, and the main program \emph{model.cpp} can all be found under the \href{{https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/cg/programs/c%2B%2B}}{program link here}.
 \end{itemize}
 
 \noindent
-It returns in $p$ the location of the minimum, the number of iterations and 
-the minimum value of the function under study $fret$.
+Below we show only excerpts from the main program. For the full program, see the above link.
 \end{block}
 \end{frame}
 
 \begin{frame}[plain,fragile]
-\frametitle{Simple example and code (model.cpp on webpage)}
+\frametitle{Finding the minimum of the harmonic oscillator model in one dimension}
 
 \begin{block}{}
 \begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
-#include "nrutil.h"
-using namespace std;
-//     Here we define various functions called by the main program
-
-double E_function(double *x);
-void   dE_function(double *x, double *g);
-void   dfpmin(double p[], int n, double gtol, int *iter, double *fret,
-	    double(*func)(double []), void (*dfunc)(double [], double []));
 //   Main function begins here
 int main()
 {
@@ -848,142 +757,46 @@ int main()
      double gtol, fret;
      double alpha;
      n = 1;
-     cout << "Read in guess for alpha" << endl;
-     cin >> alpha;
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Simple example and code (model.cpp on webpage)}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 //   reserve space in memory for vectors containing the variational
 //   parameters
-     double *p = new double [2];
-     gtol = 1.0e-5;
-//   now call dfmin and compute the minimum
-     p[1] = alpha;
-     dfpmin(p, n, gtol, &iter, &fret,&E_function,&dE_function);
-     cout << "Value of energy minimum = " << fret << endl;
-     cout << "Number of iterations = " << iter << endl;
-     cout << "Value of alpha at minimu = " << p[1] << endl;
-      delete [] p;
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Simple example and code (model.cpp on webpage)}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
-//  this function defines the Energy function
-double E_function(double x[])
-{
-  double value = x[1]*x[1]*0.5+1.0/(8*x[1]*x[1]);
-  return value;
-} // end of function to evaluate
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Simple example and code (model.cpp on webpage)}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
-//  this function defines the derivative of the energy 
-void dE_function(double x[], double g[])
-{
-  g[1] = x[1]-1.0/(4*x[1]*x[1]*x[1]);
-} // end of function to evaluate
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Simple example and code (model.cpp on webpage)}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
-using namespace std;
-//     Here we define various functions called by the main program
-
-double E_function(double *x);
-void   dE_function(double *x, double *g);
-void   dfpmin(double p[], int n, double gtol, int *iter, double *fret,
-	    double(*func)(double []), void (*dfunc)(double [], double []));
-//   Main function begins here
-int main()
-{
-     int n, iter;
-     double gtol, fret;
-     double alpha;
-     n = 1;
+     Vector g(n), p(n);
      cout << "Read in guess for alpha" << endl;
      cin >> alpha;
-\end{minted}
-\end{block}
-\end{frame}
-
-\begin{frame}[plain,fragile]
-\frametitle{Simple example and code (model.cpp on webpage)}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
-//   reserve space in memory for vectors containing the variational
-//   parameters
-     double *p = new double [2];
      gtol = 1.0e-5;
 //   now call dfmin and compute the minimum
-     p[1] = alpha;
-     dfpmin(p, n, gtol, &iter, &fret,&E_function,&dE_function);
+     p(0) = alpha;
+     dfpmin(p, n, gtol, &iter, &fret, Efunction, dEfunction);
      cout << "Value of energy minimum = " << fret << endl;
      cout << "Number of iterations = " << iter << endl;
-     cout << "Value of alpha at minimu = " << p[1] << endl;
-      delete [] p;
+     cout << "Value of alpha at minimum = " << p(0) << endl;
+      return 0;
+}  // end of main program
+
 \end{minted}
 \end{block}
 \end{frame}
 
 \begin{frame}[plain,fragile]
-\frametitle{Simple example and code (model.cpp on webpage)}
+\frametitle{Functions to observe}
 
 \begin{block}{}
+The functions \textbf{Efunction} and \textbf{dEfunction} compute the expectation value of the energy and its derivative.
+These functions need to be changed when you want to your own derivatives.
 \begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
-//  this function defines the Energy function
-double E_function(double x[])
+//  this function defines the expectation value of the local energy
+double Efunction(Vector  &x)
 {
-
-//  Change here by calling your Metropolis function which 
-//  returns the local energy
-
-  double value = x[1]*x[1]*0.5+1.0/(8*x[1]*x[1]);
+  double value = x(0)*x(0)*0.5+1.0/(8*x(0)*x(0));
   return value;
 } // end of function to evaluate
-\end{minted}
-You need to change this function so that you call the local energy for your system. I used 1000
-cycles per call to get a new value of $\langle E_L[\alpha]\rangle$.
-\end{block}
-\end{frame}
 
-\begin{frame}[plain,fragile]
-\frametitle{Simple example and code (model.cpp on webpage)}
-
-\begin{block}{}
-\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=2mm]{c++}
 //  this function defines the derivative of the energy 
-void dE_function(double x[], double g[])
+void dEfunction(Vector &x, Vector &g)
 {
-//  Change here by calling your Metropolis function. 
-//  I compute both the local energy and its derivative for every call to func
-
-  g[1] = x[1]-1.0/(4*x[1]*x[1]*x[1]);
+  g(0) = x(0)-1.0/(4*x(0)*x(0)*x(0));
 } // end of function to evaluate
 \end{minted}
-You need to change this function so that you call the local energy for your system. I used 1000
+You need to change these functions in order to compute the local energy for your system. I used 1000
 cycles per call to get a new value of $\langle E_L[\alpha]\rangle$.
 When I compute the local energy I also compute its derivative.
 After roughly 10-20 iterations I got a converged result in terms of $\alpha$.
