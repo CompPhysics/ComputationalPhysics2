@@ -1,0 +1,566 @@
+\documentclass[10pt]{article}
+\usepackage{a4wide}
+\usepackage{listings}
+\usepackage{listings}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\OP}[1]{{\bf\widehat{#1}}}
+
+\begin{document}
+
+
+\section*{Project 3, Variational Monte Carlo studies of helium and beryllium}
+
+The final aim of this project is to develop a variational Monte Carlo program which can be used to obtain ground state properties of atoms like He, Be, O, Ne, Si etc as well as diatomic molecules. 
+for important molecules 
+
+The final project builds on project 1 and 2 and adds the optimization procedure for the variational parameter $\beta$ using for example Newton's methods, the steepest descent method or the conjugate gradient method. 
+Furthermore, the single-particle wave functions used in the computation
+of the Slater determinant will be replaced by Gaussian type orbitals (GTO) using already optimized parameters. 
+
+Thus, in addition to these ingredients, the final project contains all the elements you have included inprojects 1 and 2. This means that you can include all results you have obtained in projects 1 and 2 in the wrap-up of the final report. It is the final report which counts for the final mark.
+
+You will thus see that this report contains much of the same text as included in projects 1 and 2. 
+
+{\bf The deadline for project 3 is May 31, at noon}.  See below for delivery format.
+
+
+
+\section*{Part 1: Variational Monte Carlo calculations of the helium atom}
+
+We will start with the simplest possible system beyond hydrogen, namely the helium atom.
+We label $r_1$ the distance from electron 1 to the nucleus and similarly 
+$r_2$ the distance between electron 2 and the nucleus.
+The contribution to the potential energy from the interactions between the 
+electrons and the nucleus is
+\be
+   -\frac{2}{r_1}-\frac{2}{r_2},
+\ee 
+and if we add the electron-electron repulsion with
+$r_{12}=|{\bf r}_1-{\bf r}_2|$, the total potential energy 
+$V(r_1, r_2)$ is
+\be
+ V(r_1, r_2)=-\frac{2}{r_1}-\frac{2}{r_2}+
+               \frac{1}{r_{12}},
+\ee
+yielding the total Hamiltonian
+\be
+   \OP{H}=-\frac{\nabla_1^2}{2}-\frac{\nabla_2^2}{2}
+          -\frac{2}{r_1}-\frac{2}{r_2}+
+               \frac{1}{r_{12}},
+\ee
+and Schr\"odinger's equation reads
+\be
+   \OP{H}\psi=E\psi.
+\ee
+All equations are in so-called atomic units. The distances
+$r_i$ and $r_{12}$ are dimensionless. To have energies in electronvolt
+you need to multiply all results with 
+$2\times E_0$,
+where $E_0=13.6$ eV.
+The experimental binding energy for helium in atomic units a.u. is $E_{\mathrm{He}}=-2.9037$ a.u..
+
+
+\begin{enumerate}
+
+\item[1a)] We want to perform  a Variational Monte Carlo calculation of the ground state of the helium atom.
+In our first attempt we will use a brute force Metropolis sampling with a trial wave function which has the following form
+\begin{equation}
+   \psi_{T}({\bf r_1},{\bf r_2}, {\bf r_{12}}) = 
+   \exp{\left(-\alpha(r_1+r_2)\right)}
+   \exp{\left(\frac{r_{12}}{2(1+\beta r_{12})}\right)}, 
+\label{eq:trial}
+\end{equation}
+with $\alpha$ and $\beta$ as variational parameters.
+
+Your task is to perform a Variational Monte Carlo calculation
+using the Metropolis algorithm to compute the integral
+\begin{equation}
+   \langle E \rangle =
+   \frac{\int d{\bf r_1}d{\bf r_2}\psi^{\ast}_T({\bf r_1},{\bf r_2}, {\bf r_{12}})\OP{H}({\bf r_1},{\bf r_2}, {\bf r_{12}})\psi_T({\bf r_1},{\bf r_2}, {\bf r_{12}})}
+        {\int d{\bf r_1}d{\bf r_2}\psi^{\ast}_T({\bf r_1},{\bf r_2}, {\bf r_{12}})\psi_T({\bf r_1},{\bf r_2}, {\bf r_{12}})}.
+\end{equation}
+You should parallelize your program.   Find the  energy minimum and compute also the mean distance
+$r_{12}$ between the two electrons for the optimal set of the variational parameters.
+A code for doing a VMC calculation for the helium atom can be 
+found on the webpage of the course, see under programs.
+
+Your Monte Carlo moves are determined by
+\begin{equation}
+   {\bf R}' = {\bf R} +\delta \times r,
+\end{equation}
+where $r$ is a random number from the uniform distribution and $\delta$
+a chosen step length.
+In solving this exercise you need to devise an algorithm which finds
+an optimal value of $\delta$ for the variational parameters $\alpha$ and $\beta$,
+resulting in roughly $50\%$ accepted moves. 
+
+Give a physical  interpretation of the best value of $\alpha$.
+Make a plot of the variance as a function of the number of Monte Carlo
+cycles.
+\item[1b)]
+Find closed form expressions for the local energy (see below) for the above 
+trial wave function and explain shortly how this 
+trial function satisfies 
+the cusp condition when $r_1\rightarrow 0$ or
+$r_2\rightarrow 0$ or  $r_{12}\rightarrow 0$. Show that
+closed-form expression for the trial wave function is
+\[ 
+E_{L2} = E_{L1}+\frac{1}{2(1+\beta r_{12})^2}\left\{\frac{\alpha(r_1+r_2)}{r_{12}}(1-\frac{\mathbf{r}_1\mathbf{r}_2}{r_1r_2})-\frac{1}{2(1+\beta r_{12})^2}-\frac{2}{r_{12}}+\frac{2\beta}{1+\beta r_{12}}\right\},
+\]
+where
+\[ 
+E_{L1} = \left(\alpha-Z\right)\left(\frac{1}{r_1}+\frac{1}{r_2}\right)+\frac{1}{r_{12}}-\alpha^2.
+\]
+
+Compare the results of with and without the closed-form expressions (in terms of CPU time).
+\item[1c)] Introduce now importance sampling and study the dependence of the results as a function of the time step $\delta t$.  
+Compare the results with those obtained under 1a) and comment eventual differences.
+In performing the Monte Carlo analysis you should use blocking as a technique  to make the statistical analysis of the numerical data.
+The code has to run in parallel. 
+\item[1d)]  With the optimal parameters for the ground state wave function, compute the onebody density. Discuss your results and compare the results with those obtained with a pure hydrogenic wave functions. Run a Monte Carlo calculations without the Jastrow factor as well
+and compute the same quantities. How important are the correlations induced by the Jastrow factor?
+
+\item[1e)]  Repeat step 1c) by varying the energy using the 
+conjugate gradient method or similar methods to obtain the best possible parameter
+$\beta$.  Replace now the hydrogen-like single-particle wave functions with the 3-21G basis defined 
+at the EMSL website \url{https://bse.pnl.gov/bse/portal}. 
+
+\end{enumerate}
+
+
+\section*{Part 2: Variational Monte Carlo calculations of the Beryllium and  Neon atoms}
+The previous exercise has prepared you for extending your calculational machinery  to other systems.
+Here we will focus on the neon and beryllium atoms.
+It is convenient to make modules or classes of trial wave functions, both many-body wave functions
+and single-particle wave functions  and the quantum numbers  involved, such as spin, orbital momentum and principal
+quantum numbers.
+
+The new item you need to pay attention to is the calculation of the Slater Determinant. This is an additional complication
+to your VMC calculations.
+If we stick to hydrogen-like wave functions,
+the trial wave function for Beryllium can be written as 
+\begin{equation}
+   \psi_{T}({\bf r_1},{\bf r_2}, {\bf r_3}, {\bf r_4}) = 
+   Det\left(\phi_{1}({\bf r_1}),\phi_{2}({\bf r_2}),
+   \phi_{3}({\bf r_3}),\phi_{4}({\bf r_4})\right)
+   \prod_{i<j}^{4}\exp{\left(\frac{r_{ij}}{2(1+\beta r_{ij})}\right)}, 
+\end{equation}
+where $Det$ is a Slater determinant and the single-particle wave functions
+are the hydrogen wave functions for the $1s$ and $2s$ orbitals. Their form
+within the variational ansatz are given by
+\begin{equation}
+\phi_{1s}({\bf r_i}) = e^{-\alpha r_i},
+\end{equation}
+and 
+\begin{equation}
+\phi_{2s}({\bf r_i}) = \left(1-\alpha r_i/2\right)e^{-\alpha r_i/2}.
+\end{equation}
+For neon, the trial wave function can take the form
+\begin{equation}
+   \psi_{T}({\bf r_1},{\bf r_2}, \dots,{\bf r_{10}}) = 
+   Det\left(\phi_{1}({\bf r_1}),\phi_{2}({\bf r_2}),
+   \dots,\phi_{10}({\bf r_{10}})\right)
+   \prod_{i<j}^{10}\exp{\left(\frac{r_{ij}}{2(1+\beta r_{ij})}\right)}, 
+\end{equation}
+In this case you need to include the $2p$ wave function as well.
+It is given as
+\begin{equation} 
+\phi_{2p}({\bf r_i}) = \alpha {\bf r_i}e^{-\alpha r_i/2}.
+\end{equation}
+Observe that $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2+r_{i_z}^2}$.
+
+
+You can approximate the Slater determinant for the ground state of the Beryllium atom
+by writing it out as
+\begin{equation}
+   \psi_{T}({\bf r_1},{\bf r_2}, {\bf r_3}, {\bf r_4}) \propto 
+\left(\phi_{1s}({\bf r_1})\phi_{2s}({\bf r_2})-\phi_{1s}({\bf r_2})\phi_{2s}({\bf r_1})\right)
+\left(\phi_{1s}({\bf r_3})\phi_{2s}({\bf r_4})-\phi_{1s}({\bf r_4})\phi_{2s}({\bf r_3})\right).
+\end{equation}
+Here you can see a simple code example which implements the above expression
+\begin{lstlisting}
+ for (i = 0; i < number_particles; i++) {
+    argument[i] = 0.0;
+    r_single_particle = 0;
+    for (j = 0; j < dimension; j++) {
+      r_single_particle  += r[i][j]*r[i][j];
+    }
+    argument[i] = sqrt(r_single_particle);
+  }
+// Slater determinant, no factors as they vanish in Metropolis ratio
+wf  = (psi1s(argument[0])*psi2s(argument[1])
+       -psi1s(argument[1])*psi2s(argument[0]))*
+      (psi1s(argument[2])*psi2s(argument[3])
+       -psi1s(argument[3])*psi2s(argument[2]));
+\end{lstlisting}
+For beryllium we can easily implement the explicit evaluation of the Slater determinant.  The above will serve as a useful check
+for your function which computes the Slater determinat. 
+The derivatives of the single-particle wave functions can be computed analytically and you should consider
+using the closed form expression for the local energy (not mandatory, you can use numerical derivatives as well although a closed form expressions speeds up your code).
+
+For the correlation part 
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
+\]
+we need to take into account whether electrons have equal or opposite spins since we have to obey the
+electron-electron cusp condition as well.  For Beryllium, as an example,  you can fix electrons 1 and 2 to have spin up while
+electrons 3 and 4 have spin down.
+When the electrons have  equal spins 
+\[
+a= 1/4,
+\]
+while for opposite spins (as for the ground state of  helium)
+\[
+a= 1/2.
+\] 
+
+\begin{enumerate}
+\item[(2a)]   Write a function which sets up the Slater determinant for beryllium and neon and can be generalized to
+handle larger systems as well. 
+Compute the ground state energies of neon and beryllium as you did for the helium atom
+in 1d). 
+The calculations should include  parallelization, blocking, importance sampling and energy minimization using the conjugate gradient approach or related approaches like the steepest descent method or Newton's method.  You should also replace the hydrogen-like single-particle wave functions with the 3-21G basis set defined 
+at the EMSL website \url{https://bse.pnl.gov/bse/portal}. If you get time, you should also try the 6-311G basis set from the same website.
+
+\item[2b)]  With the optimal parameters for the ground state wave function, compute again the onebody density. Discuss your results and compare the results with those obtained with a pure hydrogenic wave functions. Run a Monte Carlo calculations without the Jastrow factor as well
+and compute the same quantities. How important are the correlations induced by the Jastrow factor?
+
+
+\end{enumerate}
+
+
+\section*{Part 3 Variational Monte Carlo studies of molecules}
+
+The 
+H$_2$ molecule consists of two protons and two electrons 
+with a ground state energy $E=-1.17460$ a.u. and equilibrium distance between the two hydrogen atoms
+of $r_0=1.40$ Bohr radii.
+We define our systems using the following variables.
+Origo is chosen to be halfway between the two protons. The distance from 
+proton 1 is defined as 
+$-{\bf R}/2$ whereas proton 2 has a distance ${\bf R}/2$.
+Calculations are performed for fixed distances ${\bf R}$ between the two protons.
+
+Electron 1 has a distance $r_1$ from the chose origo, while  electron $2$
+has a distance $r_2$. 
+The kinetic energy operator becomes then
+\be
+   -\frac{\nabla_1^2}{2}-\frac{\nabla_2^2}{2}.
+\ee
+The distance between the two electrons is
+$r_{12}=|{\bf r}_1-{\bf r}_2|$. 
+The repulsion between the two electrons results in a potential energy term given by
+\be
+               +\frac{1}{r_{12}}.
+\ee
+In a similar way we obtain a repulsive contribution from the interaction between the two 
+protons given by
+\be
+               +\frac{1}{|{\bf R}|},
+\ee
+where ${\bf R}$ is the distance between the two protons.
+To obtain the final potential energy we need to include the attraction the electrons feel from the protons.
+To model this, we need to define the distance between the electrons and the two protons.
+If we model this along a 
+chosen $z$-akse with electron 1 placed at a distance 
+${\bf r}_1$ from a chose origo, one proton at $-{\bf R}/2$
+and the other at  ${\bf R}/2$, 
+the distance from proton 1 to electron 1 becomes
+\be
+{\bf r}_{1p1}={\bf r}_1+ {\bf R}/2,
+\ee
+and
+\be
+{\bf r}_{1p2}={\bf r}_1- {\bf R}/2,
+\ee
+from proton 2.
+Similarly, for electron 2 we obtain
+\be
+{\bf r}_{2p1}={\bf r}_2+{\bf R}/2,
+\ee
+and
+\be
+{\bf r}_{2p2}={\bf r}_2-{\bf R}/2.
+\ee
+These four distances define the attractive contributions to the potential energy
+\be
+   -\frac{1}{r_{1p1}}-\frac{1}{r_{1p2}}-\frac{1}{r_{2p1}}-\frac{1}{r_{2p2}}.
+\ee
+We can then write the total Hamiltonian as 
+\be
+   \OP{H}=-\frac{\nabla_1^2}{2}-\frac{\nabla_2^2}{2}
+   -\frac{1}{r_{1p1}}-\frac{1}{r_{1p2}}-\frac{1}{r_{2p1}}-\frac{1}{r_{2p2}}
+               +\frac{1}{r_{12}}+\frac{1}{|{\bf R}|},
+\ee
+and if we choose ${\bf R}=0$ we obtain the helium atom.
+
+In this part we will use a trial wave function of the form
+\be
+   \psi_{T}({\bf r_1},{\bf r_2}, {\bf R}) =
+   \psi({\bf r}_1,{\bf R})\psi({\bf r}_2,{\bf R})
+   \exp{\left(\frac{r_{12}}{2(1+\beta r_{12})}\right)},
+\ee
+with the following trial wave function 
+\be
+   \psi({\bf r}_1,{\bf R})=\left(\exp{(-\alpha r_{1p1})}
+      +\exp{(-\alpha r_{1p2})}\right),
+\ee
+for electron 1 and
+\be
+   \psi({\bf r}_2,{\bf R})=\left(\exp{(-\alpha r_{2p1})}
+      +\exp{(-\alpha r_{2p2})}\right).
+\ee
+The variational parameters are $\alpha$ and $\beta$.
+
+One can show that in the limit where all distances approach zero that 
+\be
+    \alpha = 1+\exp{(-R/\alpha)},
+    \label{eq:alpha}
+\ee
+resulting in $\beta$ as the only variational parameter.
+\begin{enumerate}
+\item Set up and algorithm and write a program which computes the 
+expectation value of 
+$\langle \OP{H} \rangle$
+using the best variational Monte Carlo method 
+you developed for parts 1 and 2.
+For each inter-proton distance  $R$ you must find the parameter 
+$\beta$ which minimizes the energy. Plot the corresponding energy as function
+of the distance $R$ between the protons.
+\item Use thereafter the optimal parameter sets to compute the 
+average distance
+$\langle r_{12} \rangle$ between the electrons where the energy as function of
+$R$ exhibits its minimum. Comment your results.
+\item 
+We modify now the approximation for the wave functions of electrons 1 and 2
+by subtracting the two terms instead of adding up, viz
+\be
+   \psi({\bf r}_1,{\bf R})=\left(\exp{(-\alpha r_{1p1})}
+      -\exp{(-\alpha r_{1p2})}\right),
+\ee
+for electron 1 
+\be
+   \psi({\bf r}_2,{\bf R})=\left(\exp{(-\alpha r_{2p1})}
+      -\exp{(-\alpha r_{2p2})}\right),
+\ee
+for electron 2. Mathematically, this approach is equally viable as the previous one.
+Repeat your calculations and see if you can obtain an energy minimum as 
+function of  $R$. Comment your results.
+
+\item Using your Slater determinants and Jastrow factors from part a, our final step consists in estimating the binding energy of the H$_2$ and Be$_2$ molecules using the optimal Jastrow factor and the 3-21G basis set.
+The last two references in the reference list may be useful.
+
+
+
+
+\end{enumerate}
+
+\section*{Brief summary on how ot write a report}
+
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+\begin{itemize}
+\item Give a short description of the nature of the problem and the eventual 
+numerical methods you have used.
+\item Describe the algorithm you have used and/or developed. Here you may find it convenient
+to use pseudocoding. In many cases you can describe the algorithm
+in the program itself.
+
+\item Include the source code of your program. Comment your program properly.
+\item If possible, try to find analytic solutions, or known limits
+in order to test your program when developing the code.
+\item Include your results either in figure form or in a table. Remember to
+       label your results. All tables and figures should have relevant captions
+       and labels on the axes.
+\item Try to evaluate the reliabilty and numerical stability/precision
+of your results. If possible, include a qualitative and/or quantitative
+discussion of the numerical stability, eventual loss of precision etc. 
+
+\item Try to give an interpretation of you results in your answers to 
+the problems.
+\item Critique: if possible include your comments and reflections about the 
+exercise, whether you felt you learnt something, ideas for improvements and 
+other thoughts you've made when solving the exercise.
+We wish to keep this course at the interactive level and your comments can help
+us improve it. We do appreciate your comments. 
+\item Try to establish a practice where you log your work at the 
+computerlab. You may find such a logbook very handy at later stages
+in your work, especially when you don't properly remember 
+what a previous test version 
+of your program did. Here you could also record 
+the time spent on solving the exercise, various algorithms you may have tested
+or other topics which you feel worthy of mentioning.
+\end{itemize}
+
+
+
+\section*{Format for electronic delivery of report and programs}
+%
+The preferred format for the report is a PDF file. You can also
+use DOC or postscript formats. 
+As programming language we prefer that you choose between C++, Fortran2008 or Python.
+Finally, 
+we recommend that you work together. Optimal working groups consist of 
+2-3 students, but more people can collaborate. You can then hand in a common report. 
+
+
+
+
+
+\section*{Literature}
+\begin{enumerate}
+\item B.~L.~Hammond, W.~A.~Lester and P.~J.~Reynolds, Monte Carlo methods
+in Ab Inition Quantum Chemistry, World Scientific, Singapore, 1994, chapters
+2-5 and appendix B.
+
+\item B.H.~Bransden and C.J.~Joachain, Physics of Atoms and molecules,
+Longman, 1986. Chapters 6, 7 and 9.
+\item S.A.~Alexander and R.L.~Coldwell,
+Int.~Journal of Quantum Chemistry, {\bf 63} (1997) 1001.  This article is available 
+at the webpage of the course as the file jastrow.pdf under the project 1 link.
+\item C.J.~Umrigar, K.G.~Wilson and J.W.~Wilkins, Phys.~Rev.~Lett.~{\bf 60}
+(1988) 1719. 
+
+\item Moskowitz and Kalos, Int.~Journal of Quantum Chemistry {\bf XX}, 1107 (1981).
+Results for He and H$_2$.
+\item Filippi, Singh and Umrigar, J.~Chemical Physics {\bf 105}, 123 (1996).   Useful results on
+Be$_2$ to which you can benchmark your results against.
+
+
+\end{enumerate}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+\section*{How to write the report}
+What should the report contain and how can I structure it? A typical structure follows here.
+\begin{itemize}
+\item An abstract with the main findings.
+\item  An introduction where you explain the aims and rationale for the physics case and what you have done. At the end of the introduction you should give a brief summary of the structure of the report
+\item Theoretical models and technicalities. This sections ends often being the methods section.
+\item Results and discussion
+\item Conclusions and perspectives
+\item Appendix with extra material
+\item Bibliography
+\end{itemize}
+Keep always a good log of what you do.
+
+\subsection*{What should I focus on? Introduction.}
+You don't need to answer all questions in a chronological order. When you write the introduction you could focus on the following aspects
+\begin{itemize}
+\item Motivate the reader, the first part of the introduction gives always a motivation and tries to give the overarching ideas
+\item What I have done
+\item The structure of the report, how it is organized etc
+\end{itemize}
+\subsection*{What should I focus on? Methods sections.}
+\begin{itemize}
+\item Describe the methods and algorithms
+\item You need to explain how you implemented the methods and also say something about the structure of your algorithm and present some parts of your code
+\item You should plug in some calculations to demonstrate your code, such as selected runs used to validate and verify your results. The latter is extremely important!! A reader needs to understand that your code reproduces selected benchmarks and reproduces previous results, either numerical and/or well-known closed form expressions.
+\end{itemize}
+
+\subsection*{What should I focus on? Results sections.}
+\begin{itemize}
+\item Present your results
+\item Give a critical discussion of your work and place it in the correct context.
+\item Relate your work to other calculations/studies
+\item An eventual reader should be able to reproduce your calculations if she/he wants to do so. All input variables should be properly explained.
+\item Make sure that figures and tables contain enough information in their captions, axis labels etc so that an eventual reader can gain a first impression of your work by studying figures and tables only.
+\end{itemize}
+
+\subsection*{What should I focus on? Conclusions sections.}
+\begin{itemize}
+\item State your main findings and interpretations
+\item Try as far as possible to present perspectives for future work
+\item Try to discuss the pros and cons of the methods and possible improvements
+\end{itemize}
+
+\subsection*{What should I focus on? Additional material, appendices.}
+\begin{itemize}
+\item Additional calculations used to validate the codes
+\item Selected calculations, these can be listed with few comments
+\item Listing of the code if you feel this is necessary
+\item You can consider moving parts of the material from the methods section to the appendix. You can also place additional material on your webpage.
+\end{itemize}
+\subsection*{What should I focus on? References.}
+\begin{itemize}
+\item Give always references to material you base your work on, either scientific articles/reports or books.
+\item Refer to articles as: name(s) of author(s), journal, volume (boldfaced), page and year in parenthesis.
+\item Refer to books as: name(s) of author(s), title of book, publisher, place and year, eventual page numbers
+\end{itemize}
+
+
+
+\section*{Format for electronic delivery of report and programs}
+%
+Your are free to choose your format for handing in. The simplest way is that you send us your github link that contains the report in your chosen format(pdf, ps, docx, ipython notebook etc) and the programs.
+As programming language you have to choose either C++ or Fortran or Python. We recommend C++ or Fortran.
+Finally, 
+we recommend that you work together. Optimal working groups consist of 
+2-3 students, but more people can collaborate. You can then hand in a common report. 
+
+
+
+
+
+\section*{Literature}
+\begin{enumerate}
+\item B.~L.~Hammond, W.~A.~Lester and P.~J.~Reynolds, Monte Carlo methods
+in Ab Inition Quantum Chemistry, World Scientific, Singapore, 1994, chapters
+2-5 and appendix B.
+
+\item B.H.~Bransden and C.J.~Joachain, Physics of Atoms and molecules,
+Longman, 1986. Chapters 6, 7 and 9.
+\item S.A.~Alexander and R.L.~Coldwell,
+Int.~Journal of Quantum Chemistry, {\bf 63} (1997) 1001.  This article is available 
+at the webpage of the course as the file jastrow.pdf under the project 1 link.
+\item C.J.~Umrigar, K.G.~Wilson and J.W.~Wilkins, Phys.~Rev.~Lett.~{\bf 60}
+(1988) 1719. 
+
+
+
+\end{enumerate}
+
+\section*{Unit tests, how and why?}
+Unit Testing is the practice of testing the smallest testable parts, called units, of an application individually and independently to determine if they behave exactly as expected. Unit tests (short code fragments) are usually written such that they can be preformed at any time during the development to continually verify the behavior of the code. In this way, possible bugs will be identified early in the development cycle, making the debugging at later stage much easier. There are many benefits associated with Unit Testing, such as
+\begin{itemize}
+\item It increases confidence in changing and maintaining code. Big changes can be made to the code quickly, since the tests will ensure that everything still is working properly.
+\item Since the code needs to be modular to make Unit Testing possible, the code will be easier to reuse. This improves the code design.
+\item Debugging is easier, since when a test fails, only the latest changes need to be debugged.
+\item Different parts of a project can be tested without the need to wait for the other parts to be available.
+\item A unit test can serve as a documentation on the functionality of a unit of the code.
+\end{itemize}
+Here follows a simple example, see the website of the course for more information on how to install unit test libraries.
+\begin{verbatim}
+#include <unittest++/UnitTest++.h> 
+
+class MyMultiplyClass{ 
+public: 
+   double multiply(double x, double y) { 
+      return x * y; 
+   } 
+}; 
+TEST(MyMath) { 
+     MyMultiplyClass my; CHECK_EQUAL(56, my.multiply(7,8)); 
+} 
+int main() 
+{ 
+return UnitTest::RunAllTests(); 
+}
+\end{verbatim}
+For Fortran users, the link at \url{http://sourceforge.net/projects/fortranxunit/} contains a similar software for unit testing.
+\end{document}
+
+
