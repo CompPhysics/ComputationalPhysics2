@@ -1,0 +1,44 @@
+#Program which solves the 2+1-dimensional wave equation by a finite difference scheme
+#and creates a movie of the time evolution with the scitools.easyviz library.
+
+from numpy import *
+from scitools.easyviz import *
+import os
+from Numeric import *
+import Gnuplot
+
+g = Gnuplot.Gnuplot(persist=1)
+
+
+#Define the grid
+N = 31
+h = 1.0 / (N-1)
+dt = .0005
+t_steps = 10000
+x,y = ndgrid(linspace(0,1,N),linspace(0,1,N),sparse=False)
+
+n = 10000
+plotnr = 0
+
+#Iteration over time steps
+for k in xrange(t_steps):
+    u = cos(k*pi*sqrt(5))*sin(x*pi)*cos(y*pi*2.0)
+    #Plot
+    if k % n == 0:
+        plotnr += 1
+        points = transpose(array([x,y,u]))
+        d = Gnuplot.Data(points, with= 'lines')
+        g.xlabel('x')   #  make x label
+        g.ylabel('y') 
+        g('set term png small')
+        g('set output "frame.png" ')
+#        g('set output "frame%04d.png % plotnr" ')
+        g.splot(d)                         # plot the data
+#Make movie
+#movie('frame*.png',encoder='convert', output_file='movie.gif', fps=10)
+
+
+
+
+
+
