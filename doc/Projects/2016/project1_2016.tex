@@ -1,0 +1,509 @@
+\documentclass[10pt]{article}
+\usepackage{a4wide}
+
+\begin{document}
+\section*{Introduction to numerical projects}
+
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+\begin{itemize}
+\item Give a short description of the nature of the problem and the eventual 
+numerical methods you have used.
+\item Describe the algorithm you have used and/or developed. Here you may find it convenient
+to use pseudocoding. In many cases you can describe the algorithm
+in the program itself.
+
+\item Include the source code of your program. Comment your program properly.
+\item If possible, try to find analytic solutions, or known limits
+in order to test your program when developing the code.
+\item Include your results either in figure form or in a table. Remember to
+       label your results. All tables and figures should have relevant captions
+       and labels on the axes.
+\item Try to evaluate the reliabilty and numerical stability/precision
+of your results. If possible, include a qualitative and/or quantitative
+discussion of the numerical stability, eventual loss of precision etc. 
+
+\item Try to give an interpretation of you results in your answers to 
+the problems.
+\item Critique: if possible include your comments and reflections about the 
+exercise, whether you felt you learnt something, ideas for improvements and 
+other thoughts you've made when solving the exercise.
+We wish to keep this course at the interactive level and your comments can help
+us improve it.
+\item Try to establish a practice where you log your work at the 
+computerlab. You may find such a logbook very handy at later stages
+in your work, especially when you don't properly remember 
+what a previous test version 
+of your program did. Here you could also record 
+the time spent on solving the exercise, various algorithms you may have tested
+or other topics which you feel worthy of mentioning.
+\end{itemize}
+
+
+
+\section*{Format for electronic delivery of report and programs}
+%
+The preferred format for the report is a PDF file. You can also
+use DOC or postscript formats or as an ipython notebook file. 
+As programming language we prefer that you choose between C/C++, Fortran2008 or Python.
+The following prescription should be followed when preparing the report:
+\begin{itemize}
+\item Use Devilry to hand in your projects, log in  at 
+\url{ http://devilry.ifi.uio.no} with your normal UiO username and password
+and choose FYS4411.
+There you can load up the files within the deadline.
+\item Upload {\bf only} the report file!  For the source code file(s) you have developed please provide us with your link to your github domain. 
+The report file should include all of your discussions and a list of the codes you have developed. 
+Do not include library files which are available at the course homepage, unless you have
+made specific changes to them.
+\item In your git repository, please include a folder which contains selected results. These can be in the form of output from your code
+for a selected set of runs and input parameters. 
+\item In all projects, you should include a discussion of tests and possibly unit testing of your code(s).
+\item Comments  from us on your projects, approval or not, corrections to be made 
+etc can be found under
+your Devilry domain and are only visible to you and the teachers of the course.
+
+\end{itemize}
+
+Finally, 
+we encourage you to work two and two together. Optimal working groups consist of 
+2-3 students. You can then hand in a common report. 
+
+
+\section*{Project 1, Variational Monte Carlo studies of bosonic systems, The deadline for project 1 is March 4}
+
+ The spectacular demonstration of Bose-Einstein condensation (BEC) in gases of
+ alkali atoms $^{87}$Rb, $^{23}$Na, $^7$Li confined in magnetic
+ traps \cite{anderson95,davis95,bradley95} has led to an explosion of interest in
+ confined Bose systems. Of interest is the fraction of condensed atoms, the
+ nature of the condensate, the excitations above the condensate, the atomic
+ density in the trap as a function of Temperature and the critical temperature of BEC,
+ $T_c$. The extensive progress made up to early 1999 is reviewed by Dalfovo et
+ al.\cite{dalfovo1999}.
+
+ A key feature of the trapped alkali and atomic hydrogen systems is that they are
+ dilute. The characteristic dimensions of a typical trap for $^{87}$Rb is
+ $a_{h0}=\left( {\hbar}/{m\omega_\perp}\right)^\frac{1}{2}=1-2 \times 10^4$
+ \AA\ (Ref.~\cite{anderson95}). The interaction between $^{87}$Rb atoms can be well represented
+ by its s-wave scattering length, $a_{Rb}$. This scattering length lies in the
+ range $85 < a_{Rb} < 140 a_0$ where $a_0 = 0.5292$ \AA\ is the Bohr radius.
+ The definite value $a_{Rb} = 100 a_0$ is usually selected and
+ for calculations the definite ratio of atom size to trap size 
+ $a_{Rb}/a_{h0} = 4.33 \times 10^{-3}$ 
+ is usually chosen \cite{dalfovo1999}. A typical $^{87}$Rb atom
+ density in the trap is $n \simeq 10^{12}- 10^{14}$ atoms/cm$^3$ giving an
+ inter-atom spacing $\ell \simeq 10^4$ \AA. Thus the effective atom size is small
+ compared to both the trap size and the inter-atom spacing, the condition
+ for diluteness ($na^3_{Rb} \simeq 10^{-6}$ where $n = N/V$ is the number
+ density). In this limit,
+ although the interaction is important, dilute gas approximations such as the
+ Bogoliubov theory \cite{bogo1958}, valid for small $na^3$ and large
+ condensate fraction $n_0 = N_0/N$, describe the system well. Also, since most
+ of the atoms are in the condensate (except near $T_c$), the Gross-Pitaevskii
+ equation \cite{gross1961,pita1961} 
+for the condensate describes the whole gas
+ well. Effects of atoms excited above the condensate have been incorporated
+ within the Popov approximation \cite{hutchinson97}. 
+
+
+
+Most theoretical studies of Bose-Einstein condensates (BEC)
+in gases of alkali atoms confined in magnetic or optical traps 
+have been conducted in the framework of the 
+Gross-Pitaevskii (GP) equation \cite{gross1961,pita1961}. 
+The key point for the validity of this description is the
+dilute condition of these systems, i.e., the average distance between
+the atoms is much larger than the range of the inter-atomic interaction. In
+this situation the physics is dominated by two-body collisions,
+well described in terms of the $s$-wave scattering length
+$a$.  The crucial parameter defining the condition for diluteness is the
+gas parameter $x({\bf r})= n({\bf r}) a^3$, where $n({\bf r})$ is the
+local density of the system. For low values of the average gas
+parameter $x_{av}\le 10^{-3}$, the mean field Gross-Pitaevskii
+equation does an excellent job (see for example 
+Ref.~\cite{dalfovo1999} for a review). 
+However, in recent
+experiments, the local gas parameter may well exceed this value due to
+the possibility of tuning the scattering length in the presence of a  
+Feshbach resonance \cite{cornish00}. 
+
+Under such circumstances it is unavoidable to test the accuracy of
+the GP equation by performing microscopic calculations. If we consider cases
+where the gas parameter has been driven to a region were one
+can still have a universal regime, i.e., that the specific shape of
+the potential is unimportant, we may attempt to describe the system as dilute
+hard spheres whose diameter coincides with the scattering length.
+However, the value of $x$ is such that the
+calculation of the energy of the uniform hard-sphere Bose gas would
+require to take into account the second term in the low-density
+expansion \cite{fetter} of the energy density
+\begin{equation}
+  \frac {E}{V} = \frac {2 \pi n^2 a \hbar^2}{m}
+  \left [ 1 + \frac {128}{15} \left ( \frac {n a^3}{\pi} \right)^{1/2}
+          + \cdots \right ],
+\label{low-ex}
+\end{equation}
+where $m$ is the mass of the atoms treated as hard spheres.
+For the case of uniform systems, the validity of this expansion has been 
+carefully studied using Diffusion Monte Carlo \cite{boro99} and
+Hyper-Netted-Chain techniques \cite{mazz03}.
+
+The energy functional associated with the GP theory is obtained
+within the framework of  the local-density approximation (LDA) 
+by keeping only the first
+term in the low-density expansion of Eq.~(\ref{low-ex})
+
+\begin{equation}
+  E_{\mathrm{GP}} [\Psi] = \int d{\bf r} \left [ \frac {\hbar^2 }{2m} \mid \nabla
+  \Psi({\bf r}) \mid^2 + V_{\mathrm{trap}}({\bf r})\mid \Psi \mid ^2+ \frac {2 \pi
+  \hbar^2 a }{m}\mid \Psi \mid ^4 \right ],
+\label{func1}
+\end{equation}
+
+where 
+\begin{equation}
+  V_{\mathrm{trap}}({\bf r}) = \frac {1}{2} m (\omega_{\bot}^2 x^2 
+  + \omega_{\bot}^2 y^2 +\omega_{z}^2 z^2 ) 
+\label{trap}
+\end{equation}
+is the confining potential defined by the two angular frequencies
+$\omega_{\bot}$ and $\omega_{z}$.
+The condensate 
+wave function $\Psi$ is
+normalized to the total number of particles. 
+
+By performing a functional variation of $E_{\mathrm{GP}}[\Psi]$ with respect
+to $\Psi^*$ one finds the corresponding Euler-Lagrange equation, 
+known as the Gross-Pitaevskii (GP) equation
+\begin{equation}
+  \left [ - \frac {\hbar^2}{2m} \nabla^2 + V_{\mathrm{trap}}({\bf r}) + 
+   \frac{4\pi\hbar^2 a}{m} \mid \Psi \mid^2 \right ]\Psi=\mu\Psi , 
+\label{gp1} 
+\end{equation}
+where $\mu$ is the chemical potential, which accounts for the conservation
+of the number of particles. Within the 
+LDA framework, the next step 
+is to include into the energy functional of Eq.~(\ref{func1})
+the next term of the low density expansion of Eq.~(\ref{low-ex}). 
+The functional variation gives then rise to the so-called 
+modified GP equation (MGP) \cite{fabro99} 
+
+\begin{equation}
+  \left [ - \frac {\hbar^2}{2m} \nabla^2 + V_{\mathrm{trap}}({\bf r})+\frac {4 \pi \hbar^2 a}{m} \mid \Psi \mid^2 
+    \left (1 + \frac {32 a^{3/2}}{3 \pi^{1/2}} \mid \Psi\mid \right)
+    \right ] \Psi =  \mu \Psi .
+\label{gp2}
+\end{equation}
+
+The MGP corrections have been estimated in  Ref.~\cite{fabro99} in a cylindrical 
+condensate in the range of the scattering lengths and trap parameters
+from the first JILA experiments with Feshbach resonances. These experiments took 
+advantage of the  presence of a Feshbach resonance in the collision of two
+$^{85}$Rb atoms to tune their scattering length \cite{cornish00}.
+Fully microscopic calculations using  a hard-spheres interaction have
+also been performed in the framework of Variational and Diffusion Monte
+Carlo methods \cite{dubois2001,glyde2002,glyde2003,blume1}. 
+
+ The aim of this project is to use the Variational Monte
+ Carlo (VMC) method and evaluate 
+ the ground state energy of
+ a trapped, hard sphere Bose gas for different numbers of particles
+ with a specific
+ trial wave function. See Ref.~\cite{abinitio} for a discussion of VMC.
+
+ This wave function is used 
+ to study the sensitivity of condensate and 
+ non-condensate properties to the hard sphere radius and the number 
+ of particles.
+ The trap we will use is  a spherical (S) or 
+ an elliptical (E) harmonic trap in three dimensions given by 
+  \begin{equation}
+ V_{ext}({\bf r}) = 
+ \Bigg\{
+ \begin{array}{ll}
+	 \frac{1}{2}m\omega_{ho}^2r^2 & (S)\\
+ \strut
+	 \frac{1}{2}m[\omega_{ho}^2(x^2+y^2) + \omega_z^2z^2] & (E)
+ \label{trap_eqn}
+ \end{array}
+ \end{equation}
+ where (S) stands for symmetric and 
+ \begin{equation}
+     H = \sum_i^N \left(
+	 \frac{-\hbar^2}{2m}
+	 { \bigtriangledown }_{i}^2 +
+	 V_{ext}({\bf{r}}_i)\right)  +
+	 \sum_{i<j}^{N} V_{int}({\bf{r}}_i,{\bf{r}}_j),
+ \end{equation}
+ as the two-body Hamiltonian of the system.
+ Here $\omega_{ho}^2$ defines the trap potential strength.  In the case of the
+ elliptical trap, $V_{ext}(x,y,z)$, $\omega_{ho}=\omega_{\perp}$ is the trap frequency
+ in the perpendicular or $xy$ plane and $\omega_z$ the frequency in the $z$
+ direction.
+ The mean square vibrational amplitude of a single boson at $T=0K$ in the 
+ trap (\ref{trap_eqn}) is $<x^2>=(\hbar/2m\omega_{ho})$ so that 
+ $a_{ho} \equiv (\hbar/m\omega_{ho})^{\frac{1}{2}}$ defines the 
+ characteristic length
+ of the trap.  The ratio of the frequencies is denoted 
+ $\lambda=\omega_z/\omega_{\perp}$ leading to a ratio of the
+ trap lengths
+ $(a_{\perp}/a_z)=(\omega_z/\omega_{\perp})^{\frac{1}{2}} = \sqrt{\lambda}$.
+
+ We represent the inter boson interaction by a pairwise, hard core potential
+ \begin{equation}
+ V_{int}(|{\bf r}_i-{\bf r}_j|) =  \Bigg\{
+ \begin{array}{ll}
+	 \infty & {|{\bf r}_i-{\bf r}_j|} \leq {a}\\
+	 0 & {|{\bf r}_i-{\bf r}_j|} > {a}
+ \end{array}
+ \end{equation}
+ where ${a}$ is the hard core diameter of the bosons.  Clearly, $V_{int}(|{\bf r}_i-{\bf r}_j|)$
+ is zero if the bosons are separated by a distance $|{\bf r}_i-{\bf r}_j|$ greater than $a$ but
+ infinite if they attempt to come within a distance $|{\bf r}_i-{\bf r}_j| \leq a$.
+
+ Our trial wave function for the ground state with $N$ atoms is given by
+ \begin{equation}
+ \Psi_T({\bf R})=\Psi_T({\bf r}_1, {\bf r}_2, \dots {\bf r}_N,\alpha,\beta)=\prod_i g(\alpha,\beta,{\bf r}_i)\prod_{i<j}f(a,|{\bf r}_i-{\bf r}_j|),
+ \label{eq:trialwf}
+ \end{equation}
+ where $\alpha$ and $\beta$ are variational parameters. The single-particle wave function is proportional
+ to the harmonic oscillator function for the ground state, i.e.,
+ \begin{equation}
+    g(\alpha,\beta,{\bf r}_i)= \exp{[-\alpha(x_i^2+y_i^2+\beta z_i^2)]}.
+ \end{equation}
+ For spherical traps we have $\beta = 1$ and for non-interacting bosons ($a=0$) we have
+ $\alpha = 1/2a_{ho}^2$.
+ The correlation wave function is 
+ \begin{equation}
+    f(a,|{\bf r}_i-{\bf r}_j|)=\Bigg\{
+ \begin{array}{ll}
+	 0 & {|{\bf r}_i-{\bf r}_j|} \leq {a}\\
+	 (1-\frac{a}{|{\bf r}_i-{\bf r}_j|}) & {|{\bf r}_i-{\bf r}_j|} > {a}.
+ \end{array}
+ \end{equation}  
+
+ \begin{enumerate}
+ \item[a)] Find analytic expressions for the local energy 
+ \begin{equation}
+    E_L({\bf R})=\frac{1}{\Psi_T({\bf R})}H\Psi_T({\bf R}),
+    \label{eq:locale}
+ \end{equation}
+ for the above 
+ trial wave function of Eq.~(\ref{eq:trialwf}).
+ Compute also the analytic expression for the drift force to be used in importance sampling
+ \begin{equation}
+   F = \frac{2\nabla \Psi_T}{\Psi_T}.
+ \end{equation}
+
+The tricky part is to find an analytic expressions for the derivative of the trial wave function 
+\[
+   \frac{1}{\Psi_T({\bf R})}\sum_i^{N}\nabla_i^2\Psi_T({\bf R}),
+\]
+for the above 
+trial wave function of Eq.~(\ref{eq:trialwf}).
+We rewrite 
+\[
+\Psi_T({\bf R})=\Psi_T({\bf r}_1, {\bf r}_2, \dots {\bf r}_N,\alpha,\beta)=\prod_i g(\alpha,\beta,{\bf r}_i)\prod_{i<j}f(a,|{\bf r}_i-{\bf r}_j|),
+\]
+as
+\[
+\Psi_T({\bf R})=\prod_i g(\alpha,\beta,{\bf r}_i)e^{\sum_{i<j}u(r_{ij})}
+\]
+where we have defined $r_{ij}=|{\bf r}_i-{\bf r}_j|$
+and 
+\[
+   f(r_{ij})= e^{\sum_{i<j}u(r_{ij})},
+\]
+and in our case 
+\[
+    g(\alpha,\beta,{\bf r}_i) = e^{-\alpha(x_i^2+y_i^2+z_i^2)}= \phi({\bf r}_i).
+\]
+
+The first derivative becomes
+\[
+  \nabla_k\Psi_T({\bf R}) = \nabla_k\phi({\bf r}_k)\left[\prod_{i\ne k}\phi({\bf r}_i)\right]e^{\sum_{i<j}u(r_{ij})}+ 
+\prod_i\phi({\bf r}_i)e^{\sum_{i<j}u(r_{ij})}\sum_{j\ne k}\nabla_k u(r_{ij})
+\]
+We leave it as an exercise for the reader to find the expression for the sceond derivative.
+The final expression is
+\[
+   \frac{1}{\Psi_T({\bf R})}\nabla_k^2\Psi_T({\bf R})=
+   \frac{\nabla_k^2\phi({\bf r}_k)}{\phi({\bf r}_k)}+
+\frac{\nabla_k\phi({\bf r}_k)}{\phi({\bf r}_k)}\left(\sum_{j\ne k}\frac{{\bf r}_k}{r_k}u'(r_{ij})\right)+
+\] 
+\[
+\sum_{ij\ne k}\frac{({\bf r}_k-{\bf r}_i)({\bf r}_k-{\bf r}_j)}{r_{ki}r_{kj}}u'(r_{ki})u'(r_{kj})+
+\sum_{j\ne k}\left( u''(r_{kj})+\frac{2}{r_{kj}}u'(r_{kj})\right)
+\]
+You need to get the analytic expression for this expression using the harmonic oscillator wave functions
+and the correlation term defined in the project.
+
+
+
+ \item[b)] Write a Variational Monte Carlo program which uses standard Metropolis sampling 
+ and compute the ground state energy 
+ of a spherical harmonic oscillator ($\beta = 1$) with no interaction.     
+ Use natural units and make an analysis of your calculations using both the analytic expression for the 
+ local energy and a numerical calculation of the kinetic energy using numerical derivation.
+ Compare the CPU time difference.  You should also  parallelize your code.
+ The only variational parameter is $\alpha$. Perform these calculations for $N=10$, 
+ $100$ and $500$ atoms. Compare your results with the exact answer. 
+
+ \item[c)] We turn now to the elliptic trap with a hard core interaction. 
+ We fix, as in Refs.~\cite{dubois2001,nilsen2005} $a/a_{ho}=0.0043$. Introduce lengths in units 
+ of $a_{ho}$, $r\rightarrow r/a_{ho}$ and energy in units of $\hbar\omega_{ho}$.
+ Show then that the original Hamiltonian can be rewritten as 
+ \[ 
+    H=\sum_{i=1}^N\frac{1}{2}\left(-\nabla^2_i+x_i^2+y_i^2+\gamma^2z_i^2\right)+\sum_{i<j}V_{int}(|{\bf r}_i-{\bf r}_j|).
+ \]
+ What is the expression for $\gamma$?
+ Choose the initial value for $\beta=\gamma = 2.82843$ and set up a VMC program
+ which computes the ground state energy using the trial wave function of Eq.~(\ref{eq:trialwf}). 
+ using only $\alpha$ as variational parameter.
+ Use standard Metropolis sampling and vary the parameter $\alpha$ in order to find a 
+ minimum. Perform the calculations for $N=10,50$ and $N=100$ and compare your results to those from the ideal case in the previous exercise. 
+In actual calculations employing e.g., the Metropolis algorithm,
+all moves are recast into the chosen simulation cell with 
+periodic boundary conditions. To carry out consistently the Metropolis moves,
+it has to be assumed that the correlation function has a range shorter than
+$L/2$. Then, to decide if a move of a single particle is accepted or not,
+only the set of particles contained in a sphere of radius $L/2$ centered at the
+referred particle have to be considered. 
+
+\item[d)] We repeat exercise c), but now we replace the brute force Metropolis algorithm with 
+importance sampling based on the Fokker-Planck and the Langevin equations. 
+Discuss your results and comment on eventual differences between importance sampling and brute force sampling.
+
+Your code should reproduce the results of Refs.~\cite{dubois2001,nilsen2005}.
+
+\end{enumerate}
+
+
+
+\section*{How to write the report}
+What should the report contain and how can I structure it? A typical structure follows here.
+\begin{itemize}
+\item An abstract with the main findings.
+\item  An introduction where you explain the aims and rationale for the physics case and what you have done. At the end of the introduction you should give a brief summary of the structure of the report
+\item Theoretical models and technicalities. This sections ends often being the methods section.
+\item Results and discussion
+\item Conclusions and perspectives
+\item Appendix with extra material
+\item Bibliography
+\end{itemize}
+Keep always a good log of what you do.
+
+\subsection*{What should I focus on? Introduction.}
+You don't need to answer all questions in a chronological order. When you write the introduction you could focus on the following aspects
+\begin{itemize}
+\item Motivate the reader, the first part of the introduction gives always a motivation and tries to give the overarching ideas
+\item What I have done
+\item The structure of the report, how it is organized etc
+\end{itemize}
+\subsection*{What should I focus on? Methods sections.}
+\begin{itemize}
+\item Describe the methods and algorithms
+\item You need to explain how you implemented the methods and also say something about the structure of your algorithm and present some parts of your code
+\item You should plug in some calculations to demonstrate your code, such as selected runs used to validate and verify your results. The latter is extremely important!! A reader needs to understand that your code reproduces selected benchmarks and reproduces previous results, either numerical and/or well-known closed form expressions.
+\end{itemize}
+
+\subsection*{What should I focus on? Results sections.}
+\begin{itemize}
+\item Present your results
+\item Give a critical discussion of your work and place it in the correct context.
+\item Relate your work to other calculations/studies
+\item An eventual reader should be able to reproduce your calculations if she/he wants to do so. All input variables should be properly explained.
+\item Make sure that figures and tables contain enough information in their captions, axis labels etc so that an eventual reader can gain a first impression of your work by studying figures and tables only.
+\end{itemize}
+
+\subsection*{What should I focus on? Conclusions sections.}
+\begin{itemize}
+\item State your main findings and interpretations
+\item Try as far as possible to present perspectives for future work
+\item Try to discuss the pros and cons of the methods and possible improvements
+\end{itemize}
+
+\subsection*{What should I focus on? Additional material, appendices.}
+\begin{itemize}
+\item Additional calculations used to validate the codes
+\item Selected calculations, these can be listed with few comments
+\item Listing of the code if you feel this is necessary
+\item You can consider moving parts of the material from the methods section to the appendix. You can also place additional material on your webpage.
+\end{itemize}
+\subsection*{What should I focus on? References.}
+\begin{itemize}
+\item Give always references to material you base your work on, either scientific articles/reports or books.
+\item Refer to articles as: name(s) of author(s), journal, volume (boldfaced), page and year in parenthesis.
+\item Refer to books as: name(s) of author(s), title of book, publisher, place and year, eventual page numbers
+\end{itemize}
+
+
+
+\section*{Format for electronic delivery of report and programs}
+%
+Your are free to choose your format for handing in. The simplest way is that you send us your github link that contains the report in your chosen format(pdf, ps, docx, ipython notebook etc) and the programs.
+As programming language you have to choose either C++ or Fortran or Python. We recommend C++ or Fortran.
+Finally, 
+we recommend that you work together. Optimal working groups consist of 
+2-3 students, but more people can collaborate. You can then hand in a common report. 
+
+
+
+
+
+\section*{Literature}
+\begin{enumerate}
+\item B.~L.~Hammond, W.~A.~Lester and P.~J.~Reynolds, Monte Carlo methods
+in Ab Inition Quantum Chemistry, World Scientific, Singapore, 1994, chapters
+2-5 and appendix B.
+
+\item B.H.~Bransden and C.J.~Joachain, Physics of Atoms and molecules,
+Longman, 1986. Chapters 6, 7 and 9.
+\item S.A.~Alexander and R.L.~Coldwell,
+Int.~Journal of Quantum Chemistry, {\bf 63} (1997) 1001.  This article is available 
+at the webpage of the course as the file jastrow.pdf under the project 1 link.
+\item C.J.~Umrigar, K.G.~Wilson and J.W.~Wilkins, Phys.~Rev.~Lett.~{\bf 60}
+(1988) 1719. 
+
+
+
+\end{enumerate}
+
+\section*{Unit tests, how and why?}
+Unit Testing is the practice of testing the smallest testable parts, called units, of an application individually and independently to determine if they behave exactly as expected. Unit tests (short code fragments) are usually written such that they can be preformed at any time during the development to continually verify the behavior of the code. In this way, possible bugs will be identified early in the development cycle, making the debugging at later stage much easier. There are many benefits associated with Unit Testing, such as
+\begin{itemize}
+\item It increases confidence in changing and maintaining code. Big changes can be made to the code quickly, since the tests will ensure that everything still is working properly.
+\item Since the code needs to be modular to make Unit Testing possible, the code will be easier to reuse. This improves the code design.
+\item Debugging is easier, since when a test fails, only the latest changes need to be debugged.
+\item Different parts of a project can be tested without the need to wait for the other parts to be available.
+\item A unit test can serve as a documentation on the functionality of a unit of the code.
+\end{itemize}
+Here follows a simple example, see the website of the course for more information on how to install unit test libraries.
+\begin{verbatim}
+#include <unittest++/UnitTest++.h> 
+
+class MyMultiplyClass{ 
+public: 
+   double multiply(double x, double y) { 
+      return x * y; 
+   } 
+}; 
+TEST(MyMath) { 
+     MyMultiplyClass my; CHECK_EQUAL(56, my.multiply(7,8)); 
+} 
+int main() 
+{ 
+return UnitTest::RunAllTests(); 
+}
+\end{verbatim}
+For Fortran users, the link at \url{http://sourceforge.net/projects/fortranxunit/} contains a similar software for unit testing.
+\end{document}
+
+
+
+
+
+
+ 
+
+

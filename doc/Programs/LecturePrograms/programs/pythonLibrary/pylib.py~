@@ -1,0 +1,140 @@
+# -*- coding: utf-8 -*-
+
+import numpy, math
+
+class pylib:
+    """Implements many of the functions found in M.H.Jensens
+    c++-library, used in Computational Physics.
+    (which has been ported from F95 which has been ported from F77, ...)
+    Ported by Kyrre Ness Sjøbæk (k.n.sjobak@fys.uio.no)"""
+
+    def __init__(self, inputcheck=False):
+        """Constructor,
+        Set inputcheck = True in order to do input checking (debug, slower)
+        """
+        self.inputcheck = inputcheck
+    
+    def luDecomp(self, A):
+        """LU-decomposes a matrix A, and returns the LU-decomposition of a
+        rowwise permutation of A. Used in combination with luBackSubst function
+        to solve an equation-set Ax=B.
+
+        Returns: A tuple containing
+        - LU-decomposed matrix (upper part and diagonal = matrix U, lower part = matrix L)
+        - Array which records the row permutation from partial pivoting
+        - Number which depends on the number of row interchanges was even (+1) or odd (-1)
+
+        BIG FAT WARNING: Destroys input A in calling program!
+        (A is set equal to the returned LU-decomposed matrix)
+        """
+
+        if self.inputcheck:
+            if A.shape[0] != A.shape[1]:
+                print "Error from pylib.luDecomp(A): Matrix not square!"
+                import sys
+                sys.exit(1)
+
+        ZERO = 1.0E-10;
+
+        d = 1; #Records row interchange (parity)
+        N = A.shape[0]
+        index = numpy.zeros(N)
+
+        #Loop over rows to get scaling info, check if matrix is singular
+        vv = numpy.zeros(N)
+        for i in xrange(N):
+            big = numpy.fabs(A[i]).max();
+            if big < ZERO:
+                print "Error from pylib.luDecomp(A): Matrix singular"
+                import sys
+                sys.exit(1)
+            vv[i] = 1.0/big
+
+        #Loop over columns, Crout's method
+        for j in xrange(N):
+            #i < j
+            for i in xrange(j):
+                sum = A.item(i,j)
+                for k in xrange(i):
+                    sum = sum - A.item(i,k)*A.item(k,j)
+                A.itemset(i,j,sum);
+
+            #i >= j
+            imax = None;
+            big = ZERO
+            for i in xrange(j,N):
+                sum = A.item(i,j)
+                for k in xrange(j):
+                    sum = sum - A.item(i,k)*A.item(k,j);
+                A.itemset(i,j,sum);
+                #Find biggest entry in vv (scaled by THIS sum)
+                dum = vv[i]*math.fabs(sum)
+                if dum >= big:
+                    big = dum;
+                    imax = i;
+            #Do we need to interchange rows?
+            if j != imax:
+                #Oui!
+                dum2 = A[imax].copy()
+                A[imax] = A[j]
+                A[j] = dum2
+                d = d*(-1)
+                vv[imax] = vv[j];
+            index[j] = imax;
+
+            #If the pivot element is to small, the matrix is singular
+            #to working order. For some applications of singular matrices,
+            #it is desirable to substitute in ZERO
+            if math.fabs(A.item(j,j) < ZERO):
+                A.itemset(j,j,ZERO)
+
+            #Divide by pivot element
+            if j < (N-1):
+                A[(j+1):N,j] = A[(j+1):N,j]/A.item(j,j)
+        return (A,index,d)
+        
+    def luBackSubst(self, A, index, b):
+        """Back-substitution of LU-decomposed matrix
+        Solves the set of linear equations A x = b of dimension n
+        The input A is the LU-decomposed version of A obtained from
+        pylib.luDecomp(),
+        index is the pivoting permutation vector obtained
+        from the same function, and
+        b is the right-hand-side vector b as a numpy array.
+
+        Returns the solution x as an numpy array.
+
+        BIG FAT WARNING: Destroys input b in calling program!
+        (b is set equal to x after calculation has finished)
+        """
+
+        if self.inputcheck:
+            if A.shape[0] != A.shape[1]:
+                print "Error from pylib.luDecomp(A): Matrix not square!"
+                import sys
+                sys.exit(1)
+            if A.shape[0] != b.shape[0]:
+                print "Error from pylib.luDecomp(A): Dimensions does not match!"
+                import sys
+                sys.exit(1)
+
+        N = A.shape[0];
+        ii = -1
+        for i in xrange(N):
+            ip    = index[i]
+            sum   = b[ip]
+            b[ip] = b[i]
+            if ii > -1:
+                for j in xrange(ii,i):
+                    sum = sum - A[i,j]*b[j]
+            elif sum != 0:
+                ii = i
+            b[i] = sum;
+        for i in xrange((N-1),-1,-1):
+            sum = b[i]
+            for j in xrange(i+1,N):
+                sum = sum - A[i,j]*b[j]
+            b[i] = sum/A[i,i]
+
+        return b;
+        
