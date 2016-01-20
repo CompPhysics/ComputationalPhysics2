@@ -1,7 +1,6 @@
-TITLE: Variational Monte Carlo methods
-AUTHOR: Morten Hjorth-Jensen at  National Superconducting Cyclotron Laboratory and Department of Physics and Astronomy, Michigan State University, East Lansing, MI 48824, USA & Department of Physics, University of Oslo, Oslo, Norway
-DATE: Spring 2015
-
+TITLE: Computational Physics 2: Variational Monte Carlo methods
+AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics, University of Oslo & Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University
+DATE: Spring 2016
 
 !split
 ===== Quantum Monte Carlo Motivation =====
@@ -322,18 +321,18 @@ Assume $r_1 \rightarrow 0$.
 !bt
 \[ 
     E_L(R)=
-    \frac{1}{{\cal R}_T(r_1)}\left(-\frac{1}{2}\frac{d^2}{dr_1^2}-
+    \frac{1}{\mathbf{R}_T(r_1)}\left(-\frac{1}{2}\frac{d^2}{dr_1^2}-
      \frac{1}{r_1}\frac{d}{dr_1}
-     -\frac{Z}{r_1}\right){\cal R}_T(r_1) + \mathrm{finite\hspace{0.1cm} terms}
+     -\frac{Z}{r_1}\right)\mathbf{R}_T(r_1) + \mathrm{finite\hspace{0.1cm} terms}
 \]
 !et
 For small values of $r_1$, the terms which dominate are
 !bt
 \[ 
     \lim_{r_1 \rightarrow 0}E_L(R)=
-    \frac{1}{{\cal R}_T(r_1)}\left(-
+    \frac{1}{\mathbf{R}_T(r_1)}\left(-
      \frac{1}{r_1}\frac{d}{dr_1}
-     -\frac{Z}{r_1}\right){\cal R}_T(r_1),
+     -\frac{Z}{r_1}\right)\mathbf{R}_T(r_1),
 \]
 !et
 since the second derivative does not diverge due to the finiteness of  $\Psi$ at the origin.
@@ -348,20 +347,20 @@ since the second derivative does not diverge due to the finiteness of  $\Psi$ at
 This results in
 !bt
 \[
-     \frac{1}{{\cal R}_T(r_1)}\frac{d {\cal R}_T(r_1)}{dr_1}=-Z,
+     \frac{1}{\mathbf{R}_T(r_1)}\frac{d \mathbf{R}_T(r_1)}{dr_1}=-Z,
 \]
 !et
 and
 !bt
 \[
-   {\cal R}_T(r_1)\propto e^{-Zr_1}.
+   \mathbf{R}_T(r_1)\propto e^{-Zr_1}.
 \]
 !et
 A similar condition applies to electron 2 as well. 
 For orbital momenta $l > 0$ we have 
 !bt
 \[
-     \frac{1}{{\cal R}_T(r)}\frac{d {\cal R}_T(r)}{dr}=-\frac{Z}{l+1}.
+     \frac{1}{\mathbf{R}_T(r)}\frac{d \mathbf{R}_T(r)}{dr}=-\frac{Z}{l+1}.
 \]
 !et
 Similarly, studying the case $r_{12}\rightarrow 0$ we can write 
@@ -974,14 +973,13 @@ int main()
 
 
 !split
-===== The first attempt at solving the Helium atom =====
-!bblock Exercises for first lab session, Thursday 22
+===== The first exercise =====
+!bblock Exercises for first lab session, Thursday 21
 
 *  If you have never used git, Qt, armadillo etc, get familiar with them, see the guides at the official UiO website of the course.
-*  Study the simple program at "this link": "https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/vmc/programs/"
 *  Implement the closed form expression for the local energy and the so-called quantum force
-*  Convince yourself that the closed form expressions are correct. Check both wave functions
-*  Implement the closed form expression for the local energy and compare with a code where the second derivatives are computed numerically.
+*  Convince yourself that the closed form expressions are correct.
+*  Next week: Implement the closed form expression for the local energy and compare with a code where the second derivatives are computed numerically.
 !eblock
 
 
@@ -992,7 +990,7 @@ The Metropolis algorithm , see "the original article": "http://scitation.aip.org
 was invented by Metropolis et. al
 and is often simply called the Metropolis algorithm.
 It is a method to sample a normalized probability
-distribution by a stochastic process. We define ${\cal P}_i^{(n)}$ to
+distribution by a stochastic process. We define $\mathbf{P}_i^{(n)}$ to
 be the probability for finding the system in the state $i$ at step $n$.
 The algorithm is then
 
@@ -1005,7 +1003,7 @@ The algorithm is then
 ===== The Metropolis algorithm =====
 !bblock 
 We wish to derive the required properties of $T$ and $A$ such that
-${\cal P}_i^{(n\rightarrow \infty)} \rightarrow p_i$ so that starting
+$\mathbf{P}_i^{(n\rightarrow \infty)} \rightarrow p_i$ so that starting
 from any distribution, the method converges to the correct distribution.
 Note that the description here is for a discrete probability distribution.
 Replacing probabilities $p_i$ with expressions like $p(x_i)dx_i$ will
@@ -1017,7 +1015,7 @@ take all of these over to the corresponding continuum expressions.
 !split
 ===== The Metropolis algorithm =====
 !bblock 
-The dynamical equation for ${\cal P}_i^{(n)}$ can be written directly from
+The dynamical equation for $\mathbf{P}_i^{(n)}$ can be written directly from
 the description above. The probability of being in the state $i$ at step $n$
 is given by the probability of being in any state $j$ at the previous step,
 and making an accepted transition to $i$ added to the probability of
@@ -1025,9 +1023,9 @@ being in the state $i$, making a transition to any state $j$ and
 rejecting the move:
 !bt
 \[
-{\cal P}^{(n)}_i = \sum_j \left [
-{\cal P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
-+{\cal P}^{(n-1)}_iT_{i\rightarrow j}\left ( 1- A_{i\rightarrow j} \right)
+\mathbf{P}^{(n)}_i = \sum_j \left [
+\mathbf{P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
++\mathbf{P}^{(n-1)}_iT_{i\rightarrow j}\left ( 1- A_{i\rightarrow j} \right)
 \right ] \,.
 \]
 !et
@@ -1035,10 +1033,10 @@ Since the probability of making some transition must be 1,
 $\sum_j T_{i\rightarrow j} = 1$, and the above equation becomes
 !bt
 \[
-{\cal P}^{(n)}_i = {\cal P}^{(n-1)}_i +
+\mathbf{P}^{(n)}_i = \mathbf{P}^{(n-1)}_i +
  \sum_j \left [
-{\cal P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
--{\cal P}^{(n-1)}_iT_{i\rightarrow j}A_{i\rightarrow j}
+\mathbf{P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
+-\mathbf{P}^{(n-1)}_iT_{i\rightarrow j}A_{i\rightarrow j}
 \right ] \,.
 \]
 !et
@@ -1048,7 +1046,7 @@ $\sum_j T_{i\rightarrow j} = 1$, and the above equation becomes
 !split
 ===== The Metropolis algorithm =====
 !bblock 
-For large $n$ we require that ${\cal P}^{(n\rightarrow \infty)}_i = p_i$,
+For large $n$ we require that $\mathbf{P}^{(n\rightarrow \infty)}_i = p_i$,
 the desired probability distribution. Taking this limit, gives the
 balance requirement
 !bt
@@ -1093,14 +1091,14 @@ and are therefore noisy.}
 ===== The Metropolis algorithm =====
 !bblock 
 Having chosen the acceptance probabilities, we have guaranteed that
-if the  ${\cal P}_i^{(n)}$ has equilibrated, that is if it is equal to $p_i$,
+if the  $\mathbf{P}_i^{(n)}$ has equilibrated, that is if it is equal to $p_i$,
 it will remain equilibrated. Next we need to find the circumstances for
 convergence to equilibrium.
 
 The dynamical equation can be written as
 !bt
 \[
-{\cal P}^{(n)}_i = \sum_j M_{ij}{\cal P}^{(n-1)}_j
+\mathbf{P}^{(n)}_i = \sum_j M_{ij}\mathbf{P}^{(n-1)}_j
 \]
 !et
 with the matrix $M$ given by
@@ -1759,26 +1757,26 @@ measurements is very large.
 !split
 ===== Can we understand this? Time Auto-correlation Function =====
 !bblock
-The so-called time-displacement autocorrelation $\phi(t)$ for a quantity ${\cal M}$ is given by
+The so-called time-displacement autocorrelation $\phi(t)$ for a quantity $\mathbf{M}$ is given by
 !bt
 \[
-\phi(t) = \int dt' \left[{\cal M}(t')-\langle {\cal M} \rangle\right]\left[{\cal M}(t'+t)-\langle {\cal M} \rangle\right],
+\phi(t) = \int dt' \left[\mathbf{M}(t')-\langle \mathbf{M} \rangle\right]\left[\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle\right],
 \]
 !et
 which can be rewritten as 
 !bt
 \[
-\phi(t) = \int dt' \left[{\cal M}(t'){\cal M}(t'+t)-\langle {\cal M} \rangle^2\right],
+\phi(t) = \int dt' \left[\mathbf{M}(t')\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle^2\right],
 \]
 !et
-where $\langle {\cal M} \rangle$ is the average value and
-${\cal M}(t)$ its instantaneous value. We can discretize this function as follows, where we used our
-set of computed values ${\cal M}(t)$ for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
+where $\langle \mathbf{M} \rangle$ is the average value and
+$\mathbf{M}(t)$ its instantaneous value. We can discretize this function as follows, where we used our
+set of computed values $\mathbf{M}(t)$ for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
 !bt
 \[
-\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t'){\cal M}(t'+t)
--\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t')\times
-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}{\cal M}(t'+t).
+\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\mathbf{M}(t'+t)
+-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\times
+\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t'+t).
 label{eq:phitf}
 \]
 !et
@@ -1790,20 +1788,20 @@ label{eq:phitf}
 !bblock
 One should be careful with times close to $t_{\mathrm{max}}$, the upper limit of the sums 
 becomes small and we end up integrating over a rather small time interval. This means that the statistical
-error in $\phi(t)$ due to the random nature of the fluctuations in ${\cal M}(t)$ can become large.
+error in $\phi(t)$ due to the random nature of the fluctuations in $\mathbf{M}(t)$ can become large.
 
 One should therefore choose $t \ll t_{\mathrm{max}}$.
 
-Note that the variable ${\cal M}$ can be any expectation values of interest.
+Note that the variable $\mathbf{M}$ can be any expectation values of interest.
 
 
 
 The time-correlation function gives a measure of the correlation between the various values of the variable 
-at a time $t'$ and a time $t'+t$. If we multiply the values of ${\cal M}$ at these two different times,
+at a time $t'$ and a time $t'+t$. If we multiply the values of $\mathbf{M}$ at these two different times,
 we will get a positive contribution if they are fluctuating in the same direction, or a negative value
 if they fluctuate in the opposite direction. If we then integrate over time, or use the discretized version of, the time correlation function $\phi(t)$ should take a non-zero value if the fluctuations are 
 correlated, else it should gradually go to zero. For times a long way apart 
-the different values of ${\cal M}$  are most likely 
+the different values of $\mathbf{M}$  are most likely 
 uncorrelated and $\phi(t)$ should be zero.
 !eblock
 
@@ -1857,16 +1855,16 @@ With the probabilty $\mathbf{\hat{w}}(t)$ (which in our case is the squared tria
 can write the expectation values as 
 !bt
 \[
- \langle {\cal M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}{\cal M}_{\mu},
+ \langle \mathbf{M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}\mathbf{M}_{\mu},
 \] 
 !et 
 or as the scalar of a  vector product
 !bt
  \[
- \langle {\cal M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
+ \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
 \] 
 !et 
-with $\mathbf{m}$ being the vector whose elements are the values of ${\cal M}_{\mu}$ in its 
+with $\mathbf{m}$ being the vector whose elements are the values of $\mathbf{M}_{\mu}$ in its 
 various microstates $\mu$.
 !eblock
 
@@ -1877,21 +1875,21 @@ various microstates $\mu$.
 We rewrite this relation  as
 !bt
  \[
- \langle {\cal M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
+ \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
 \] 
 !et 
 If we define $m_i=\mathbf{\hat{v}}_i\mathbf{m}_i$ as the expectation value of
-${\cal M}$ in the $i^{\mathrm{th}}$ eigenstate we can rewrite the last equation as
+$\mathbf{M}$ in the $i^{\mathrm{th}}$ eigenstate we can rewrite the last equation as
 !bt
  \[
- \langle {\cal M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
+ \langle \mathbf{M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
 \] 
 !et
 Since we have that in the limit $t\rightarrow \infty$ the mean value is dominated by the 
 the largest eigenvalue $\lambda_0$, we can rewrite the last equation as
 !bt
  \[
- \langle {\cal M}(t) \rangle  = \langle {\cal M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
+ \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
 \] 
 !et
 We define the quantity
@@ -1903,7 +1901,7 @@ We define the quantity
 and rewrite the last expectation value as
 !bt
  \[
- \langle {\cal M}(t) \rangle  = \langle {\cal M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
+ \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
 label{eq:finalmeanm}
 \] 
 !et
@@ -1921,11 +1919,11 @@ only correlation time that survives. If higher eigenvalues of the transition mat
 $\lambda_1$ and we simulate long enough,  $\tau_1$ may well define the correlation time. 
 In other cases we may not be able to extract a reliable result for $\tau_1$. 
 Coming back to the time correlation function $\phi(t)$ we can present a more general definition in terms
-of the mean magnetizations $ \langle {\cal M}(t) \rangle$. Recalling that the mean value is equal 
-to $ \langle {\cal M}(\infty) \rangle$ we arrive at the expectation values
+of the mean magnetizations $ \langle \mathbf{M}(t) \rangle$. Recalling that the mean value is equal 
+to $ \langle \mathbf{M}(\infty) \rangle$ we arrive at the expectation values
 !bt
 \[
-\phi(t) =\langle {\cal M}(0)-{\cal M}(\infty)\rangle \langle {\cal M}(t)-{\cal M}(\infty)\rangle,
+\phi(t) =\langle \mathbf{M}(0)-\mathbf{M}(\infty)\rangle \langle \mathbf{M}(t)-\mathbf{M}(\infty)\rangle,
 \]
 !et
 resulting in
@@ -1967,16 +1965,16 @@ called the integrated correlation time.
 ===== What is blocking? =====
 !bblock Blocking
     * Say that we have a set of samples from a Monte Carlo experiment
-    * Assuming (wrongly) that our samples are uncorrelated our best estimate of the standard deviation of the mean $\langle {\cal M}\rangle$ is given by
+    * Assuming (wrongly) that our samples are uncorrelated our best estimate of the standard deviation of the mean $\langle \mathbf{M}\rangle$ is given by
 !bt   
 \[
-\sigma=\sqrt{\frac{1}{n}\left(\langle {\cal M}^2\rangle-\langle {\cal M}\rangle^2\right)} 
+\sigma=\sqrt{\frac{1}{n}\left(\langle \mathbf{M}^2\rangle-\langle \mathbf{M}\rangle^2\right)} 
 \]
 !et
     * If the samples are correlated we can rewrite our results to show  that
 !bt      
 \[
-\sigma=\sqrt{\frac{1+2\tau/\Delta t}{n}\left(\langle {\cal M}^2\rangle-\langle {\cal M}\rangle^2\right)}
+\sigma=\sqrt{\frac{1+2\tau/\Delta t}{n}\left(\langle \mathbf{M}^2\rangle-\langle \mathbf{M}\rangle^2\right)}
 \]
 !et
       where $\tau$ is the correlation time (the time between a sample and the next uncorrelated sample) and $\Delta t$ is time between each sample
@@ -1988,7 +1986,7 @@ called the integrated correlation time.
     * If $\Delta t\gg\tau$ our first estimate of $\sigma$ still holds
     * Much more common that $\Delta t<\tau$
     * In the method of data blocking we divide the sequence of samples into blocks
-    * We then take the mean $\langle {\cal M}_i\rangle$ of block $i=1\ldots n_{blocks}$ to calculate the total mean and variance
+    * We then take the mean $\langle \mathbf{M}_i\rangle$ of block $i=1\ldots n_{blocks}$ to calculate the total mean and variance
     * The size of each block must be so large that sample $j$ of block $i$ is not correlated with sample $j$ of block $i+1$
     * The correlation time $\tau$ would be a good choice
 !eblock
@@ -3684,7 +3682,7 @@ d^{-1}_{kj}(\mathbf{x^{new}}) = \left\{\begin{array}{l l}
 !bblock
 This equation scales as $O(N^2)$.
 The evaluation of the determinant of an $N \times N$ matrix by standard Gaussian elimination 
-requires ${\cal O}(N^3)$
+requires $\mathbf{O}(N^3)$
 calculations. 
 As there are $Nd$ independent coordinates we need to evaluate $Nd$ Slater determinants 
 for the gradient (quantum force) and $Nd$ for the Laplacian (kinetic energy). 
@@ -3698,7 +3696,7 @@ determinant matrix once. This can be done by standard LU decomposition methods.
 ===== How to get the determinant =====
 !bblock
 Determining a determinant of an $N \times N$ matrix by
-standard Gaussian elimination is of the order of ${\cal O}(N^3)$
+standard Gaussian elimination is of the order of $\mathbf{O}(N^3)$
 calculations. As there are $N\cdot d$ independent coordinates we need
 to evaluate $Nd$ Slater determinants for the gradient (quantum force) and
 $N\cdot d$ for the Laplacian (kinetic energy)
@@ -4099,24 +4097,24 @@ for  $l=1$ og $m_l=\pm 1$.
 !bblock
 A problem with the spherical harmonics is that they are complex. The introduction of *solid harmonics* allows the use
 of real orbital wave-functions for a wide range of applications. The
-complex solid harmonics ${\cal Y}_{lm_l}(\mathbf{r})$ are related to
+complex solid harmonics $\mathbf{Y}_{lm_l}(\mathbf{r})$ are related to
 the spherical harmonics  $Y_{lm_l}(\mathbf{r})$ through
 !bt
 \begin{equation*}
-  {\cal Y}_{lm_l}(\mathbf{r}) = r^l Y_{lm_l}(\mathbf{r}).
+  \mathbf{Y}_{lm_l}(\mathbf{r}) = r^l Y_{lm_l}(\mathbf{r}).
 \end{equation*}
 !et
 By factoring out the leading $r$-dependency of the radial-function
 !bt
 \begin{equation*}
-  {\cal R}_{nl}(\mathbf{r}) = r^{-l} R_{nl}(\mathbf{r}),
+  \mathbf{R}_{nl}(\mathbf{r}) = r^{-l} R_{nl}(\mathbf{r}),
 \end{equation*}
 !et
 we obtain 
 !bt
 \begin{equation*}
   \Psi_{nlm_l}(r,\theta, \phi) %=R_{nl}(r) \cdot Y_{lm_l}(\theta,\phi)
-  = {\cal R}_{nl}(\mathbf{r})\cdot{\cal Y}_{lm_l}(\mathbf{r}).
+  = \mathbf{R}_{nl}(\mathbf{r})\cdot\mathbf{Y}_{lm_l}(\mathbf{r}).
 %\label{totalSolidHydrogenWavefunction}
 \end{equation*}
 !et
@@ -4167,23 +4165,23 @@ alter the solid harmonics.
 We have defined 
 !bt
 \[
-  {\cal Y}_{lm_l}(\mathbf{r}) = r^l Y_{lm_l}(\mathbf{r}).
+  \mathbf{Y}_{lm_l}(\mathbf{r}) = r^l Y_{lm_l}(\mathbf{r}).
 \]
 !et
 The real-valued spherical harmonics are defined as
 !bt
 \[
-S_{l0} =  \sqrt{\frac{4\pi}{2l+1}} {\cal Y}_{l0}(\mathbf{r}),
+S_{l0} =  \sqrt{\frac{4\pi}{2l+1}} \mathbf{Y}_{l0}(\mathbf{r}),
 \]
 !et
 !bt
 \[
-S_{lm_l} =  (-1)^{m_l}\sqrt{\frac{8\pi}{2l+1}} \mathrm{Re}{\cal Y}_{l0}(\mathbf{r}),
+S_{lm_l} =  (-1)^{m_l}\sqrt{\frac{8\pi}{2l+1}} \mathrm{Re}\mathbf{Y}_{l0}(\mathbf{r}),
 \]
 !et
 !bt
 \[
-S_{lm_l} =  (-1)^{m_l}\sqrt{\frac{8\pi}{2l+1}} \mathrm{Im}{\cal Y}_{l0}(\mathbf{r}),
+S_{lm_l} =  (-1)^{m_l}\sqrt{\frac{8\pi}{2l+1}} \mathrm{Im}\mathbf{Y}_{l0}(\mathbf{r}),
 \]
 !et
 for $m_l> 0$.
