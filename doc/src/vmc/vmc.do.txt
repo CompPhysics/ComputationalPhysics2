@@ -253,6 +253,95 @@ Variation is then performed by minimizing both the energy and the variance.
 
 
 !split
+===== "Quantum Monte Carlo for bosons":"https://github.com/mortele/variational-monte-carlo-fys4411" =====
+!bblock
+
+For boson in a harmonic oscillator-like  trap we will use is a spherical (S)
+ or an elliptical (E) harmonic trap in one, two and finally three
+ dimensions, with the latter given by
+!bt
+ \begin{equation}
+ V_{ext}(\mathbf{r}) = \Bigg\{
+ \begin{array}{ll}
+	 \frac{1}{2}m\omega_{ho}^2r^2 & (S)\\
+ \strut
+	 \frac{1}{2}m[\omega_{ho}^2(x^2+y^2) + \omega_z^2z^2] & (E)
+ label{trap_eqn}
+ \end{array}
+ \end{equation}
+!et 
+where (S) stands for symmetric and 
+!bt
+\begin{equation}
+     \hat{H} = \sum_i^N \left(
+	 \frac{-\hbar^2}{2m}
+	 { \bigtriangledown }_{i}^2 +
+	 V_{ext}({\bf{r}}_i)\right)  +
+	 \sum_{i<j}^{N} V_{int}({\bf{r}}_i,{\bf{r}}_j),
+\end{equation}
+!et
+as the two-body Hamiltonian of the system.  
+!eblock
+
+
+!split
+===== "Quantum Monte Carlo for bosons":"https://github.com/mortele/variational-monte-carlo-fys4411" =====
+!bblock
+ We will represent the inter-boson interaction by a pairwise, repulsive potential
+!bt 
+\begin{equation}
+ V_{int}(|\mathbf{r}_i-\mathbf{r}_j|) =  \Bigg\{
+ \begin{array}{ll}
+	 \infty & {|\mathbf{r}_i-\mathbf{r}_j|} \leq {a}\\
+	 0 & {|\mathbf{r}_i-\mathbf{r}_j|} > {a}
+ \end{array}
+ \end{equation}
+!et
+ where $a$ is the so-called hard-core diameter of the bosons.
+ Clearly, $V_{int}(|\mathbf{r}_i-\mathbf{r}_j|)$ is zero if the bosons are
+ separated by a distance $|\mathbf{r}_i-\mathbf{r}_j|$ greater than $a$ but
+ infinite if they attempt to come within a distance $|\mathbf{r}_i-\mathbf{r}_j| \leq a$.
+!eblock
+
+!split
+===== "Quantum Monte Carlo for bosons":"https://github.com/mortele/variational-monte-carlo-fys4411" =====
+!bblock
+ Our trial wave function for the ground state with $N$ atoms is given by
+!bt
+ \begin{equation}
+ \Psi_T(\mathbf{R})=\Psi_T(\mathbf{r}_1, \mathbf{r}_2, \dots \mathbf{r}_N,\alpha,\beta)=\prod_i g(\alpha,\beta,\mathbf{r}_i)\prod_{i<j}f(a,|\mathbf{r}_i-\mathbf{r}_j|),
+ label{eq:trialwf}
+ \end{equation}
+!et
+ where $\alpha$ and $\beta$ are variational parameters. The
+ single-particle wave function is proportional to the harmonic
+ oscillator function for the ground state
+!bt 
+\begin{equation}
+    g(\alpha,\beta,\mathbf{r}_i)= \exp{[-\alpha(x_i^2+y_i^2+\beta z_i^2)]}.
+ \end{equation}
+!et
+!eblock
+
+!split
+===== "Quantum Monte Carlo for bosons":"https://github.com/mortele/variational-monte-carlo-fys4411" =====
+!bblock
+For spherical traps we have $\beta = 1$ and for non-interacting
+bosons ($a=0$) we have $\alpha = 1/2a_{ho}^2$.  The correlation wave
+ function is
+!bt
+ \begin{equation}
+    f(a,|\mathbf{r}_i-\mathbf{r}_j|)=\Bigg\{
+ \begin{array}{ll}
+	 0 & {|\mathbf{r}_i-\mathbf{r}_j|} \leq {a}\\
+	 (1-\frac{a}{|\mathbf{r}_i-\mathbf{r}_j|}) & {|\mathbf{r}_i-\mathbf{r}_j|} > {a}.
+ \end{array}
+ \end{equation}  
+!et
+!eblock
+
+
+!split
 ===== Quantum Monte Carlo: the helium atom =====
 !bblock
 The helium atom consists of two electrons and a nucleus with
@@ -3830,7 +3919,7 @@ we have
 !bt
 \[
   \frac{\nabla^2_k \Psi_C}{\Psi_C }=
-\sum_{ij\ne k}\frac{({\bf r}_k-{\bf r}_i)({\bf r}_k-{\bf r}_j)}{r_{ki}r_{kj}}f'(r_{ki})f'(r_{kj})+
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}f'(r_{ki})f'(r_{kj})+
 \sum_{j\ne k}\left( f''(r_{kj})+\frac{2}{r_{kj}}f'(r_{kj})\right)
 \]
 !et
@@ -3851,7 +3940,7 @@ we have
 !bt
 \[
   \frac{\nabla^2_k \Psi_C}{\Psi_C }=
-\sum_{ij\ne k}\frac{({\bf r}_k-{\bf r}_i)({\bf r}_k-{\bf r}_j)}{r_{ki}r_{kj}}\frac{a}{(1+\beta r_{ki})^2}
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}\frac{a}{(1+\beta r_{ki})^2}
 \frac{a}{(1+\beta r_{kj})^2}+
 \sum_{j\ne k}\left(\frac{2a}{r_{kj}(1+\beta r_{kj})^2}-\frac{2a\beta}{(1+\beta r_{kj})^3}\right)
 \]
@@ -3917,7 +4006,7 @@ the gradient needed for the quantum force and local energy is easy to compute.
 We get for particle  $k$
 !bt
 \[
-\frac{ \nabla_k \Psi_C}{ \Psi_C }= \sum_{j\ne k}\frac{{\bf r}_{kj}}{r_{kj}}\frac{a}{(1+\beta r_{kj})^2},
+\frac{ \nabla_k \Psi_C}{ \Psi_C }= \sum_{j\ne k}\frac{\mathbf{r}_{kj}}{r_{kj}}\frac{a}{(1+\beta r_{kj})^2},
 \]
 !et
 which is rather easy to code.  Remember to sum over all particles  when you compute the local energy.
