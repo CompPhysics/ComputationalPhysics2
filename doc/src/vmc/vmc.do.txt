@@ -1219,892 +1219,6 @@ magnitude, and all other eigenvalues are smaller.
 
 
 !split
-===== Why blocking? ===== 
-!bblock Statistical analysis
-    * Monte Carlo simulations can be treated as *computer experiments*
-    * The results can be analysed with the same statistical tools as we would use analysing experimental data.
-    * As in all experiments, we are looking for expectation values and an estimate of how accurate they are, i.e., possible sources for errors.
-
-A very good article which explains blocking is H.~Flyvbjerg and H.~G.~Petersen, *Error estimates on averages of correlated data*,  "Journal of Chemical Physics 91, 461-466 (1989)":"http://scitation.aip.org/content/aip/journal/jcp/91/1/10.1063/1.457480".
-
-!eblock    
-
-!split
-===== Why blocking? ===== 
-!bblock Statistical analysis
-    * As in other experiments, Monte Carlo experiments have two classes of errors:
-      * Statistical errors
-      * Systematical errors
-    * Statistical errors can be estimated using standard tools from statistics
-    * Systematical errors are method specific and must be treated differently from case to case. (In VMC a common source is the step length or time step in importance sampling)
-!eblock    
-
-!split
-===== Statistics and blocking ===== 
-!bblock
-The *probability distribution function (PDF)* is a function
-$p(x)$ on the domain which, in the discrete case, gives us the
-probability or relative frequency with which these values of $X$ occur:
-!bt
-\[
-p(x) = \mathrm{prob}(X=x)
-\]
-!et
-In the continuous case, the PDF does not directly depict the
-actual probability. Instead we define the probability for the
-stochastic variable to assume any value on an infinitesimal interval
-around $x$ to be $p(x)dx$. The continuous function $p(x)$ then gives us
-the *density* of the probability rather than the probability
-itself. The probability for a stochastic variable to assume any value
-on a non-infinitesimal interval $[a,\,b]$ is then just the integral:
-!bt
-\[
-\mathrm{prob}(a\leq X\leq b) = \int_a^b p(x)dx
-\]
-!et
-Qualitatively speaking, a stochastic variable represents the values of
-numbers chosen as if by chance from some specified PDF so that the
-selection of a large set of these numbers reproduces this PDF.
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-Also of interest to us is the *cumulative probability distribution function (CDF)*, $P(x)$, which is just the probability
-for a stochastic variable $X$ to assume any value less than $x$:
-!bt
-\[
-P(x)=\mathrm{Prob(}X\leq x\mathrm{)} =\int_{-\infty}^x p(x^{\prime})dx^{\prime}
-\]
-!et
-The relation between a CDF and its corresponding PDF is then:
-!bt
-\[
-p(x) = \frac{d}{dx}P(x)
-\]
-!et
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-A particularly useful class of special expectation values are the
-*moments*. The $n$-th moment of the PDF $p$ is defined as
-follows:
-!bt
-\[
-\langle x^n\rangle \equiv \int\! x^n p(x)\,dx
-\]
-!et
-The zero-th moment $\langle 1\rangle$ is just the normalization condition of
-$p$. The first moment, $\langle x\rangle$, is called the *mean* of $p$
-and often denoted by the letter $\mu$:
-!bt
-\[
-\langle x\rangle = \mu \equiv \int\! x p(x)\,dx
-\]
-!et
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-A special version of the moments is the set of *central moments*,
-the n-th central moment defined as:
-!bt
-\[
-\langle (x-\langle x \rangle )^n\rangle \equiv \int\! (x-\langle x\rangle)^n p(x)\,dx
-\]
-!et
-The zero-th and first central moments are both trivial, equal $1$ and
-$0$, respectively. But the second central moment, known as the
-*variance* of $p$, is of particular interest. For the stochastic
-variable $X$, the variance is denoted as $\sigma^2_X$ or $\mathrm{var}(X)$:
-!bt
-\begin{align}
-\sigma^2_X\ \ =\ \ \mathrm{var}(X) & =  \langle (x-\langle x\rangle)^2\rangle =
-\int\! (x-\langle x\rangle)^2 p(x)\,dx\\
-& =  \int\! \left(x^2 - 2 x \langle x\rangle^{2} +
-  \langle x\rangle^2\right)p(x)\,dx\\
-& =  \langle x^2\rangle - 2 \langle x\rangle\langle x\rangle + \langle x\rangle^2\\
-& =  \langle x^2\rangle - \langle x\rangle^2
-\end{align}
-!et
-The square root of the variance, $\sigma =\sqrt{\langle (x-\langle x\rangle)^2\rangle}$ is called the *standard deviation* of $p$. It is clearly just the RMS (root-mean-square)
-value of the deviation of the PDF from its mean value, interpreted
-qualitatively as the *spread* of $p$ around its mean.
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-Another important quantity is the so called covariance, a variant of
-the above defined variance. Consider again the set $\{X_i\}$ of $n$
-stochastic variables (not necessarily uncorrelated) with the
-multivariate PDF $P(x_1,\dots,x_n)$. The *covariance* of two
-of the stochastic variables, $X_i$ and $X_j$, is defined as follows:
-!bt
-\begin{align}
-\mathrm{cov}(X_i,\,X_j) &\equiv \langle (x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle
-\nonumber\\
-&=
-\int\!\cdots\!\int\!(x_i-\langle x_i \rangle)(x_j-\langle x_j \rangle)\,
-P(x_1,\dots,x_n)\,dx_1\dots dx_n
-label{eq:def_covariance}
-\end{align}
-!et
-with
-!bt
-\[
-\langle x_i\rangle =
-\int\!\cdots\!\int\!x_i\,P(x_1,\dots,x_n)\,dx_1\dots dx_n
-\]
-!et
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-If we consider the above covariance as a matrix $C_{ij}=\mathrm{cov}(X_i,\,X_j)$, then the diagonal elements are just the familiar
-variances, $C_{ii} = \mathrm{cov}(X_i,\,X_i) = \mathrm{var}(X_i)$. It turns out that
-all the off-diagonal elements are zero if the stochastic variables are
-uncorrelated. This is easy to show, keeping in mind the linearity of
-the expectation value. Consider the stochastic variables $X_i$ and
-$X_j$, ($i\neq j$):
-!bt
-\begin{align}
-\mathrm{cov}(X_i,\,X_j) &= \langle(x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle\\
-&=\langle x_i x_j - x_i\langle x_j\rangle - \langle x_i\rangle x_j + \langle x_i\rangle\langle x_j\rangle\rangle \\
-&=\langle x_i x_j\rangle - \langle x_i\langle x_j\rangle\rangle - \langle \langle x_i\rangle x_j\rangle +
-\langle \langle x_i\rangle\langle x_j\rangle\rangle\\
-&=\langle x_i x_j\rangle - \langle x_i\rangle\langle x_j\rangle - \langle x_i\rangle\langle x_j\rangle +
-\langle x_i\rangle\langle x_j\rangle\\
-&=\langle x_i x_j\rangle - \langle x_i\rangle\langle x_j\rangle
-\end{align}
-!et
-!eblock
-
-
-
-!split
-===== Statistics and blocking =====
-!bblock
-If $X_i$ and $X_j$ are independent, we get 
-$\langle x_i x_j\rangle =\langle x_i\rangle\langle x_j\rangle$, resulting in $\mathrm{cov}(X_i, X_j) = 0\ \ (i\neq j)$.
-
-Also useful for us is the covariance of linear combinations of
-stochastic variables. Let $\{X_i\}$ and $\{Y_i\}$ be two sets of
-stochastic variables. Let also $\{a_i\}$ and $\{b_i\}$ be two sets of
-scalars. Consider the linear combination:
-!bt
-\[
-U = \sum_i a_i X_i \qquad V = \sum_j b_j Y_j
-\]
-!et
-By the linearity of the expectation value
-!bt
-\[
-\mathrm{cov}(U, V) = \sum_{i,j}a_i b_j \mathrm{cov}(X_i, Y_j)
-\]
-!et
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-Now, since the variance is just $\mathrm{var}(X_i) = \mathrm{cov}(X_i, X_i)$, we get
-the variance of the linear combination $U = \sum_i a_i X_i$:
-!bt
-\begin{equation}
-\mathrm{var}(U) = \sum_{i,j}a_i a_j \mathrm{cov}(X_i, X_j)
-label{eq:variance_linear_combination}
-\end{equation}
-!et
-And in the special case when the stochastic variables are
-uncorrelated, the off-diagonal elements of the covariance are as we
-know zero, resulting in:
-!bt
-\[
-\mathrm{var}(U) = \sum_i a_i^2 \mathrm{cov}(X_i, X_i) = \sum_i a_i^2 \mathrm{var}(X_i)
-\]
-!et
-!bt
-\[
-\mathrm{var}(\sum_i a_i X_i) = \sum_i a_i^2 \mathrm{var}(X_i)
-\]
-!et
-which will become very useful in our study of the error in the mean
-value of a set of measurements.
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-A *stochastic process* is a process that produces sequentially a
-chain of values:
-!bt
-\[
-\{x_1, x_2,\dots\,x_k,\dots\}.
-\]
-!et
-We will call these
-values our *measurements* and the entire set as our measured
-*sample*.  The action of measuring all the elements of a sample
-we will call a stochastic *experiment* since, operationally,
-they are often associated with results of empirical observation of
-some physical or mathematical phenomena; precisely an experiment. We
-assume that these values are distributed according to some 
-PDF $p_X^{\phantom X}(x)$, where $X$ is just the formal symbol for the
-stochastic variable whose PDF is $p_X^{\phantom X}(x)$. Instead of
-trying to determine the full distribution $p$ we are often only
-interested in finding the few lowest moments, like the mean
-$\mu_X^{\phantom X}$ and the variance $\sigma_X^{\phantom X}$.
-!eblock
-
-
-!split 
-===== Statistics and blocking =====
-!bblock
-In practical situations a sample is always of finite size. Let that
-size be $n$. The expectation value of a sample, the *sample mean*, is then defined as follows:
-!bt
-\[
-\bar{x}_n \equiv \frac{1}{n}\sum_{k=1}^n x_k
-\]
-!et
-The *sample variance* is:
-!bt
-\[
-\mathrm{var}(x) \equiv \frac{1}{n}\sum_{k=1}^n (x_k - \bar{x}_n)^2
-\]
-!et
-its square root being the *standard deviation of the sample*. The
-*sample covariance* is:
-!bt
-\[
-\mathrm{cov}(x)\equiv\frac{1}{n}\sum_{kl}(x_k - \bar{x}_n)(x_l - \bar{x}_n)
-\]
-!et
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-Note that the sample variance is the sample covariance without the
-cross terms. In a similar manner as the covariance in Eq.~(ref{eq:def_covariance}) is a measure of the correlation between
-two stochastic variables, the above defined sample covariance is a
-measure of the sequential correlation between succeeding measurements
-of a sample.
-
-These quantities, being known experimental values, differ
-significantly from and must not be confused with the similarly named
-quantities for stochastic variables, mean $\mu_X$, variance $\mathrm{var}(X)$
-and covariance $\mathrm{cov}(X,Y)$.
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-The law of large numbers
-states that as the size of our sample grows to infinity, the sample
-mean approaches the true mean $\mu_X^{\phantom X}$ of the chosen PDF:
-!bt
-\[
-\lim_{n\to\infty}\bar{x}_n = \mu_X^{\phantom X}
-\]
-!et
-The sample mean $\bar{x}_n$ works therefore as an estimate of the true
-mean $\mu_X^{\phantom X}$.
-
-What we need to find out is how good an approximation $\bar{x}_n$ is to
-$\mu_X^{\phantom X}$. In any stochastic measurement, an estimated
-mean is of no use to us without a measure of its error. A quantity
-that tells us how well we can reproduce it in another experiment. We
-are therefore interested in the PDF of the sample mean itself. Its
-standard deviation will be a measure of the spread of sample means,
-and we will simply call it the *error* of the sample mean, or
-just sample error, and denote it by $\mathrm{err}_X^{\phantom X}$. In
-practice, we will only be able to produce an *estimate* of the
-sample error since the exact value would require the knowledge of the
-true PDFs behind, which we usually do not have.
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-The straight forward brute force way of estimating the sample error is
-simply by producing a number of samples, and treating the mean of each
-as a measurement. The standard deviation of these means will then be
-an estimate of the original sample error. If we are unable to produce
-more than one sample, we can split it up sequentially into smaller
-ones, treating each in the same way as above. This procedure is known
-as *blocking* and will be given more attention shortly. At this
-point it is worth while exploring more indirect methods of estimation
-that will help us understand some important underlying principles of
-correlational effects.
-!eblock
-
-
-!split
-===== Statistics and blocking =====
-!bblock
-Let us first take a look at what happens to the sample error as the
-size of the sample grows. In a sample, each of the measurements $x_i$
-can be associated with its own stochastic variable $X_i$. The
-stochastic variable $\overline X_n$ for the sample mean $\bar{x}_n$ is
-then just a linear combination, already familiar to us:
-!bt
-\[
-\overline X_n = \frac{1}{n}\sum_{i=1}^n X_i
-\]
-!et
-All the coefficients are just equal $1/n$. The PDF of $\overline X_n$,
-denoted by $p_{\overline X_n}(x)$ is the desired PDF of the sample
-means. 
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-The probability density of obtaining a sample mean $\bar x_n$
-is the product of probabilities of obtaining arbitrary values $x_1,
-x_2,\dots,x_n$ with the constraint that the mean of the set $\{x_i\}$
-is $\bar x_n$:
-!bt
-\[
-p_{\overline X_n}(x) = \int p_X^{\phantom X}(x_1)\cdots
-\int p_X^{\phantom X}(x_n)\ 
-\delta\!\left(x - \frac{x_1+x_2+\dots+x_n}{n}\right)dx_n \cdots dx_1
-\]
-!et
-And in particular we are interested in its variance $\mathrm{var}(\overline X_n)$.
-!eblock
-
-
-
-!split
-===== Statistics and blocking =====
-!bblock
-It is generally not possible to express $p_{\overline X_n}(x)$ in a
-closed form given an arbitrary PDF $p_X^{\phantom X}$ and a number
-$n$. But for the limit $n\to\infty$ it is possible to make an
-approximation. The very important result is called *the central limit theorem*. It tells us that as $n$ goes to infinity,
-$p_{\overline X_n}(x)$ approaches a Gaussian distribution whose mean
-and variance equal the true mean and variance, $\mu_{X}^{\phantom X}$
-and $\sigma_{X}^{2}$, respectively:
-!bt
-\begin{equation}
-\lim_{n\to\infty} p_{\overline X_n}(x) =
-\left(\frac{n}{2\pi\mathrm{var}(X)}\right)^{1/2}
-e^{-\frac{n(x-\bar x_n)^2}{2\mathrm{var}(X)}}
-label{eq:central_limit_gaussian}
-\end{equation}
-!et
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-The desired variance
-$\mathrm{var}(\overline X_n)$, i.e. the sample error squared
-$\mathrm{err}_X^2$, is given by:
-!bt
-\begin{equation}
-\mathrm{err}_X^2 = \mathrm{var}(\overline X_n) = \frac{1}{n^2}
-\sum_{ij} \mathrm{cov}(X_i, X_j)
-label{eq:error_exact}
-\end{equation}
-!et
-We see now that in order to calculate the exact error of the sample
-with the above expression, we would need the true means
-$\mu_{X_i}^{\phantom X}$ of the stochastic variables $X_i$. To
-calculate these requires that we know the true multivariate PDF of all
-the $X_i$. But this PDF is unknown to us, we have only got the measurements of
-one sample. The best we can do is to let the sample itself be an
-estimate of the PDF of each of the $X_i$, estimating all properties of
-$X_i$ through the measurements of the sample.
-!eblock
-
-
-!split
-===== Statistics and blocking =====
-!bblock
-Our estimate of $\mu_{X_i}^{\phantom X}$ is then the sample mean $\bar x$
-itself, in accordance with the the central limit theorem:
-!bt
-\[
-\mu_{X_i}^{\phantom X} = \langle x_i\rangle \approx \frac{1}{n}\sum_{k=1}^n x_k = \bar x
-\]
-!et
-Using $\bar x$ in place of $\mu_{X_i}^{\phantom X}$ we can give an
-*estimate* of the covariance in Eq.~(ref{eq:error_exact})
-!bt
-\[
-\mathrm{cov}(X_i, X_j) = \langle (x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle
-\approx\langle (x_i - \bar x)(x_j - \bar{x})\rangle,
-\]
-!et
-resulting in
-!bt
-\[ 
-\frac{1}{n} \sum_{l}^n \left(\frac{1}{n}\sum_{k}^n (x_k -\bar x_n)(x_l - \bar x_n)\right)=\frac{1}{n}\frac{1}{n} \sum_{kl} (x_k -\bar x_n)(x_l - \bar x_n)=\frac{1}{n}\mathrm{cov}(x)
-\]
-!et
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-By the same procedure we can use the sample variance as an
-estimate of the variance of any of the stochastic variables $X_i$
-!bt
-\[
-\mathrm{var}(X_i)=\langle x_i - \langle x_i\rangle\rangle \approx \langle x_i - \bar x_n\rangle\nonumber,
-\]
-!et
-which is approximated as 
-!bt
-\begin{equation}
-\mathrm{var}(X_i)\approx \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)=\mathrm{var}(x)
-label{eq:var_estimate_i_think}
-\end{equation}
-!et
-
-Now we can calculate an estimate of the error
-$\mathrm{err}_X^{\phantom X}$ of the sample mean $\bar x_n$:
-!bt
-\begin{align}
-\mathrm{err}_X^2
-&=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) \nonumber \\
-&\approx&\frac{1}{n^2}\sum_{ij}\frac{1}{n}\mathrm{cov}(x) =\frac{1}{n^2}n^2\frac{1}{n}\mathrm{cov}(x)\nonumber\\
-&=\frac{1}{n}\mathrm{cov}(x)
-label{eq:error_estimate}
-\end{align}
-!et
-which is nothing but the sample covariance divided by the number of
-measurements in the sample.
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-
-In the special case that the measurements of the sample are
-uncorrelated (equivalently the stochastic variables $X_i$ are
-uncorrelated) we have that the off-diagonal elements of the covariance
-are zero. This gives the following estimate of the sample error:
-!bt
-\[
-\mathrm{err}_X^2=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) =
-\frac{1}{n^2} \sum_i \mathrm{var}(X_i),
-\]
-!et
-resulting in
-!bt
-\begin{equation}
-\mathrm{err}_X^2\approx \frac{1}{n^2} \sum_i \mathrm{var}(x)= \frac{1}{n}\mathrm{var}(x)
-label{eq:error_estimate_uncorrel}
-\end{equation}
-!et
-where in the second step we have used Eq.~(ref{eq:var_estimate_i_think}).
-The error of the sample is then just its standard deviation divided by
-the square root of the number of measurements the sample contains.
-This is a very useful formula which is easy to compute. It acts as a
-first approximation to the error, but in numerical experiments, we
-cannot overlook the always present correlations.
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-For computational purposes one usually splits up the estimate of
-$\mathrm{err}_X^2$, given by Eq.~(ref{eq:error_estimate}), into two
-parts
-!bt
-\[
-\mathrm{err}_X^2 = \frac{1}{n}\mathrm{var}(x) + \frac{1}{n}(\mathrm{cov}(x)-\mathrm{var}(x)),
-\]
-!et
-which equals
-!bt
-\begin{equation}
-\frac{1}{n^2}\sum_{k=1}^n (x_k - \bar x_n)^2 +\frac{2}{n^2}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n)
-label{eq:error_estimate_split_up}
-\end{equation}
-!et
-The first term is the same as the error in the uncorrelated case,
-Eq.~(ref{eq:error_estimate_uncorrel}). This means that the second
-term accounts for the error correction due to correlation between the
-measurements. For uncorrelated measurements this second term is zero.
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-Computationally the uncorrelated first term is much easier to treat
-efficiently than the second.
-!bt
-\[
-\mathrm{var}(x) = \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)^2 =
-\left(\frac{1}{n}\sum_{k=1}^n x_k^2\right) - \bar x_n^2
-\]
-!et
-We just accumulate separately the values $x^2$ and $x$ for every
-measurement $x$ we receive. The correlation term, though, has to be
-calculated at the end of the experiment since we need all the
-measurements to calculate the cross terms. Therefore, all measurements
-have to be stored throughout the experiment.
-!eblock
-
-
-
-
-!split
-===== Statistics and blocking =====
-!bblock
-Let us analyze the problem by splitting up the correlation term into
-partial sums of the form:
-!bt
-\[
-f_d = \frac{1}{n-d}\sum_{k=1}^{n-d}(x_k - \bar x_n)(x_{k+d} - \bar x_n)
-\]
-!et
-The correlation term of the error can now be rewritten in terms of
-$f_d$
-!bt
-\[
-\frac{2}{n}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n) =
-2\sum_{d=1}^{n-1} f_d
-\]
-!et
-The value of $f_d$ reflects the correlation between measurements
-separated by the distance $d$ in the sample samples.  Notice that for
-$d=0$, $f$ is just the sample variance, $\mathrm{var}(x)$. If we divide $f_d$
-by $\mathrm{var}(x)$, we arrive at the so called *autocorrelation function*
-!bt
-\[
-\kappa_d = \frac{f_d}{\mathrm{var}(x)}
-\]
-!et
-which gives us a useful measure of the correlation pair correlation
-starting always at $1$ for $d=0$.
-!eblock
-
-
-!split
-===== Statistics and blocking =====
-!bblock
-The sample error (see eq.~(ref{eq:error_estimate_split_up})) can now be
-written in terms of the autocorrelation function:
-!bt
-\begin{align}
-\mathrm{err}_X^2 &=
-\frac{1}{n}\mathrm{var}(x)+\frac{2}{n}\cdot\mathrm{var}(x)\sum_{d=1}^{n-1}
-\frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
-\left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
-&=\frac{\tau}{n}\cdot\mathrm{var}(x)
-label{eq:error_estimate_corr_time}
-\end{align}
-!et
-and we see that $\mathrm{err}_X$ can be expressed in terms the
-uncorrelated sample variance times a correction factor $\tau$ which
-accounts for the correlation between measurements. We call this
-correction factor the *autocorrelation time*:
-!bt
-\begin{equation}
-\tau = 1+2\sum_{d=1}^{n-1}\kappa_d
-label{eq:autocorrelation_time}
-\end{equation}
-!et
-!eblock
-
-!split
-===== Statistics and blocking =====
-!bblock
-For a correlation free experiment, $\tau$
-equals 1. From the point of view of
-eq.~(ref{eq:error_estimate_corr_time}) we can interpret a sequential
-correlation as an effective reduction of the number of measurements by
-a factor $\tau$. The effective number of measurements becomes:
-!bt
-\[
-n_\mathrm{eff} = \frac{n}{\tau}
-\]
-!et
-To neglect the autocorrelation time $\tau$ will always cause our
-simple uncorrelated estimate of $\mathrm{err}_X^2\approx \mathrm{var}(x)/n$ to
-be less than the true sample error. The estimate of the error will be
-too *good*. On the other hand, the calculation of the full
-autocorrelation time poses an efficiency problem if the set of
-measurements is very large.
-!eblock
-
-
-
-
-
-!split
-===== Can we understand this? Time Auto-correlation Function =====
-!bblock
-The so-called time-displacement autocorrelation $\phi(t)$ for a quantity $\mathbf{M}$ is given by
-!bt
-\[
-\phi(t) = \int dt' \left[\mathbf{M}(t')-\langle \mathbf{M} \rangle\right]\left[\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle\right],
-\]
-!et
-which can be rewritten as 
-!bt
-\[
-\phi(t) = \int dt' \left[\mathbf{M}(t')\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle^2\right],
-\]
-!et
-where $\langle \mathbf{M} \rangle$ is the average value and
-$\mathbf{M}(t)$ its instantaneous value. We can discretize this function as follows, where we used our
-set of computed values $\mathbf{M}(t)$ for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
-!bt
-\[
-\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\mathbf{M}(t'+t)
--\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\times
-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t'+t).
-label{eq:phitf}
-\]
-!et
-!eblock
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-One should be careful with times close to $t_{\mathrm{max}}$, the upper limit of the sums 
-becomes small and we end up integrating over a rather small time interval. This means that the statistical
-error in $\phi(t)$ due to the random nature of the fluctuations in $\mathbf{M}(t)$ can become large.
-
-One should therefore choose $t \ll t_{\mathrm{max}}$.
-
-Note that the variable $\mathbf{M}$ can be any expectation values of interest.
-
-
-
-The time-correlation function gives a measure of the correlation between the various values of the variable 
-at a time $t'$ and a time $t'+t$. If we multiply the values of $\mathbf{M}$ at these two different times,
-we will get a positive contribution if they are fluctuating in the same direction, or a negative value
-if they fluctuate in the opposite direction. If we then integrate over time, or use the discretized version of, the time correlation function $\phi(t)$ should take a non-zero value if the fluctuations are 
-correlated, else it should gradually go to zero. For times a long way apart 
-the different values of $\mathbf{M}$  are most likely 
-uncorrelated and $\phi(t)$ should be zero.
-!eblock
-
-
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-We can derive the correlation time by observing that our Metropolis algorithm is based on a random
-walk in the space of all  possible spin configurations. 
-Our probability 
-distribution function $\mathbf{\hat{w}}(t)$ after a given number of time steps $t$ could be written as
-!bt
-\[
-   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}^t\hat{w}}(0),
-\]
-!et
-with $\mathbf{\hat{w}}(0)$ the distribution at $t=0$ and $\mathbf{\hat{W}}$ representing the 
-transition probability matrix. 
-We can always expand $\mathbf{\hat{w}}(0)$ in terms of the right eigenvectors of 
-$\mathbf{\hat{v}}$ of $\mathbf{\hat{W}}$ as 
-!bt
-\[
-    \mathbf{\hat{w}}(0)  = \sum_i\alpha_i\mathbf{\hat{v}}_i,
-\]
-!et
-resulting in 
-!bt
-\[
-   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}}^t\mathbf{\hat{w}}(0)=\mathbf{\hat{W}}^t\sum_i\alpha_i\mathbf{\hat{v}}_i=
-\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i,
-\]
-!et
-with $\lambda_i$ the $i^{\mathrm{th}}$ eigenvalue corresponding to  
-the eigenvector $\mathbf{\hat{v}}_i$. 
-!eblock
-
-
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-If we assume that $\lambda_0$ is the largest eigenvector we see that in the limit $t\rightarrow \infty$,
-$\mathbf{\hat{w}}(t)$ becomes proportional to the corresponding eigenvector 
-$\mathbf{\hat{v}}_0$. This is our steady state or final distribution. 
-
-We can relate this property to an observable like the mean energy.
-With the probabilty $\mathbf{\hat{w}}(t)$ (which in our case is the squared trial wave function) we
-can write the expectation values as 
-!bt
-\[
- \langle \mathbf{M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}\mathbf{M}_{\mu},
-\] 
-!et 
-or as the scalar of a  vector product
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
-\] 
-!et 
-with $\mathbf{m}$ being the vector whose elements are the values of $\mathbf{M}_{\mu}$ in its 
-various microstates $\mu$.
-!eblock
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-We rewrite this relation  as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
-\] 
-!et 
-If we define $m_i=\mathbf{\hat{v}}_i\mathbf{m}_i$ as the expectation value of
-$\mathbf{M}$ in the $i^{\mathrm{th}}$ eigenstate we can rewrite the last equation as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
-\] 
-!et
-Since we have that in the limit $t\rightarrow \infty$ the mean value is dominated by the 
-the largest eigenvalue $\lambda_0$, we can rewrite the last equation as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
-\] 
-!et
-We define the quantity
-!bt
-\[
-   \tau_i=-\frac{1}{log\lambda_i},
-\]
-!et
-and rewrite the last expectation value as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
-label{eq:finalmeanm}
-\] 
-!et
-!eblock
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-
-The quantities $\tau_i$ are the correlation times for the system. They control also the auto-correlation function 
-discussed above.  The longest correlation time is obviously given by the second largest
-eigenvalue $\tau_1$, which normally defines the correlation time discussed above. For large times, this is the 
-only correlation time that survives. If higher eigenvalues of the transition matrix are well separated from 
-$\lambda_1$ and we simulate long enough,  $\tau_1$ may well define the correlation time. 
-In other cases we may not be able to extract a reliable result for $\tau_1$. 
-Coming back to the time correlation function $\phi(t)$ we can present a more general definition in terms
-of the mean magnetizations $ \langle \mathbf{M}(t) \rangle$. Recalling that the mean value is equal 
-to $ \langle \mathbf{M}(\infty) \rangle$ we arrive at the expectation values
-!bt
-\[
-\phi(t) =\langle \mathbf{M}(0)-\mathbf{M}(\infty)\rangle \langle \mathbf{M}(t)-\mathbf{M}(\infty)\rangle,
-\]
-!et
-resulting in
-!bt
-\[
-\phi(t) =\sum_{i,j\ne 0}m_i\alpha_im_j\alpha_je^{-t/\tau_i},
-\]
-!et
-which is appropriate for all times.
-!eblock
-
-
-
-!split
-===== Correlation Time =====
-!bblock
-
-If the correlation function decays exponentially
-!bt
-\[ \phi (t) \sim \exp{(-t/\tau)}\]
-!et
-then the exponential correlation time can be computed as the average
-!bt
-\[   \tau_{\mathrm{exp}}  =  -\langle  \frac{t}{log|\frac{\phi(t)}{\phi(0)}|} \rangle. \]
-!et
-If the decay is exponential, then
-!bt
-\[  \int_0^{\infty} dt \phi(t)  = \int_0^{\infty} dt \phi(0)\exp{(-t/\tau)}  = \tau \phi(0),\] 
-!et
-which  suggests another measure of correlation
-!bt
-\[   \tau_{\mathrm{int}} = \sum_k \frac{\phi(k)}{\phi(0)}, \]
-!et
-called the integrated correlation time.
-!eblock
-
-
-!split
-===== What is blocking? =====
-!bblock Blocking
-    * Say that we have a set of samples from a Monte Carlo experiment
-    * Assuming (wrongly) that our samples are uncorrelated our best estimate of the standard deviation of the mean $\langle \mathbf{M}\rangle$ is given by
-!bt   
-\[
-\sigma=\sqrt{\frac{1}{n}\left(\langle \mathbf{M}^2\rangle-\langle \mathbf{M}\rangle^2\right)} 
-\]
-!et
-    * If the samples are correlated we can rewrite our results to show  that
-!bt      
-\[
-\sigma=\sqrt{\frac{1+2\tau/\Delta t}{n}\left(\langle \mathbf{M}^2\rangle-\langle \mathbf{M}\rangle^2\right)}
-\]
-!et
-      where $\tau$ is the correlation time (the time between a sample and the next uncorrelated sample) and $\Delta t$ is time between each sample
-!eblock    
-
-!split
-===== What is blocking? =====
-!bblock Blocking 
-    * If $\Delta t\gg\tau$ our first estimate of $\sigma$ still holds
-    * Much more common that $\Delta t<\tau$
-    * In the method of data blocking we divide the sequence of samples into blocks
-    * We then take the mean $\langle \mathbf{M}_i\rangle$ of block $i=1\ldots n_{blocks}$ to calculate the total mean and variance
-    * The size of each block must be so large that sample $j$ of block $i$ is not correlated with sample $j$ of block $i+1$
-    * The correlation time $\tau$ would be a good choice
-!eblock
-
-!split
-===== What is blocking? =====
-!bblock Blocking
-    * Problem: We don't know $\tau$ or it is too expensive to compute
-    * Solution: Make a plot of std. dev. as a function of blocksize
-    * The estimate of std. dev. of correlated data is too low $\to$ the error will increase with increasing block size until the blocks are uncorrelated, where we reach a plateau
-    * When the std. dev. stops increasing the blocks are uncorrelated
-!eblock
-
-!split
-===== Implementation =====
-!bblock 
-    * Do a Monte Carlo simulation, storing all samples to file
-    * Do the statistical analysis on this file, independently of your Monte Carlo program
-    * Read the file into an array
-    * Loop over various block sizes
-    * For each block size $n_b$, loop over the array in steps of $n_b$ taking the mean of elements $i n_b,\ldots,(i+1) n_b$
-    * Take the mean and variance of the resulting array
-    * Write the results for each block size to file for later
-      analysis
-!eblock
-
-
-
-!split
 ===== Importance sampling =====
 !bblock 
 We need to replace the brute force
@@ -3280,16 +2394,892 @@ where we have used $\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =6Dt$.
 !eblock
 
 
-!split
-===== Efficient calculation of Slater determinants =====
-!bblock
-* Repetition about many-body expectation values
-* Construction of the Slater determinant
-* Thursday March 19 we will discuss parallelization and hints and tricks for efficient coding
 
-You should start to implement the calculation of the Slater determinants. Start with the beryllium atom and
-continue with the neon atom. Together with parallelization, these are the tasks of project 2. The pdf file and latex files are found in the folders
+!split
+===== Why blocking? ===== 
+!bblock Statistical analysis
+    * Monte Carlo simulations can be treated as *computer experiments*
+    * The results can be analysed with the same statistical tools as we would use analysing experimental data.
+    * As in all experiments, we are looking for expectation values and an estimate of how accurate they are, i.e., possible sources for errors.
+
+A very good article which explains blocking is H.~Flyvbjerg and H.~G.~Petersen, *Error estimates on averages of correlated data*,  "Journal of Chemical Physics 91, 461-466 (1989)":"http://scitation.aip.org/content/aip/journal/jcp/91/1/10.1063/1.457480".
+
+!eblock    
+
+!split
+===== Why blocking? ===== 
+!bblock Statistical analysis
+    * As in other experiments, Monte Carlo experiments have two classes of errors:
+      * Statistical errors
+      * Systematical errors
+    * Statistical errors can be estimated using standard tools from statistics
+    * Systematical errors are method specific and must be treated differently from case to case. (In VMC a common source is the step length or time step in importance sampling)
+!eblock    
+
+!split
+===== Statistics and blocking ===== 
+!bblock
+The *probability distribution function (PDF)* is a function
+$p(x)$ on the domain which, in the discrete case, gives us the
+probability or relative frequency with which these values of $X$ occur:
+!bt
+\[
+p(x) = \mathrm{prob}(X=x)
+\]
+!et
+In the continuous case, the PDF does not directly depict the
+actual probability. Instead we define the probability for the
+stochastic variable to assume any value on an infinitesimal interval
+around $x$ to be $p(x)dx$. The continuous function $p(x)$ then gives us
+the *density* of the probability rather than the probability
+itself. The probability for a stochastic variable to assume any value
+on a non-infinitesimal interval $[a,\,b]$ is then just the integral:
+!bt
+\[
+\mathrm{prob}(a\leq X\leq b) = \int_a^b p(x)dx
+\]
+!et
+Qualitatively speaking, a stochastic variable represents the values of
+numbers chosen as if by chance from some specified PDF so that the
+selection of a large set of these numbers reproduces this PDF.
 !eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+Also of interest to us is the *cumulative probability distribution function (CDF)*, $P(x)$, which is just the probability
+for a stochastic variable $X$ to assume any value less than $x$:
+!bt
+\[
+P(x)=\mathrm{Prob(}X\leq x\mathrm{)} =\int_{-\infty}^x p(x^{\prime})dx^{\prime}
+\]
+!et
+The relation between a CDF and its corresponding PDF is then:
+!bt
+\[
+p(x) = \frac{d}{dx}P(x)
+\]
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+A particularly useful class of special expectation values are the
+*moments*. The $n$-th moment of the PDF $p$ is defined as
+follows:
+!bt
+\[
+\langle x^n\rangle \equiv \int\! x^n p(x)\,dx
+\]
+!et
+The zero-th moment $\langle 1\rangle$ is just the normalization condition of
+$p$. The first moment, $\langle x\rangle$, is called the *mean* of $p$
+and often denoted by the letter $\mu$:
+!bt
+\[
+\langle x\rangle = \mu \equiv \int\! x p(x)\,dx
+\]
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+A special version of the moments is the set of *central moments*,
+the n-th central moment defined as:
+!bt
+\[
+\langle (x-\langle x \rangle )^n\rangle \equiv \int\! (x-\langle x\rangle)^n p(x)\,dx
+\]
+!et
+The zero-th and first central moments are both trivial, equal $1$ and
+$0$, respectively. But the second central moment, known as the
+*variance* of $p$, is of particular interest. For the stochastic
+variable $X$, the variance is denoted as $\sigma^2_X$ or $\mathrm{var}(X)$:
+!bt
+\begin{align}
+\sigma^2_X\ \ =\ \ \mathrm{var}(X) & =  \langle (x-\langle x\rangle)^2\rangle =
+\int\! (x-\langle x\rangle)^2 p(x)\,dx\\
+& =  \int\! \left(x^2 - 2 x \langle x\rangle^{2} +
+  \langle x\rangle^2\right)p(x)\,dx\\
+& =  \langle x^2\rangle - 2 \langle x\rangle\langle x\rangle + \langle x\rangle^2\\
+& =  \langle x^2\rangle - \langle x\rangle^2
+\end{align}
+!et
+The square root of the variance, $\sigma =\sqrt{\langle (x-\langle x\rangle)^2\rangle}$ is called the *standard deviation* of $p$. It is clearly just the RMS (root-mean-square)
+value of the deviation of the PDF from its mean value, interpreted
+qualitatively as the *spread* of $p$ around its mean.
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+Another important quantity is the so called covariance, a variant of
+the above defined variance. Consider again the set $\{X_i\}$ of $n$
+stochastic variables (not necessarily uncorrelated) with the
+multivariate PDF $P(x_1,\dots,x_n)$. The *covariance* of two
+of the stochastic variables, $X_i$ and $X_j$, is defined as follows:
+!bt
+\begin{align}
+\mathrm{cov}(X_i,\,X_j) &\equiv \langle (x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle
+\nonumber\\
+&=
+\int\!\cdots\!\int\!(x_i-\langle x_i \rangle)(x_j-\langle x_j \rangle)\,
+P(x_1,\dots,x_n)\,dx_1\dots dx_n
+label{eq:def_covariance}
+\end{align}
+!et
+with
+!bt
+\[
+\langle x_i\rangle =
+\int\!\cdots\!\int\!x_i\,P(x_1,\dots,x_n)\,dx_1\dots dx_n
+\]
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+If we consider the above covariance as a matrix $C_{ij}=\mathrm{cov}(X_i,\,X_j)$, then the diagonal elements are just the familiar
+variances, $C_{ii} = \mathrm{cov}(X_i,\,X_i) = \mathrm{var}(X_i)$. It turns out that
+all the off-diagonal elements are zero if the stochastic variables are
+uncorrelated. This is easy to show, keeping in mind the linearity of
+the expectation value. Consider the stochastic variables $X_i$ and
+$X_j$, ($i\neq j$):
+!bt
+\begin{align}
+\mathrm{cov}(X_i,\,X_j) &= \langle(x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle\\
+&=\langle x_i x_j - x_i\langle x_j\rangle - \langle x_i\rangle x_j + \langle x_i\rangle\langle x_j\rangle\rangle \\
+&=\langle x_i x_j\rangle - \langle x_i\langle x_j\rangle\rangle - \langle \langle x_i\rangle x_j\rangle +
+\langle \langle x_i\rangle\langle x_j\rangle\rangle\\
+&=\langle x_i x_j\rangle - \langle x_i\rangle\langle x_j\rangle - \langle x_i\rangle\langle x_j\rangle +
+\langle x_i\rangle\langle x_j\rangle\\
+&=\langle x_i x_j\rangle - \langle x_i\rangle\langle x_j\rangle
+\end{align}
+!et
+!eblock
+
+
+
+!split
+===== Statistics and blocking =====
+!bblock
+If $X_i$ and $X_j$ are independent, we get 
+$\langle x_i x_j\rangle =\langle x_i\rangle\langle x_j\rangle$, resulting in $\mathrm{cov}(X_i, X_j) = 0\ \ (i\neq j)$.
+
+Also useful for us is the covariance of linear combinations of
+stochastic variables. Let $\{X_i\}$ and $\{Y_i\}$ be two sets of
+stochastic variables. Let also $\{a_i\}$ and $\{b_i\}$ be two sets of
+scalars. Consider the linear combination:
+!bt
+\[
+U = \sum_i a_i X_i \qquad V = \sum_j b_j Y_j
+\]
+!et
+By the linearity of the expectation value
+!bt
+\[
+\mathrm{cov}(U, V) = \sum_{i,j}a_i b_j \mathrm{cov}(X_i, Y_j)
+\]
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+Now, since the variance is just $\mathrm{var}(X_i) = \mathrm{cov}(X_i, X_i)$, we get
+the variance of the linear combination $U = \sum_i a_i X_i$:
+!bt
+\begin{equation}
+\mathrm{var}(U) = \sum_{i,j}a_i a_j \mathrm{cov}(X_i, X_j)
+label{eq:variance_linear_combination}
+\end{equation}
+!et
+And in the special case when the stochastic variables are
+uncorrelated, the off-diagonal elements of the covariance are as we
+know zero, resulting in:
+!bt
+\[
+\mathrm{var}(U) = \sum_i a_i^2 \mathrm{cov}(X_i, X_i) = \sum_i a_i^2 \mathrm{var}(X_i)
+\]
+!et
+!bt
+\[
+\mathrm{var}(\sum_i a_i X_i) = \sum_i a_i^2 \mathrm{var}(X_i)
+\]
+!et
+which will become very useful in our study of the error in the mean
+value of a set of measurements.
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+A *stochastic process* is a process that produces sequentially a
+chain of values:
+!bt
+\[
+\{x_1, x_2,\dots\,x_k,\dots\}.
+\]
+!et
+We will call these
+values our *measurements* and the entire set as our measured
+*sample*.  The action of measuring all the elements of a sample
+we will call a stochastic *experiment* since, operationally,
+they are often associated with results of empirical observation of
+some physical or mathematical phenomena; precisely an experiment. We
+assume that these values are distributed according to some 
+PDF $p_X^{\phantom X}(x)$, where $X$ is just the formal symbol for the
+stochastic variable whose PDF is $p_X^{\phantom X}(x)$. Instead of
+trying to determine the full distribution $p$ we are often only
+interested in finding the few lowest moments, like the mean
+$\mu_X^{\phantom X}$ and the variance $\sigma_X^{\phantom X}$.
+!eblock
+
+
+!split 
+===== Statistics and blocking =====
+!bblock
+In practical situations a sample is always of finite size. Let that
+size be $n$. The expectation value of a sample, the *sample mean*, is then defined as follows:
+!bt
+\[
+\bar{x}_n \equiv \frac{1}{n}\sum_{k=1}^n x_k
+\]
+!et
+The *sample variance* is:
+!bt
+\[
+\mathrm{var}(x) \equiv \frac{1}{n}\sum_{k=1}^n (x_k - \bar{x}_n)^2
+\]
+!et
+its square root being the *standard deviation of the sample*. The
+*sample covariance* is:
+!bt
+\[
+\mathrm{cov}(x)\equiv\frac{1}{n}\sum_{kl}(x_k - \bar{x}_n)(x_l - \bar{x}_n)
+\]
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+Note that the sample variance is the sample covariance without the
+cross terms. In a similar manner as the covariance in Eq.~(ref{eq:def_covariance}) is a measure of the correlation between
+two stochastic variables, the above defined sample covariance is a
+measure of the sequential correlation between succeeding measurements
+of a sample.
+
+These quantities, being known experimental values, differ
+significantly from and must not be confused with the similarly named
+quantities for stochastic variables, mean $\mu_X$, variance $\mathrm{var}(X)$
+and covariance $\mathrm{cov}(X,Y)$.
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+The law of large numbers
+states that as the size of our sample grows to infinity, the sample
+mean approaches the true mean $\mu_X^{\phantom X}$ of the chosen PDF:
+!bt
+\[
+\lim_{n\to\infty}\bar{x}_n = \mu_X^{\phantom X}
+\]
+!et
+The sample mean $\bar{x}_n$ works therefore as an estimate of the true
+mean $\mu_X^{\phantom X}$.
+
+What we need to find out is how good an approximation $\bar{x}_n$ is to
+$\mu_X^{\phantom X}$. In any stochastic measurement, an estimated
+mean is of no use to us without a measure of its error. A quantity
+that tells us how well we can reproduce it in another experiment. We
+are therefore interested in the PDF of the sample mean itself. Its
+standard deviation will be a measure of the spread of sample means,
+and we will simply call it the *error* of the sample mean, or
+just sample error, and denote it by $\mathrm{err}_X^{\phantom X}$. In
+practice, we will only be able to produce an *estimate* of the
+sample error since the exact value would require the knowledge of the
+true PDFs behind, which we usually do not have.
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+The straight forward brute force way of estimating the sample error is
+simply by producing a number of samples, and treating the mean of each
+as a measurement. The standard deviation of these means will then be
+an estimate of the original sample error. If we are unable to produce
+more than one sample, we can split it up sequentially into smaller
+ones, treating each in the same way as above. This procedure is known
+as *blocking* and will be given more attention shortly. At this
+point it is worth while exploring more indirect methods of estimation
+that will help us understand some important underlying principles of
+correlational effects.
+!eblock
+
+
+!split
+===== Statistics and blocking =====
+!bblock
+Let us first take a look at what happens to the sample error as the
+size of the sample grows. In a sample, each of the measurements $x_i$
+can be associated with its own stochastic variable $X_i$. The
+stochastic variable $\overline X_n$ for the sample mean $\bar{x}_n$ is
+then just a linear combination, already familiar to us:
+!bt
+\[
+\overline X_n = \frac{1}{n}\sum_{i=1}^n X_i
+\]
+!et
+All the coefficients are just equal $1/n$. The PDF of $\overline X_n$,
+denoted by $p_{\overline X_n}(x)$ is the desired PDF of the sample
+means. 
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+The probability density of obtaining a sample mean $\bar x_n$
+is the product of probabilities of obtaining arbitrary values $x_1,
+x_2,\dots,x_n$ with the constraint that the mean of the set $\{x_i\}$
+is $\bar x_n$:
+!bt
+\[
+p_{\overline X_n}(x) = \int p_X^{\phantom X}(x_1)\cdots
+\int p_X^{\phantom X}(x_n)\ 
+\delta\!\left(x - \frac{x_1+x_2+\dots+x_n}{n}\right)dx_n \cdots dx_1
+\]
+!et
+And in particular we are interested in its variance $\mathrm{var}(\overline X_n)$.
+!eblock
+
+
+
+!split
+===== Statistics and blocking =====
+!bblock
+It is generally not possible to express $p_{\overline X_n}(x)$ in a
+closed form given an arbitrary PDF $p_X^{\phantom X}$ and a number
+$n$. But for the limit $n\to\infty$ it is possible to make an
+approximation. The very important result is called *the central limit theorem*. It tells us that as $n$ goes to infinity,
+$p_{\overline X_n}(x)$ approaches a Gaussian distribution whose mean
+and variance equal the true mean and variance, $\mu_{X}^{\phantom X}$
+and $\sigma_{X}^{2}$, respectively:
+!bt
+\begin{equation}
+\lim_{n\to\infty} p_{\overline X_n}(x) =
+\left(\frac{n}{2\pi\mathrm{var}(X)}\right)^{1/2}
+e^{-\frac{n(x-\bar x_n)^2}{2\mathrm{var}(X)}}
+label{eq:central_limit_gaussian}
+\end{equation}
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+The desired variance
+$\mathrm{var}(\overline X_n)$, i.e. the sample error squared
+$\mathrm{err}_X^2$, is given by:
+!bt
+\begin{equation}
+\mathrm{err}_X^2 = \mathrm{var}(\overline X_n) = \frac{1}{n^2}
+\sum_{ij} \mathrm{cov}(X_i, X_j)
+label{eq:error_exact}
+\end{equation}
+!et
+We see now that in order to calculate the exact error of the sample
+with the above expression, we would need the true means
+$\mu_{X_i}^{\phantom X}$ of the stochastic variables $X_i$. To
+calculate these requires that we know the true multivariate PDF of all
+the $X_i$. But this PDF is unknown to us, we have only got the measurements of
+one sample. The best we can do is to let the sample itself be an
+estimate of the PDF of each of the $X_i$, estimating all properties of
+$X_i$ through the measurements of the sample.
+!eblock
+
+
+!split
+===== Statistics and blocking =====
+!bblock
+Our estimate of $\mu_{X_i}^{\phantom X}$ is then the sample mean $\bar x$
+itself, in accordance with the the central limit theorem:
+!bt
+\[
+\mu_{X_i}^{\phantom X} = \langle x_i\rangle \approx \frac{1}{n}\sum_{k=1}^n x_k = \bar x
+\]
+!et
+Using $\bar x$ in place of $\mu_{X_i}^{\phantom X}$ we can give an
+*estimate* of the covariance in Eq.~(ref{eq:error_exact})
+!bt
+\[
+\mathrm{cov}(X_i, X_j) = \langle (x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle
+\approx\langle (x_i - \bar x)(x_j - \bar{x})\rangle,
+\]
+!et
+resulting in
+!bt
+\[ 
+\frac{1}{n} \sum_{l}^n \left(\frac{1}{n}\sum_{k}^n (x_k -\bar x_n)(x_l - \bar x_n)\right)=\frac{1}{n}\frac{1}{n} \sum_{kl} (x_k -\bar x_n)(x_l - \bar x_n)=\frac{1}{n}\mathrm{cov}(x)
+\]
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+By the same procedure we can use the sample variance as an
+estimate of the variance of any of the stochastic variables $X_i$
+!bt
+\[
+\mathrm{var}(X_i)=\langle x_i - \langle x_i\rangle\rangle \approx \langle x_i - \bar x_n\rangle\nonumber,
+\]
+!et
+which is approximated as 
+!bt
+\begin{equation}
+\mathrm{var}(X_i)\approx \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)=\mathrm{var}(x)
+label{eq:var_estimate_i_think}
+\end{equation}
+!et
+
+Now we can calculate an estimate of the error
+$\mathrm{err}_X^{\phantom X}$ of the sample mean $\bar x_n$:
+!bt
+\begin{align}
+\mathrm{err}_X^2
+&=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) \nonumber \\
+&\approx&\frac{1}{n^2}\sum_{ij}\frac{1}{n}\mathrm{cov}(x) =\frac{1}{n^2}n^2\frac{1}{n}\mathrm{cov}(x)\nonumber\\
+&=\frac{1}{n}\mathrm{cov}(x)
+label{eq:error_estimate}
+\end{align}
+!et
+which is nothing but the sample covariance divided by the number of
+measurements in the sample.
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+
+In the special case that the measurements of the sample are
+uncorrelated (equivalently the stochastic variables $X_i$ are
+uncorrelated) we have that the off-diagonal elements of the covariance
+are zero. This gives the following estimate of the sample error:
+!bt
+\[
+\mathrm{err}_X^2=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) =
+\frac{1}{n^2} \sum_i \mathrm{var}(X_i),
+\]
+!et
+resulting in
+!bt
+\begin{equation}
+\mathrm{err}_X^2\approx \frac{1}{n^2} \sum_i \mathrm{var}(x)= \frac{1}{n}\mathrm{var}(x)
+label{eq:error_estimate_uncorrel}
+\end{equation}
+!et
+where in the second step we have used Eq.~(ref{eq:var_estimate_i_think}).
+The error of the sample is then just its standard deviation divided by
+the square root of the number of measurements the sample contains.
+This is a very useful formula which is easy to compute. It acts as a
+first approximation to the error, but in numerical experiments, we
+cannot overlook the always present correlations.
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+For computational purposes one usually splits up the estimate of
+$\mathrm{err}_X^2$, given by Eq.~(ref{eq:error_estimate}), into two
+parts
+!bt
+\[
+\mathrm{err}_X^2 = \frac{1}{n}\mathrm{var}(x) + \frac{1}{n}(\mathrm{cov}(x)-\mathrm{var}(x)),
+\]
+!et
+which equals
+!bt
+\begin{equation}
+\frac{1}{n^2}\sum_{k=1}^n (x_k - \bar x_n)^2 +\frac{2}{n^2}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n)
+label{eq:error_estimate_split_up}
+\end{equation}
+!et
+The first term is the same as the error in the uncorrelated case,
+Eq.~(ref{eq:error_estimate_uncorrel}). This means that the second
+term accounts for the error correction due to correlation between the
+measurements. For uncorrelated measurements this second term is zero.
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+Computationally the uncorrelated first term is much easier to treat
+efficiently than the second.
+!bt
+\[
+\mathrm{var}(x) = \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)^2 =
+\left(\frac{1}{n}\sum_{k=1}^n x_k^2\right) - \bar x_n^2
+\]
+!et
+We just accumulate separately the values $x^2$ and $x$ for every
+measurement $x$ we receive. The correlation term, though, has to be
+calculated at the end of the experiment since we need all the
+measurements to calculate the cross terms. Therefore, all measurements
+have to be stored throughout the experiment.
+!eblock
+
+
+
+
+!split
+===== Statistics and blocking =====
+!bblock
+Let us analyze the problem by splitting up the correlation term into
+partial sums of the form:
+!bt
+\[
+f_d = \frac{1}{n-d}\sum_{k=1}^{n-d}(x_k - \bar x_n)(x_{k+d} - \bar x_n)
+\]
+!et
+The correlation term of the error can now be rewritten in terms of
+$f_d$
+!bt
+\[
+\frac{2}{n}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n) =
+2\sum_{d=1}^{n-1} f_d
+\]
+!et
+The value of $f_d$ reflects the correlation between measurements
+separated by the distance $d$ in the sample samples.  Notice that for
+$d=0$, $f$ is just the sample variance, $\mathrm{var}(x)$. If we divide $f_d$
+by $\mathrm{var}(x)$, we arrive at the so called *autocorrelation function*
+!bt
+\[
+\kappa_d = \frac{f_d}{\mathrm{var}(x)}
+\]
+!et
+which gives us a useful measure of the correlation pair correlation
+starting always at $1$ for $d=0$.
+!eblock
+
+
+!split
+===== Statistics and blocking =====
+!bblock
+The sample error (see eq.~(ref{eq:error_estimate_split_up})) can now be
+written in terms of the autocorrelation function:
+!bt
+\begin{align}
+\mathrm{err}_X^2 &=
+\frac{1}{n}\mathrm{var}(x)+\frac{2}{n}\cdot\mathrm{var}(x)\sum_{d=1}^{n-1}
+\frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
+\left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
+&=\frac{\tau}{n}\cdot\mathrm{var}(x)
+label{eq:error_estimate_corr_time}
+\end{align}
+!et
+and we see that $\mathrm{err}_X$ can be expressed in terms the
+uncorrelated sample variance times a correction factor $\tau$ which
+accounts for the correlation between measurements. We call this
+correction factor the *autocorrelation time*:
+!bt
+\begin{equation}
+\tau = 1+2\sum_{d=1}^{n-1}\kappa_d
+label{eq:autocorrelation_time}
+\end{equation}
+!et
+!eblock
+
+!split
+===== Statistics and blocking =====
+!bblock
+For a correlation free experiment, $\tau$
+equals 1. From the point of view of
+eq.~(ref{eq:error_estimate_corr_time}) we can interpret a sequential
+correlation as an effective reduction of the number of measurements by
+a factor $\tau$. The effective number of measurements becomes:
+!bt
+\[
+n_\mathrm{eff} = \frac{n}{\tau}
+\]
+!et
+To neglect the autocorrelation time $\tau$ will always cause our
+simple uncorrelated estimate of $\mathrm{err}_X^2\approx \mathrm{var}(x)/n$ to
+be less than the true sample error. The estimate of the error will be
+too *good*. On the other hand, the calculation of the full
+autocorrelation time poses an efficiency problem if the set of
+measurements is very large.
+!eblock
+
+
+
+
+
+!split
+===== Can we understand this? Time Auto-correlation Function =====
+!bblock
+The so-called time-displacement autocorrelation $\phi(t)$ for a quantity $\mathbf{M}$ is given by
+!bt
+\[
+\phi(t) = \int dt' \left[\mathbf{M}(t')-\langle \mathbf{M} \rangle\right]\left[\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle\right],
+\]
+!et
+which can be rewritten as 
+!bt
+\[
+\phi(t) = \int dt' \left[\mathbf{M}(t')\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle^2\right],
+\]
+!et
+where $\langle \mathbf{M} \rangle$ is the average value and
+$\mathbf{M}(t)$ its instantaneous value. We can discretize this function as follows, where we used our
+set of computed values $\mathbf{M}(t)$ for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
+!bt
+\[
+\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\mathbf{M}(t'+t)
+-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\times
+\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t'+t).
+label{eq:phitf}
+\]
+!et
+!eblock
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+One should be careful with times close to $t_{\mathrm{max}}$, the upper limit of the sums 
+becomes small and we end up integrating over a rather small time interval. This means that the statistical
+error in $\phi(t)$ due to the random nature of the fluctuations in $\mathbf{M}(t)$ can become large.
+
+One should therefore choose $t \ll t_{\mathrm{max}}$.
+
+Note that the variable $\mathbf{M}$ can be any expectation values of interest.
+
+
+
+The time-correlation function gives a measure of the correlation between the various values of the variable 
+at a time $t'$ and a time $t'+t$. If we multiply the values of $\mathbf{M}$ at these two different times,
+we will get a positive contribution if they are fluctuating in the same direction, or a negative value
+if they fluctuate in the opposite direction. If we then integrate over time, or use the discretized version of, the time correlation function $\phi(t)$ should take a non-zero value if the fluctuations are 
+correlated, else it should gradually go to zero. For times a long way apart 
+the different values of $\mathbf{M}$  are most likely 
+uncorrelated and $\phi(t)$ should be zero.
+!eblock
+
+
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+We can derive the correlation time by observing that our Metropolis algorithm is based on a random
+walk in the space of all  possible spin configurations. 
+Our probability 
+distribution function $\mathbf{\hat{w}}(t)$ after a given number of time steps $t$ could be written as
+!bt
+\[
+   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}^t\hat{w}}(0),
+\]
+!et
+with $\mathbf{\hat{w}}(0)$ the distribution at $t=0$ and $\mathbf{\hat{W}}$ representing the 
+transition probability matrix. 
+We can always expand $\mathbf{\hat{w}}(0)$ in terms of the right eigenvectors of 
+$\mathbf{\hat{v}}$ of $\mathbf{\hat{W}}$ as 
+!bt
+\[
+    \mathbf{\hat{w}}(0)  = \sum_i\alpha_i\mathbf{\hat{v}}_i,
+\]
+!et
+resulting in 
+!bt
+\[
+   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}}^t\mathbf{\hat{w}}(0)=\mathbf{\hat{W}}^t\sum_i\alpha_i\mathbf{\hat{v}}_i=
+\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i,
+\]
+!et
+with $\lambda_i$ the $i^{\mathrm{th}}$ eigenvalue corresponding to  
+the eigenvector $\mathbf{\hat{v}}_i$. 
+!eblock
+
+
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+If we assume that $\lambda_0$ is the largest eigenvector we see that in the limit $t\rightarrow \infty$,
+$\mathbf{\hat{w}}(t)$ becomes proportional to the corresponding eigenvector 
+$\mathbf{\hat{v}}_0$. This is our steady state or final distribution. 
+
+We can relate this property to an observable like the mean energy.
+With the probabilty $\mathbf{\hat{w}}(t)$ (which in our case is the squared trial wave function) we
+can write the expectation values as 
+!bt
+\[
+ \langle \mathbf{M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}\mathbf{M}_{\mu},
+\] 
+!et 
+or as the scalar of a  vector product
+!bt
+ \[
+ \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
+\] 
+!et 
+with $\mathbf{m}$ being the vector whose elements are the values of $\mathbf{M}_{\mu}$ in its 
+various microstates $\mu$.
+!eblock
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+We rewrite this relation  as
+!bt
+ \[
+ \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
+\] 
+!et 
+If we define $m_i=\mathbf{\hat{v}}_i\mathbf{m}_i$ as the expectation value of
+$\mathbf{M}$ in the $i^{\mathrm{th}}$ eigenstate we can rewrite the last equation as
+!bt
+ \[
+ \langle \mathbf{M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
+\] 
+!et
+Since we have that in the limit $t\rightarrow \infty$ the mean value is dominated by the 
+the largest eigenvalue $\lambda_0$, we can rewrite the last equation as
+!bt
+ \[
+ \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
+\] 
+!et
+We define the quantity
+!bt
+\[
+   \tau_i=-\frac{1}{log\lambda_i},
+\]
+!et
+and rewrite the last expectation value as
+!bt
+ \[
+ \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
+label{eq:finalmeanm}
+\] 
+!et
+!eblock
+
+
+!split
+===== Time Auto-correlation Function =====
+!bblock
+
+The quantities $\tau_i$ are the correlation times for the system. They control also the auto-correlation function 
+discussed above.  The longest correlation time is obviously given by the second largest
+eigenvalue $\tau_1$, which normally defines the correlation time discussed above. For large times, this is the 
+only correlation time that survives. If higher eigenvalues of the transition matrix are well separated from 
+$\lambda_1$ and we simulate long enough,  $\tau_1$ may well define the correlation time. 
+In other cases we may not be able to extract a reliable result for $\tau_1$. 
+Coming back to the time correlation function $\phi(t)$ we can present a more general definition in terms
+of the mean magnetizations $ \langle \mathbf{M}(t) \rangle$. Recalling that the mean value is equal 
+to $ \langle \mathbf{M}(\infty) \rangle$ we arrive at the expectation values
+!bt
+\[
+\phi(t) =\langle \mathbf{M}(0)-\mathbf{M}(\infty)\rangle \langle \mathbf{M}(t)-\mathbf{M}(\infty)\rangle,
+\]
+!et
+resulting in
+!bt
+\[
+\phi(t) =\sum_{i,j\ne 0}m_i\alpha_im_j\alpha_je^{-t/\tau_i},
+\]
+!et
+which is appropriate for all times.
+!eblock
+
+
+
+!split
+===== Correlation Time =====
+!bblock
+
+If the correlation function decays exponentially
+!bt
+\[ \phi (t) \sim \exp{(-t/\tau)}\]
+!et
+then the exponential correlation time can be computed as the average
+!bt
+\[   \tau_{\mathrm{exp}}  =  -\langle  \frac{t}{log|\frac{\phi(t)}{\phi(0)}|} \rangle. \]
+!et
+If the decay is exponential, then
+!bt
+\[  \int_0^{\infty} dt \phi(t)  = \int_0^{\infty} dt \phi(0)\exp{(-t/\tau)}  = \tau \phi(0),\] 
+!et
+which  suggests another measure of correlation
+!bt
+\[   \tau_{\mathrm{int}} = \sum_k \frac{\phi(k)}{\phi(0)}, \]
+!et
+called the integrated correlation time.
+!eblock
+
+
+!split
+===== What is blocking? =====
+!bblock Blocking
+    * Say that we have a set of samples from a Monte Carlo experiment
+    * Assuming (wrongly) that our samples are uncorrelated our best estimate of the standard deviation of the mean $\langle \mathbf{M}\rangle$ is given by
+!bt   
+\[
+\sigma=\sqrt{\frac{1}{n}\left(\langle \mathbf{M}^2\rangle-\langle \mathbf{M}\rangle^2\right)} 
+\]
+!et
+    * If the samples are correlated we can rewrite our results to show  that
+!bt      
+\[
+\sigma=\sqrt{\frac{1+2\tau/\Delta t}{n}\left(\langle \mathbf{M}^2\rangle-\langle \mathbf{M}\rangle^2\right)}
+\]
+!et
+      where $\tau$ is the correlation time (the time between a sample and the next uncorrelated sample) and $\Delta t$ is time between each sample
+!eblock    
+
+!split
+===== What is blocking? =====
+!bblock Blocking 
+    * If $\Delta t\gg\tau$ our first estimate of $\sigma$ still holds
+    * Much more common that $\Delta t<\tau$
+    * In the method of data blocking we divide the sequence of samples into blocks
+    * We then take the mean $\langle \mathbf{M}_i\rangle$ of block $i=1\ldots n_{blocks}$ to calculate the total mean and variance
+    * The size of each block must be so large that sample $j$ of block $i$ is not correlated with sample $j$ of block $i+1$
+    * The correlation time $\tau$ would be a good choice
+!eblock
+
+!split
+===== What is blocking? =====
+!bblock Blocking
+    * Problem: We don't know $\tau$ or it is too expensive to compute
+    * Solution: Make a plot of std. dev. as a function of blocksize
+    * The estimate of std. dev. of correlated data is too low $\to$ the error will increase with increasing block size until the blocks are uncorrelated, where we reach a plateau
+    * When the std. dev. stops increasing the blocks are uncorrelated
+!eblock
+
+!split
+===== Implementation =====
+!bblock 
+    * Do a Monte Carlo simulation, storing all samples to file
+    * Do the statistical analysis on this file, independently of your Monte Carlo program
+    * Read the file into an array
+    * Loop over various block sizes
+    * For each block size $n_b$, loop over the array in steps of $n_b$ taking the mean of elements $i n_b,\ldots,(i+1) n_b$
+    * Take the mean and variance of the resulting array
+    * Write the results for each block size to file for later
+      analysis
+!eblock
+
+
 
 
 !split
