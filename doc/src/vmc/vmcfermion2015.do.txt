@@ -1455,14 +1455,20 @@ The general derivative formula of the Jastrow factor is (the subscript $C$ stand
 \]
 !et
 However, 
-with our written in way which can be reused later as
+with our
 !bt
 \[
-\Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}f(r_{ij})\right\}},
+\Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
 \]
 !et
 the gradient needed for the quantum force and local energy is easy to compute.  
-The function $f(r_{ij})$ will depends on the system under study. In the equations below we will keep this general form.
+We get for particle  $k$
+!bt
+\[
+\frac{ \nabla_k \Psi_C}{ \Psi_C }= \sum_{j\ne k}\frac{\mathbf{r}_{kj}}{r_{kj}}\frac{a}{(1+\beta r_{kj})^2},
+\]
+!et
+which is rather easy to code.  Remember to sum over all particles  when you compute the local energy.
 
 !eblock
 
@@ -1470,20 +1476,20 @@ The function $f(r_{ij})$ will depends on the system under study. In the equation
 !split
 ===== Importance sampling, program elements =====
 !bblock
-In the Metropolis/Hasting algorithm, the *acceptance ratio* determines the probability for a particle  to be accepted at a new position. The ratio of the trial wave functions evaluated at the new and current positions is given by ($OB$ for the onebody  part)
+In the Metropolis/Hasting algorithm, the *acceptance ratio* determines the probability for a particle  to be accepted at a new position. The ratio of the trial wave functions evaluated at the new and current positions is given by ($D$ for determinant part)
 !bt
 \[
 R \equiv \frac{\Psi_{T}^{new}}{\Psi_{T}^{old}} = 
-\frac{\Psi_{OB}^{new}}{\Psi_{OB}^{old}}\frac{\Psi_{C}^{new}}{\Psi_{C}^{old}}
+\frac{\Psi_{D}^{new}}{\Psi_{D}^{old}}\frac{\Psi_{C}^{new}}{\Psi_{C}^{old}}
 \]
 !et
-Here $\Psi_{OB}$ is our onebody part (Slater determinant or product of boson single-particle states)  while $\Psi_{C}$ is our correlation function, or Jastrow factor. 
+Here $\Psi_{D}$ is our Slater determinant while $\Psi_{C}$ is our correlation function, or Jastrow factor. 
 We need to optimize the $\nabla \Psi_T / \Psi_T$ ratio and the second derivative as well, that is
 the $\mathbf{\nabla}^2 \Psi_T/\Psi_T$ ratio. The first is needed when we compute the so-called quantum force in importance sampling.
 The second is needed when we compute the kinetic energy term of the local energy.
 !bt
 \[
-\frac{\mathbf{\mathbf{\nabla}}  \Psi}{\Psi}  = \frac{\mathbf{\nabla}  (\Psi_{OB} \, \Psi_{C})}{\Psi_{OB} \, \Psi_{C}}  =  \frac{ \Psi_C \mathbf{\nabla}  \Psi_{OB} + \Psi_{OB} \mathbf{\nabla}  \Psi_{C}}{\Psi_{OB} \Psi_{C}} = \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+\frac{\mathbf{\mathbf{\nabla}}  \Psi}{\Psi}  = \frac{\mathbf{\nabla}  (\Psi_{D} \, \Psi_{C})}{\Psi_{D} \, \Psi_{C}}  =  \frac{ \Psi_C \mathbf{\nabla}  \Psi_{D} + \Psi_{D} \mathbf{\nabla}  \Psi_{C}}{\Psi_{D} \Psi_{C}} = \frac{\mathbf{\nabla}  \Psi_{D}}{\Psi_{D}} + \frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
 \]
 !et
 !eblock
@@ -1512,7 +1518,7 @@ The expectation value of the kinetic energy expressed in atomic units for electr
 The second derivative which enters the definition of the local energy is 
 !bt
 \[
-\frac{\mathbf{\nabla}^2 \Psi}{\Psi}=\frac{\mathbf{\nabla}^2 \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}^2  \Psi_C}{ \Psi_C} + 2 \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}}\cdot\frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+\frac{\mathbf{\nabla}^2 \Psi}{\Psi}=\frac{\mathbf{\nabla}^2 \Psi_{D}}{\Psi_{D}} + \frac{\mathbf{\nabla}^2  \Psi_C}{ \Psi_C} + 2 \frac{\mathbf{\nabla}  \Psi_{D}}{\Psi_{D}}\cdot\frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
 \]
 !et
 We discuss here how to calculate these quantities in an optimal way,
@@ -1533,9 +1539,11 @@ $r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2}$ if we work w
 In our particular case we have
 !bt
 \[
-\Psi_C=\prod_{i< j}g(r_{ij})=\exp{\left\{\sum_{i<j}f(r_{ij})\right\}}.
+\Psi_C=\prod_{i< j}g(r_{ij})=\exp{\left\{\sum_{i<j}f(r_{ij})\right\}}=
+\exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
 \]
 !et
+
 !eblock
 
 
@@ -1707,6 +1715,24 @@ is the relative distance.
 !split
 ===== Importance sampling =====
 !bblock 
+When the correlation function is the *linear Pade-Jastrow* we have
+!bt
+\[
+f_{ij} = \frac{a r_{ij}}{(1 + \beta r_{ij})},
+\]
+!et
+which yields the closed form expression
+!bt
+\[
+\frac{\partial f_{ij}}{\partial r_{ij}} = \frac{a}{(1 + \beta r_{ij})^2}.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
 The second derivative of the Jastrow factor divided by the Jastrow factor (the way it enters the kinetic energy) is
 !bt
 \[
@@ -1728,7 +1754,7 @@ The second derivative of the Jastrow factor divided by the Jastrow factor (the w
 But we have a simple form for the function, namely
 !bt
 \[
-\Psi_{C}=\prod_{i< j}\exp{f(r_{ij})},
+\Psi_{C}=\prod_{i< j}\exp{f(r_{ij})}= \exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
 \]
 !et
 and it is easy to see that for particle  $k$
@@ -1741,6 +1767,56 @@ we have
 \]
 !et
 !eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
+Using 
+!bt
+\[
+f(r_{ij})= \frac{ar_{ij}}{1+\beta r_{ij}},
+\]
+!et
+and $g'(r_{kj})=dg(r_{kj})/dr_{kj}$ and 
+$g''(r_{kj})=d^2g(r_{kj})/dr_{kj}^2$  we find that for particle  $k$
+we have
+!bt
+\[
+  \frac{\mathbf{\nabla}^2_k \Psi_C}{\Psi_C }=
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}\frac{a}{(1+\beta r_{ki})^2}
+\frac{a}{(1+\beta r_{kj})^2}+
+\sum_{j\ne k}\left(\frac{2a}{r_{kj}(1+\beta r_{kj})^2}-\frac{2a\beta}{(1+\beta r_{kj})^3}\right)
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
+For the correlation part 
+!bt
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}\frac{ar_{ij}}{1+\beta r_{ij}}\right\}},
+\]
+!et
+we need to take into account whether electrons have equal or opposite spins since we have to obey the
+electron-electron cusp condition as well.  
+When the electrons have  equal spins 
+!bt
+\[
+a= 1/4,
+\]
+!et
+while for opposite spins (like the ground state in Helium)
+!bt
+\[
+a= 1/2
+\] 
+!et
+!eblock
+
 
 !split
 ===== Importance sampling, Fokker-Planck and Langevin equations =====
