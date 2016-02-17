@@ -1,0 +1,249 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="Conjugate gradient methods and other optimization methods">
+
+<title>Conjugate gradient methods and other optimization methods</title>
+
+<!-- Bootstrap style: bootstrap -->
+<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<!-- not necessary
+<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+-->
+
+<style type="text/css">
+
+/* Add scrollbar to dropdown menus in bootstrap navigation bar */
+.dropdown-menu {
+   height: auto;
+   max-height: 400px;
+   overflow-x: hidden;
+}
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [('Motivation', 2, None, '___sec0'),
+              ('Simple example and demonstration', 2, None, '___sec1'),
+              ('Simple example and demonstration', 2, None, '___sec2'),
+              ('Exercise 1: Find the local energy for the harmonic oscillator',
+               2,
+               None,
+               '___sec3'),
+              ('Variance in the simple model', 2, None, '___sec4'),
+              ('Computing the derivatives', 2, None, '___sec5'),
+              ('Expressions for finding the derivatives of the local energy',
+               2,
+               None,
+               '___sec6'),
+              ('Derivatives of the local energy', 2, None, '___sec7'),
+              ('Exercise 2: General expression for the derivative of the energy',
+               2,
+               None,
+               '___sec8'),
+              ('Conjugate gradient (CG) method', 2, None, '___sec9'),
+              ('Conjugate gradient method', 2, None, '___sec10'),
+              ("Conjugate gradient method, Newton's method first",
+               2,
+               None,
+               '___sec11'),
+              ('Simple example and demonstration', 2, None, '___sec12'),
+              ('Simple example and demonstration', 2, None, '___sec13'),
+              ('Conjugate gradient method', 2, None, '___sec14'),
+              ('Conjugate gradient method', 2, None, '___sec15'),
+              ('Conjugate gradient method', 2, None, '___sec16'),
+              ('Conjugate gradient method', 2, None, '___sec17'),
+              ('Conjugate gradient method and iterations',
+               2,
+               None,
+               '___sec18'),
+              ('Conjugate gradient method', 2, None, '___sec19'),
+              ('Conjugate gradient method', 2, None, '___sec20'),
+              ('Conjugate gradient method', 2, None, '___sec21'),
+              ('Using the conjugate gradient method', 2, None, '___sec22'),
+              ('Simple codes for  steepest descent and conjugate gradient using a $2\\times 2$ matrix',
+               2,
+               None,
+               '___sec23'),
+              ('The routine for the steepest descent method',
+               2,
+               None,
+               '___sec24'),
+              ('Simple implementation of the Conjugate gradient algorithm',
+               2,
+               None,
+               '___sec25'),
+              ('Codes from numerical recipes', 2, None, '___sec26'),
+              ('Finding the minimum of the harmonic oscillator model in one dimension',
+               2,
+               None,
+               '___sec27'),
+              ('Functions to observe', 2, None, '___sec28')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- Bootstrap navigation bar -->
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="CG-bs.html">Conjugate gradient methods and other optimization methods</a>
+  </div>
+
+  <div class="navbar-collapse collapse navbar-responsive-collapse">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+     <!-- navigation toc: --> <li><a href="._CG-bs001.html#___sec0" style="font-size: 80%;">Motivation</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs002.html#___sec1" style="font-size: 80%;">Simple example and demonstration</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs003.html#___sec2" style="font-size: 80%;">Simple example and demonstration</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs004.html#___sec3" style="font-size: 80%;">Exercise 1: Find the local energy for the harmonic oscillator</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs005.html#___sec4" style="font-size: 80%;">Variance in the simple model</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs006.html#___sec5" style="font-size: 80%;">Computing the derivatives</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs007.html#___sec6" style="font-size: 80%;">Expressions for finding the derivatives of the local energy</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs008.html#___sec7" style="font-size: 80%;">Derivatives of the local energy</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs009.html#___sec8" style="font-size: 80%;">Exercise 2: General expression for the derivative of the energy</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs010.html#___sec9" style="font-size: 80%;">Conjugate gradient (CG) method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs011.html#___sec10" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs012.html#___sec11" style="font-size: 80%;">Conjugate gradient method, Newton's method first</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec12" style="font-size: 80%;">Simple example and demonstration</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs014.html#___sec13" style="font-size: 80%;">Simple example and demonstration</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs015.html#___sec14" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs016.html#___sec15" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs017.html#___sec16" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs018.html#___sec17" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs019.html#___sec18" style="font-size: 80%;">Conjugate gradient method and iterations</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs020.html#___sec19" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs021.html#___sec20" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs022.html#___sec21" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs023.html#___sec22" style="font-size: 80%;">Using the conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs024.html#___sec23" style="font-size: 80%;">Simple codes for  steepest descent and conjugate gradient using a \( 2\times 2 \) matrix</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs025.html#___sec24" style="font-size: 80%;">The routine for the steepest descent method</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs026.html#___sec25" style="font-size: 80%;">Simple implementation of the Conjugate gradient algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs027.html#___sec26" style="font-size: 80%;">Codes from numerical recipes</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs028.html#___sec27" style="font-size: 80%;">Finding the minimum of the harmonic oscillator model in one dimension</a></li>
+     <!-- navigation toc: --> <li><a href="._CG-bs029.html#___sec28" style="font-size: 80%;">Functions to observe</a></li>
+
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+</div> <!-- end of navigation bar -->
+
+<div class="container">
+
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
+
+<a name="part0013"></a>
+<!-- !split -->
+
+<h2 id="___sec12">Simple example and demonstration </h2>
+<div class="panel panel-default">
+<div class="panel-body">
+The function \( f \) can be either the energy or the variance.  If we choose the energy then we have
+$$
+\begin{equation*}
+\hat{\alpha}_{i+1}-\hat{\alpha}_i=\hat{A}^{-1}(\nabla E(\hat{\alpha}_{i+1})-\nabla E(\hat{\alpha}_i)).
+\end{equation*}
+$$
+
+In the simple harmonic oscillator model, the gradient and the Hessian \( \hat{A} \) are
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
+\end{equation*}
+$$
+
+and a second derivative which is always positive (meaning that we find a minimum)
+$$
+\begin{equation*}
+\hat{A}= \frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = 1+\frac{3}{4\alpha^4}
+\end{equation*}
+$$
+</div>
+</div>
+
+
+<p>
+<p>
+<!-- navigation buttons at the bottom of the page -->
+<ul class="pagination">
+<li><a href="._CG-bs012.html">&laquo;</a></li>
+  <li><a href="._CG-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._CG-bs005.html">6</a></li>
+  <li><a href="._CG-bs006.html">7</a></li>
+  <li><a href="._CG-bs007.html">8</a></li>
+  <li><a href="._CG-bs008.html">9</a></li>
+  <li><a href="._CG-bs009.html">10</a></li>
+  <li><a href="._CG-bs010.html">11</a></li>
+  <li><a href="._CG-bs011.html">12</a></li>
+  <li><a href="._CG-bs012.html">13</a></li>
+  <li class="active"><a href="._CG-bs013.html">14</a></li>
+  <li><a href="._CG-bs014.html">15</a></li>
+  <li><a href="._CG-bs015.html">16</a></li>
+  <li><a href="._CG-bs016.html">17</a></li>
+  <li><a href="._CG-bs017.html">18</a></li>
+  <li><a href="._CG-bs018.html">19</a></li>
+  <li><a href="._CG-bs019.html">20</a></li>
+  <li><a href="._CG-bs020.html">21</a></li>
+  <li><a href="._CG-bs021.html">22</a></li>
+  <li><a href="._CG-bs022.html">23</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._CG-bs029.html">30</a></li>
+  <li><a href="._CG-bs014.html">&raquo;</a></li>
+</ul>
+<!-- ------------------- end of main content --------------- -->
+
+</div>  <!-- end container -->
+<!-- include javascript, jQuery *first* -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap footer
+<footer>
+<a href="http://..."><img width="250" align=right src="http://..."></a>
+</footer>
+-->
+
+
+<center style="font-size:80%">
+<!-- copyright only on the titlepage -->
+</center>
+
+
+</body>
+</html>
+    
+

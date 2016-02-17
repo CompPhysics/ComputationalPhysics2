@@ -1,0 +1,242 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="Conjugate gradient methods and other optimization methods">
+
+<title>Conjugate gradient methods and other optimization methods</title>
+
+
+<style type="text/css">
+/* bloodish style */
+
+body {
+  font-family: Helvetica, Verdana, Arial, Sans-serif;
+  color: #404040;
+  background: #ffffff;
+}
+h1 { font-size: 1.8em;  color: #8A0808; }
+h2 { font-size: 1.6em;  color: #8A0808; }
+h3 { font-size: 1.4em;  color: #8A0808; }
+h4 { color: #8A0808; }
+a { color: #8A0808; text-decoration:none; }
+tt { font-family: "Courier New", Courier; }
+/* pre style removed because it will interfer with pygments */
+p { text-indent: 0px; }
+hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+p.caption { width: 80%; font-style: normal; text-align: left; }
+hr.figure { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+.alert-text-small   { font-size: 80%;  }
+.alert-text-large   { font-size: 130%; }
+.alert-text-normal  { font-size: 90%;  }
+.alert {
+  padding:8px 35px 8px 14px; margin-bottom:18px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5);
+  border:1px solid #bababa;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  color: #555;
+  background-color: #f8f8f8;
+  background-position: 10px 5px;
+  background-repeat: no-repeat;
+  background-size: 38px;
+  padding-left: 55px;
+  width: 75%;
+ }
+.alert-block {padding-top:14px; padding-bottom:14px}
+.alert-block > p, .alert-block > ul {margin-bottom:1em}
+.alert li {margin-top: 1em}
+.alert-block p+p {margin-top:5px}
+.alert-notice { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_notice.png); }
+.alert-summary  { background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_summary.png); }
+.alert-warning { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_warning.png); }
+.alert-question {background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_question.png); }
+
+div { text-align: justify; text-justify: inter-word; }
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [(' Motivation  ', 2, None, '___sec0'),
+              (' Simple example and demonstration ', 2, None, '___sec1'),
+              (' Simple example and demonstration ', 2, None, '___sec2'),
+              (' Exercise 1: Find the local energy for the harmonic oscillator ',
+               2,
+               None,
+               '___sec3'),
+              (' Variance in the simple model ', 2, None, '___sec4'),
+              (' Computing the derivatives ', 2, None, '___sec5'),
+              (' Expressions for finding the derivatives of the local energy ',
+               2,
+               None,
+               '___sec6'),
+              (' Derivatives of the local energy ', 2, None, '___sec7'),
+              (' Exercise 2: General expression for the derivative of the energy ',
+               2,
+               None,
+               '___sec8'),
+              (' Exercise 3: Helium atom and hydrogen-like functions ',
+               2,
+               None,
+               '___sec9'),
+              (' Conjugate gradient (CG) method ', 2, None, '___sec10'),
+              (' Conjugate gradient method ', 2, None, '___sec11'),
+              (" Conjugate gradient method, Newton's method first ",
+               2,
+               None,
+               '___sec12'),
+              (' Simple example and demonstration ', 2, None, '___sec13'),
+              (' Simple example and demonstration ', 2, None, '___sec14'),
+              (' Using the conjugate gradient method ', 2, None, '___sec15'),
+              (' Conjugate gradient method ', 2, None, '___sec16'),
+              (' Conjugate gradient method ', 2, None, '___sec17'),
+              (' Conjugate gradient method ', 2, None, '___sec18'),
+              (' Conjugate gradient method ', 2, None, '___sec19'),
+              (' Conjugate gradient method and iterations ',
+               2,
+               None,
+               '___sec20'),
+              (' Conjugate gradient method ', 2, None, '___sec21'),
+              (' Conjugate gradient method ', 2, None, '___sec22'),
+              (' Conjugate gradient method ', 2, None, '___sec23'),
+              (' Conjugate gradient method, our case ', 2, None, '___sec24'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec25'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec26'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec27'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec28'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec29'),
+              (' Simple codes for  steepest descent and conjugate gradient ',
+               2,
+               None,
+               '___sec30'),
+              (' Codes from numerical recipes ', 2, None, '___sec31'),
+              (' What you have to provide ', 2, None, '___sec32'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec33'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec34'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec35'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec36'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec37'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec38'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec39'),
+              (' Simple example and code (model.cpp on webpage) ',
+               2,
+               None,
+               '___sec40')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<a name="part0041"></a>
+<p>
+<!-- begin top navigation -->
+<table style="width: 100%"><tr><td>
+<div style="text-align: left;"><a href="._cg-plain040.html"><img src="http://hplgit.github.io/doconce/bundled/html_images/prev1.png" border=0 alt="&laquo; Previous"></a></div>
+</td><td>
+</td></tr></table>
+<!-- end top navigation -->
+</p>
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec40">Simple example and code (model.cpp on webpage) </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic">//  this function defines the derivative of the energy </span>
+<span style="color: #B00040">void</span> <span style="color: #0000FF">dE_function</span>(<span style="color: #B00040">double</span> x[], <span style="color: #B00040">double</span> g[])
+{
+<span style="color: #408080; font-style: italic">//  Change here by calling your Metropolis function. </span>
+<span style="color: #408080; font-style: italic">//  I compute both the local energy and its derivative for every call to func</span>
+
+  g[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> x[<span style="color: #666666">1</span>]<span style="color: #666666">-1.0/</span>(<span style="color: #666666">4*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>x[<span style="color: #666666">1</span>]);
+} <span style="color: #408080; font-style: italic">// end of function to evaluate</span>
+</pre></div>
+<p>
+You need to change this function so that you call the local energy for your system. I used 1000
+cycles per call to get a new value of \( \langle E_L[\alpha]\rangle \).
+When I compute the local energy I also compute its derivative.
+After roughly 10-20 iterations I got a converged result in terms of \( \alpha \).
+</div>
+
+
+<p>
+<!-- begin bottom navigation -->
+<table style="width: 100%"><tr><td>
+<div style="text-align: left;"><a href="._cg-plain040.html"><img src="http://hplgit.github.io/doconce/bundled/html_images/prev1.png" border=0 alt="&laquo; Previous"></a></div>
+</td><td>
+</td></tr></table>
+<!-- end bottom navigation -->
+</p>
+
+<!-- ------------------- end of main content --------------- -->
+
+
+</body>
+</html>
+    
+
