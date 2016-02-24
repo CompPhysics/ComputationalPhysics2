@@ -1,0 +1,250 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="How to parallelize a Variational Monte Carlo code with MPI and OpenMP">
+
+<title>How to parallelize a Variational Monte Carlo code with MPI and OpenMP</title>
+
+
+<style type="text/css">
+/* bloodish style */
+
+body {
+  font-family: Helvetica, Verdana, Arial, Sans-serif;
+  color: #404040;
+  background: #ffffff;
+}
+h1 { font-size: 1.8em;  color: #8A0808; }
+h2 { font-size: 1.6em;  color: #8A0808; }
+h3 { font-size: 1.4em;  color: #8A0808; }
+h4 { color: #8A0808; }
+a { color: #8A0808; text-decoration:none; }
+tt { font-family: "Courier New", Courier; }
+/* pre style removed because it will interfer with pygments */
+p { text-indent: 0px; }
+hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+p.caption { width: 80%; font-style: normal; text-align: left; }
+hr.figure { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+.alert-text-small   { font-size: 80%;  }
+.alert-text-large   { font-size: 130%; }
+.alert-text-normal  { font-size: 90%;  }
+.alert {
+  padding:8px 35px 8px 14px; margin-bottom:18px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5);
+  border:1px solid #bababa;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  color: #555;
+  background-color: #f8f8f8;
+  background-position: 10px 5px;
+  background-repeat: no-repeat;
+  background-size: 38px;
+  padding-left: 55px;
+  width: 75%;
+ }
+.alert-block {padding-top:14px; padding-bottom:14px}
+.alert-block > p, .alert-block > ul {margin-bottom:1em}
+.alert li {margin-top: 1em}
+.alert-block p+p {margin-top:5px}
+.alert-notice { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_notice.png); }
+.alert-summary  { background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_summary.png); }
+.alert-warning { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_warning.png); }
+.alert-question {background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_gray_question.png); }
+
+div { text-align: justify; text-justify: inter-word; }
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [(' Your background  ', 2, None, '___sec0'),
+              ('  ', 2, None, '___sec1'),
+              (' How do I run MPI on a PC/Laptop?  ', 2, None, '___sec2'),
+              (' Can I do it on my own PC/laptop? ', 2, None, '___sec3'),
+              (' What is Message Passing Interface (MPI)?  ',
+               2,
+               None,
+               '___sec4'),
+              (' Going Parallel with MPI ', 2, None, '___sec5'),
+              (' MPI is a library  ', 2, None, '___sec6'),
+              (' The basic ideas of parallel computing ', 2, None, '___sec7'),
+              (' A rough classification of hardware models  ',
+               2,
+               None,
+               '___sec8'),
+              ('  Shared memory and distributed memory ', 2, None, '___sec9'),
+              ('    Different parallel programming paradigms  ',
+               2,
+               None,
+               '___sec10'),
+              ('    Different parallel programming paradigms ',
+               2,
+               None,
+               '___sec11'),
+              (' SPMD (single-program-multiple-data) ', 2, None, '___sec12'),
+              ("    Today's situation of parallel computing  ",
+               2,
+               None,
+               '___sec13'),
+              ('  Overhead present in parallel computing ',
+               2,
+               None,
+               '___sec14'),
+              ('    Parallelizing a sequential algorithm  ',
+               2,
+               None,
+               '___sec15'),
+              ('    Bindings to MPI routines  ', 2, None, '___sec16'),
+              (' Communicator  ', 2, None, '___sec17'),
+              ('  Some of the most  important MPI functions ',
+               2,
+               None,
+               '___sec18'),
+              ('    The first MPI C/C++ program  ', 2, None, '___sec19'),
+              ('    The Fortran program ', 2, None, '___sec20'),
+              ('    Note 1  ', 2, None, '___sec21'),
+              ('    Ordered output with $MPI\\_Barrier$  ',
+               2,
+               None,
+               '___sec22'),
+              ('    Note 2 ', 2, None, '___sec23'),
+              ('    Ordered output with $MPI\\_Recv$ and $MPI\\_Send$ ',
+               2,
+               None,
+               '___sec24'),
+              ('    Note 3  ', 2, None, '___sec25'),
+              ('    Note 4  ', 2, None, '___sec26'),
+              (' Numerical integration in parallel ', 2, None, '___sec27'),
+              ('    Dissection of trapezoidal rule with $MPI\\_reduce$ ',
+               2,
+               None,
+               '___sec28'),
+              ('    Dissection of trapezoidal rule with $MPI\\_reduce$ ',
+               2,
+               None,
+               '___sec29'),
+              (' Integrating with _MPI_ ', 2, None, '___sec30'),
+              (' How do I use $MPI\\_reduce$? ', 2, None, '___sec31'),
+              (' More on $MPI\\_Reduce$ ', 2, None, '___sec32'),
+              ('     Dissection of trapezoidal rule with $MPI\\_reduce$ ',
+               2,
+               None,
+               '___sec33'),
+              ('    Dissection of trapezoidal rule with $MPI\\_reduce$ ',
+               2,
+               None,
+               '___sec34'),
+              ('     Optimization and profiling ', 2, None, '___sec35'),
+              (' More on optimization ', 2, None, '___sec36'),
+              ('    Optimization and profiling  ', 2, None, '___sec37'),
+              ('    Optimization and profiling  ', 2, None, '___sec38'),
+              ('    What is OpenMP ', 2, None, '___sec39'),
+              ('    Getting started, things to remember ',
+               2,
+               None,
+               '___sec40'),
+              ('    General code structure  ', 2, None, '___sec41'),
+              ('    Parallel region ', 2, None, '___sec42'),
+              ('    Hello world, not again, please! ', 2, None, '___sec43'),
+              ('    Important OpenMP library routines ', 2, None, '___sec44'),
+              ('    Parallel for loop ', 2, None, '___sec45'),
+              (' Example code ', 2, None, '___sec46'),
+              ('    More on Parallel for loop ', 2, None, '___sec47'),
+              ('    Inner product ', 2, None, '___sec48'),
+              (' Different threads do different tasks ', 2, None, '___sec49'),
+              ('     Single execution  ', 2, None, '___sec50'),
+              ('    Coordination and synchronization  ', 2, None, '___sec51'),
+              ('    Data scope  ', 2, None, '___sec52'),
+              ('    Some remarks  ', 2, None, '___sec53'),
+              ('    Parallelizing nested for-loops ', 2, None, '___sec54'),
+              ('    Nested parallelism  ', 2, None, '___sec55'),
+              ('    Parallel tasks ', 2, None, '___sec56'),
+              ('    Common mistakes ', 2, None, '___sec57'),
+              ('    Matrix-matrix multiplication ', 2, None, '___sec58'),
+              ('    Matrix-matrix multiplication  ', 2, None, '___sec59'),
+              ('    Matrix-matrix multiplication ', 2, None, '___sec60'),
+              ('    Matrix-matrix multiplication ', 2, None, '___sec61')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<a name="part0044"></a>
+<p>
+
+</p>
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec43">Hello world, not again, please! </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #BC7A00">#include &lt;omp.h&gt;</span>
+<span style="color: #BC7A00">#include &lt;stdio.h&gt;</span>
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span> (<span style="color: #B00040">int</span> argc, <span style="color: #B00040">char</span> <span style="color: #666666">*</span>argv[])
+{
+<span style="color: #B00040">int</span> th_id, nthreads;
+<span style="color: #BC7A00">#pragma omp parallel private(th_id) shared(nthreads)</span>
+{
+th_id <span style="color: #666666">=</span> omp_get_thread_num();
+printf(<span style="color: #BA2121">&quot;Hello World from thread %d</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>, th_id);
+<span style="color: #BC7A00">#pragma omp barrier</span>
+<span style="color: #008000; font-weight: bold">if</span> ( th_id <span style="color: #666666">==</span> <span style="color: #666666">0</span> ) {
+nthreads <span style="color: #666666">=</span> omp_get_num_threads();
+printf(<span style="color: #BA2121">&quot;There are %d threads</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>,nthreads);
+}
+}
+<span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}
+</pre></div>
+
+</div>
+
+
+<p>
+<p>
+<!-- begin bottom navigation -->
+<table style="width: 100%"><tr><td>
+<div style="text-align: left;"><a href="._para-plain043.html"><img src="http://hplgit.github.io/doconce/bundled/html_images/prev1.png" border=0 alt="&laquo; Previous"></a></div>
+</td><td>
+<div style="text-align: right;"><a href="._para-plain045.html"><img src="http://hplgit.github.io/doconce/bundled/html_images/next1.png" border=0 alt="Next &raquo;"></a></div>
+</td></tr></table>
+<!-- end bottom navigation -->
+</p>
+
+<!-- ------------------- end of main content --------------- -->
+
+
+</body>
+</html>
+    
+
