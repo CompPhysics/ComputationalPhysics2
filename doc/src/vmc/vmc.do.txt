@@ -4343,3 +4343,113 @@ for $m_l> 0$.
 
 !eblock
 
+
+!split
+===== Proof for updating algorithm for Slater determinant =====
+!bblock
+As a starting point we may consider that each time a new position is suggested in the Metropolis algorithm, a row of the current Slater matrix experiences some kind of perturbation. Hence, the Slater matrix with its orbitals evaluated at the new position equals the old Slater matrix plus a perturbation matrix,
+!bt
+\begin{equation}
+label{oldSM}
+d_{jk}(\mathbf{x^{new}}) = d_{jk}(\mathbf{x^{old}}) + \Delta_{jk},
+\end{equation}
+!et
+where
+!bt
+\begin{equation}
+label{pertMatrix}
+\Delta_{jk} = \delta_{ik}[\phi_j(\mathbf{x_{i}^{new}}) - \phi_j(\mathbf{x_{i}^{old}})] = \delta_{ik}(\Delta\phi)_j .
+\end{equation}
+!et
+!eblock
+
+!split
+===== Proof for updating algorithm for Slater determinant =====
+!bblock
+Computing the inverse of the transposed matrix we arrive at
+!bt
+\begin{equation}label{invDkj}
+ d_{kj}(\mathbf{x^{new}})^{-1} = [d_{kj}(\mathbf{x^{old}}) + \Delta_{kj}]^{-1}.
+\end{equation}
+!et
+!eblock
+
+!split
+===== Proof for updating algorithm for Slater determinant =====
+!bblock
+The evaluation of the right hand side (rhs) term above is carried out by applying the identity $(A +  B)^{-1} = A^{-1} - (A + B)^{-1} B A^{-1}$. In compact notation it yields
+!bt
+\begin{eqnarray*}
+ [\mathbf{D}^{T}(\mathbf{x^{new}})]^{-1} & = & [\mathbf{D}^{T}(\mathbf{x^{old}}) + \Delta^T]^{-1}\\
+& = & [\mathbf{D}^{T}(\mathbf{x^{old}})]^{-1} - [\mathbf{D}^{T}(\mathbf{x^{old}}) + \Delta^T]^{-1} \Delta^T [\mathbf{D}^{T}(\mathbf{x^{old}})]^{-1}\\
+& = & [\mathbf{D}^{T}(\mathbf{x^{old}})]^{-1} - \underbrace{{[\mathbf{D}^{T}(\mathbf{x^{new}})]^{-1}}}_{\text{By Eq.}{\ref{invDkj}}}  \Delta^T [\mathbf{D}^{T}(\mathbf{x^{old}})]^{-1}.
+\end{eqnarray*}
+!et
+
+!eblock
+
+!split
+===== Proof for updating algorithm for Slater determinant =====
+!bblock
+Using index notation, the last result may be expanded by
+!bt
+\begin{eqnarray*}
+d^{-1}_{kj}(\mathbf{x^{new}}) & = & d^{-1}_{kj}(\mathbf{x^{old}}) -  \sum_{l} \sum_{m} d^{-1}_{km}(\mathbf{x^{new}}) \Delta^{T}_{ml}  d^{-1}_{lj}(\mathbf{x^{old}})\\
+& = & d^{-1}_{kj}(\mathbf{x^{old}}) -  \sum_{l} \sum_{m} d^{-1}_{km}(\mathbf{x^{new}}) \Delta_{lm}  d^{-1}_{lj}(\mathbf{x^{cur}})\\
+& = & d^{-1}_{kj}(\mathbf{x^{old}}) -  \sum_{l} \sum_{m} d^{-1}_{km}(\mathbf{x^{new}}) \delta_{im} (\Delta \phi)_{l} d^{-1}_{lj}(\mathbf{x^{old}})\\
+& = & d^{-1}_{kj}(\mathbf{x^{old}}) - d^{-1}_{ki}(\mathbf{x^{new}}) \sum_{l=1}^{N}(\Delta \phi)_{l}  d^{-1}_{lj}(\mathbf{x^{old}})\\
+& = & d^{-1}_{kj}(\mathbf{x^{old}}) - d^{-1}_{ki}(\mathbf{x^{new}}) \sum_{l=1}^{N}[\phi_{l}(\mathbf{r_{i}^{new}}) - \phi_{l}(\mathbf{r_{i}^{old}})]  D^{-1}_{lj}(\mathbf{x^{old}}).
+\end{eqnarray*}
+!et
+
+!eblock
+
+!split
+===== Proof for updating algorithm for Slater determinant =====
+!bblock
+Using 
+$$\mathbf{D}^{-1}(\mathbf{x^{old}}) = \frac{adj \mathbf{D}}{|\mathbf{D}(\mathbf{x^{old}})|} \, \quad \text{and} \, \quad \mathbf{D}^{-1}(\mathbf{x^{new}}) = \frac{adj \mathbf{D}}{|\mathbf{D}(\mathbf{x^{new}})|},$$
+and dividing these two equations we get
+$$\frac{\mathbf{D}^{-1}(\mathbf{x^{old}})}{\mathbf{D}^{-1}(\mathbf{x^{new}})} = \frac{|\mathbf{D}(\mathbf{x^{new}})|}{|\mathbf{D}(\mathbf{x^{old}})|} = R \Rightarrow d^{-1}_{ki}(\mathbf{x^{new}}) = \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R}.$$
+
+!eblock
+
+!split
+===== Proof for updating algorithm for Slater determinant =====
+!bblock
+We have $$d^{-1}_{kj}(\mathbf{x^{new}})  =  d^{-1}_{kj}(\mathbf{x^{old}}) - \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N}[\phi_{l}(\mathbf{r_{i}^{new}}) - \phi_{l}(\mathbf{r_{i}^{old}})]  d^{-1}_{lj}(\mathbf{x^{old}}),$$
+or
+!bt
+\begin{align}
+ d^{-1}_{kj}(\mathbf{x^{new}})  =  d^{-1}_{kj}(\mathbf{x^{old}}) \qquad & - & \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N}\phi_{l}(\mathbf{r_{i}^{new}})  d^{-1}_{lj}(\mathbf{x^{old}}) \nonumber\\
+  & + &  \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N}\phi_{l}(\mathbf{r_{i}^{old}})  d^{-1}_{lj}(\mathbf{x^{old}})\nonumber\\
+                             =  d^{-1}_{kj}(\mathbf{x^{old}}) \qquad & - & \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N} d_{il}(\mathbf{x^{new}})  d^{-1}_{lj}(\mathbf{x^{old}}) \nonumber\\
+& + &  \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N} d_{il}(\mathbf{x^{old}}) d^{-1}_{lj}(\mathbf{x^{old}}).\nonumber
+\end{align}
+!et
+!eblock
+
+!split
+===== Proof for updating algorithm for Slater determinant =====
+!bblock
+In this equation, the first line becomes zero for $j=i$ and the second for $j \neq i$. Therefore, the update of the inverse for the new Slater matrix is given by
+!bt
+\begin{eqnarray}
+\boxed{d^{-1}_{kj}(\mathbf{x^{new}})  = \left\{ 
+\begin{array}{l l}
+  d^{-1}_{kj}(\mathbf{x^{old}}) - \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N} d_{il}(\mathbf{x^{new}})  d^{-1}_{lj}(\mathbf{x^{old}}) & \mbox{if $j \neq i$}\nonumber \\ \\
+ \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N} d_{il}(\mathbf{x^{old}}) d^{-1}_{lj}(\mathbf{x^{old}}) & \mbox{if $j=i$}
+\end{array} \right.}
+\end{eqnarray}
+!et
+!eblock
+
+
+
+
+
+
+
+
+
+
