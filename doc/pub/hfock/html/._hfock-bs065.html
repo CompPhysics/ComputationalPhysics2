@@ -1,0 +1,636 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="FYS4411 Computational Physics 2:  Hartree-Fock methods">
+
+<title>FYS4411 Computational Physics 2:  Hartree-Fock methods</title>
+
+<!-- Bootstrap style: bootstrap -->
+<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<!-- not necessary
+<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+-->
+
+<style type="text/css">
+
+/* Add scrollbar to dropdown menus in bootstrap navigation bar */
+.dropdown-menu {
+   height: auto;
+   max-height: 400px;
+   overflow-x: hidden;
+}
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [('Why Hartree-Fock?', 2, None, '___sec0'),
+              ('Why Hartree-Fock?', 2, None, '___sec1'),
+              ('Definitions and notations', 2, None, '___sec2'),
+              ('Definitions and notations', 2, None, '___sec3'),
+              ('Definitions and notations', 2, None, '___sec4'),
+              ('Definitions and notations', 2, None, '___sec5'),
+              ('Definitions and notations', 2, None, '___sec6'),
+              ('Brief reminder on some linear algebra properties',
+               2,
+               None,
+               '___sec7'),
+              ('Basic Matrix Features', 2, None, '___sec8'),
+              ('Basic Matrix Features', 2, None, '___sec9'),
+              ('Basic Matrix Features, simple $2 \\times 2$ determinant',
+               2,
+               None,
+               '___sec10'),
+              ('Definitions and notations', 2, None, '___sec11'),
+              ('Definitions and notations', 2, None, '___sec12'),
+              ('Definitions and notations', 2, None, '___sec13'),
+              ('Definitions and notations', 2, None, '___sec14'),
+              ('Definitions and notations', 2, None, '___sec15'),
+              ('Definitions and notations', 2, None, '___sec16'),
+              ('Definitions and notations', 2, None, '___sec17'),
+              ('Definitions and notations', 2, None, '___sec18'),
+              ('Definitions and notations', 2, None, '___sec19'),
+              ('Definitions and notations', 2, None, '___sec20'),
+              ('Definitions and notations', 2, None, '___sec21'),
+              ('Compact functional', 2, None, '___sec22'),
+              ('Properties of the interaction elements', 2, None, '___sec23'),
+              ('Redefining the matrix elements', 2, None, '___sec24'),
+              ('Rewriting the energy functional', 2, None, '___sec25'),
+              ('Reminder on Variational Calculus and Lagrangian Multipliers',
+               2,
+               None,
+               '___sec26'),
+              ('Variational Calculus and Lagrangian Multipliers, simple example',
+               2,
+               None,
+               '___sec27'),
+              ('Manipulating terms', 2, None, '___sec28'),
+              ('Adding the Lagrangian multiplier', 2, None, '___sec29'),
+              ('And with the Euler-Lagrange equations we get',
+               2,
+               None,
+               '___sec30'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec31'),
+              ('More on linear algebra', 2, None, '___sec32'),
+              ('Coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec33'),
+              ('More Basic Matrix Features, simple $2 \\times 2$ determinant, useful property of determinants',
+               2,
+               None,
+               '___sec34'),
+              ('More Basic Matrix Features, $n \\times n$ determinant',
+               2,
+               None,
+               '___sec35'),
+              ('More Basic Matrix Features, a general $n \\times n$ determinant',
+               2,
+               None,
+               '___sec36'),
+              ('A general Slater determinant', 2, None, '___sec37'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec38'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec39'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec40'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec41'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec42'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec43'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec44'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec45'),
+              ('Hartree-Fock algorithm', 2, None, '___sec46'),
+              ('Hartree-Fock algorithm', 2, None, '___sec47'),
+              ('Hartree-Fock algorithm', 2, None, '___sec48'),
+              ('Hartree-Fock algorithm', 2, None, '___sec49'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec50'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec51'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec52'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec53'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec54'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec55'),
+              ("Analysis of Hartree-Fock equations, Koopman's theorem",
+               2,
+               None,
+               '___sec56'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec57'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec58'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec59'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec60'),
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
+               2,
+               None,
+               '___sec61'),
+              ('Exercise 1: Hartree-Fock Slater determinant',
+               2,
+               None,
+               '___sec62'),
+              ('Exercise 2: Matrix elements for the Hartree-Fock method and the nuclear shell model',
+               2,
+               None,
+               '___sec63'),
+              ('Exercise 3: Developing a  Hartree-Fock program',
+               2,
+               None,
+               '___sec64')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript"
+ src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- Bootstrap navigation bar -->
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="hfock-bs.html">FYS4411 Computational Physics 2:  Hartree-Fock methods</a>
+  </div>
+
+  <div class="navbar-collapse collapse navbar-responsive-collapse">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+     <!-- navigation toc: --> <li><a href="._hfock-bs001.html#___sec0" style="font-size: 80%;">Why Hartree-Fock?</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs002.html#___sec1" style="font-size: 80%;">Why Hartree-Fock?</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs003.html#___sec2" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs004.html#___sec3" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs005.html#___sec4" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs006.html#___sec5" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs007.html#___sec6" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs008.html#___sec7" style="font-size: 80%;">Brief reminder on some linear algebra properties</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs009.html#___sec8" style="font-size: 80%;">Basic Matrix Features</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs010.html#___sec9" style="font-size: 80%;">Basic Matrix Features</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs011.html#___sec10" style="font-size: 80%;">Basic Matrix Features, simple \( 2 \times 2 \) determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs012.html#___sec11" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs013.html#___sec12" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs014.html#___sec13" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs015.html#___sec14" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs016.html#___sec15" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs017.html#___sec16" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs018.html#___sec17" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs019.html#___sec18" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs020.html#___sec19" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs021.html#___sec20" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs022.html#___sec21" style="font-size: 80%;">Definitions and notations</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs023.html#___sec22" style="font-size: 80%;">Compact functional</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs024.html#___sec23" style="font-size: 80%;">Properties of the interaction elements</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs025.html#___sec24" style="font-size: 80%;">Redefining the matrix elements</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs026.html#___sec25" style="font-size: 80%;">Rewriting the energy functional</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs027.html#___sec26" style="font-size: 80%;">Reminder on Variational Calculus and Lagrangian Multipliers</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs028.html#___sec27" style="font-size: 80%;">Variational Calculus and Lagrangian Multipliers, simple example</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs029.html#___sec28" style="font-size: 80%;">Manipulating terms</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs030.html#___sec29" style="font-size: 80%;">Adding the Lagrangian multiplier</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs031.html#___sec30" style="font-size: 80%;">And with the Euler-Lagrange equations we get</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs032.html#___sec31" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs033.html#___sec32" style="font-size: 80%;">More on linear algebra</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs034.html#___sec33" style="font-size: 80%;">Coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs035.html#___sec34" style="font-size: 80%;">More Basic Matrix Features, simple \( 2 \times 2 \) determinant, useful property of determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs036.html#___sec35" style="font-size: 80%;">More Basic Matrix Features, \( n \times n \) determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs037.html#___sec36" style="font-size: 80%;">More Basic Matrix Features, a general \( n \times n \) determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs038.html#___sec37" style="font-size: 80%;">A general Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs039.html#___sec38" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs040.html#___sec39" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs041.html#___sec40" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs042.html#___sec41" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs043.html#___sec42" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs044.html#___sec43" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs045.html#___sec44" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs046.html#___sec45" style="font-size: 80%;">Hartree-Fock by varying the coefficients of a wave function expansion</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs047.html#___sec46" style="font-size: 80%;">Hartree-Fock algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs048.html#___sec47" style="font-size: 80%;">Hartree-Fock algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs049.html#___sec48" style="font-size: 80%;">Hartree-Fock algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs050.html#___sec49" style="font-size: 80%;">Hartree-Fock algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs051.html#___sec50" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs052.html#___sec51" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs053.html#___sec52" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs054.html#___sec53" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs055.html#___sec54" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs056.html#___sec55" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs057.html#___sec56" style="font-size: 80%;">Analysis of Hartree-Fock equations, Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs058.html#___sec57" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs059.html#___sec58" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs060.html#___sec59" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs061.html#___sec60" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs062.html#___sec61" style="font-size: 80%;">Analysis of Hartree-Fock equations and Koopman's theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs063.html#___sec62" style="font-size: 80%;">Exercise 1: Hartree-Fock Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._hfock-bs064.html#___sec63" style="font-size: 80%;">Exercise 2: Matrix elements for the Hartree-Fock method and the nuclear shell model</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec64" style="font-size: 80%;">Exercise 3: Developing a  Hartree-Fock program</a></li>
+
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+</div> <!-- end of navigation bar -->
+
+<div class="container">
+
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
+
+<a name="part0065"></a>
+<!-- !split -->
+
+<p>
+<!-- --- begin exercise --- -->
+
+<h2 id="___sec64">Exercise 3: Developing a  Hartree-Fock program </h2>
+
+<p>
+Neutron drops are a powerful theoretical laboratory for testing,
+validating and improving nuclear structure models. Indeed, all
+approaches to nuclear structure, from ab initio theory to shell model
+to density functional theory are applicable in such systems. We will,
+therefore, use neutron drops as a test system for setting up a
+Hartree-Fock code.  This program can later be extended to studies of
+the binding energy of nuclei like $^{16}$O or $^{40}$Ca. The
+single-particle energies obtained by solving the Hartree-Fock
+equations can then be directly related to experimental separation
+energies. For those of you interested in such studies, the program you
+will end up developing here can be used in later projects, with simple
+extensions.  Since Hartree-Fock theory is the starting point for
+several many-body techniques (density functional theory, random-phase
+approximation, shell-model etc), the aim here is to develop a computer
+program to solve the Hartree-Fock equations in a given single-particle basis,
+here the harmonic oscillator.
+
+<p>
+The Hamiltonian for a system of \( N \) neutron drops confined in a
+harmonic potential reads
+$$
+\hat{H} = \sum_{i=1}^{N} \frac{\hat{p}_{i}^{2}}{2m}+\sum_{i=1}^{N} \frac{1}{2} m\omega {r}_{i}^{2}+\sum_{i < j} \hat{V}_{ij},
+$$
+
+with \( \hbar^{2}/2m = 20.73 \) fm$^{2}$, \( mc^{2} = 938.90590 \) MeV, and 
+\( \hat{V}_{ij} \) is the two-body interaction potential whose 
+matrix elements are precalculated
+and to be read in by you.
+
+<p>
+The Hartree-Fock algorithm can be broken down as follows. We recall that  our Hartree-Fock matrix  is 
+$$
+\hat{h}_{\alpha\beta}^{HF}=\langle \alpha \vert\hat{h}_0 \vert \beta \rangle+
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+$$
+
+Normally we assume that the single-particle basis \( \vert\beta\rangle \)
+forms an eigenbasis for the operator \( \hat{h}_0 \) (this is our case), meaning that the
+Hartree-Fock matrix becomes
+$$
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+$$
+
+The Hartree-Fock eigenvalue problem
+$$
+\sum_{\beta}\hat{h}_{\alpha\beta}^{HF}C_{i\beta}=\epsilon_i^{\mathrm{HF}}C_{i\alpha},
+$$
+
+can be written out in a more compact form as
+$$
+\hat{h}^{HF}\hat{C}=\epsilon^{\mathrm{HF}}\hat{C}. 
+$$
+
+<p>
+The equations are often rewritten in terms of a so-called density matrix,
+which is defined as 
+$$
+\begin{equation}
+\rho_{\gamma\delta}=\sum_{i=1}^{N}\langle\gamma|i\rangle\langle i|\delta\rangle = \sum_{i=1}^{N}C_{i\gamma}C^*_{i\delta}.
+\tag{18}
+\end{equation}
+$$
+
+It means that we can rewrite the Hartree-Fock Hamiltonian as
+$$
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{\gamma\delta} \rho_{\gamma\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+$$
+
+It is convenient to use the density matrix since we can precalculate in every iteration the product of two eigenvector components \( C \).
+
+<p>
+Note that \( \langle \alpha\vert\hat{h}_0\vert\beta \rangle \) denotes the
+matrix elements of the one-body part of the starting hamiltonian. For
+self-bound nuclei \( \langle \alpha\vert\hat{h}_0\vert\beta \rangle \) is the
+kinetic energy, whereas for neutron drops, \( \langle \alpha \vert \hat{h}_0 \vert \beta \rangle \) represents the harmonic oscillator hamiltonian since
+the system is confined in a harmonic trap. If we are working in a
+harmonic oscillator basis with the same \( \omega \) as the trapping
+potential, then \( \langle \alpha\vert\hat{h}_0 \vert \beta \rangle \) is
+diagonal.
+
+<p>
+An example of a function written in python (see also the exercises below)  which performs the Hartree-Fock calculation is shown here. In setting up your code you will need to write a function which sets up the single-particle basis, the matrix elements \( t_{\alpha\gamma} \) of the one-body operator (called \( h0 \) in the function below) and the antisymmetrized TBMEs (called <em>nninteraction</em> in the code link below) and the density matrix elements \( \rho_{\beta\delta} \) (called <em>densityMatrix</em> below). 
+The python <a href="https://github.com/NuclearStructure/PHY981/blob/master/doc/ProjectsExercises/projects/2016/Codes/hfnuclei.py" target="_self">program</a>  shows how one can, in a brute force way read in matrix elements in \( m \)-scheme and compute the Hartree-Fock single-particle energies for four major shells. The interaction which has been used is the so-called N3LO interaction of <a href="http://journals.aps.org/prc/abstract/10.1103/PhysRevC.68.041001" target="_self">Machleidt and Entem</a>
+using the <a href="http://journals.aps.org/prc/abstract/10.1103/PhysRevC.75.061001" target="_self">Similarity Renormalization Group</a> approach method to renormalize the interaction, using an oscillator energy \( \hbar\omega=10 \) MeV.
+
+<p>
+The nucleon-nucleon two-body matrix elements are in \( m \)-scheme and are fully anti-symmetrized. The Hartree-Fock programs uses the density matrix discussed above in order to compute the Hartree-Fock matrix.
+Here we display the Hartree-Fock part only, assuming that single-particle data and two-body matrix elements have already been read in.
+
+<p>
+We will perform Hartree-Fock calculations for eight, \( N=8 \), neutrons in an oscillator potentials with an oscillator frequency \( \hbar\omega =10 \) MeV. This means that we are filling the \( 0s \) and the \( 0p \) shells and that these single-particle states define the reference state, or our ansatz for the ground state.
+The total set of single-particle states will comprise four major shells only, that is the \( 0s \), \( 0p \), \( 1s0d \) and \( 1p0f \) shells.
+
+<p>
+The input file spdata.dat contains the information of all single-particle quantum numbers needed to define this space. In total we have \( 40 \) single-particle states labeled by \( n \), \( j \), \( l \) and \( m \), where \( m \) is the projection of the total single-particle angular momentum \( j \). To every set of single-particle quantum numbers there is a unique number \( p \) identifiying them, meaning that the two-body matrix elements in the file twobody.dat are identified as 
+\( \langle pq \vert \hat{v}\vert rs \rangle \).
+
+<p>
+You will need to read these two files and set up arrays which store the matrix elements while running the program.
+
+<p>
+<b>a)</b>
+Set up a Hartree-Fock program which uses first only the
+Harmonic oscillator single-particle Hamiltonian for for eight, \( N=8 \),
+neutrons in an oscillator potential with an oscillator energy
+\( \hbar\omega =10 \) MeV. Use the single-particle states defined in the
+file spdata.dat. This serves as a useful test of your calculations
+since the result should be the harmonic oscillator single-particle
+energies.
+
+<p>
+<b>b)</b>
+hamiltonian is diagonal in \( ljm \) (and independent of \( m \)), and that
+the Hartree-Fock equations can be written as 
+$$ \sum_{n_3}
+h^{lj}_{n_1n_3}C^{lj}_{n_3\bar{n}} =
+\epsilon_{\bar{n}lj}C^{lj}_{n_3\bar{n}}.  
+$$
+
+where the
+single-particle Hartree-Fock Hamiltonian matrix elements are 
+$$
+h^{lj}_{n_1n_3} = \delta_{n_3 n_1}(2n_1+l + 3/2)\hbar\omega +
+\sum_{n_2n_4}\sum_{l'j'}^{occ}\langle n_1ljn_2l'j'|V|n_3ljn_4l'j'\rangle\rho^{l'j'}_{n_4n_2}.  
+$$
+
+The
+\( occ \) on the second summation is to remind you that the sum is over
+\( l'j' \) values of occupied Hartree-Fock states only. This follows from
+the fact that the density matrix is diagonal in these quantum
+numbers. Note well that we need to do the additional summation over
+\( l' \), \( j' \).
+
+<p>
+<b>c)</b>
+Include thereafter the nucleon-nucleon
+interaction from the file twobody.dat and perform Hartree-Fock
+calculations for neutrons only using the single-particle states that
+comprise four major shells only, that is the \( 0s \), \( 0p \), \( 1s0d \) and
+\( 1p0f \) shells.  The occupied single-particle states are those of the
+\( 0s \) and \( 0p \) shells, having in total eight neutrons.  Compute the
+Hartree-Fock single-particle energies and compare the final results
+with the harmonic oscillator energies. Comment your results.
+
+<p>
+<b>d)</b>
+With a working program, add now eight protons and compute the
+Hartree-Fock single-particle energies for \( {}^{16}\mbox{O} \), that is both
+protons and neutrons. Compare the proton and neutron single-particle
+energies for the \( \varepsilon^{HF}_{0p_{1/2}} \) and
+\( \varepsilon^{HF}_{0d_{5/2}} \) with their corresponding separation
+energies. Which separation energies would you compare them with?
+
+<p>
+The python
+<a href="https://github.com/NuclearStructure/PHY981/blob/master/doc/ProjectsExercises/projects/2016/Codes/hfnuclei.py" target="_self">program</a>
+shows how one can, in a brute force way read in matrix elements in
+\( m \)-scheme and compute the Hartree-Fock single-particle energies for
+four major shells. The interaction which has been used is the
+so-called N3LO interaction of <a href="http://journals.aps.org/prc/abstract/10.1103/PhysRevC.68.041001" target="_self">Machleidt and
+Entem</a>
+using the <a href="http://journals.aps.org/prc/abstract/10.1103/PhysRevC.75.061001" target="_self">Similarity Renormalization
+Group</a>
+approach method to renormalize the interaction, using an oscillator
+energy \( \hbar\omega=10 \) MeV.
+
+<p>
+The nucleon-nucleon two-body matrix elements are in \( m \)-scheme and are fully anti-symmetrized. The Hartree-Fock programs uses the density matrix discussed above in order to compute the Hartree-Fock matrix.
+Here we display the Hartree-Fock part only, assuming that single-particle data and two-body matrix elements have already been read in. 
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">	<span style="color: #BA2121; font-style: italic">&quot;&quot;&quot; Star HF-iterations, preparing variables and density matrix &quot;&quot;&quot;</span>
+
+        <span style="color: #BA2121; font-style: italic">&quot;&quot;&quot; Coefficients for setting up density matrix, assuming only one along the diagonals &quot;&quot;&quot;</span>
+	C <span style="color: #666666">=</span> np<span style="color: #666666">.</span>eye(spOrbitals) <span style="color: #408080; font-style: italic"># HF coefficients</span>
+        DensityMatrix <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros([spOrbitals,spOrbitals])
+        <span style="color: #008000; font-weight: bold">for</span> gamma <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+            <span style="color: #008000; font-weight: bold">for</span> delta <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+                <span style="color: #008000">sum</span> <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+                <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Nparticles):
+                    <span style="color: #008000">sum</span> <span style="color: #666666">+=</span> C[gamma][i]<span style="color: #666666">*</span>C[delta][i]
+                DensityMatrix[gamma][delta] <span style="color: #666666">=</span> Decimal(<span style="color: #008000">sum</span>)
+        maxHFiter <span style="color: #666666">=</span> <span style="color: #666666">100</span>
+        epsilon <span style="color: #666666">=</span>  <span style="color: #666666">1.0e-10</span> 
+        difference <span style="color: #666666">=</span> <span style="color: #666666">1.0</span>
+	hf_count <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+	oldenergies <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(spOrbitals)
+	newenergies <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(spOrbitals)
+	<span style="color: #008000; font-weight: bold">while</span> hf_count <span style="color: #666666">&lt;</span> maxHFiter <span style="color: #AA22FF; font-weight: bold">and</span> difference <span style="color: #666666">&gt;</span> epsilon:
+		<span style="color: #008000; font-weight: bold">print</span> <span style="color: #BA2121">&quot;############### Iteration </span><span style="color: #BB6688; font-weight: bold">%i</span><span style="color: #BA2121"> ###############&quot;</span> <span style="color: #666666">%</span> hf_count
+   	        HFmatrix <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros([spOrbitals,spOrbitals])		
+		<span style="color: #008000; font-weight: bold">for</span> alpha <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+			<span style="color: #008000; font-weight: bold">for</span> beta <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+                            <span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;  If tests for three-dimensional systems, including isospin conservation &quot;&quot;&quot;</span>
+                            <span style="color: #008000; font-weight: bold">if</span> l[alpha] <span style="color: #666666">!=</span> l[beta] <span style="color: #AA22FF; font-weight: bold">and</span> j[alpha] <span style="color: #666666">!=</span> j[beta] <span style="color: #AA22FF; font-weight: bold">and</span> mj[alpha] <span style="color: #666666">!=</span> mj[beta] <span style="color: #AA22FF; font-weight: bold">and</span> tz[alpha] <span style="color: #666666">!=</span> tz[beta]: <span style="color: #008000; font-weight: bold">continue</span>
+                            <span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;  Setting up the Fock matrix using the density matrix and antisymmetrized NN interaction in m-scheme &quot;&quot;&quot;</span>
+     		            sumFockTerm <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+                            <span style="color: #008000; font-weight: bold">for</span> gamma <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+                                <span style="color: #008000; font-weight: bold">for</span> delta <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+                                    <span style="color: #008000; font-weight: bold">if</span> (mj[alpha]<span style="color: #666666">+</span>mj[gamma]) <span style="color: #666666">!=</span> (mj[beta]<span style="color: #666666">+</span>mj[delta]) <span style="color: #AA22FF; font-weight: bold">and</span> (tz[alpha]<span style="color: #666666">+</span>tz[gamma]) <span style="color: #666666">!=</span> (tz[beta]<span style="color: #666666">+</span>tz[delta]): <span style="color: #008000; font-weight: bold">continue</span>
+                                    sumFockTerm <span style="color: #666666">+=</span> DensityMatrix[gamma][delta]<span style="color: #666666">*</span>nninteraction[alpha][gamma][beta][delta]
+                            HFmatrix[alpha][beta] <span style="color: #666666">=</span> Decimal(sumFockTerm)
+                            <span style="color: #BA2121; font-style: italic">&quot;&quot;&quot;  Adding the one-body term, here plain harmonic oscillator &quot;&quot;&quot;</span>
+                            <span style="color: #008000; font-weight: bold">if</span> beta <span style="color: #666666">==</span> alpha:   HFmatrix[alpha][alpha] <span style="color: #666666">+=</span> singleparticleH[alpha]
+		spenergies, C <span style="color: #666666">=</span> np<span style="color: #666666">.</span>linalg<span style="color: #666666">.</span>eigh(HFmatrix)
+                <span style="color: #BA2121; font-style: italic">&quot;&quot;&quot; Setting up new density matrix in m-scheme &quot;&quot;&quot;</span>
+                DensityMatrix <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros([spOrbitals,spOrbitals])
+                <span style="color: #008000; font-weight: bold">for</span> gamma <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+                    <span style="color: #008000; font-weight: bold">for</span> delta <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+                        <span style="color: #008000">sum</span> <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+                        <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Nparticles):
+                            <span style="color: #008000">sum</span> <span style="color: #666666">+=</span> C[gamma][i]<span style="color: #666666">*</span>C[delta][i]
+                        DensityMatrix[gamma][delta] <span style="color: #666666">=</span> Decimal(<span style="color: #008000">sum</span>)
+		newenergies <span style="color: #666666">=</span> spenergies
+                <span style="color: #BA2121; font-style: italic">&quot;&quot;&quot; Brute force computation of difference between previous and new sp HF energies &quot;&quot;&quot;</span>
+                <span style="color: #008000">sum</span> <span style="color: #666666">=0.0</span>
+                <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+                    <span style="color: #008000">sum</span> <span style="color: #666666">+=</span> (<span style="color: #008000">abs</span>(newenergies[i]<span style="color: #666666">-</span>oldenergies[i]))<span style="color: #666666">/</span>spOrbitals
+                difference <span style="color: #666666">=</span> <span style="color: #008000">sum</span>
+                oldenergies <span style="color: #666666">=</span> newenergies
+                <span style="color: #008000; font-weight: bold">print</span> <span style="color: #BA2121">&quot;Single-particle energies, ordering may have changed &quot;</span>
+                <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(spOrbitals):
+                    <span style="color: #008000; font-weight: bold">print</span>(<span style="color: #BA2121">&#39;{0:4d}  {1:.4f}&#39;</span><span style="color: #666666">.</span>format(i, Decimal(oldenergies[i])))
+		hf_count <span style="color: #666666">+=</span> <span style="color: #666666">1</span>
+</pre></div>
+<p>
+Running the program, one finds that the lowest-lying states for a nucleus like \( {}^{16}\mbox{O} \), we see that the nucleon-nucleon force brings a natural spin-orbit splitting for the \( 0p \) states (or other states except the \( s \)-states).
+Since we are using the \( m \)-scheme for our calculations, we observe that there are several states with the same
+eigenvalues. The number of eigenvalues corresponds to the degeneracy \( 2j+1 \) and is well respected in our calculations, as see from the table here.
+
+<p>
+The values of the lowest-lying states are (\( \pi \) for protons and \( \nu \) for neutrons)
+
+<div class="row">
+  <div class="col-xs-3">
+    <table class="table table-striped table-hover table-condensed">
+<thead>
+<tr><td align="center"><b>  Quantum numbers   </b></td> <td align="center"><b>Energy [MeV]</b></td> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   \( 0s_{1/2}^{\pi} \)    </td> <td align="center">   -40.4602        </td> </tr>
+<tr><td align="center">   \( 0s_{1/2}^{\pi} \)    </td> <td align="center">   -40.4602        </td> </tr>
+<tr><td align="center">   \( 0s_{1/2}^{\nu} \)    </td> <td align="center">   -40.6426        </td> </tr>
+<tr><td align="center">   \( 0s_{1/2}^{\nu} \)    </td> <td align="center">   -40.6426        </td> </tr>
+<tr><td align="center">   \( 0p_{1/2}^{\pi} \)    </td> <td align="center">   -6.7133         </td> </tr>
+<tr><td align="center">   \( 0p_{1/2}^{\pi} \)    </td> <td align="center">   -6.7133         </td> </tr>
+<tr><td align="center">   \( 0p_{1/2}^{\nu} \)    </td> <td align="center">   -6.8403         </td> </tr>
+<tr><td align="center">   \( 0p_{1/2}^{\nu} \)    </td> <td align="center">   -6.8403         </td> </tr>
+<tr><td align="center">   \( 0p_{3/2}^{\pi} \)    </td> <td align="center">   -11.5886        </td> </tr>
+<tr><td align="center">   \( 0p_{3/2}^{\pi} \)    </td> <td align="center">   -11.5886        </td> </tr>
+<tr><td align="center">   \( 0p_{3/2}^{\pi} \)    </td> <td align="center">   -11.5886        </td> </tr>
+<tr><td align="center">   \( 0p_{3/2}^{\pi} \)    </td> <td align="center">   -11.5886        </td> </tr>
+<tr><td align="center">   \( 0p_{3/2}^{\nu} \)    </td> <td align="center">   -11.7201        </td> </tr>
+<tr><td align="center">   \( 0p_{3/2}^{\nu} \)    </td> <td align="center">   -11.7201        </td> </tr>
+<tr><td align="center">   \( 0p_{3/2}^{\nu} \)    </td> <td align="center">   -11.7201        </td> </tr>
+<tr><td align="center">   \( 0p_{3/2}^{\nu} \)    </td> <td align="center">   -11.7201        </td> </tr>
+<tr><td align="center">   \( 0d_{5/2}^{\pi} \)    </td> <td align="center">   18.7589         </td> </tr>
+<tr><td align="center">   \( 0d_{5/2}^{\nu} \)    </td> <td align="center">   18.8082         </td> </tr>
+</tbody>
+    </table>
+  </div> <!-- col-xs-3 -->
+</div> <!-- cell row -->
+<p>
+We can use these results to attempt our first link with experimental data, namely to compute the shell gap or the separation energies. The shell gap for neutrons is given by
+$$
+\Delta S_n= 2BE(N,Z)-BE(N-1,Z)-BE(N+1,Z).
+$$
+
+For \( {}^{16}\mbox{O} \)  we have an experimental value for the  shell gap of \( 11.51 \) MeV for neutrons, while our Hartree-Fock calculations result in \( 25.65 \) MeV. This means that correlations beyond a simple Hartree-Fock calculation with a two-body force play an important role in nuclear physics.
+The splitting between the \( 0p_{3/2}^{\nu} \) and the \( 0p_{1/2}^{\nu} \) state is 4.88 MeV, while the experimental value for the gap between the ground state \( 1/2^{-} \) and the first excited \( 3/2^{-} \) states is 6.08 MeV. The two-nucleon spin-orbit force plays a central role here. In our discussion of nuclear forces we will see how the spin-orbit force comes into play here.
+
+<p>
+<!-- --- end exercise --- -->
+
+<p>
+<!-- navigation buttons at the bottom of the page -->
+<ul class="pagination">
+<li><a href="._hfock-bs064.html">&laquo;</a></li>
+  <li><a href="._hfock-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._hfock-bs057.html">58</a></li>
+  <li><a href="._hfock-bs058.html">59</a></li>
+  <li><a href="._hfock-bs059.html">60</a></li>
+  <li><a href="._hfock-bs060.html">61</a></li>
+  <li><a href="._hfock-bs061.html">62</a></li>
+  <li><a href="._hfock-bs062.html">63</a></li>
+  <li><a href="._hfock-bs063.html">64</a></li>
+  <li><a href="._hfock-bs064.html">65</a></li>
+  <li class="active"><a href="._hfock-bs065.html">66</a></li>
+</ul>
+<!-- ------------------- end of main content --------------- -->
+
+</div>  <!-- end container -->
+<!-- include javascript, jQuery *first* -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap footer
+<footer>
+<a href="http://..."><img width="250" align=right src="http://..."></a>
+</footer>
+-->
+
+
+<center style="font-size:80%">
+<!-- copyright only on the titlepage -->
+</center>
+
+
+</body>
+</html>
+    
+
