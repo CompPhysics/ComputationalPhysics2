@@ -232,7 +232,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._para-bs001.html#___sec0" style="font-size: 80%;">Content</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs002.html#___sec1" style="font-size: 80%;">Optimization and profiling</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs003.html#___sec2" style="font-size: 80%;">More on optimization</a></li>
-     <!-- navigation toc: --> <li><a href="#___sec3" style="font-size: 80%;">Optimization and profiling</a></li>
+     <!-- navigation toc: --> <li><a href="._para-bs004.html#___sec3" style="font-size: 80%;">Optimization and profiling</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs005.html#___sec4" style="font-size: 80%;">Optimization and debugging</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs006.html#___sec5" style="font-size: 80%;">Other hints</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs007.html#___sec6" style="font-size: 80%;">Vectorization and the basic idea behind parallel computing</a></li>
@@ -308,7 +308,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._para-bs077.html#___sec76" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs078.html#___sec77" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs079.html#___sec78" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
-     <!-- navigation toc: --> <li><a href="._para-bs080.html#___sec79" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec79" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
 
         </ul>
       </li>
@@ -321,59 +321,62 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0004"></a>
+<a name="part0080"></a>
 <!-- !split -->
 
-<h2 id="___sec3">Optimization and profiling  </h2>
+<h2 id="___sec79">Matrix-matrix multiplication </h2>
 <div class="panel panel-default">
 <div class="panel-body">
-It is also useful to profile your program under the development stage.
-You would then compile with 
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">c<span style="color: #666666">++</span>  <span style="color: #666666">-</span>pg <span style="color: #666666">-</span>O3 <span style="color: #666666">-</span>c  mycode.cpp
-c<span style="color: #666666">++</span>  <span style="color: #666666">-</span>pg <span style="color: #666666">-</span>O3 <span style="color: #666666">-</span>o  mycode.exe  mycode.o
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span style="color: #408080; font-style: italic">//  Loop 3: Compute C = A * B.</span>
+<span style="color: #408080; font-style: italic">//</span>
+  <span style="color: #BC7A00"># pragma omp for</span>
+  <span style="color: #008000; font-weight: bold">for</span> ( i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> n; i<span style="color: #666666">++</span> )
+  {
+    <span style="color: #008000; font-weight: bold">for</span> ( j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> n; j<span style="color: #666666">++</span> )
+    {
+      c[i][j] <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+      <span style="color: #008000; font-weight: bold">for</span> ( k <span style="color: #666666">=</span> <span style="color: #666666">0</span>; k <span style="color: #666666">&lt;</span> n; k<span style="color: #666666">++</span> )
+      {
+        c[i][j] <span style="color: #666666">=</span> c[i][j] <span style="color: #666666">+</span> a[i][k] <span style="color: #666666">*</span> b[k][j];
+      }
+    }
+  }
+}
+  wtime <span style="color: #666666">=</span> omp_get_wtime ( ) <span style="color: #666666">-</span> wtime;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  Elapsed seconds = &quot;</span> <span style="color: #666666">&lt;&lt;</span> wtime <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  C(100,100)  = &quot;</span> <span style="color: #666666">&lt;&lt;</span> c[<span style="color: #666666">99</span>][<span style="color: #666666">99</span>] <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>;
+<span style="color: #408080; font-style: italic">//</span>
+<span style="color: #408080; font-style: italic">//  Terminate.</span>
+<span style="color: #408080; font-style: italic">//</span>
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  Normal end of execution.</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>;
+  <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
 </pre></div>
-<p>
-After you have run the code you can obtain the profiling information via
-<p>
-
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">gprof mycode.exe <span style="color: #666666">&gt;</span>  ProfileOutput
-</pre></div>
-<p>
-When you have profiled properly your code, you must take out this option as it 
-slows down performance.
-For memory tests use <a href="http://www.valgrind.org" target="_self">valgrind</a>. An excellent environment for all these aspects, and much  more, is  Qt creator.
-
 <p>
 </div>
 </div>
 
 
 <p>
+
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-<li><a href="._para-bs003.html">&laquo;</a></li>
+<li><a href="._para-bs079.html">&laquo;</a></li>
   <li><a href="._para-bs000.html">1</a></li>
-  <li><a href="._para-bs001.html">2</a></li>
-  <li><a href="._para-bs002.html">3</a></li>
-  <li><a href="._para-bs003.html">4</a></li>
-  <li class="active"><a href="._para-bs004.html">5</a></li>
-  <li><a href="._para-bs005.html">6</a></li>
-  <li><a href="._para-bs006.html">7</a></li>
-  <li><a href="._para-bs007.html">8</a></li>
-  <li><a href="._para-bs008.html">9</a></li>
-  <li><a href="._para-bs009.html">10</a></li>
-  <li><a href="._para-bs010.html">11</a></li>
-  <li><a href="._para-bs011.html">12</a></li>
-  <li><a href="._para-bs012.html">13</a></li>
-  <li><a href="._para-bs013.html">14</a></li>
   <li><a href="">...</a></li>
-  <li><a href="._para-bs080.html">81</a></li>
-  <li><a href="._para-bs005.html">&raquo;</a></li>
+  <li><a href="._para-bs072.html">73</a></li>
+  <li><a href="._para-bs073.html">74</a></li>
+  <li><a href="._para-bs074.html">75</a></li>
+  <li><a href="._para-bs075.html">76</a></li>
+  <li><a href="._para-bs076.html">77</a></li>
+  <li><a href="._para-bs077.html">78</a></li>
+  <li><a href="._para-bs078.html">79</a></li>
+  <li><a href="._para-bs079.html">80</a></li>
+  <li class="active"><a href="._para-bs080.html">81</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
