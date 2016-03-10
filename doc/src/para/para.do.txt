@@ -488,29 +488,94 @@ algorithm cannot be parallelized we may not achieve an optimal parallelization.
 !split
 ===== How do I run MPI on a PC/Laptop?  =====
 !bblock
-The  machines at the computer lab have eight CPUs (look up the file /proc/cpuinfo)
-* Compile with mpicxx or mpic++ or mpif90
-* Set up collaboration between processes and run 
+The  machines at the computer lab have four to eight CPUs (look up the file /proc/cpuinfo)
+* Compile with mpicxx/mpic++ or mpif90
 !bc cppcod
-  mpd --ncpus=8 &
-  #  run code with
-  mpiexec -n 8 ./nameofprog
+  # Compile and link
+  mpic++ -O3 -o nameofprog.x nameofprog.cpp
+  #  run code with 8 processes
+  mpiexec -n 8 ./nameofprog.x
 !ec
-Here we declare that we will use 8 CPUs via the *-ncpus* option and via $-n 8$ when running.
 !eblock
 
 !split
-===== Can I do it on my own PC/laptop? =====
+===== Can I do it on my own PC/laptop? OpenMP installation =====
 !bblock
 At the computer lab, we have installed both OpenMP and MPI. If you wish to install MPI and OpenMP 
-on your laptop, we recommend the following:
-* For MPI, we recommend that you follow the instructions at the "Open MPI":"www.open-mpi.org/software" website and follow the instructions. OpenMPI is also accessible for easy installation for Ubuntu users via the _synaptic package manager_. 
+on your laptop/PC, we recommend the following:
 * For OpenMP, the compile option _-fopenmp_ is included automatically in recent versions of the C++ compiler and Fortran compilers. 
 * For OS X users however, use for example 
 !bc cppcod
   brew install clang-omp
 !ec
 !eblock
+
+
+
+!split
+===== Installing MPI =====
+!bblock
+For linux/ubuntu users, you need to install two packages (alternatively use the synaptic package manager)
+!bc cppcod
+  sudo apt-get install libopenmpi-dev
+  sudo apt-get install openmpi-bin
+!ec
+For OS X users, install brew (after having installed xcode and gcc, needed for the 
+gfortran compiler of openmpi) and then install with brew
+!bc cppcod
+   brew install openmpi
+!ec
+When running an executable (code.x), run as
+!bc cppcod
+  mpirun -n 10 ./code.x
+!ec
+where we indicate that we want  the number of processes to be 10.
+
+
+!eblock
+
+
+!split
+===== Installing MPI and using Qt =====
+!bblock
+With openmpi installed, when using Qt, add to your .pro file the instructions "here":"http://dragly.org/2012/03/14/developing-mpi-applications-in-qt-creator/"
+
+You may need to tell Qt where opempi is stored.
+
+For the machines at the computer lab, openmpi is located  at 
+!bc cppcod
+ /usr/lib64/openmpi/bin
+!ec
+Add to your *.bashrc* file the following
+!bc cppcod
+  export PATH=/usr/lib64/openmpi/bin:$PATH 
+!ec
+!eblock
+
+
+!split
+===== Using "Smaug":"http://comp-phys.net/cluster-info/using-smaug/", the CompPhys computing cluster =====
+!bblock
+For running on SMAUG, go to URL:"http://comp-phys.net/" and click on the link internals and click on
+computing cluster.
+To get access to Smaug, you will need to send us an e-mail with your name, UiO username, phone number, room number and affiliation to the research group. In return, you will receive a password you may use to access the cluster.
+
+Here follows a simple recipe
+!bc cppcod
+   log in as ssh -username tid.uio.no
+   ssh username@fyslab-compphys
+!ec
+In the folder 
+!bc cppcod
+    shared/guides/starting_jobs 
+!ec
+you will find a simple example on how to set up a job and compile and run.
+This files are write protected. Copy them to your own folder and compile and run there. 
+For more information see the "readme file under the program folder":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/ParallelizationMPI". 
+!eblock
+
+
+
 
 !split
 ===== What is Message Passing Interface (MPI)?  =====
@@ -622,7 +687,7 @@ The discussion in these slides focuses on the C++ binding.
 
 
 !split
-=====    The first MPI C/C++ program  =====
+=====    "The first MPI C/C++ program":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program2.cpp"  =====
 !bblock
 
 
@@ -680,7 +745,7 @@ END PROGRAM hello
 
 
 !split
-=====    Ordered output with $MPI\_Barrier$  =====
+=====    "Ordered output with MPIBarrier":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program3.cpp"  =====
 !bblock
 
 !bc cppcod
@@ -717,7 +782,7 @@ action.
 
 
 !split
-=====    Ordered output  =====
+=====    "Ordered output":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program4.cpp"  =====
 !bblock
 
 
@@ -793,7 +858,7 @@ to process 2, and so forth.
 !eblock
 
 !split
-===== Numerical integration in parallel =====
+===== "Numerical integration in parallel":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp" =====
 !bblock    Integrating $\pi$
 
 * The code example computes $\pi$ using the trapezoidal rules.
@@ -803,7 +868,7 @@ to process 2, and so forth.
    I=\int_a^bf(x) dx\approx h\left(f(a)/2 + f(a+h) +f(a+2h)+\dots +f(b-h)+ f(b)/2\right).
 \]
 !et
-
+Click "on this link":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp" for the full program.
 
 !eblock
 
@@ -965,6 +1030,71 @@ double trapezoidal_rule(double a, double b, int n,
 
 
 !eblock
+
+
+
+!split
+=====   "The quantum dot program for two electrons":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp"  =====
+!bblock
+!bc cppcod
+// Begin of main program   
+int main(int argc, char* argv[])
+{
+  ...  Omitted declarations
+  //  MPI initializations
+  MPI_Init (&argc, &argv);
+  MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+  MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+  time_start = MPI_Wtime();
+
+  if (my_rank == 0 && argc <= 1) {
+    cout << "Bad Usage: " << argv[0] << 
+      " read also output file on same line" << endl;
+  }
+  if (my_rank == 0 && argc > 1) {
+    outfilename=argv[1];
+    ofile.open(outfilename); 
+  }
+  Vector variate(2);
+  variate(0) = 1.0;  // value of alpha
+  variate(1) = 0.4;  // value of beta
+  // broadcast the total number of  variations
+  //  MPI_Bcast (&number_cycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  total_number_cycles = number_cycles*numprocs; 
+  //  Do the mc sampling  and accumulate data with MPI_Reduce
+  cumulative_e = cumulative_e2 = 0.0;
+  mc_sampling(number_cycles, cumulative_e, cumulative_e2, variate);
+  //  Collect data in total averages
+  MPI_Reduce(&cumulative_e, &total_cumulative_e, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&cumulative_e2, &total_cumulative_e2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+  time_end = MPI_Wtime();
+  total_time = time_end-time_start;
+  // Print out results  
+  if ( my_rank == 0) {
+    cout << "Time = " <<  total_time  << " on number of processors: "  << numprocs  << endl;
+    energy = total_cumulative_e/numprocs;
+    variance = total_cumulative_e2/numprocs-energy*energy;
+    error=sqrt(variance/(total_number_cycles-1.0));
+    ofile << setiosflags(ios::showpoint | ios::uppercase);
+    ofile << setw(15) << setprecision(8) << variate(0);
+    ofile << setw(15) << setprecision(8) << variate(1);
+    ofile << setw(15) << setprecision(8) << energy;
+    ofile << setw(15) << setprecision(8) << variance;
+    ofile << setw(15) << setprecision(8) << error << endl;
+    ofile.close();  // close output file
+  }
+  // End MPI
+  MPI_Finalize ();  
+  return 0;
+}  //  end of main function
+!ec
+
+
+!eblock
+
+
+
 
 
 !split
