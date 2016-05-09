@@ -313,7 +313,7 @@ Time used  for vector addition = 0.03000000000
 !ec
 This particular C++ compiler speeds up the above loop operations with a factor of 3. 
 Performing the same operations for $10^8$ elements results only in a factor $1.4$.
-The result will however vary from compiler to compiler. In general however, with optimization flags like $-O3$ or $-Ofast$, we gain a considerable speedup if our code can be vectorized. Many of these operations can be done automatically by your compiler. These automatic or near automatic compiler techniques improve performance considerably. 
+The result will however vary from compiler to compiler. In general however, with optimization flags like $-O3$ or $-Ofast$, we gain a considerable speedup if our code can be vectorized. Many of these operations can be done automatically by your compiler. These automatic or near automatic compiler techniques improve performance considerably.  Below we will see an example on a different behavior if we use the _clang_ compiler.
 
 !split
 =====  Automatic vectorization and vectorization inhibitors, criteria =====
@@ -457,175 +457,70 @@ Loads and stores to memory can be as important as floating point operations when
 ===== Memory and communication  =====
 
 
-* Most communication in a computer is carried out in chunks – blocks of bytes of data that move together
+* Most communication in a computer is carried out in chunks, blocks of bytes of data that move together
 * In the memory hierarchy, data moves between memory and cache, and between different levels of cache, in groups called lines
  * Lines are typically 64-128 bytes, or 8-16 double precision words
- * Even if you don’t use the data, it is moved and occupies space in the cache
+ * Even if you do not use the data, it is moved and occupies space in the cache
 * This performance feature is not captured in most programming languages
 
 
 !split
-=====  Matrix multiplication and performance measurement =====
-Common operation for optimal (in floating-point operations) solution of linear systems
-!bc cppcod 
-for(i=0; i < n; i++) {
-  m = i[row] - i[row-1];
-  sum = 0;
-  for(k=0; k < m; k++) sum += *a++ * x[*j++];
-  y[row] = sum;
-}
-!ec
-Data structures are a[nnz], j[nnz], i[n], x[n], y[n].
-o How many floating point operations are there? 
-o How many load operations?
-o And  how many store operations?
+=====  Measuring performance =====
 
-
-There are nnz steps in the loop
-♦ Each performs 2 floating point operations
-♦ Each loads 3 values: A(k), ja(k), x(ja(k))
-• We’ll assume ja is half the size of A, x, and y
-♦ Each stores 1 value: y(row)
-♦ Also load n values: ia(row)
-♦ We assume “sum” is stored in a register and
-is not written to memory
-• Time = nnz(2c + 2.5r) + n(0.5r+w)
-• However, this is too pessimistic. We
-need a slightly better model
-
-Assume values are only loaded
-once
-♦ Because nnz > n, and there are only
-n values of X, X is only loaded n
-times, not nnz times
-• Assumes that after the first time:
-- X is in cache
-- Cache memory is infinitely fast
-
-Memory motion - Loads:
-♦ nnz (sizeof(double) + sizeof(int)) +
-n (sizeof(double) + sizeof(int))
-♦ Assume a perfect cache (never load same data
-twice)
-• Memory motion – Stores:
-♦ n (sizeof(double))
-• Computation
-♦ nnz multiply-add (MA)
-
-Assume nnz >> n
-♦ Then load ja(k) and a(k) (typically 4 + 8 = 12 bytes)
-for each multiply and add operation
-• Roughly 12 bytes per MA
-• Typical workstation node can move 1-4 bytes/
-MultiplyAdd
-♦ Thus we can estimate a bound on the maximum
-possible performance:
-♦ 4 bytes moved/12 bytes needed for operation is 33%
-of peak
-♦ 1 byte move/12 bytes needed for operation is 8% of
-peak
-• Thus, maximum performance is 8-33% of
-peak
-
-
-Instruction Counts:
-♦ nnz (2*load-double + load-int + mult-add) +
-n (load-int + store-double)
-• Roughly 4 instructions per MA
-• Maximum performance is 25% of peak (33% if MA overlaps
-one load/store)
-♦ (wide instruction words can help here)
-• Changing matrix data structure (e.g., exploit small block
-structure) allows reuse of data in register, eliminating some
-loads (x and j)
-• Implementation improvements (tricks) cannot improve on
-these limits
-• Details of the estimate depend on the details of the execution
-model (what does the model hardware provide) and the
-fidelity of that execution model to the real hardware.
-
-
-
-How Should You Measure
-Performance?
-• What is wrong with this code to
-time a loop:
-Call cpu_time(tstart)
-do i=1,n
-x(i) = a*y(i)
-enddo
-call cpu_time(tend)
-tloop = tend – tstart
-print *, tloop
-
-
-Problem: Clock Ticks
-• Timers are not infinitely accurate
-♦ All clocks have a granularity – the minimum
-time that they can measure
-♦ The error in a time measurement, even if
-everything is perfect, may be the size of
-this granularity (sometimes called a clock
-tick)
-• Always know what your clock
-granularity is
-• Ensure that your measurement is for a
-long enough duration (say 100 x the
-“tick”)
-
-
-Problem: Cold Start
-• What happens when the code is executed?
-The assumption is that the code is ready to
-execute. But
-♦ Code may still be on disk, and not even read into
-memory.
-♦ Data may be in slow memory rather than fast (which
-may be wrong or right for what you are measuring)
-• Multiple tests often necessary to ensure that
-cold start effects are not present
-• Special effort often required to ensure data in
-the intended part of the memory hierarchy.
-
-Problem: Smart Compiler
-• If the result of the computation is
-not used, the compiler may
-eliminate the code
-♦ Performance will look impossibly high
-♦ Even worse, eliminate some of the
-code so the performance looks
-plausible
-• Ensure that the results are (or may
-be) used.
-
-
-Problem: Interference
-• Other activities are sharing your processor
-♦ Operating system, system demons, other users
-♦ Some parts of the hardware do not always perform with
-exactly the same performance
-• Make multiple tests and report
-• Easy choices include
-♦ Average tests – represents what users might observe over
+How do we measure erformance? What is wrong with this code to time a loop
+!bc cppcod
 time
-♦ Minimum value – Because must interference slows system,
-may be the most reproducible
-• Note that if multiple iterations are used to avoid clock tick problems,
-the best you can do is the minimum of an average
-♦ Box plot – show all data, giving mean, median, and first
-and third quartile
-• Harder is to ensure reported result is statistically
+for 
+end loop
+!ec
 
-There’s More
-• Accurate, reproducible
-performance measurement is hard
-• Think carefully about your
-experiment:
-♦ What is it, precisely, that you want to
-measure
-♦ How representative is your test to the
-situation that you are trying to
-measure?
+!split
+=====  Problems with measuring time =====
+o Timers are not infinitely accurate
+o All clocks have a granularity, the minimum time that they can measure
+o The error in a time measurement, even if everything is perfect, may be the size of this granularity (sometimes called a clock tick)
+o Always know what your clock granularity is
+o Ensure that your measurement is for a long enough duration (say 100 times the _tick_)
+
+
+!split
+=====  Problems with cold start =====
+What happens when the code is executed? The assumption is that the code is ready to
+execute. But
+o Code may still be on disk, and not even read into memory.
+o Data may be in slow memory rather than fast (which may be wrong or right for what you are measuring)
+o Multiple tests often necessary to ensure that cold start effects are not present
+o Special effort often required to ensure data in the intended part of the memory hierarchy.
+
+!split
+=====  Problems with smart compilers =====
+o If the result of the computation is not used, the compiler may eliminate the code
+o Performance will look impossibly high
+o Even worse, eliminate some of the code so the performance looks plausible
+o Ensure that the results are (or may be) used.
+
+!split
+=====  Problems with interference =====
+o Other activities are sharing your processor
+o Operating system, system demons, other users
+o Some parts of the hardware do not always perform with exactly the same performance
+o Make multiple tests and report
+o Easy choices include
+ *  Average tests represents what users might observe over time
+o Minimum value: Because must interference slows system, may be the most reproducible
+o Note that if multiple iterations are used to avoid clock tick problems, the best you can do is the minimum of an average
+
+!split
+=====  Problems with measuring performance  =====
+o Accurate, reproducible performance measurement is hard
+o Think carefully about your experiment:
+o What is it, precisely, that you want to measure
+o How representative is your test to the situation that you are trying to measure?
+
+
+!split
+=====  Example: matrix-matrix multiplication  =====
+
 
 !split
 =====    Today's situation of parallel computing  =====
