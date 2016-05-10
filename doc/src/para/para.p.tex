@@ -1,0 +1,2677 @@
+%%
+%% Automatically generated file from DocOnce source
+%% (https://github.com/hplgit/doconce/)
+%%
+%%
+% #ifdef PTEX2TEX_EXPLANATION
+%%
+%% The file follows the ptex2tex extended LaTeX format, see
+%% ptex2tex: http://code.google.com/p/ptex2tex/
+%%
+%% Run
+%%      ptex2tex myfile
+%% or
+%%      doconce ptex2tex myfile
+%%
+%% to turn myfile.p.tex into an ordinary LaTeX file myfile.tex.
+%% (The ptex2tex program: http://code.google.com/p/ptex2tex)
+%% Many preprocess options can be added to ptex2tex or doconce ptex2tex
+%%
+%%      ptex2tex -DMINTED myfile
+%%      doconce ptex2tex myfile envir=minted
+%%
+%% ptex2tex will typeset code environments according to a global or local
+%% .ptex2tex.cfg configure file. doconce ptex2tex will typeset code
+%% according to options on the command line (just type doconce ptex2tex to
+%% see examples). If doconce ptex2tex has envir=minted, it enables the
+%% minted style without needing -DMINTED.
+% #endif
+
+% #define PREAMBLE
+
+% #ifdef PREAMBLE
+%-------------------- begin preamble ----------------------
+
+\documentclass[%
+oneside,                 % oneside: electronic viewing, twoside: printing
+final,                   % draft: marks overfull hboxes, figures with paths
+10pt]{article}
+
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{relsize,makeidx,color,setspace,amsmath,amsfonts,amssymb}
+\usepackage[table]{xcolor}
+\usepackage{bm,ltablex,microtype}
+
+\usepackage[pdftex]{graphicx}
+
+\usepackage{ptex2tex}
+% #ifdef MINTED
+\usepackage{minted}
+\usemintedstyle{default}
+% #endif
+
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{lmodern}         % Latin Modern fonts derived from Computer Modern
+
+% Hyperlinks in PDF:
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=black,
+    filecolor=black,
+    %filecolor=blue,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+    }
+%\hyperbaseurl{}   % hyperlinks are relative to this root
+
+\setcounter{tocdepth}{2}  % levels in table of contents
+
+% --- fancyhdr package for fancy headers ---
+\usepackage{fancyhdr}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[LE,RO]{\thepage}
+% Ensure copyright on titlepage (article style) and chapter pages (book style)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2016, Morten Hjorth-Jensen. Released under CC Attribution-NonCommercial 4.0 license}}
+%  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+% Ensure copyright on titlepages with \thispagestyle{empty}
+\fancypagestyle{empty}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2016, Morten Hjorth-Jensen. Released under CC Attribution-NonCommercial 4.0 license}}
+  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+
+\pagestyle{fancy}
+
+
+\usepackage[framemethod=TikZ]{mdframed}
+
+% --- begin definitions of admonition environments ---
+
+% --- end of definitions of admonition environments ---
+
+% prevent orhpans and widows
+\clubpenalty = 10000
+\widowpenalty = 10000
+
+% --- end of standard preamble for documents ---
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+\usepackage[totoc]{idxlayout}   % for index in the toc
+\usepackage[nottoc]{tocbibind}  % for references/bibliography in the toc
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+% matching end for #ifdef PREAMBLE
+% #endif
+
+\newcommand{\exercisesection}[1]{\subsection*{#1}}
+
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\thispagestyle{empty}
+
+\begin{center}
+{\LARGE\bf
+\begin{spacing}{1.25}
+Computational Physics Lectures: How to optimize codes, from vectorization to parallelization
+\end{spacing}
+}
+\end{center}
+
+% ----------------- author(s) -------------------------
+
+\begin{center}
+{\bf Morten Hjorth-Jensen${}^{1, 2}$} \\ [0mm]
+\end{center}
+
+\begin{center}
+% List of all institutions:
+\centerline{{\small ${}^1$Department of Physics, University of Oslo}}
+\centerline{{\small ${}^2$Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University}}
+\end{center}
+    
+% ----------------- end author(s) -------------------------
+
+% --- begin date ---
+\begin{center}
+2016
+\end{center}
+% --- end date ---
+
+\vspace{1cm}
+
+
+% !split
+\subsection{Content}
+\begin{itemize}
+\item Simple compiler options 
+
+\item Tools to benchmark your code
+
+\item Machine architectures
+
+\item What is vectorization?
+
+\item How to measure code performance
+
+\item Parallelization with OpenMP
+
+\item Parallelization with MPI
+
+\item Vectorization and parallelization, examples
+\end{itemize}
+
+\noindent
+% !split
+\subsection{Optimization and profiling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+
+Till now we have not paid much attention to speed and possible optimization possibilities
+inherent in the various compilers. We have compiled and linked as
+\bcppcod
+c++  -c  mycode.cpp
+c++  -o  mycode.exe  mycode.o
+\ecppcod
+For Fortran replace with for example \textbf{gfortran} or \textbf{ifort}.
+This is what we call a flat compiler option and should be used when we develop the code.
+It produces normally a very large and slow code when translated to machine instructions.
+We use this option for debugging and for establishing the correct program output because
+every operation is done precisely as the user specified it.
+
+It is instructive to look up the compiler manual for further instructions by writing
+\bcppcod
+man c++
+\ecppcod
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{More on optimization}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We have additional compiler options for optimization. These may include procedure inlining where 
+performance may be improved, moving constants inside loops outside the loop, 
+identify potential parallelism, include automatic vectorization or replace a division with a reciprocal
+and a multiplication if this speeds up the code.
+\bcppcod
+c++  -O3 -c  mycode.cpp
+c++  -O3 -o  mycode.exe  mycode.o
+\ecppcod
+This (other options are -O2 or -Ofast) is the recommended option.
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Optimization and profiling}
+
+% --- begin paragraph admon ---
+\paragraph{}
+It is also useful to profile your program under the development stage.
+You would then compile with 
+\bcppcod
+c++  -pg -O3 -c  mycode.cpp
+c++  -pg -O3 -o  mycode.exe  mycode.o
+\ecppcod
+After you have run the code you can obtain the profiling information via
+\bcppcod
+gprof mycode.exe >  ProfileOutput
+\ecppcod
+When you have profiled properly your code, you must take out this option as it 
+slows down performance.
+For memory tests use \href{{http://www.valgrind.org}}{valgrind}. An excellent environment for all these aspects, and much  more, is  Qt creator.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Optimization and debugging}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Adding debugging options is a very useful alternative under the development stage of a program.
+You would then compile with 
+\bcppcod
+c++  -g -O0 -c  mycode.cpp
+c++  -g -O0 -o  mycode.exe  mycode.o
+\ecppcod
+This option generates debugging information allowing you to trace for example if an array is properly allocated. Some compilers work best with the no optimization option \textbf{-O0}.
+% --- end paragraph admon ---
+
+
+
+% --- begin paragraph admon ---
+\paragraph{Other optimization flags.}
+Depending on the compiler, one can add flags which generate code that catches integer overflow errors. 
+The flag \textbf{-ftrapv} does this for the CLANG compiler on OS X operating systems.
+% --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{Other hints}
+
+% --- begin paragraph admon ---
+\paragraph{}
+In general, irrespective of compiler options, it is useful to
+\begin{itemize}
+\item avoid if tests or call to functions inside loops, if possible. 
+
+\item avoid multiplication with constants inside loops if possible
+\end{itemize}
+
+\noindent
+Here is an example of a part of a program where specific operations lead to a slower code
+\bcppcod
+k = n-1;
+for (i = 0; i < n; i++){
+    a[i] = b[i] +c*d;
+    e = g[k];
+}
+\ecppcod
+A better code is
+\bcppcod
+temp = c*d;
+for (i = 0; i < n; i++){
+    a[i] = b[i] + temp;
+}
+e = g[n-1];
+\ecppcod
+Here we avoid a repeated multiplication inside a loop. 
+Most compilers, depending on compiler flags, identify and optimize such bottlenecks on their own, without requiring any particular action by the programmer. However, it is always useful to single out and avoid code examples like the first one discussed here.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Vectorization and the basic idea behind parallel computing}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Present CPUs are highly parallel processors with varying levels of parallelism. The typical situation can be described via the following three statements.
+\begin{itemize}
+\item Pursuit of shorter computation time and larger simulation size gives rise to parallel computing.
+
+\item Multiple processors are involved to solve a global problem.
+
+\item The essence is to divide the entire computation evenly among collaborative processors.  Divide and conquer.
+\end{itemize}
+
+\noindent
+Before we proceed with a more detailed discussion of topics like vectorization and parallelization, we need to remind ourselves about some basic features of different hardware models.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{A rough classification of hardware models}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item Conventional single-processor computers are named SISD (single-instruction-single-data) machines.
+
+\item SIMD (single-instruction-multiple-data) machines incorporate the idea of parallel processing, using a large number of processing units to execute the same instruction on different data.
+
+\item Modern parallel computers are so-called MIMD (multiple-instruction-multiple-data) machines and can execute different instruction streams in parallel on different data.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Shared memory and distributed memory}
+
+% --- begin paragraph admon ---
+\paragraph{}
+One way of categorizing modern parallel computers is to look at the memory configuration.
+\begin{itemize}
+\item In shared memory systems the CPUs share the same address space. Any CPU can access any data in the global memory.
+
+\item In distributed memory systems each CPU has its own memory.
+\end{itemize}
+
+\noindent
+The CPUs are connected by some network and may exchange messages.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Different parallel programming paradigms}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item \textbf{Task parallelism}:  the work of a global problem can be divided into a number of independent tasks, which rarely need to synchronize.  Monte Carlo simulations represent a typical situation. Integration is another. However this paradigm is of limited use.
+
+\item \textbf{Data parallelism}:  use of multiple threads (e.g.~one or more threads per processor) to dissect loops over arrays etc.  Communication and synchronization between processors are often hidden, thus easy to program. However, the user surrenders much control to a specialized compiler. Examples of data parallelism are compiler-based parallelization and OpenMP directives. 
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Different parallel programming paradigms}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item \textbf{Message passing}:  all involved processors have an independent memory address space. The user is responsible for  partitioning the data/work of a global problem and distributing the  subproblems to the processors. Collaboration between processors is achieved by explicit message passing, which is used for data transfer plus synchronization.
+
+\item This paradigm is the most general one where the user has full control. Better parallel efficiency is usually achieved by explicit message passing. However, message-passing programming is more difficult.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% !split 
+\subsection{What is vectorization?}
+Vectorization is a special
+case of \textbf{Single Instructions Multiple Data} (SIMD) to denote a single
+instruction stream capable of operating on multiple data elements in
+parallel. 
+We can think of vectorization as the unrolling of loops accompanied with SIMD instructions.
+
+Vectorization is the process of converting an algorithm that performs scalar operations
+(typically one operation at the time) to vector operations where a single operation can refer to many simultaneous operations.
+Consider the following example
+\bcppcod
+for (i = 0; i < n; i++){
+    a[i] = b[i] + c[i];
+}
+\ecppcod
+If the code is not vectorized, the compiler will simply start with the first element and 
+then perform subsequent additions operating on one address in memory at the time. 
+
+% !split 
+\subsection{Number of elements that can acted upon}
+A SIMD instruction can operate  on multiple data elements in one single instruction.
+It uses the so-called 128-bit SIMD floating-point register. 
+In this sense, vectorization adds some form of parallelism since one instruction is applied  
+to many parts of say a vector.
+
+The number of elements which can be operated on in parallel
+range from four single-precision floating point data elements in so-called 
+Streaming SIMD Extensions and two double-precision floating-point data
+elements in Streaming SIMD Extensions 2 to sixteen byte operations in
+a 128-bit register in Streaming SIMD Extensions 2. Thus, vector-length
+ranges from 2 to 16, depending on the instruction extensions used and
+on the data type. 
+
+IN summary, our instructions  operate on 128 bit (16 byte) operands
+\begin{itemize}
+\item 4 floats or ints
+
+\item 2 doubles
+
+\item Data paths 128 bits vide for vector unit
+\end{itemize}
+
+\noindent
+% !split 
+\subsection{Number of elements that can acted upon, examples}
+We start with the simple scalar operations given by
+\bcppcod
+for (i = 0; i < n; i++){
+    a[i] = b[i] + c[i];
+}
+\ecppcod
+If the code is not vectorized  and we have a 128-bit register to store a 32 bits floating point number,
+it means that we have $3\times 32$ bits that are not used. For the first element we have
+
+
+
+\begin{quote}
+\begin{tabular}{cccc}
+\hline
+\multicolumn{1}{c}{ 0 } & \multicolumn{1}{c}{ 1 } & \multicolumn{1}{c}{ 2 } & \multicolumn{1}{c}{ 3 } \\
+\hline
+a[0]= & not used & not used & not used \\
+\hline
+b[0]+ & not used & not used & not used \\
+\hline
+c[0]  & not used & not used & not used \\
+\hline
+\end{tabular}
+\end{quote}
+
+\noindent
+We have thus unused space in our SIMD registers. These registers could hold three additional integers.
+
+
+% !split 
+\subsection{Operation counts for scalar operation}
+The code
+\bcppcod
+for (i = 0; i < n; i++){
+    a[i] = b[i] + c[i];
+}
+\ecppcod
+has for $n$ repeats
+\begin{enumerate}
+\item one load for $a[i]$ in address 1
+
+\item one load for $b[i]$ in address 2
+
+\item add $a[i]$ and $b[i]$ to give $c[i]$
+
+\item store $c[i]$ in address 2
+\end{enumerate}
+
+\noindent
+% !split 
+\subsection{Number of elements that can acted upon, examples}
+If we vectorize the code, we can perform, with a 128-bit register four simultaneous operations, that is
+we have
+\bcppcod
+for (i = 0; i < n; i+=4){
+    a[i] = b[i] + c[i];
+    a[i+1] = b[i+1] + c[i+1];
+    a[i+2] = b[i+2] + c[i+2];
+    a[i+3] = b[i+3] + c[i+3];
+}
+\ecppcod
+displayed here as
+
+
+\begin{quote}
+\begin{tabular}{cccc}
+\hline
+\multicolumn{1}{c}{ 0 } & \multicolumn{1}{c}{ 1 } & \multicolumn{1}{c}{ 2 } & \multicolumn{1}{c}{ 3 } \\
+\hline
+a[0]= & a[1]= & a[2]= & a[3]= \\
+\hline
+b[0]+ & b[1]+ & b[2]+ & b[3]+ \\
+\hline
+c[0]  & c[1]  & c[2]  & c[3]  \\
+\hline
+\end{tabular}
+\end{quote}
+
+\noindent
+Four additions are now done in a single step.
+
+% !split 
+\subsection{Number of operations when vectorized}
+For $n/4$ repeats assuming floats or integers
+\begin{enumerate}
+\item one vector load for $a[i]$ in address 1
+
+\item one load for $b[i]$ in address 2
+
+\item add $a[i]$ and $b[i]$ to give $c[i]$
+
+\item store $c[i]$ in address 2
+\end{enumerate}
+
+\noindent
+% !split
+\subsection{\href{{https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/LecturePrograms/programs/Classes/cpp/program7.cpp}}{A simple test case with and without vectorization}}
+We implement these operations in a simple c++ program as 
+
+\bcppcode
+#include <cstdlib>
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include "time.h" 
+
+using namespace std; // note use of namespace                                       
+int main (int argc, char* argv[])
+{
+  int i = atoi(argv[1]); 
+  double *a, *b, *c;
+  a = new double[i]; 
+  b = new double[i]; 
+  c = new double[i]; 
+  for (int j = 0; j < i; j++) {
+    a[j] = 0.0;
+    b[j] = cos(j*1.0);
+    c[j] = sin(j*3.0);
+  }
+  clock_t start, finish;
+  start = clock();
+  for (int j = 0; j < i; j++) {
+    a[j] = b[j]+b[j]*c[j];
+  }
+  finish = clock();
+  double timeused = (double) (finish - start)/(CLOCKS_PER_SEC );
+  cout << setiosflags(ios::showpoint | ios::uppercase);
+  cout << setprecision(10) << setw(20) << "Time used  for vector addition and multiplication=" << timeused  << endl;
+  delete [] a;
+  delete [] b;
+  delete [] c;
+  return 0;     
+}
+\ecppcode
+
+
+% !split 
+\subsection{Compiling with and without vectorization}
+We can compile and link without vectorization
+\bcppcod
+c++ -o novec.x vecexample.cpp
+\ecppcod
+and with vectorization (and additional optimizations)
+\bcppcod
+c++ -O3 -o  vec.x vecexample.cpp 
+\ecppcod
+The speedup depends on the size of the vectors. In the example here we have run with $10^7$ elements.
+The example here was run on a PC with ubuntu 14.04 as operating system and an Intel i7-4790 CPU running at 3.60 GHz. 
+\bcppcod
+Compphys:~ hjensen$ ./vec.x 10000000
+Time used  for vector addition = 0.0100000
+Compphys:~ hjensen$ ./novec.x 10000000
+Time used  for vector addition = 0.03000000000
+\ecppcod
+This particular C++ compiler speeds up the above loop operations with a factor of 3. 
+Performing the same operations for $10^8$ elements results only in a factor $1.4$.
+The result will however vary from compiler to compiler. In general however, with optimization flags like $-O3$ or $-Ofast$, we gain a considerable speedup if our code can be vectorized. Many of these operations can be done automatically by your compiler. These automatic or near automatic compiler techniques improve performance considerably.  Below we will see an example on a different behavior if we use the \textbf{clang} compiler.
+
+% !split
+\subsection{Automatic vectorization and vectorization inhibitors, criteria}
+
+Not all loops can be vectorized, as discussed in \href{{https://software.intel.com/en-us/articles/a-guide-to-auto-vectorization-with-intel-c-compilers}}{Intel's guide to vectorization}
+
+An important criteria is that the loop counter $n$ is known at the entry of the loop.
+\bcppcod
+  for (int j = 0; j < n; j++) {
+    a[j] = cos(j*1.0);
+  }
+\ecppcod
+The variable $n$ does need to be known at compile time. However, this variable must stay the same for the entire duration of the loop. It implies that an exit statement inside the loop cannot be data dependent.
+
+% !split
+\subsection{Automatic vectorization and vectorization inhibitors, exit criteria}
+
+An exit statement should in general be avoided. 
+If the exit statement contains data-dependent conditions, the loop cannot be vectorized. 
+The following is an example of a non-vectorizable loop
+\bcppcod
+  for (int j = 0; j < n; j++) {
+    a[j] = cos(j*1.0);
+    if (a[j] < 0 ) break;
+  }
+\ecppcod
+Avoid loop termination conditions and opt for a single entry loop variable $n$. The lower and upper bounds have to be kept fixed within the loop. 
+
+% !split
+\subsection{Automatic vectorization and vectorization inhibitors, straight-line code}
+
+SIMD instructions perform the same type of operations multiple times. 
+A \textbf{switch} statement leads thus to a non-vectorizable loop since different statemens cannot branch.
+The following code can however be vectorized since the \textbf{if} statement is implemented as a masked assignment.
+\bcppcod
+  for (int j = 0; j < n; j++) {
+    double x  = cos(j*1.0);
+    if (x > 0 ) {
+       a[j] =  x*sin(j*2.0); 
+    }
+    else {
+       a[j] = 0.0;
+    }
+  }
+\ecppcod
+These operations can be performed for all data elements but only those elements which the mask evaluates as true are stored. In general, one should avoid branches such as \textbf{switch}, \textbf{go to}, or \textbf{return} statements or \textbf{if} constructs that cannot be treated as masked assignments. 
+
+
+% !split
+\subsection{Automatic vectorization and vectorization inhibitors, nested loops}
+
+Only the innermost loop of the following example is vectorized
+\bcppcod
+  for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+           a[i][j] += b[i][j];
+      }  
+  }
+\ecppcod
+The exception is if an original outer loop is transformed into an inner loop as the result of compiler optimizations.
+
+
+% !split
+\subsection{Automatic vectorization and vectorization inhibitors, function calls}
+
+Calls to programmer defined functions ruin vectorization. However, calls to intrinsic functions like
+$\sin{x}$, $\cos{x}$, $\exp{x}$ etc are allowed since they are normally efficiently vectorized. 
+The following example is fully vectorizable
+\bcppcod
+  for (int i = 0; i < n; i++) {
+      a[i] = log10(i)*cos(i);
+  }
+\ecppcod
+Similarly, \textbf{inline} functions defined by the programmer, allow for vectorization since the function statements are glued into the actual place where the function is called. 
+
+
+% !split
+\subsection{Automatic vectorization and vectorization inhibitors, data dependencies}
+
+One has to keep in mind that vectorization changes the order of operations inside a loop. A so-called
+read-after-write statement with an explicit flow dependency cannot be vectorized. The following code
+\bcppcod
+  double b = 15.;
+  for (int i = 1; i < n; i++) {
+      a[i] = a[i-1] + b;
+  }
+\ecppcod
+is an example of flow dependency and results in wrong numerical results if vectorized. For a scalar operation, the value $a[i-1]$ computed during the iteration is loaded into the right-hand side and the results are fine. In vector mode however, with a vector length of four, the values $a[0]$, $a[1]$, $a[2]$ and $a[3]$ from the previous loop will be loaded into the right-hand side and produce wrong results. That is, we have
+\bcppcod
+   a[1] = a[0] + b;
+   a[2] = a[1] + b;
+   a[3] = a[2] + b;
+   a[4] = a[3] + b;
+\ecppcod
+and if the two first iterations are  executed at the same by the SIMD instruction, the value of say $a[1]$ could be used by the second iteration before it has been calculated by the first iteration, leading thereby to wrong results.
+
+% !split
+\subsection{Automatic vectorization and vectorization inhibitors, more data dependencies}
+
+On the other hand,  a so-called 
+write-after-read statement can be vectorized. The following code
+\bcppcod
+  double b = 15.;
+  for (int i = 1; i < n; i++) {
+      a[i-1] = a[i] + b;
+  }
+\ecppcod
+is an example of flow dependency that can be vectorized since no iteration with a higher value of $i$
+can complete before an iteration with a lower value of $i$. However, such code leads to problems with parallelization.
+
+
+% !split
+\subsection{Automatic vectorization and vectorization inhibitors, memory stride}
+
+
+For C++ programmers  it is also worth keeping in mind that an array notation is preferred to the more compact use of pointers to access array elements. The compiler can often not tell if it is safe to vectorize the code. 
+
+When dealing with arrays, you should also avoid memory stride, since this slows down considerably vectorization. When you access array element, write for example the inner loop to vectorize using unit stride, that is, access successively the next array element in memory, as shown here
+\bcppcod
+  for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+           a[i][j] += b[i][j];
+      }  
+  }
+\ecppcod
+
+
+% !split
+\subsection{Memory management}
+The main memory contains the program data
+\begin{itemize}
+\item Cache memory contains a copy of the main memory data
+
+\item Cache is faster but consumes more space and power. It is normally assumed to be much faster than main memory
+
+\item Registers contain working data only
+\begin{itemize}
+
+ \item Modern CPUs perform most or all operations only on data in register
+
+\end{itemize}
+
+\noindent
+\item Multiple Cache memories contain a copy of the main memory data
+\begin{itemize}
+
+ \item Cache items accessed by their address in main memory
+
+ \item L1 cache is the fastest but has the least capacity
+
+ \item L2, L3 provide intermediate performance/size tradeoffs
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+Loads and stores to memory can be as important as floating point operations when we measure performance.
+
+
+% !split
+\subsection{Memory and communication}
+
+
+\begin{itemize}
+\item Most communication in a computer is carried out in chunks, blocks of bytes of data that move together
+
+\item In the memory hierarchy, data moves between memory and cache, and between different levels of cache, in groups called lines
+\begin{itemize}
+
+ \item Lines are typically 64-128 bytes, or 8-16 double precision words
+
+ \item Even if you do not use the data, it is moved and occupies space in the cache
+
+\end{itemize}
+
+\noindent
+\item This performance feature is not captured in most programming languages
+\end{itemize}
+
+\noindent
+% !split
+\subsection{Measuring performance}
+
+How do we measure erformance? What is wrong with this code to time a loop?
+\bccq
+  clock_t start, finish;
+  start = clock();
+  for (int j = 0; j < i; j++) {
+    a[j] = b[j]+b[j]*c[j];
+  }
+  finish = clock();
+  double timeused = (double) (finish - start)/(CLOCKS_PER_SEC );
+\eccq
+
+% !split
+\subsection{Problems with measuring time}
+\begin{enumerate}
+\item Timers are not infinitely accurate
+
+\item All clocks have a granularity, the minimum time that they can measure
+
+\item The error in a time measurement, even if everything is perfect, may be the size of this granularity (sometimes called a clock tick)
+
+\item Always know what your clock granularity is
+
+\item Ensure that your measurement is for a long enough duration (say 100 times the \textbf{tick})
+\end{enumerate}
+
+\noindent
+% !split
+\subsection{Problems with cold start}
+
+What happens when the code is executed? The assumption is that the code is ready to
+execute. But
+\begin{enumerate}
+\item Code may still be on disk, and not even read into memory.
+
+\item Data may be in slow memory rather than fast (which may be wrong or right for what you are measuring)
+
+\item Multiple tests often necessary to ensure that cold start effects are not present
+
+\item Special effort often required to ensure data in the intended part of the memory hierarchy.
+\end{enumerate}
+
+\noindent
+% !split
+\subsection{Problems with smart compilers}
+
+\begin{enumerate}
+\item If the result of the computation is not used, the compiler may eliminate the code
+
+\item Performance will look impossibly fantastic
+
+\item Even worse, eliminate some of the code so the performance looks plausible
+
+\item Ensure that the results are (or may be) used.
+\end{enumerate}
+
+\noindent
+% !split
+\subsection{Problems with interference}
+\begin{enumerate}
+\item Other activities are sharing your processor
+\begin{itemize}
+
+  \item Operating system, system demons, other users
+\begin{itemize}
+
+   \item Some parts of the hardware do not always perform with exactly the same performance
+
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+\item Make multiple tests and report
+
+\item Easy choices include
+\begin{itemize}
+
+  \item Average tests represent what users might observe over time
+\end{itemize}
+
+\noindent
+\end{enumerate}
+
+\noindent
+% !split
+\subsection{Problems with measuring performance}
+\begin{enumerate}
+\item Accurate, reproducible performance measurement is hard
+
+\item Think carefully about your experiment:
+
+\item What is it, precisely, that you want to measure
+
+\item How representative is your test to the situation that you are trying to measure?
+\end{enumerate}
+
+\noindent
+% !split
+\subsection{Thomas algorithm for tridiagonal linear algebra equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\[
+\left( \begin{array}{ccccc}
+        b_0 & c_0 &        &         &         \\
+	a_0 &  b_1 &  c_1    &         &         \\
+	   &    & \ddots  &         &         \\
+	      &	    & a_{m-3} & b_{m-2} & c_{m-2} \\
+	         &    &         & a_{m-2} & b_{m-1}
+   \end{array} \right)
+\left( \begin{array}{c}
+       x_0     \\
+       x_1     \\
+       \vdots  \\
+       x_{m-2} \\
+       x_{m-1}
+   \end{array} \right)=\left( \begin{array}{c}
+       f_0     \\
+       f_1     \\
+       \vdots  \\
+       f_{m-2} \\
+       f_{m-1} \\
+   \end{array} \right)
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Thomas algorithm, forward substitution}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The first step is to multiply the first row by $a_0/b_0$ and subtract it from the second row.  This is known as the forward substitution step. We obtain then
+\[
+	a_i = 0,
+\]
+
+\[                                 
+	b_i = b_i - \frac{a_{i-1}}{b_{i-1}}c_{i-1},
+\]
+and
+\[
+	f_i = f_i - \frac{a_{i-1}}{b_{i-1}}f_{i-1}.
+\]
+At this point the simplified equation, with only an upper triangular matrix takes the form
+\[
+\left( \begin{array}{ccccc}
+    b_0 & c_0 &        &         &         \\
+       & b_1 &  c_1    &         &         \\
+          &    & \ddots &         &         \\
+	     &     &        & b_{m-2} & c_{m-2} \\
+	        &    &        &         & b_{m-1}
+   \end{array} \right)\left( \begin{array}{c}
+       x_0     \\
+       x_1     \\
+       \vdots  \\
+       x_{m-2} \\
+       x_{m-1}
+   \end{array} \right)=\left( \begin{array}{c}
+       f_0     \\
+       f_1     \\
+       \vdots  \\
+       f_{m-2} \\
+       f_{m-1} \\
+   \end{array} \right)
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Thomas algorithm, backward substitution}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The next step is  the backward substitution step.  The last row is multiplied by $c_{N-3}/b_{N-2}$ and subtracted from the second to last row, thus eliminating $c_{N-3}$ from the last row.  The general backward substitution procedure is 
+\[
+	c_i = 0, 
+\]
+and 
+\[
+	f_{i-1} = f_{i-1} - \frac{c_{i-1}}{b_i}f_i
+\]
+All that ramains to be computed is the solution, which is the very straight forward process of
+\[
+x_i = \frac{f_i}{b_i}
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Thomas algorithm and counting of operations (floating point and memory)}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+
+
+\begin{quote}
+\begin{tabular}{cc}
+\hline
+\multicolumn{1}{c}{ Operation } & \multicolumn{1}{c}{ Floating Point } \\
+\hline
+Memory Reads    & $14(N-2)$        \\
+Memory Writes   & $4(N-2)$         \\
+Additions       & $3(N-2) + (N-1)$ \\
+Subtractions    & $3(N-2)$         \\
+Multiplications & $3(N-2)$         \\
+Divisions       & $4(N-2)$         \\
+Comparisons     & $2(N-1)$         \\
+\hline
+\end{tabular}
+\end{quote}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+    // Forward substitution                                                                       
+    for (int i=1; i < n; i++) {
+      b[i] = b[i] - (a[i-1]*c[i-1])/b[i-1];
+      g[i] = g[i] - (a[i-1]*g[i-1])/b[i-1];
+    }
+    x[n-1] = f[n-1] / b[n-1];
+    // Backwards substitution                                                           
+    for (int i = n-2; i >= 0; i--) {
+      f[i] = f[i] - c[i]*f[i+1]/b[i+1];
+      x[i] = f[i]/b[i];
+    }
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{\href{{https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/LecturePrograms/programs/Classes/cpp/program8.cpp}}{Example: Transpose of a matrix}}
+
+\bcppcode
+#include <cstdlib>
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include "time.h"
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+{
+  // read in dimension of square matrix
+  int n = atoi(argv[1]);
+  double **A, **B;
+  // Allocate space for the two matrices
+  A = new double*[n]; B = new double*[n];
+  for (int i = 0; i < n; i++){
+    A[i] = new double[n];
+    B[i] = new double[n];
+  }
+  // Set up values for matrix A
+  for (int i = 0; i < n; i++){
+    for (int j = 0; j < n; j++) {
+      A[i][j] =  cos(i*1.0)*sin(j*3.0);
+    }
+  }
+  clock_t start, finish;
+  start = clock();
+  // Then compute the transpose
+  for (int i = 0; i < n; i++){
+    for (int j = 0; j < n; j++) {
+      B[i][j]= A[j][i];
+    }
+  }
+
+  finish = clock();
+  double timeused = (double) (finish - start)/(CLOCKS_PER_SEC );
+  cout << setiosflags(ios::showpoint | ios::uppercase);
+  cout << setprecision(10) << setw(20) << "Time used  for setting up transpose of matrix=" << timeused  << endl;
+
+  // Free up space
+  for (int i = 0; i < n; i++){
+    delete[] A[i];
+    delete[] B[i];
+  }
+  delete[] A;
+  delete[] B;
+  return 0;
+}
+
+\ecppcode
+
+
+% !split
+\subsection{\href{{https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/LecturePrograms/programs/Classes/cpp/program9.cpp}}{Matrix-matrix multiplication}}
+This the matrix-matrix multiplication code with plain c++ memory allocation
+
+\bccq
+#include <cstdlib>
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include "time.h"
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+{
+  // read in dimension of square matrix
+  int n = atoi(argv[1]);
+  double **A, **B, **C;
+  // Allocate space for the three matrices
+  A = new double*[n]; B = new double*[n]; C = new double*[n];
+  for (int i = 0; i < n; i++){
+    A[i] = new double[n];
+    B[i] = new double[n];
+    C[i] = new double[n];
+  }
+  // Set up values for matrix A and B and zero matrix C
+  for (int i = 0; i < n; i++){
+    for (int j = 0; j < n; j++) {
+      A[i][j] =  cos(i*1.0)*sin(j*3.0);
+      B[i][j] =  cos(i*5.0)*sin(j*4.0);
+      C[i][j] =  0.0;    
+    }
+  }
+  clock_t start, finish;
+  start = clock();
+  // Then perform the matrix-matrix multiplication
+  for (int i = 0; i < n; i++){
+    for (int j = 0; j < n; j++) {
+       double sum = 0.0;
+       for (int k = 0; j < n; j++) {
+            sum += B[i][k]*A[k][j];
+       }
+       C[i][j] = sum;
+    }
+  }
+  finish = clock();
+  double timeused = (double) (finish - start)/(CLOCKS_PER_SEC );
+  cout << setiosflags(ios::showpoint | ios::uppercase);
+  cout << setprecision(10) << setw(20) << "Time used  for matrix-matrix multiplication=" << timeused  << endl;
+
+  // Free up space
+  for (int i = 0; i < n; i++){
+    delete[] A[i];
+    delete[] B[i];
+    delete[] C[i];
+  }
+  delete[] A;
+  delete[] B;
+  delete[] C;
+  return 0;
+}
+
+\eccq
+
+
+% !split
+\subsection{Today's situation of parallel computing}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item Distributed memory is the dominant hardware configuration. There is a large diversity in these machines, from  MPP (massively parallel processing) systems to clusters of off-the-shelf PCs, which are very cost-effective.
+
+\item Message-passing is a mature programming paradigm and widely accepted. It often provides an efficient match to the hardware. It is primarily used for the distributed memory systems, but can also be used on shared memory systems.
+
+\item Modern nodes have nowadays several cores, which makes it interesting to use both shared memory (the given node) and distributed memory (several nodes with communication). This leads often to codes which use both MPI and OpenMP.
+\end{itemize}
+
+\noindent
+Our lectures will focus on both MPI and OpenMP.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Overhead present in parallel computing}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item \textbf{Uneven load balance}:  not all the processors can perform useful work at all time.
+
+\item \textbf{Overhead of synchronization}
+
+\item \textbf{Overhead of communication}
+
+\item \textbf{Extra computation due to parallelization}
+\end{itemize}
+
+\noindent
+Due to the above overhead and that certain parts of a sequential
+algorithm cannot be parallelized we may not achieve an optimal parallelization.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Parallelizing a sequential algorithm}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item Identify the part(s) of a sequential algorithm that can be  executed in parallel. This is the difficult part,
+
+\item Distribute the global work and data among $P$ processors.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+
+
+% !split
+\subsection{Strategies}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+\item Develop codes locally, run with some few processes and test your codes.  Do benchmarking, timing and so forth on local nodes, for example your laptop or PC. 
+
+\item When you are convinced that your codes run correctly, you can start your production runs on available supercomputers.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{How do I run MPI on a PC/Laptop?}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The  machines at the computer lab have four to eight CPUs (look up the file /proc/cpuinfo)
+\begin{itemize}
+\item Compile with mpicxx/mpic++ or mpif90
+\end{itemize}
+
+\noindent
+\bcppcod
+  # Compile and link
+  mpic++ -O3 -o nameofprog.x nameofprog.cpp
+  #  run code with 8 processes
+  mpiexec -n 8 ./nameofprog.x
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Can I do it on my own PC/laptop? OpenMP installation}
+
+% --- begin paragraph admon ---
+\paragraph{}
+At the computer lab, we have installed both OpenMP and MPI. If you wish to install MPI and OpenMP 
+on your laptop/PC, we recommend the following:
+\begin{itemize}
+\item For OpenMP, the compile option \textbf{-fopenmp} is included automatically in recent versions of the C++ compiler and Fortran compilers. 
+
+\item For OS X users however, use for example 
+\end{itemize}
+
+\noindent
+\bcppcod
+  brew install clang-omp
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{Installing MPI}
+
+% --- begin paragraph admon ---
+\paragraph{}
+For linux/ubuntu users, you need to install two packages (alternatively use the synaptic package manager)
+\bcppcod
+  sudo apt-get install libopenmpi-dev
+  sudo apt-get install openmpi-bin
+\ecppcod
+For OS X users, install brew (after having installed xcode and gcc, needed for the 
+gfortran compiler of openmpi) and then install with brew
+\bcppcod
+   brew install openmpi
+\ecppcod
+When running an executable (code.x), run as
+\bcppcod
+  mpirun -n 10 ./code.x
+\ecppcod
+where we indicate that we want  the number of processes to be 10.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Installing MPI and using Qt}
+
+% --- begin paragraph admon ---
+\paragraph{}
+With openmpi installed, when using Qt, add to your .pro file the instructions \href{{http://dragly.org/2012/03/14/developing-mpi-applications-in-qt-creator/}}{here}
+
+You may need to tell Qt where opempi is stored.
+
+For the machines at the computer lab, openmpi is located  at 
+\bcppcod
+ /usr/lib64/openmpi/bin
+\ecppcod
+Add to your \emph{.bashrc} file the following
+\bcppcod
+  export PATH=/usr/lib64/openmpi/bin:$PATH 
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Using \href{{http://comp-phys.net/cluster-info/using-smaug/}}{Smaug}, the CompPhys computing cluster}
+
+% --- begin paragraph admon ---
+\paragraph{}
+For running on SMAUG, go to \href{{http://comp-phys.net/}}{\nolinkurl{http://comp-phys.net/}} and click on the link internals and click on
+computing cluster.
+To get access to Smaug, you will need to send us an e-mail with your name, UiO username, phone number, room number and affiliation to the research group. In return, you will receive a password you may use to access the cluster.
+
+Here follows a simple recipe
+\bcppcod
+   log in as ssh -username tid.uio.no
+   ssh username@fyslab-compphys
+\ecppcod
+In the folder 
+\bcppcod
+    shared/guides/starting_jobs 
+\ecppcod
+you will find a simple example on how to set up a job and compile and run.
+This files are write protected. Copy them to your own folder and compile and run there. 
+For more information see the \href{{https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/ParallelizationMPI}}{readme file under the program folder}.
+% --- end paragraph admon ---
+
+
+
+
+
+
+% !split
+\subsection{What is Message Passing Interface (MPI)?}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\textbf{MPI} is a library, not a language. It specifies the names, calling sequences and results of functions
+or subroutines to be called from C/C++ or Fortran programs, and the classes and methods that make up the MPI C++
+library. The programs that users write in Fortran, C or C++ are compiled with ordinary compilers and linked
+with the MPI library.
+
+MPI programs should be able to run
+on all possible machines and run all MPI implementetations without change.
+
+An MPI computation is a collection of processes communicating with messages.
+% --- end paragraph admon ---
+
+
+% !split
+\subsection{Going Parallel with MPI}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\textbf{Task parallelism}: the work of a global problem can be divided
+into a number of independent tasks, which rarely need to synchronize. 
+Monte Carlo simulations or numerical integration are examples of this.
+
+
+MPI is a message-passing library where all the routines
+have corresponding C/C++-binding
+\bcppcod
+   MPI_Command_name
+\ecppcod
+and Fortran-binding (routine names are in uppercase, but can also be in lower case)
+\bforcod
+   MPI_COMMAND_NAME
+\eforcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{MPI is a library}
+
+% --- begin paragraph admon ---
+\paragraph{}
+MPI is a library specification for the message passing interface,
+proposed as a standard.
+
+\begin{itemize}
+\item independent of hardware;
+
+\item not a language or compiler specification;
+
+\item not a specific implementation or product.
+\end{itemize}
+
+\noindent
+A message passing standard for portability and ease-of-use. 
+Designed for high performance.
+
+Insert communication and synchronization functions where necessary.
+% --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{Bindings to MPI routines}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+
+MPI is a message-passing library where all the routines
+have corresponding C/C++-binding
+\bcppcod
+   MPI_Command_name
+\ecppcod
+and Fortran-binding (routine names are in uppercase, but can also be in lower case)
+\bforcod
+   MPI_COMMAND_NAME
+\eforcod
+The discussion in these slides focuses on the C++ binding.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Communicator}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+\item A group of MPI processes with a name (context).
+
+\item Any process is identified by its rank. The rank is only meaningful within a particular communicator.
+
+\item By default the communicator contains all the MPI processes.
+\end{itemize}
+
+\noindent
+\bcppcod
+  MPI_COMM_WORLD 
+\ecppcod
+\begin{itemize}
+\item Mechanism to identify subset of processes.
+
+\item Promotes modular design of parallel libraries.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Some of the most  important MPI functions}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+
+
+\begin{itemize}
+\item $MPI\_Init$ - initiate an MPI computation
+
+\item $MPI\_Finalize$ - terminate the MPI computation and clean up
+
+\item $MPI\_Comm\_size$ - how many processes participate in a given MPI communicator?
+
+\item $MPI\_Comm\_rank$ - which one am I? (A number between 0 and size-1.)
+
+\item $MPI\_Send$ - send a message to a particular process within an MPI communicator
+
+\item $MPI\_Recv$ - receive a message from a particular process within an MPI communicator
+
+\item $MPI\_reduce$  or $MPI\_Allreduce$, send and receive messages
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{\href{{https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program2.cpp}}{The first MPI C/C++ program}}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+
+Let every process write "Hello world" (oh not this program again!!) on the standard output. 
+\bcppcod
+using namespace std;
+#include <mpi.h>
+#include <iostream>
+int main (int nargs, char* args[])
+{
+int numprocs, my_rank;
+//   MPI initializations
+MPI_Init (&nargs, &args);
+MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+cout << "Hello world, I have  rank " << my_rank << " out of " 
+     << numprocs << endl;
+//  End MPI
+MPI_Finalize ();
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{The Fortran program}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bforcod
+PROGRAM hello
+INCLUDE "mpif.h"
+INTEGER:: size, my_rank, ierr
+
+CALL  MPI_INIT(ierr)
+CALL MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierr)
+CALL MPI_COMM_RANK(MPI_COMM_WORLD, my_rank, ierr)
+WRITE(*,*)"Hello world, I've rank ",my_rank," out of ",size
+CALL MPI_FINALIZE(ierr)
+
+END PROGRAM hello
+\eforcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Note 1}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item The output to screen is not ordered since all processes are trying to write  to screen simultaneously.
+
+\item It is the operating system which opts for an ordering.  
+
+\item If we wish to have an organized output, starting from the first process, we may rewrite our program as in the next example.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{\href{{https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program3.cpp}}{Ordered output with MPIBarrier}}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\bcppcod
+int main (int nargs, char* args[])
+{
+ int numprocs, my_rank, i;
+ MPI_Init (&nargs, &args);
+ MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+ MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+ for (i = 0; i < numprocs; i++) {}
+ MPI_Barrier (MPI_COMM_WORLD);
+ if (i == my_rank) {
+ cout << "Hello world, I have  rank " << my_rank << 
+        " out of " << numprocs << endl;}
+      MPI_Finalize ();
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Note 2}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+\item Here we have used the $MPI\_Barrier$ function to ensure that that every process has completed  its set of instructions in  a particular order.
+
+\item A barrier is a special collective operation that does not allow the processes to continue until all processes in the communicator (here $MPI\_COMM\_WORLD$) have called $MPI\_Barrier$. 
+
+\item The barriers make sure that all processes have reached the same point in the code. Many of the collective operations like $MPI\_ALLREDUCE$ to be discussed later, have the same property; that is, no process can exit the operation until all processes have started. 
+\end{itemize}
+
+\noindent
+However, this is slightly more time-consuming since the processes synchronize between themselves as many times as there
+are processes.  In the next Hello world example we use the send and receive functions in order to a have a synchronized
+action.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{\href{{https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program4.cpp}}{Ordered output}}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+
+\bccpcod
+.....
+int numprocs, my_rank, flag;
+MPI_Status status;
+MPI_Init (&nargs, &args);
+MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+if (my_rank > 0)
+MPI_Recv (&flag, 1, MPI_INT, my_rank-1, 100, 
+           MPI_COMM_WORLD, &status);
+cout << "Hello world, I have  rank " << my_rank << " out of " 
+<< numprocs << endl;
+if (my_rank < numprocs-1)
+MPI_Send (&my_rank, 1, MPI_INT, my_rank+1, 
+          100, MPI_COMM_WORLD);
+MPI_Finalize ();
+\eccpcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Note 3}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+
+The basic sending of messages is given by the function $MPI\_SEND$, which in C/C++
+is defined as 
+\bcppcod
+int MPI_Send(void *buf, int count, 
+             MPI_Datatype datatype, 
+             int dest, int tag, MPI_Comm comm)}
+\ecppcod
+This single command allows the passing of any kind of variable, even a large array, to any group of tasks. 
+The variable \textbf{buf} is the variable we wish to send while \textbf{count}
+is the  number of variables we are passing. If we are passing only a single value, this should be 1. 
+
+If we transfer an array, it is  the overall size of the array. 
+For example, if we want to send a 10 by 10 array, count would be $10\times 10=100$ 
+since we are  actually passing 100 values.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Note 4}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+Once you have  sent a message, you must receive it on another task. The function $MPI\_RECV$
+is similar to the send call.
+\bcppcod
+int MPI_Recv( void *buf, int count, MPI_Datatype datatype, 
+            int source, 
+            int tag, MPI_Comm comm, MPI_Status *status )
+\ecppcod
+
+The arguments that are different from those in MPI\_SEND are
+\textbf{buf} which  is the name of the variable where you will  be storing the received data, 
+\textbf{source} which  replaces the destination in the send command. This is the return ID of the sender.
+
+Finally,  we have used  $MPI\_Status\_status$,  
+where one can check if the receive was completed.
+
+The output of this code is the same as the previous example, but now
+process 0 sends a message to process 1, which forwards it further
+to process 2, and so forth.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{\href{{https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp}}{Numerical integration in parallel}}
+
+% --- begin paragraph admon ---
+\paragraph{Integrating $\pi$.}
+
+\begin{itemize}
+\item The code example computes $\pi$ using the trapezoidal rules.
+
+\item The trapezoidal rule
+\end{itemize}
+
+\noindent
+\[
+   I=\int_a^bf(x) dx\approx h\left(f(a)/2 + f(a+h) +f(a+2h)+\dots +f(b-h)+ f(b)/2\right).
+\]
+Click \href{{https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp}}{on this link} for the full program.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Dissection of trapezoidal rule with $MPI\_reduce$}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\bcppcod
+//    Trapezoidal rule and numerical integration usign MPI
+using namespace std;
+#include <mpi.h>
+#include <iostream>
+
+//     Here we define various functions called by the main program
+
+double int_function(double );
+double trapezoidal_rule(double , double , int , double (*)(double));
+
+//   Main function begins here
+int main (int nargs, char* args[])
+{
+  int n, local_n, numprocs, my_rank; 
+  double a, b, h, local_a, local_b, total_sum, local_sum;   
+  double  time_start, time_end, total_time;
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Dissection of trapezoidal rule}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\bcppcod
+  //  MPI initializations
+  MPI_Init (&nargs, &args);
+  MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+  MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+  time_start = MPI_Wtime();
+  //  Fixed values for a, b and n 
+  a = 0.0 ; b = 1.0;  n = 1000;
+  h = (b-a)/n;    // h is the same for all processes 
+  local_n = n/numprocs;  
+  // make sure n > numprocs, else integer division gives zero
+  // Length of each process' interval of
+  // integration = local_n*h.  
+  local_a = a + my_rank*local_n*h;
+  local_b = local_a + local_n*h;
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Integrating with \textbf{MPI}}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\bcppcod
+  total_sum = 0.0;
+  local_sum = trapezoidal_rule(local_a, local_b, local_n, 
+                               &int_function); 
+  MPI_Reduce(&local_sum, &total_sum, 1, MPI_DOUBLE, 
+              MPI_SUM, 0, MPI_COMM_WORLD);
+  time_end = MPI_Wtime();
+  total_time = time_end-time_start;
+  if ( my_rank == 0) {
+    cout << "Trapezoidal rule = " <<  total_sum << endl;
+    cout << "Time = " <<  total_time  
+         << " on number of processors: "  << numprocs  << endl;
+  }
+  // End MPI
+  MPI_Finalize ();  
+  return 0;
+}  // end of main program
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{How do I use $MPI\_reduce$?}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+Here we have used
+\bcppcod
+MPI_reduce( void *senddata, void* resultdata, int count, 
+     MPI_Datatype datatype, MPI_Op, int root, MPI_Comm comm)
+\ecppcod
+
+The two variables $senddata$ and $resultdata$ are obvious, besides the fact that one sends the address
+of the variable or the first element of an array.  If they are arrays they need to have the same size. 
+The variable $count$ represents the total dimensionality, 1 in case of just one variable, 
+while $MPI\_Datatype$ 
+defines the type of variable which is sent and received.  
+
+The new feature is $MPI\_Op$. It defines the type
+of operation we want to do.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{More on $MPI\_Reduce$}
+
+% --- begin paragraph admon ---
+\paragraph{}
+In our case, since we are summing
+the rectangle  contributions from every process we define  $MPI\_Op = MPI\_SUM$.
+If we have an array or matrix we can search for the largest og smallest element by sending either $MPI\_MAX$ or 
+$MPI\_MIN$.  If we want the location as well (which array element) we simply transfer 
+$MPI\_MAXLOC$ or $MPI\_MINOC$. If we want the product we write $MPI\_PROD$. 
+
+$MPI\_Allreduce$ is defined as
+\bcppcod
+MPI_Allreduce( void *senddata, void* resultdata, int count, 
+          MPI_Datatype datatype, MPI_Op, MPI_Comm comm)        
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Dissection of trapezoidal rule}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+We use $MPI\_reduce$ to collect data from each process. Note also the use of the function 
+$MPI\_Wtime$. 
+\bcppcod
+//  this function defines the function to integrate
+double int_function(double x)
+{
+  double value = 4./(1.+x*x);
+  return value;
+} // end of function to evaluate
+
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Dissection of trapezoidal rule}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+//  this function defines the trapezoidal rule
+double trapezoidal_rule(double a, double b, int n, 
+                         double (*func)(double))
+{
+  double trapez_sum;
+  double fa, fb, x, step;
+  int    j;
+  step=(b-a)/((double) n);
+  fa=(*func)(a)/2. ;
+  fb=(*func)(b)/2. ;
+  trapez_sum=0.;
+  for (j=1; j <= n-1; j++){
+    x=j*step+a;
+    trapez_sum+=(*func)(x);
+  }
+  trapez_sum=(trapez_sum+fb+fa)*step;
+  return trapez_sum;
+}  // end trapezoidal_rule 
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{\href{{https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp}}{The quantum dot program for two electrons}}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+// Begin of main program   
+int main(int argc, char* argv[])
+{
+  ...  Omitted declarations
+  //  MPI initializations
+  MPI_Init (&argc, &argv);
+  MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+  MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+  time_start = MPI_Wtime();
+
+  if (my_rank == 0 && argc <= 1) {
+    cout << "Bad Usage: " << argv[0] << 
+      " read also output file on same line" << endl;
+  }
+  if (my_rank == 0 && argc > 1) {
+    outfilename=argv[1];
+    ofile.open(outfilename); 
+  }
+  Vector variate(2);
+  variate(0) = 1.0;  // value of alpha
+  variate(1) = 0.4;  // value of beta
+  // broadcast the total number of  variations
+  //  MPI_Bcast (&number_cycles, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  total_number_cycles = number_cycles*numprocs; 
+  //  Do the mc sampling  and accumulate data with MPI_Reduce
+  cumulative_e = cumulative_e2 = 0.0;
+  mc_sampling(number_cycles, cumulative_e, cumulative_e2, variate);
+  //  Collect data in total averages
+  MPI_Reduce(&cumulative_e, &total_cumulative_e, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&cumulative_e2, &total_cumulative_e2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+  time_end = MPI_Wtime();
+  total_time = time_end-time_start;
+  // Print out results  
+  if ( my_rank == 0) {
+    cout << "Time = " <<  total_time  << " on number of processors: "  << numprocs  << endl;
+    energy = total_cumulative_e/numprocs;
+    variance = total_cumulative_e2/numprocs-energy*energy;
+    error=sqrt(variance/(total_number_cycles-1.0));
+    ofile << setiosflags(ios::showpoint | ios::uppercase);
+    ofile << setw(15) << setprecision(8) << variate(0);
+    ofile << setw(15) << setprecision(8) << variate(1);
+    ofile << setw(15) << setprecision(8) << energy;
+    ofile << setw(15) << setprecision(8) << variance;
+    ofile << setw(15) << setprecision(8) << error << endl;
+    ofile.close();  // close output file
+  }
+  // End MPI
+  MPI_Finalize ();  
+  return 0;
+}  //  end of main function
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+
+
+
+% !split
+\subsection{What is OpenMP}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+\item OpenMP provides high-level thread programming
+
+\item Multiple cooperating threads are allowed to run simultaneously
+
+\item Threads are created and destroyed dynamically in a fork-join pattern
+\begin{itemize}
+
+   \item An OpenMP program consists of a number of parallel regions
+
+   \item Between two parallel regions there is only one master thread
+
+   \item In the beginning of a parallel region, a team of new threads is spawned
+
+\end{itemize}
+
+\noindent
+  \item The newly spawned threads work simultaneously with the master thread
+
+  \item At the end of a parallel region, the new threads are destroyed
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Getting started, things to remember}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+ \item Remember the header file 
+\end{itemize}
+
+\noindent
+\bcppcod
+#include <omp.h>
+\ecppcod
+\begin{itemize}
+ \item Insert compiler directives in C++ syntax as 
+\end{itemize}
+
+\noindent
+\bcppcod
+#pragma omp...
+\ecppcod
+\begin{itemize}
+\item Compile with for example \emph{c++ -fopenmp code.cpp}
+
+\item Execute
+\begin{itemize}
+
+  \item Remember to assign the environment variable \textbf{OMP NUM THREADS}
+
+  \item It specifies the total number of threads inside a parallel region, if not otherwise overwritten
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{General code structure}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+#include <omp.h>
+main ()
+{
+int var1, var2, var3;
+/* serial code */
+/* ... */
+/* start of a parallel region */
+#pragma omp parallel private(var1, var2) shared(var3)
+{
+/* ... */
+}
+/* more serial code */
+/* ... */
+/* another parallel region */
+#pragma omp parallel
+{
+/* ... */
+}
+}
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Parallel region}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+\item A parallel region is a block of code that is executed by a team of threads
+
+\item The following compiler directive creates a parallel region
+\end{itemize}
+
+\noindent
+\bcppcod
+#pragma omp parallel { ... }
+\ecppcod
+\begin{itemize}
+\item Clauses can be added at the end of the directive
+
+\item Most often used clauses:
+\begin{itemize}
+
+ \item \textbf{default(shared)} or \textbf{default(none)}
+
+ \item \textbf{public(list of variables)}
+
+ \item \textbf{private(list of variables)}
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Hello world, not again, please!}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+#include <omp.h>
+#include <stdio.h>
+int main (int argc, char *argv[])
+{
+int th_id, nthreads;
+#pragma omp parallel private(th_id) shared(nthreads)
+{
+th_id = omp_get_thread_num();
+printf("Hello World from thread %d\n", th_id);
+#pragma omp barrier
+if ( th_id == 0 ) {
+nthreads = omp_get_num_threads();
+printf("There are %d threads\n",nthreads);
+}
+}
+return 0;
+}
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Important OpenMP library routines}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item \textbf{int omp get num threads ()}, returns the number of threads inside a parallel region
+
+\item \textbf{int omp get thread num ()},  returns the  a thread for each thread inside a parallel region
+
+\item \textbf{void omp set num threads (int)}, sets the number of threads to be used
+
+\item \textbf{void omp set nested (int)},  turns nested parallelism on/off
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Parallel for loop}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+ \item Inside a parallel region, the following compiler directive can be used to parallelize a for-loop:
+\end{itemize}
+
+\noindent
+\bcppcod
+#pragma omp for
+\ecppcod
+\begin{itemize}
+\item Clauses can be added, such as
+\begin{itemize}
+
+  \item \textbf{schedule(static, chunk size)}
+
+  \item \textbf{schedule(dynamic, chunk size)} 
+
+  \item \textbf{schedule(guided, chunk size)} (non-deterministic allocation)
+
+  \item \textbf{schedule(runtime)}
+
+  \item \textbf{private(list of variables)}
+
+  \item \textbf{reduction(operator:variable)}
+
+  \item \textbf{nowait}
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Example code}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+#include <omp.h>
+#define CHUNKSIZE 100
+#define N
+1000
+main ()
+{
+int i, chunk;
+float a[N], b[N], c[N];
+for (i=0; i < N; i++)
+a[i] = b[i] = i * 1.0;
+chunk = CHUNKSIZE;
+#pragma omp parallel shared(a,b,c,chunk) private(i)
+{
+#pragma omp for schedule(dynamic,chunk)
+for (i=0; i < N; i++)
+c[i] = a[i] + b[i];
+} /* end of parallel region */
+}
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{More on Parallel for loop}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+\item The number of loop iterations cannot be non-deterministic; break, return, exit, goto not allowed inside the for-loop
+
+\item The loop index is private to each thread
+
+\item A reduction variable is special
+\begin{itemize}
+
+  \item During the for-loop there is a local private copy in each thread
+
+  \item At the end of the for-loop, all the local copies are combined together by the reduction operation
+
+\end{itemize}
+
+\noindent
+\item Unless the nowait clause is used, an implicit barrier synchronization will be added at the end by the compiler
+\end{itemize}
+
+\noindent
+\bcppcod
+// #pragma omp parallel and #pragma omp for
+\ecppcod
+can be combined into
+\bcppcod
+#pragma omp parallel for
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Inner product}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\[
+\sum_{i=0}^{n-1} a_ib_i
+\]
+\bcppcod
+int i;
+double sum = 0.;
+/* allocating and initializing arrays */
+/* ... */
+#pragma omp parallel for default(shared) private(i) reduction(+:sum)
+for (i=0; i<N; i++)
+sum += a[i]*b[i];
+}
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Different threads do different tasks}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+Different threads do different tasks independently, each section is executed by one thread.
+\bcppcod
+#pragma omp parallel
+{
+#pragma omp sections
+{
+#pragma omp section
+funcA ();
+#pragma omp section
+funcB ();
+#pragma omp section
+funcC ();
+}
+}
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection{Single execution}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+#pragma omp single { ... }
+\ecppcod
+The code is executed by one thread only, no guarantee which thread
+
+Can introduce an implicit barrier at the end
+\bcppcod
+#pragma omp master { ... }
+\ecppcod
+Code executed by the master thread, guaranteed and no implicit barrier at the end.
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Coordination and synchronization}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+#pragma omp barrier
+\ecppcod
+Synchronization, must be encountered by all threads in a team (or none)
+\bcppcod
+#pragma omp ordered { a block of codes }
+\ecppcod
+is another form of synchronization (in sequential order).
+The form
+\bcppcod
+#pragma omp critical { a block of codes }
+\ecppcod
+and 
+\bcppcod
+#pragma omp atomic { single assignment statement }
+\ecppcod
+is  more efficient than 
+\bcppcod
+#pragma omp critical
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Data scope}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+\item OpenMP data scope attribute clauses:
+\begin{itemize}
+
+ \item \textbf{shared}
+
+ \item \textbf{private}
+
+ \item \textbf{firstprivate}
+
+ \item \textbf{lastprivate}
+
+ \item \textbf{reduction}
+\end{itemize}
+
+\noindent
+\end{itemize}
+
+\noindent
+What are the purposes of these attributes
+\begin{itemize}
+\item define how and which variables are transferred to a parallel region (and back)
+
+\item define which variables are visible to all threads in a parallel region, and which variables are privately allocated to each thread
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Some remarks}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+\item When entering a parallel region, the \textbf{private} clause ensures each thread having its own new variable instances. The new variables are assumed to be uninitialized.
+
+\item A shared variable exists in only one memory location and all threads can read and write to that address. It is the programmer's responsibility to ensure that multiple threads properly access a shared variable.
+
+\item The \textbf{firstprivate} clause combines the behavior of the private clause with automatic initialization.
+
+\item The \textbf{lastprivate} clause combines the behavior of the private clause with a copy back (from the last loop iteration or section) to the original variable outside the parallel region.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Parallelizing nested for-loops}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+\begin{itemize}
+ \item Serial code
+\end{itemize}
+
+\noindent
+\bcppcod
+for (i=0; i<100; i++)
+for (j=0; j<100; j++)
+a[i][j] = b[i][j] + c[i][j]
+\ecppcod
+
+\begin{itemize}
+\item Parallelization
+\end{itemize}
+
+\noindent
+\bcppcod
+#pragma omp parallel for private(j)
+for (i=0; i<100; i++)
+for (j=0; j<100; j++)
+a[i][j] = b[i][j] + c[i][j]
+\ecppcod
+
+\begin{itemize}
+\item Why not parallelize the inner loop? to save overhead of repeated thread forks-joins
+
+\item Why must \textbf{j} be private? To avoid race condition among the threads
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Nested parallelism}
+
+% --- begin paragraph admon ---
+\paragraph{}
+When a thread in a parallel region encounters another parallel construct, it
+may create a new team of threads and become the master of the new
+team.
+\bcppcod
+#pragma omp parallel num_threads(4)
+{
+/* .... */
+#pragma omp parallel num_threads(2)
+{
+//  
+}
+}
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Parallel tasks}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+#pragma omp task 
+#pragma omp parallel shared(p_vec) private(i)
+{
+#pragma omp single
+{
+for (i=0; i<N; i++) {
+double r = random_number();
+if (p_vec[i] > r) {
+#pragma omp task
+do_work (p_vec[i]);
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Common mistakes}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Race condition
+\bcppcod
+int nthreads;
+#pragma omp parallel shared(nthreads)
+{
+nthreads = omp_get_num_threads();
+}
+\ecppcod
+Deadlock
+\bcppcod
+#pragma omp parallel
+{
+...
+#pragma omp critical
+{
+...
+#pragma omp barrier
+}
+}
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Matrix-matrix multiplication}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+# include <cstdlib>
+# include <iostream>
+# include <cmath>
+# include <ctime>
+# include <omp.h>
+
+using namespace std;
+
+// Main function
+int main ( )
+{
+// brute force coding of arrays
+  double a[500][500];
+  double angle;
+  double b[500][500];
+  double c[500][500];
+  int i;
+  int j;
+  int k;
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Matrix-matrix multiplication}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+  int n = 500;
+  double pi = acos(-1.0);
+  double s;
+  int thread_num;
+  double wtime;
+
+  cout << "\n";
+  cout << "  C++/OpenMP version\n";
+  cout << "  Compute matrix product C = A * B.\n";
+
+  thread_num = omp_get_max_threads ( );
+
+//
+//  Loop 1: Evaluate A.
+//
+  s = 1.0 / sqrt ( ( double ) ( n ) );
+
+  wtime = omp_get_wtime ( );
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+% !split
+\subsection{Matrix-matrix multiplication}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+# pragma omp parallel shared ( a, b, c, n, pi, s ) 
+private ( angle, i, j, k )
+{
+  # pragma omp for
+  for ( i = 0; i < n; i++ )
+  {
+    for ( j = 0; j < n; j++ )
+    {
+      angle = 2.0 * pi * i * j / ( double ) n;
+      a[i][j] = s * ( sin ( angle ) + cos ( angle ) );
+    }
+  }
+//
+//  Loop 2: Copy A into B.
+//
+  # pragma omp for
+  for ( i = 0; i < n; i++ )
+  {
+    for ( j = 0; j < n; j++ )
+    {
+      b[i][j] = a[i][j];
+    }
+  }
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+
+% !split
+\subsection{Matrix-matrix multiplication}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\bcppcod
+//  Loop 3: Compute C = A * B.
+//
+  # pragma omp for
+  for ( i = 0; i < n; i++ )
+  {
+    for ( j = 0; j < n; j++ )
+    {
+      c[i][j] = 0.0;
+      for ( k = 0; k < n; k++ )
+      {
+        c[i][j] = c[i][j] + a[i][k] * b[k][j];
+      }
+    }
+  }
+}
+  wtime = omp_get_wtime ( ) - wtime;
+  cout << "  Elapsed seconds = " << wtime << "\n";
+  cout << "  C(100,100)  = " << c[99][99] << "\n";
+//
+//  Terminate.
+//
+  cout << "\n";
+  cout << "  Normal end of execution.\n";
+  return 0;
+\ecppcod
+% --- end paragraph admon ---
+
+
+
+
+
+
+% ------------------- end of main content ---------------
+
+% #ifdef PREAMBLE
+\end{document}
+% #endif
+

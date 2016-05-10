@@ -1,0 +1,53 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+\PYGdefault{c+c1}{// Begin of main program}
+\PYGdefault{k+kt}{int} \PYGdefault{n+nf}{main}\PYGdefault{p}{(}\PYGdefault{k+kt}{int} \PYGdefault{n}{argc}\PYGdefault{p}{,} \PYGdefault{k+kt}{char}\PYGdefault{o}{*} \PYGdefault{n}{argv}\PYGdefault{p}{[])}
+\PYGdefault{p}{\PYGdefaultZob{}}
+  \PYGdefault{p}{...}  \PYGdefault{n}{Omitted} \PYGdefault{n}{declarations}
+  \PYGdefault{c+c1}{//  MPI initializations}
+  \PYGdefault{n}{MPI\PYGdefaultZus{}Init} \PYGdefault{p}{(}\PYGdefault{o}{\PYGdefaultZam{}}\PYGdefault{n}{argc}\PYGdefault{p}{,} \PYGdefault{o}{\PYGdefaultZam{}}\PYGdefault{n}{argv}\PYGdefault{p}{);}
+  \PYGdefault{n}{MPI\PYGdefaultZus{}Comm\PYGdefaultZus{}size} \PYGdefault{p}{(}\PYGdefault{n}{MPI\PYGdefaultZus{}COMM\PYGdefaultZus{}WORLD}\PYGdefault{p}{,} \PYGdefault{o}{\PYGdefaultZam{}}\PYGdefault{n}{numprocs}\PYGdefault{p}{);}
+  \PYGdefault{n}{MPI\PYGdefaultZus{}Comm\PYGdefaultZus{}rank} \PYGdefault{p}{(}\PYGdefault{n}{MPI\PYGdefaultZus{}COMM\PYGdefaultZus{}WORLD}\PYGdefault{p}{,} \PYGdefault{o}{\PYGdefaultZam{}}\PYGdefault{n}{my\PYGdefaultZus{}rank}\PYGdefault{p}{);}
+  \PYGdefault{n}{time\PYGdefaultZus{}start} \PYGdefault{o}{=} \PYGdefault{n}{MPI\PYGdefaultZus{}Wtime}\PYGdefault{p}{();}
+
+  \PYGdefault{k}{if} \PYGdefault{p}{(}\PYGdefault{n}{my\PYGdefaultZus{}rank} \PYGdefault{o}{==} \PYGdefault{l+m+mi}{0} \PYGdefault{o}{\PYGdefaultZam{}\PYGdefaultZam{}} \PYGdefault{n}{argc} \PYGdefault{o}{\PYGdefaultZlt{}=} \PYGdefault{l+m+mi}{1}\PYGdefault{p}{)} \PYGdefault{p}{\PYGdefaultZob{}}
+    \PYGdefault{n}{cout} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{l+s}{\PYGdefaultZdq{}Bad Usage: \PYGdefaultZdq{}} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{argv}\PYGdefault{p}{[}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{]} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}}
+      \PYGdefault{l+s}{\PYGdefaultZdq{} read also output file on same line\PYGdefaultZdq{}} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{endl}\PYGdefault{p}{;}
+  \PYGdefault{p}{\PYGdefaultZcb{}}
+  \PYGdefault{k}{if} \PYGdefault{p}{(}\PYGdefault{n}{my\PYGdefaultZus{}rank} \PYGdefault{o}{==} \PYGdefault{l+m+mi}{0} \PYGdefault{o}{\PYGdefaultZam{}\PYGdefaultZam{}} \PYGdefault{n}{argc} \PYGdefault{o}{\PYGdefaultZgt{}} \PYGdefault{l+m+mi}{1}\PYGdefault{p}{)} \PYGdefault{p}{\PYGdefaultZob{}}
+    \PYGdefault{n}{outfilename}\PYGdefault{o}{=}\PYGdefault{n}{argv}\PYGdefault{p}{[}\PYGdefault{l+m+mi}{1}\PYGdefault{p}{];}
+    \PYGdefault{n}{ofile}\PYGdefault{p}{.}\PYGdefault{n}{open}\PYGdefault{p}{(}\PYGdefault{n}{outfilename}\PYGdefault{p}{);}
+  \PYGdefault{p}{\PYGdefaultZcb{}}
+  \PYGdefault{n}{Vector} \PYGdefault{n}{variate}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{2}\PYGdefault{p}{);}
+  \PYGdefault{n}{variate}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{)} \PYGdefault{o}{=} \PYGdefault{l+m+mf}{1.0}\PYGdefault{p}{;}  \PYGdefault{c+c1}{// value of alpha}
+  \PYGdefault{n}{variate}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{1}\PYGdefault{p}{)} \PYGdefault{o}{=} \PYGdefault{l+m+mf}{0.4}\PYGdefault{p}{;}  \PYGdefault{c+c1}{// value of beta}
+  \PYGdefault{c+c1}{// broadcast the total number of  variations}
+  \PYGdefault{c+c1}{//  MPI\PYGdefaultZus{}Bcast (\PYGdefaultZam{}number\PYGdefaultZus{}cycles, 1, MPI\PYGdefaultZus{}INT, 0, MPI\PYGdefaultZus{}COMM\PYGdefaultZus{}WORLD);}
+  \PYGdefault{n}{total\PYGdefaultZus{}number\PYGdefaultZus{}cycles} \PYGdefault{o}{=} \PYGdefault{n}{number\PYGdefaultZus{}cycles}\PYGdefault{o}{*}\PYGdefault{n}{numprocs}\PYGdefault{p}{;}
+  \PYGdefault{c+c1}{//  Do the mc sampling  and accumulate data with MPI\PYGdefaultZus{}Reduce}
+  \PYGdefault{n}{cumulative\PYGdefaultZus{}e} \PYGdefault{o}{=} \PYGdefault{n}{cumulative\PYGdefaultZus{}e2} \PYGdefault{o}{=} \PYGdefault{l+m+mf}{0.0}\PYGdefault{p}{;}
+  \PYGdefault{n}{mc\PYGdefaultZus{}sampling}\PYGdefault{p}{(}\PYGdefault{n}{number\PYGdefaultZus{}cycles}\PYGdefault{p}{,} \PYGdefault{n}{cumulative\PYGdefaultZus{}e}\PYGdefault{p}{,} \PYGdefault{n}{cumulative\PYGdefaultZus{}e2}\PYGdefault{p}{,} \PYGdefault{n}{variate}\PYGdefault{p}{);}
+  \PYGdefault{c+c1}{//  Collect data in total averages}
+  \PYGdefault{n}{MPI\PYGdefaultZus{}Reduce}\PYGdefault{p}{(}\PYGdefault{o}{\PYGdefaultZam{}}\PYGdefault{n}{cumulative\PYGdefaultZus{}e}\PYGdefault{p}{,} \PYGdefault{o}{\PYGdefaultZam{}}\PYGdefault{n}{total\PYGdefaultZus{}cumulative\PYGdefaultZus{}e}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{1}\PYGdefault{p}{,} \PYGdefault{n}{MPI\PYGdefaultZus{}DOUBLE}\PYGdefault{p}{,} \PYGdefault{n}{MPI\PYGdefaultZus{}SUM}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{0}\PYGdefault{p}{,} \PYGdefault{n}{MPI\PYGdefaultZus{}COMM\PYGdefaultZus{}WORLD}\PYGdefault{p}{);}
+  \PYGdefault{n}{MPI\PYGdefaultZus{}Reduce}\PYGdefault{p}{(}\PYGdefault{o}{\PYGdefaultZam{}}\PYGdefault{n}{cumulative\PYGdefaultZus{}e2}\PYGdefault{p}{,} \PYGdefault{o}{\PYGdefaultZam{}}\PYGdefault{n}{total\PYGdefaultZus{}cumulative\PYGdefaultZus{}e2}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{1}\PYGdefault{p}{,} \PYGdefault{n}{MPI\PYGdefaultZus{}DOUBLE}\PYGdefault{p}{,} \PYGdefault{n}{MPI\PYGdefaultZus{}SUM}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{0}\PYGdefault{p}{,} \PYGdefault{n}{MPI\PYGdefaultZus{}COMM\PYGdefaultZus{}WORLD}\PYGdefault{p}{);}
+
+  \PYGdefault{n}{time\PYGdefaultZus{}end} \PYGdefault{o}{=} \PYGdefault{n}{MPI\PYGdefaultZus{}Wtime}\PYGdefault{p}{();}
+  \PYGdefault{n}{total\PYGdefaultZus{}time} \PYGdefault{o}{=} \PYGdefault{n}{time\PYGdefaultZus{}end}\PYGdefault{o}{\PYGdefaultZhy{}}\PYGdefault{n}{time\PYGdefaultZus{}start}\PYGdefault{p}{;}
+  \PYGdefault{c+c1}{// Print out results}
+  \PYGdefault{k}{if} \PYGdefault{p}{(} \PYGdefault{n}{my\PYGdefaultZus{}rank} \PYGdefault{o}{==} \PYGdefault{l+m+mi}{0}\PYGdefault{p}{)} \PYGdefault{p}{\PYGdefaultZob{}}
+    \PYGdefault{n}{cout} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{l+s}{\PYGdefaultZdq{}Time = \PYGdefaultZdq{}} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}}  \PYGdefault{n}{total\PYGdefaultZus{}time}  \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{l+s}{\PYGdefaultZdq{} on number of processors: \PYGdefaultZdq{}}  \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{numprocs}  \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{endl}\PYGdefault{p}{;}
+    \PYGdefault{n}{energy} \PYGdefault{o}{=} \PYGdefault{n}{total\PYGdefaultZus{}cumulative\PYGdefaultZus{}e}\PYGdefault{o}{/}\PYGdefault{n}{numprocs}\PYGdefault{p}{;}
+    \PYGdefault{n}{variance} \PYGdefault{o}{=} \PYGdefault{n}{total\PYGdefaultZus{}cumulative\PYGdefaultZus{}e2}\PYGdefault{o}{/}\PYGdefault{n}{numprocs}\PYGdefault{o}{\PYGdefaultZhy{}}\PYGdefault{n}{energy}\PYGdefault{o}{*}\PYGdefault{n}{energy}\PYGdefault{p}{;}
+    \PYGdefault{n}{error}\PYGdefault{o}{=}\PYGdefault{n}{sqrt}\PYGdefault{p}{(}\PYGdefault{n}{variance}\PYGdefault{o}{/}\PYGdefault{p}{(}\PYGdefault{n}{total\PYGdefaultZus{}number\PYGdefaultZus{}cycles}\PYGdefault{o}{\PYGdefaultZhy{}}\PYGdefault{l+m+mf}{1.0}\PYGdefault{p}{));}
+    \PYGdefault{n}{ofile} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setiosflags}\PYGdefault{p}{(}\PYGdefault{n}{ios}\PYGdefault{o}{::}\PYGdefault{n}{showpoint} \PYGdefault{o}{|} \PYGdefault{n}{ios}\PYGdefault{o}{::}\PYGdefault{n}{uppercase}\PYGdefault{p}{);}
+    \PYGdefault{n}{ofile} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setw}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{15}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setprecision}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{8}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{variate}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{);}
+    \PYGdefault{n}{ofile} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setw}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{15}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setprecision}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{8}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{variate}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{1}\PYGdefault{p}{);}
+    \PYGdefault{n}{ofile} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setw}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{15}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setprecision}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{8}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{energy}\PYGdefault{p}{;}
+    \PYGdefault{n}{ofile} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setw}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{15}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setprecision}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{8}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{variance}\PYGdefault{p}{;}
+    \PYGdefault{n}{ofile} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setw}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{15}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{setprecision}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{8}\PYGdefault{p}{)} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{error} \PYGdefault{o}{\PYGdefaultZlt{}\PYGdefaultZlt{}} \PYGdefault{n}{endl}\PYGdefault{p}{;}
+    \PYGdefault{n}{ofile}\PYGdefault{p}{.}\PYGdefault{n}{close}\PYGdefault{p}{();}  \PYGdefault{c+c1}{// close output file}
+  \PYGdefault{p}{\PYGdefaultZcb{}}
+  \PYGdefault{c+c1}{// End MPI}
+  \PYGdefault{n}{MPI\PYGdefaultZus{}Finalize} \PYGdefault{p}{();}
+  \PYGdefault{k}{return} \PYGdefault{l+m+mi}{0}\PYGdefault{p}{;}
+\PYGdefault{p}{\PYGdefaultZcb{}}  \PYGdefault{c+c1}{//  end of main function}
+\end{Verbatim}
