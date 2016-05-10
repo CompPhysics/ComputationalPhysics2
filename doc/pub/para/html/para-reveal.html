@@ -499,10 +499,10 @@ The code
 has for \( n \) repeats
 
 <ol>
-<p><li> one load for \( a[i] \) in address 1</li>
+<p><li> one load for \( c[i] \) in address 1</li>
 <p><li> one load for \( b[i] \) in address 2</li>
-<p><li> add \( a[i] \) and \( b[i] \) to give \( c[i] \)</li>
-<p><li> store \( c[i] \) in address 2</li>
+<p><li> add \( c[i] \) and \( b[i] \) to give \( a[i] \)</li>
+<p><li> store \( a[i] \) in address 2</li>
 </ol>
 </section>
 
@@ -544,10 +544,10 @@ Four additions are now done in a single step.
 For \( n/4 \) repeats assuming floats or integers
 
 <ol>
-<p><li> one vector load for \( a[i] \) in address 1</li>
+<p><li> one vector load for \( c[i] \) in address 1</li>
 <p><li> one load for \( b[i] \) in address 2</li>
-<p><li> add \( a[i] \) and \( b[i] \) to give \( c[i] \)</li>
-<p><li> store \( c[i] \) in address 2</li>
+<p><li> add \( c[i] \) and \( b[i] \) to give \( a[i] \)</li>
+<p><li> store \( a[i] \) in address 2</li>
 </ol>
 </section>
 
@@ -630,7 +630,39 @@ The result will however vary from compiler to compiler. In general however, with
 
 
 <section>
-<h2 id="___sec19">Automatic vectorization and vectorization inhibitors, criteria </h2>
+<h2 id="___sec19">Compiling with and without vectorization using clang </h2>
+We can compile and link without vectorization with clang compiler
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%">clang++ -o -fno-vectorize novec.x vecexample.cpp
+</pre></div>
+<p>
+and with vectorization
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%">clang++ -O3 -Rpass=loop-vectorize -o  vec.x vecexample.cpp 
+</pre></div>
+<p>
+We can also add vectorization analysis, see for example
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%">clang++ -O3 -Rpass-analysis=loop-vectorize -o  vec.x vecexample.cpp 
+</pre></div>
+<p>
+or figure out if vectorization was missed
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%">clang++ -O3 -Rpass-missed=loop-vectorize -o  vec.x vecexample.cpp 
+</pre></div>
+</section>
+
+
+<section>
+<h2 id="___sec20">Automatic vectorization and vectorization inhibitors, criteria </h2>
 
 <p>
 Not all loops can be vectorized, as discussed in <a href="https://software.intel.com/en-us/articles/a-guide-to-auto-vectorization-with-intel-c-compilers" target="_blank">Intel's guide to vectorization</a>
@@ -650,7 +682,7 @@ The variable \( n \) does need to be known at compile time. However, this variab
 
 
 <section>
-<h2 id="___sec20">Automatic vectorization and vectorization inhibitors, exit criteria </h2>
+<h2 id="___sec21">Automatic vectorization and vectorization inhibitors, exit criteria </h2>
 
 <p>
 An exit statement should in general be avoided. 
@@ -670,7 +702,7 @@ Avoid loop termination conditions and opt for a single entry loop variable \( n 
 
 
 <section>
-<h2 id="___sec21">Automatic vectorization and vectorization inhibitors, straight-line code </h2>
+<h2 id="___sec22">Automatic vectorization and vectorization inhibitors, straight-line code </h2>
 
 <p>
 SIMD instructions perform the same type of operations multiple times. 
@@ -695,7 +727,7 @@ These operations can be performed for all data elements but only those elements 
 
 
 <section>
-<h2 id="___sec22">Automatic vectorization and vectorization inhibitors, nested loops </h2>
+<h2 id="___sec23">Automatic vectorization and vectorization inhibitors, nested loops </h2>
 
 <p>
 Only the innermost loop of the following example is vectorized
@@ -714,7 +746,7 @@ The exception is if an original outer loop is transformed into an inner loop as 
 
 
 <section>
-<h2 id="___sec23">Automatic vectorization and vectorization inhibitors, function calls </h2>
+<h2 id="___sec24">Automatic vectorization and vectorization inhibitors, function calls </h2>
 
 <p>
 Calls to programmer defined functions ruin vectorization. However, calls to intrinsic functions like
@@ -733,7 +765,7 @@ Similarly, <b>inline</b> functions defined by the programmer, allow for vectoriz
 
 
 <section>
-<h2 id="___sec24">Automatic vectorization and vectorization inhibitors, data dependencies </h2>
+<h2 id="___sec25">Automatic vectorization and vectorization inhibitors, data dependencies </h2>
 
 <p>
 One has to keep in mind that vectorization changes the order of operations inside a loop. A so-called
@@ -762,7 +794,7 @@ and if the two first iterations are  executed at the same by the SIMD instructio
 
 
 <section>
-<h2 id="___sec25">Automatic vectorization and vectorization inhibitors, more data dependencies </h2>
+<h2 id="___sec26">Automatic vectorization and vectorization inhibitors, more data dependencies </h2>
 
 <p>
 On the other hand,  a so-called 
@@ -782,7 +814,7 @@ can complete before an iteration with a lower value of \( i \). However, such co
 
 
 <section>
-<h2 id="___sec26">Automatic vectorization and vectorization inhibitors, memory stride </h2>
+<h2 id="___sec27">Automatic vectorization and vectorization inhibitors, memory stride </h2>
 
 <p>
 For C++ programmers  it is also worth keeping in mind that an array notation is preferred to the more compact use of pointers to access array elements. The compiler can often not tell if it is safe to vectorize the code.
@@ -802,7 +834,7 @@ When dealing with arrays, you should also avoid memory stride, since this slows 
 
 
 <section>
-<h2 id="___sec27">Memory management </h2>
+<h2 id="___sec28">Memory management </h2>
 The main memory contains the program data
 
 <ul>
@@ -829,7 +861,7 @@ Loads and stores to memory can be as important as floating point operations when
 
 
 <section>
-<h2 id="___sec28">Memory and communication  </h2>
+<h2 id="___sec29">Memory and communication  </h2>
 
 <ul>
 <p><li> Most communication in a computer is carried out in chunks, blocks of bytes of data that move together</li>
@@ -845,7 +877,7 @@ Loads and stores to memory can be as important as floating point operations when
 
 
 <section>
-<h2 id="___sec29">Measuring performance </h2>
+<h2 id="___sec30">Measuring performance </h2>
 
 <p>
 How do we measure erformance? What is wrong with this code to time a loop?
@@ -864,7 +896,7 @@ How do we measure erformance? What is wrong with this code to time a loop?
 
 
 <section>
-<h2 id="___sec30">Problems with measuring time </h2>
+<h2 id="___sec31">Problems with measuring time </h2>
 
 <ol>
 <p><li> Timers are not infinitely accurate</li>
@@ -877,7 +909,7 @@ How do we measure erformance? What is wrong with this code to time a loop?
 
 
 <section>
-<h2 id="___sec31">Problems with cold start </h2>
+<h2 id="___sec32">Problems with cold start </h2>
 
 <p>
 What happens when the code is executed? The assumption is that the code is ready to
@@ -893,7 +925,7 @@ execute. But
 
 
 <section>
-<h2 id="___sec32">Problems with smart compilers </h2>
+<h2 id="___sec33">Problems with smart compilers </h2>
 
 <ol>
 <p><li> If the result of the computation is not used, the compiler may eliminate the code</li>
@@ -905,7 +937,7 @@ execute. But
 
 
 <section>
-<h2 id="___sec33">Problems with interference </h2>
+<h2 id="___sec34">Problems with interference </h2>
 
 <ol>
 <p><li> Other activities are sharing your processor</li>
@@ -933,7 +965,7 @@ execute. But
 
 
 <section>
-<h2 id="___sec34">Problems with measuring performance  </h2>
+<h2 id="___sec35">Problems with measuring performance  </h2>
 
 <ol>
 <p><li> Accurate, reproducible performance measurement is hard</li>
@@ -945,7 +977,7 @@ execute. But
 
 
 <section>
-<h2 id="___sec35">Thomas algorithm for tridiagonal linear algebra equations </h2>
+<h2 id="___sec36">Thomas algorithm for tridiagonal linear algebra equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>&nbsp;<br>
@@ -977,7 +1009,7 @@ $$
 
 
 <section>
-<h2 id="___sec36">Thomas algorithm, forward substitution </h2>
+<h2 id="___sec37">Thomas algorithm, forward substitution </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1030,7 +1062,7 @@ $$
 
 
 <section>
-<h2 id="___sec37">Thomas algorithm, backward substitution </h2>
+<h2 id="___sec38">Thomas algorithm, backward substitution </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1059,7 +1091,7 @@ $$
 
 
 <section>
-<h2 id="___sec38">Thomas algorithm and counting of operations (floating point and memory)  </h2>
+<h2 id="___sec39">Thomas algorithm and counting of operations (floating point and memory)  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1103,7 +1135,7 @@ $$
 
 
 <section>
-<h2 id="___sec39"><a href="https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/LecturePrograms/programs/Classes/cpp/program8.cpp" target="_blank">Example: Transpose of a matrix</a> </h2>
+<h2 id="___sec40"><a href="https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/LecturePrograms/programs/Classes/cpp/program8.cpp" target="_blank">Example: Transpose of a matrix</a> </h2>
 
 <p>
 
@@ -1160,7 +1192,7 @@ int main (int argc, char* argv[])
 
 
 <section>
-<h2 id="___sec40"><a href="https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/LecturePrograms/programs/Classes/cpp/program9.cpp" target="_blank">Matrix-matrix multiplication</a> </h2>
+<h2 id="___sec41"><a href="https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/LecturePrograms/programs/Classes/cpp/program9.cpp" target="_blank">Matrix-matrix multiplication</a> </h2>
 This the matrix-matrix multiplication code with plain c++ memory allocation
 
 <p>
@@ -1226,7 +1258,7 @@ int main (int argc, char* argv[])
 
 
 <section>
-<h2 id="___sec41">How do we define speedup? Simplest form </h2>
+<h2 id="___sec42">How do we define speedup? Simplest form </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1242,7 +1274,7 @@ int main (int argc, char* argv[])
 
 
 <section>
-<h2 id="___sec42">How do we define speedup? Correct baseline </h2>
+<h2 id="___sec43">How do we define speedup? Correct baseline </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1267,7 +1299,7 @@ The key is choosing the correct baseline for comparison
 
 
 <section>
-<h2 id="___sec43">Parallel  speedup </h2>
+<h2 id="___sec44">Parallel  speedup </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1291,7 +1323,7 @@ That means using \( p \) processors is more than \( p \) times faster than using
 
 
 <section>
-<h2 id="___sec44">Speedup and memory  </h2>
+<h2 id="___sec45">Speedup and memory  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1309,7 +1341,7 @@ Consider the case of a memorybound computation with \( M \) words of memory
 
 
 <section>
-<h2 id="___sec45">Upper bounds on speedup </h2>
+<h2 id="___sec46">Upper bounds on speedup </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1329,7 +1361,7 @@ time \( Wf/p \) on \( p \) processors.
 
 
 <section>
-<h2 id="___sec46">Amdahl's law </h2>
+<h2 id="___sec47">Amdahl's law </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1370,7 +1402,7 @@ is \( 1/(1-.99)=100 \)!
 
 
 <section>
-<h2 id="___sec47">How much is parallelizable </h2>
+<h2 id="___sec48">How much is parallelizable </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1388,7 +1420,7 @@ is \( 10^{-6} \) or less due to large arrays or objects that are perfectly paral
 
 
 <section>
-<h2 id="___sec48">Today's situation of parallel computing  </h2>
+<h2 id="___sec49">Today's situation of parallel computing  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1406,7 +1438,7 @@ Our lectures will focus on both MPI and OpenMP.
 
 
 <section>
-<h2 id="___sec49">Overhead present in parallel computing </h2>
+<h2 id="___sec50">Overhead present in parallel computing </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1424,7 +1456,7 @@ algorithm cannot be parallelized we may not achieve an optimal parallelization.
 
 
 <section>
-<h2 id="___sec50">Parallelizing a sequential algorithm  </h2>
+<h2 id="___sec51">Parallelizing a sequential algorithm  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1436,7 +1468,7 @@ algorithm cannot be parallelized we may not achieve an optimal parallelization.
 
 
 <section>
-<h2 id="___sec51">Strategies </h2>
+<h2 id="___sec52">Strategies </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1448,7 +1480,7 @@ algorithm cannot be parallelized we may not achieve an optimal parallelization.
 
 
 <section>
-<h2 id="___sec52">How do I run MPI on a PC/Laptop?  </h2>
+<h2 id="___sec53">How do I run MPI on a PC/Laptop?  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1471,7 +1503,7 @@ The  machines at the computer lab have four to eight CPUs (look up the file /pro
 
 
 <section>
-<h2 id="___sec53">Can I do it on my own PC/laptop? OpenMP installation </h2>
+<h2 id="___sec54">Can I do it on my own PC/laptop? OpenMP installation </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1493,7 +1525,7 @@ on your laptop/PC, we recommend the following:
 
 
 <section>
-<h2 id="___sec54">Installing MPI </h2>
+<h2 id="___sec55">Installing MPI </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1528,7 +1560,7 @@ where we indicate that we want  the number of processes to be 10.
 
 
 <section>
-<h2 id="___sec55">Installing MPI and using Qt </h2>
+<h2 id="___sec56">Installing MPI and using Qt </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1557,7 +1589,7 @@ Add to your <em>.bashrc</em> file the following
 
 
 <section>
-<h2 id="___sec56">Using <a href="http://comp-phys.net/cluster-info/using-smaug/" target="_blank">Smaug</a>, the CompPhys computing cluster </h2>
+<h2 id="___sec57">Using <a href="http://comp-phys.net/cluster-info/using-smaug/" target="_blank">Smaug</a>, the CompPhys computing cluster </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1589,7 +1621,7 @@ For more information see the <a href="https://github.com/CompPhysics/Computation
 
 
 <section>
-<h2 id="___sec57">What is Message Passing Interface (MPI)?  </h2>
+<h2 id="___sec58">What is Message Passing Interface (MPI)?  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1611,7 +1643,7 @@ An MPI computation is a collection of processes communicating with messages.
 
 
 <section>
-<h2 id="___sec58">Going Parallel with MPI </h2>
+<h2 id="___sec59">Going Parallel with MPI </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1640,7 +1672,7 @@ and Fortran-binding (routine names are in uppercase, but can also be in lower ca
 
 
 <section>
-<h2 id="___sec59">MPI is a library  </h2>
+<h2 id="___sec60">MPI is a library  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1666,7 +1698,7 @@ Insert communication and synchronization functions where necessary.
 
 
 <section>
-<h2 id="___sec60">Bindings to MPI routines  </h2>
+<h2 id="___sec61">Bindings to MPI routines  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1693,7 +1725,7 @@ The discussion in these slides focuses on the C++ binding.
 
 
 <section>
-<h2 id="___sec61">Communicator  </h2>
+<h2 id="___sec62">Communicator  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1715,7 +1747,7 @@ The discussion in these slides focuses on the C++ binding.
 
 
 <section>
-<h2 id="___sec62">Some of the most  important MPI functions </h2>
+<h2 id="___sec63">Some of the most  important MPI functions </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1732,7 +1764,7 @@ The discussion in these slides focuses on the C++ binding.
 
 
 <section>
-<h2 id="___sec63"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program2.cpp" target="_blank">The first MPI C/C++ program</a>  </h2>
+<h2 id="___sec64"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program2.cpp" target="_blank">The first MPI C/C++ program</a>  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1761,7 +1793,7 @@ MPI_Finalize ();
 
 
 <section>
-<h2 id="___sec64">The Fortran program </h2>
+<h2 id="___sec65">The Fortran program </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1785,7 +1817,7 @@ END PROGRAM hello
 
 
 <section>
-<h2 id="___sec65">Note 1  </h2>
+<h2 id="___sec66">Note 1  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1799,7 +1831,7 @@ END PROGRAM hello
 
 
 <section>
-<h2 id="___sec66"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program3.cpp" target="_blank">Ordered output with MPIBarrier</a>  </h2>
+<h2 id="___sec67"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program3.cpp" target="_blank">Ordered output with MPIBarrier</a>  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1824,7 +1856,7 @@ END PROGRAM hello
 
 
 <section>
-<h2 id="___sec67">Note 2 </h2>
+<h2 id="___sec68">Note 2 </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -1844,7 +1876,7 @@ action.
 
 
 <section>
-<h2 id="___sec68"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program4.cpp" target="_blank">Ordered output</a>  </h2>
+<h2 id="___sec69"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program4.cpp" target="_blank">Ordered output</a>  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1872,7 +1904,7 @@ MPI_Finalize ();
 
 
 <section>
-<h2 id="___sec69">Note 3  </h2>
+<h2 id="___sec70">Note 3  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1901,7 +1933,7 @@ since we are  actually passing 100 values.
 
 
 <section>
-<h2 id="___sec70">Note 4  </h2>
+<h2 id="___sec71">Note 4  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1934,7 +1966,7 @@ to process 2, and so forth.
 
 
 <section>
-<h2 id="___sec71"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp" target="_blank">Numerical integration in parallel</a> </h2>
+<h2 id="___sec72"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp" target="_blank">Numerical integration in parallel</a> </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Integrating \( \pi \).</b>
 <ul>
@@ -1955,7 +1987,7 @@ Click <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-page
 
 
 <section>
-<h2 id="___sec72">Dissection of trapezoidal rule with \( MPI\_reduce \) </h2>
+<h2 id="___sec73">Dissection of trapezoidal rule with \( MPI\_reduce \) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1984,7 +2016,7 @@ Click <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-page
 
 
 <section>
-<h2 id="___sec73">Dissection of trapezoidal rule  </h2>
+<h2 id="___sec74">Dissection of trapezoidal rule  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2011,7 +2043,7 @@ Click <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-page
 
 
 <section>
-<h2 id="___sec74">Integrating with <b>MPI</b> </h2>
+<h2 id="___sec75">Integrating with <b>MPI</b> </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2040,7 +2072,7 @@ Click <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-page
 
 
 <section>
-<h2 id="___sec75">How do I use \( MPI\_reduce \)? </h2>
+<h2 id="___sec76">How do I use \( MPI\_reduce \)? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2066,7 +2098,7 @@ of operation we want to do.
 
 
 <section>
-<h2 id="___sec76">More on \( MPI\_Reduce \) </h2>
+<h2 id="___sec77">More on \( MPI\_Reduce \) </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2090,7 +2122,7 @@ If we have an array or matrix we can search for the largest og smallest element 
 
 
 <section>
-<h2 id="___sec77">Dissection of trapezoidal rule  </h2>
+<h2 id="___sec78">Dissection of trapezoidal rule  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2112,7 +2144,7 @@ We use \( MPI\_reduce \) to collect data from each process. Note also the use of
 
 
 <section>
-<h2 id="___sec78">Dissection of trapezoidal rule  </h2>
+<h2 id="___sec79">Dissection of trapezoidal rule  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2143,7 +2175,7 @@ We use \( MPI\_reduce \) to collect data from each process. Note also the use of
 
 
 <section>
-<h2 id="___sec79"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp" target="_blank">The quantum dot program for two electrons</a>  </h2>
+<h2 id="___sec80"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp" target="_blank">The quantum dot program for two electrons</a>  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2207,7 +2239,7 @@ We use \( MPI\_reduce \) to collect data from each process. Note also the use of
 
 
 <section>
-<h2 id="___sec80">What is OpenMP </h2>
+<h2 id="___sec81">What is OpenMP </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2232,7 +2264,7 @@ We use \( MPI\_reduce \) to collect data from each process. Note also the use of
 
 
 <section>
-<h2 id="___sec81">Getting started, things to remember </h2>
+<h2 id="___sec82">Getting started, things to remember </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2268,7 +2300,7 @@ We use \( MPI\_reduce \) to collect data from each process. Note also the use of
 
 
 <section>
-<h2 id="___sec82">General code structure  </h2>
+<h2 id="___sec83">General code structure  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2300,7 +2332,7 @@ main ()
 
 
 <section>
-<h2 id="___sec83">Parallel region </h2>
+<h2 id="___sec84">Parallel region </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2328,7 +2360,7 @@ main ()
 
 
 <section>
-<h2 id="___sec84">Hello world, not again, please! </h2>
+<h2 id="___sec85">Hello world, not again, please! </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2358,7 +2390,7 @@ printf(<span style="color: #CD5555">&quot;There are %d threads\n&quot;</span>,nt
 
 
 <section>
-<h2 id="___sec85">Important OpenMP library routines </h2>
+<h2 id="___sec86">Important OpenMP library routines </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2372,7 +2404,7 @@ printf(<span style="color: #CD5555">&quot;There are %d threads\n&quot;</span>,nt
 
 
 <section>
-<h2 id="___sec86">Parallel for loop </h2>
+<h2 id="___sec87">Parallel for loop </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2409,7 +2441,7 @@ printf(<span style="color: #CD5555">&quot;There are %d threads\n&quot;</span>,nt
 
 
 <section>
-<h2 id="___sec87">Example code </h2>
+<h2 id="___sec88">Example code </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2440,7 +2472,7 @@ c[i] = a[i] + b[i];
 
 
 <section>
-<h2 id="___sec88">More on Parallel for loop </h2>
+<h2 id="___sec89">More on Parallel for loop </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2474,7 +2506,7 @@ can be combined into
 
 
 <section>
-<h2 id="___sec89">Inner product </h2>
+<h2 id="___sec90">Inner product </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>&nbsp;<br>
@@ -2501,7 +2533,7 @@ sum += a[i]*b[i];
 
 
 <section>
-<h2 id="___sec90">Different threads do different tasks </h2>
+<h2 id="___sec91">Different threads do different tasks </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2528,7 +2560,7 @@ funcC ();
 
 
 <section>
-<h2 id="___sec91">Single execution  </h2>
+<h2 id="___sec92">Single execution  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2553,7 +2585,7 @@ Code executed by the master thread, guaranteed and no implicit barrier at the en
 
 
 <section>
-<h2 id="___sec92">Coordination and synchronization  </h2>
+<h2 id="___sec93">Coordination and synchronization  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2596,7 +2628,7 @@ is  more efficient than
 
 
 <section>
-<h2 id="___sec93">Data scope  </h2>
+<h2 id="___sec94">Data scope  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2624,7 +2656,7 @@ What are the purposes of these attributes
 
 
 <section>
-<h2 id="___sec94">Some remarks  </h2>
+<h2 id="___sec95">Some remarks  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2638,7 +2670,7 @@ What are the purposes of these attributes
 
 
 <section>
-<h2 id="___sec95">Parallelizing nested for-loops </h2>
+<h2 id="___sec96">Parallelizing nested for-loops </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -2671,7 +2703,7 @@ a[i][j] = b[i][j] + c[i][j]
 
 
 <section>
-<h2 id="___sec96">Nested parallelism  </h2>
+<h2 id="___sec97">Nested parallelism  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2696,7 +2728,7 @@ team.
 
 
 <section>
-<h2 id="___sec97">Parallel tasks </h2>
+<h2 id="___sec98">Parallel tasks </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2719,7 +2751,7 @@ do_work (p_vec[i]);
 
 
 <section>
-<h2 id="___sec98">Common mistakes </h2>
+<h2 id="___sec99">Common mistakes </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2754,7 +2786,7 @@ Deadlock
 
 
 <section>
-<h2 id="___sec99">Matrix-matrix multiplication </h2>
+<h2 id="___sec100">Matrix-matrix multiplication </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2786,7 +2818,7 @@ Deadlock
 
 
 <section>
-<h2 id="___sec100">Matrix-matrix multiplication  </h2>
+<h2 id="___sec101">Matrix-matrix multiplication  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2817,7 +2849,7 @@ Deadlock
 
 
 <section>
-<h2 id="___sec101">Matrix-matrix multiplication </h2>
+<h2 id="___sec102">Matrix-matrix multiplication </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2853,7 +2885,7 @@ Deadlock
 
 
 <section>
-<h2 id="___sec102">Matrix-matrix multiplication </h2>
+<h2 id="___sec103">Matrix-matrix multiplication </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>

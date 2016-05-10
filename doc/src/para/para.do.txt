@@ -240,10 +240,10 @@ for (i = 0; i < n; i++){
 }
 !ec
 has for $n$ repeats
-o one load for $a[i]$ in address 1
+o one load for $c[i]$ in address 1
 o one load for $b[i]$ in address 2
-o add $a[i]$ and $b[i]$ to give $c[i]$
-o store $c[i]$ in address 2
+o add $c[i]$ and $b[i]$ to give $a[i]$
+o store $a[i]$ in address 2
 
 !split 
 ===== Number of elements that can acted upon, examples =====
@@ -273,10 +273,10 @@ Four additions are now done in a single step.
 !split 
 ===== Number of operations when vectorized =====
 For $n/4$ repeats assuming floats or integers
-o one vector load for $a[i]$ in address 1
+o one vector load for $c[i]$ in address 1
 o one load for $b[i]$ in address 2
-o add $a[i]$ and $b[i]$ to give $c[i]$
-o store $c[i]$ in address 2
+o add $c[i]$ and $b[i]$ to give $a[i]$
+o store $a[i]$ in address 2
 
 
 !split
@@ -341,6 +341,25 @@ Time used  for vector addition = 0.03000000000
 This particular C++ compiler speeds up the above loop operations with a factor of 3. 
 Performing the same operations for $10^8$ elements results only in a factor $1.4$.
 The result will however vary from compiler to compiler. In general however, with optimization flags like $-O3$ or $-Ofast$, we gain a considerable speedup if our code can be vectorized. Many of these operations can be done automatically by your compiler. These automatic or near automatic compiler techniques improve performance considerably.  Below we will see an example on a different behavior if we use the _clang_ compiler.
+
+!split 
+===== Compiling with and without vectorization using clang =====
+We can compile and link without vectorization with clang compiler
+!bc cppcod
+clang++ -o -fno-vectorize novec.x vecexample.cpp
+!ec
+and with vectorization
+!bc cppcod
+clang++ -O3 -Rpass=loop-vectorize -o  vec.x vecexample.cpp 
+!ec
+We can also add vectorization analysis, see for example
+!bc cppcod
+clang++ -O3 -Rpass-analysis=loop-vectorize -o  vec.x vecexample.cpp 
+!ec
+or figure out if vectorization was missed
+!bc cppcod
+clang++ -O3 -Rpass-missed=loop-vectorize -o  vec.x vecexample.cpp 
+!ec
 
 !split
 =====  Automatic vectorization and vectorization inhibitors, criteria =====
