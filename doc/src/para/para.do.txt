@@ -660,28 +660,27 @@ x_i = \frac{f_i}{b_i}
 |-------------------------------------------------------------------------------------------|
 | Memory Reads   |    $14(N-2)$   |
 | Memory Writes  |     $4(N-2)$   |
-| Additions      |  $3(N-2) + (N-1)$ |
 | Subtractions   |     $3(N-2)$   |
 | Multiplications |     $3(N-2)$  |
 | Divisions       |     $4(N-2)$  |
-| Comparisons	|	$2(N-1)$ | 
 |-------------------------------------------------------------------------------------------|
 
 !eblock
 
 !bblock
 !bc cppcod
-    // Forward substitution                                                                       
-    for (int i=1; i < n; i++) {
-      b[i] = b[i] - (a[i-1]*c[i-1])/b[i-1];
-      g[i] = g[i] - (a[i-1]*g[i-1])/b[i-1];
-    }
-    x[n-1] = f[n-1] / b[n-1];
-    // Backwards substitution                                                           
-    for (int i = n-2; i >= 0; i--) {
-      f[i] = f[i] - c[i]*f[i+1]/b[i+1];
-      x[i] = f[i]/b[i];
-    }
+// Forward substitution    
+// Note that we can simplify by precalculating a[i-1]/b[i-1]
+  for (int i=1; i < n; i++) {
+     b[i] = b[i] - (a[i-1]*c[i-1])/b[i-1];
+     f[i] = g[i] - (a[i-1]*f[i-1])/b[i-1];
+  }
+  x[n-1] = f[n-1] / b[n-1];
+  // Backwards substitution                                                           
+  for (int i = n-2; i >= 0; i--) {
+     f[i] = f[i] - c[i]*f[i+1]/b[i+1];
+     x[i] = f[i]/b[i];
+  }
 !ec
 !eblock
 
@@ -803,6 +802,112 @@ int main (int argc, char* argv[])
 }
 
 !ec
+
+!split
+=====  How do we define speedup? Simplest form =====
+!bblock
+* Speedup(code,sys,p) = $T_b/T_p$
+* Speedup measures the ratio of performance between two objects
+* Versions of same code, with different number of processors
+* Serial and vector versions
+* Try different programing languages, c++ and Fortran
+* Two algorithms computing the _same_ result 
+!eblock
+
+!split
+=====  How do we define speedup? Correct baseline =====
+!bblock
+The key is choosing the correct baseline for comparison
+* For our serial vs. vectorization examples, using compiler-provided vectorization, the baseline is simple; the same code, with vectorization turned off
+*  For parallel applications, this is much harder:
+  * Choice of algorithm, decomposition, performance of baseline case etc.
+!eblock
+
+
+!split
+=====  Parallel  speedup =====
+!bblock
+For parallel applications, speeduo  is typically defined as
+* Speedup(code,sys,p) = $T_1/T_p$
+
+Here  $T_1$ is the time on one processor and $T_p$ is the time using $p$ processors.
+*  Can Speedup(code,sys,p) become larger than  $p$?
+That means using $p$ processors is more than $p$ times faster than using one processor.
+!eblock
+
+
+!split
+=====  Speedup and memory  =====
+!bblock
+The speedup on $p$ processors can
+be greater than $p$ if memory usage is optimal!
+Consider the case of a memorybound computation with $M$ words of memory
+*  If $M/p$ fits into cache while $M$ does not, the time to access memory will be different in the two cases:
+ * $T_1$ uses the main memory bandwidth
+ * $T_p$ uses the appropriate cache bandwidth 
+
+!eblock
+
+
+!split
+=====  Upper bounds on speedup =====
+!bblock
+Assume that almost all parts of a code are perfectly
+parallizable (fraction $f$). The remainder,
+fraction $(1-f)$ cannot be parallelized at all.
+
+That is, there is work that takes time $W$ on one process; a fraction $f$ of that work will take
+time $Wf/p$ on $p$ processors. 
+* What is the maximum possible speedup as a function of $f$? 
+!eblock
+
+
+!split
+=====  Amdahl's law =====
+!bblock
+On one processor we have 
+!bt
+\[
+T_1 = (1-f)W + fW = W
+\]
+!et
+On $p$ processors we have
+!bt
+\[
+T_p = (1-f)W + \frac{fW}{p},
+\]
+!et
+resulting in a speedup of 
+!bt
+\[
+\frac{T_1}{T_p} = \frac{W}{(1-f)W+fW/p}
+\]
+!et
+
+As p goes to infinity, $fW/p$ goes to zero, and the maximum speedup is
+!bt
+\[
+\frac{1}{1-f},
+\]
+!et 
+meaning that if 
+if $f = 0.99$ (all but $1\%$ parallelizable), the maximum speedup
+is $1/(1-.99)=100$! 
+!eblock
+
+
+!split
+=====  How much is parallelizable =====
+!bblock
+If any non-parallel code slips into the
+application, the parallel
+performance is limited. 
+
+In many simulations, however, the fraction of non-parallelizable work
+is $10^{-6}$ or less due to large arrays or objects that are perfectly parallelizable.
+
+!eblock
+
 
 
 !split
