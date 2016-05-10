@@ -1189,16 +1189,14 @@ $$
 <p>
 <table border="1">
 <thead>
-<tr><th align="center">   Operation   </th> <th align="center">   Floating Point   </th> </tr>
+<tr><th align="center">   Operation   </th> <th align="center">Floating Point</th> </tr>
 </thead>
 <tbody>
-<tr><td align="center">   Memory Reads       </td> <td align="center">   \( 14(N-2) \)           </td> </tr>
-<tr><td align="center">   Memory Writes      </td> <td align="center">   \( 4(N-2) \)            </td> </tr>
-<tr><td align="center">   Additions          </td> <td align="center">   \( 3(N-2) + (N-1) \)    </td> </tr>
-<tr><td align="center">   Subtractions       </td> <td align="center">   \( 3(N-2) \)            </td> </tr>
-<tr><td align="center">   Multiplications    </td> <td align="center">   \( 3(N-2) \)            </td> </tr>
-<tr><td align="center">   Divisions          </td> <td align="center">   \( 4(N-2) \)            </td> </tr>
-<tr><td align="center">   Comparisons        </td> <td align="center">   \( 2(N-1) \)            </td> </tr>
+<tr><td align="center">   Memory Reads       </td> <td align="center">   \( 14(N-2) \)     </td> </tr>
+<tr><td align="center">   Memory Writes      </td> <td align="center">   \( 4(N-2) \)      </td> </tr>
+<tr><td align="center">   Subtractions       </td> <td align="center">   \( 3(N-2) \)      </td> </tr>
+<tr><td align="center">   Multiplications    </td> <td align="center">   \( 3(N-2) \)      </td> </tr>
+<tr><td align="center">   Divisions          </td> <td align="center">   \( 4(N-2) \)      </td> </tr>
 </tbody>
 </table>
 
@@ -1212,17 +1210,18 @@ $$
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%">    <span style="color: #228B22">// Forward substitution                                                                       </span>
-    <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #a7a7a7; font-weight: bold">int</span> i=<span style="color: #B452CD">1</span>; i &lt; n; i++) {
-      b[i] = b[i] - (a[i-<span style="color: #B452CD">1</span>]*c[i-<span style="color: #B452CD">1</span>])/b[i-<span style="color: #B452CD">1</span>];
-      g[i] = g[i] - (a[i-<span style="color: #B452CD">1</span>]*g[i-<span style="color: #B452CD">1</span>])/b[i-<span style="color: #B452CD">1</span>];
-    }
-    x[n-<span style="color: #B452CD">1</span>] = f[n-<span style="color: #B452CD">1</span>] / b[n-<span style="color: #B452CD">1</span>];
-    <span style="color: #228B22">// Backwards substitution                                                           </span>
-    <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #a7a7a7; font-weight: bold">int</span> i = n-<span style="color: #B452CD">2</span>; i &gt;= <span style="color: #B452CD">0</span>; i--) {
-      f[i] = f[i] - c[i]*f[i+<span style="color: #B452CD">1</span>]/b[i+<span style="color: #B452CD">1</span>];
-      x[i] = f[i]/b[i];
-    }
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%"><span style="color: #228B22">// Forward substitution    </span>
+<span style="color: #228B22">// Note that we can simplify by precalculating a[i-1]/b[i-1]</span>
+  <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #a7a7a7; font-weight: bold">int</span> i=<span style="color: #B452CD">1</span>; i &lt; n; i++) {
+     b[i] = b[i] - (a[i-<span style="color: #B452CD">1</span>]*c[i-<span style="color: #B452CD">1</span>])/b[i-<span style="color: #B452CD">1</span>];
+     f[i] = g[i] - (a[i-<span style="color: #B452CD">1</span>]*f[i-<span style="color: #B452CD">1</span>])/b[i-<span style="color: #B452CD">1</span>];
+  }
+  x[n-<span style="color: #B452CD">1</span>] = f[n-<span style="color: #B452CD">1</span>] / b[n-<span style="color: #B452CD">1</span>];
+  <span style="color: #228B22">// Backwards substitution                                                           </span>
+  <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #a7a7a7; font-weight: bold">int</span> i = n-<span style="color: #B452CD">2</span>; i &gt;= <span style="color: #B452CD">0</span>; i--) {
+     f[i] = f[i] - c[i]*f[i+<span style="color: #B452CD">1</span>]/b[i+<span style="color: #B452CD">1</span>];
+     x[i] = f[i]/b[i];
+  }
 </pre></div>
 
 </div>

@@ -660,28 +660,27 @@ x_i = \frac{f_i}{b_i}
 |-------------------------------------------------------------------------------------------|
 | Memory Reads   |    $14(N-2)$   |
 | Memory Writes  |     $4(N-2)$   |
-| Additions      |  $3(N-2) + (N-1)$ |
 | Subtractions   |     $3(N-2)$   |
 | Multiplications |     $3(N-2)$  |
 | Divisions       |     $4(N-2)$  |
-| Comparisons	|	$2(N-1)$ | 
 |-------------------------------------------------------------------------------------------|
 
 !eblock
 
 !bblock
 !bc cppcod
-    // Forward substitution                                                                       
-    for (int i=1; i < n; i++) {
-      b[i] = b[i] - (a[i-1]*c[i-1])/b[i-1];
-      g[i] = g[i] - (a[i-1]*g[i-1])/b[i-1];
-    }
-    x[n-1] = f[n-1] / b[n-1];
-    // Backwards substitution                                                           
-    for (int i = n-2; i >= 0; i--) {
-      f[i] = f[i] - c[i]*f[i+1]/b[i+1];
-      x[i] = f[i]/b[i];
-    }
+// Forward substitution    
+// Note that we can simplify by precalculating a[i-1]/b[i-1]
+  for (int i=1; i < n; i++) {
+     b[i] = b[i] - (a[i-1]*c[i-1])/b[i-1];
+     f[i] = g[i] - (a[i-1]*f[i-1])/b[i-1];
+  }
+  x[n-1] = f[n-1] / b[n-1];
+  // Backwards substitution                                                           
+  for (int i = n-2; i >= 0; i--) {
+     f[i] = f[i] - c[i]*f[i+1]/b[i+1];
+     x[i] = f[i]/b[i];
+  }
 !ec
 !eblock
 
