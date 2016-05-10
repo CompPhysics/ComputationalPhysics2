@@ -303,7 +303,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._para-bs024.html#___sec23" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, nested loops</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs025.html#___sec24" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, function calls</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs026.html#___sec25" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, data dependencies</a></li>
-     <!-- navigation toc: --> <li><a href="#___sec26" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, more data dependencies</a></li>
+     <!-- navigation toc: --> <li><a href="._para-bs027.html#___sec26" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, more data dependencies</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs028.html#___sec27" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, memory stride</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs029.html#___sec28" style="font-size: 80%;">Memory management</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs030.html#___sec29" style="font-size: 80%;">Memory and communication</a></li>
@@ -378,7 +378,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._para-bs099.html#___sec98" style="font-size: 80%;">Parallel tasks</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs100.html#___sec99" style="font-size: 80%;">Common mistakes</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs101.html#___sec100" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
-     <!-- navigation toc: --> <li><a href="._para-bs102.html#___sec101" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec101" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs103.html#___sec102" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs104.html#___sec103" style="font-size: 80%;">Matrix-matrix multiplication</a></li>
 
@@ -393,54 +393,59 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0027"></a>
+<a name="part0102"></a>
 <!-- !split -->
 
-<h2 id="___sec26">Automatic vectorization and vectorization inhibitors, more data dependencies </h2>
-
-<p>
-On the other hand,  a so-called 
-write-after-read statement can be vectorized. The following code
+<h2 id="___sec101">Matrix-matrix multiplication  </h2>
+<div class="panel panel-default">
+<div class="panel-body">
+<p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">  <span style="color: #B00040">double</span> b <span style="color: #666666">=</span> <span style="color: #666666">15.</span>;
-  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">1</span>; i <span style="color: #666666">&lt;</span> n; i<span style="color: #666666">++</span>) {
-      a[i<span style="color: #666666">-1</span>] <span style="color: #666666">=</span> a[i] <span style="color: #666666">+</span> b;
-  }
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%">  <span style="color: #B00040">int</span> n <span style="color: #666666">=</span> <span style="color: #666666">500</span>;
+  <span style="color: #B00040">double</span> pi <span style="color: #666666">=</span> acos(<span style="color: #666666">-1.0</span>);
+  <span style="color: #B00040">double</span> s;
+  <span style="color: #B00040">int</span> thread_num;
+  <span style="color: #B00040">double</span> wtime;
+
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  C++/OpenMP version</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  Compute matrix product C = A * B.</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&quot;</span>;
+
+  thread_num <span style="color: #666666">=</span> omp_get_max_threads ( );
+
+<span style="color: #408080; font-style: italic">//</span>
+<span style="color: #408080; font-style: italic">//  Loop 1: Evaluate A.</span>
+<span style="color: #408080; font-style: italic">//</span>
+  s <span style="color: #666666">=</span> <span style="color: #666666">1.0</span> <span style="color: #666666">/</span> sqrt ( ( <span style="color: #B00040">double</span> ) ( n ) );
+
+  wtime <span style="color: #666666">=</span> omp_get_wtime ( );
 </pre></div>
 <p>
-is an example of flow dependency that can be vectorized since no iteration with a higher value of \( i \)
-can complete before an iteration with a lower value of \( i \). However, such code leads to problems with parallelization.
+</div>
+</div>
+
 
 <p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-<li><a href="._para-bs026.html">&laquo;</a></li>
+<li><a href="._para-bs101.html">&laquo;</a></li>
   <li><a href="._para-bs000.html">1</a></li>
   <li><a href="">...</a></li>
-  <li><a href="._para-bs019.html">20</a></li>
-  <li><a href="._para-bs020.html">21</a></li>
-  <li><a href="._para-bs021.html">22</a></li>
-  <li><a href="._para-bs022.html">23</a></li>
-  <li><a href="._para-bs023.html">24</a></li>
-  <li><a href="._para-bs024.html">25</a></li>
-  <li><a href="._para-bs025.html">26</a></li>
-  <li><a href="._para-bs026.html">27</a></li>
-  <li class="active"><a href="._para-bs027.html">28</a></li>
-  <li><a href="._para-bs028.html">29</a></li>
-  <li><a href="._para-bs029.html">30</a></li>
-  <li><a href="._para-bs030.html">31</a></li>
-  <li><a href="._para-bs031.html">32</a></li>
-  <li><a href="._para-bs032.html">33</a></li>
-  <li><a href="._para-bs033.html">34</a></li>
-  <li><a href="._para-bs034.html">35</a></li>
-  <li><a href="._para-bs035.html">36</a></li>
-  <li><a href="._para-bs036.html">37</a></li>
-  <li><a href="">...</a></li>
+  <li><a href="._para-bs094.html">95</a></li>
+  <li><a href="._para-bs095.html">96</a></li>
+  <li><a href="._para-bs096.html">97</a></li>
+  <li><a href="._para-bs097.html">98</a></li>
+  <li><a href="._para-bs098.html">99</a></li>
+  <li><a href="._para-bs099.html">100</a></li>
+  <li><a href="._para-bs100.html">101</a></li>
+  <li><a href="._para-bs101.html">102</a></li>
+  <li class="active"><a href="._para-bs102.html">103</a></li>
+  <li><a href="._para-bs103.html">104</a></li>
   <li><a href="._para-bs104.html">105</a></li>
-  <li><a href="._para-bs028.html">&raquo;</a></li>
+  <li><a href="._para-bs103.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
