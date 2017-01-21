@@ -1,0 +1,432 @@
+%%
+%% Automatically generated file from DocOnce source
+%% (https://github.com/hplgit/doconce/)
+%%
+%%
+% #ifdef PTEX2TEX_EXPLANATION
+%%
+%% The file follows the ptex2tex extended LaTeX format, see
+%% ptex2tex: http://code.google.com/p/ptex2tex/
+%%
+%% Run
+%%      ptex2tex myfile
+%% or
+%%      doconce ptex2tex myfile
+%%
+%% to turn myfile.p.tex into an ordinary LaTeX file myfile.tex.
+%% (The ptex2tex program: http://code.google.com/p/ptex2tex)
+%% Many preprocess options can be added to ptex2tex or doconce ptex2tex
+%%
+%%      ptex2tex -DMINTED myfile
+%%      doconce ptex2tex myfile envir=minted
+%%
+%% ptex2tex will typeset code environments according to a global or local
+%% .ptex2tex.cfg configure file. doconce ptex2tex will typeset code
+%% according to options on the command line (just type doconce ptex2tex to
+%% see examples). If doconce ptex2tex has envir=minted, it enables the
+%% minted style without needing -DMINTED.
+% #endif
+
+% #define PREAMBLE
+
+% #ifdef PREAMBLE
+%-------------------- begin preamble ----------------------
+
+\documentclass[%
+oneside,                 % oneside: electronic viewing, twoside: printing
+final,                   % draft: marks overfull hboxes, figures with paths
+10pt]{article}
+
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{relsize,makeidx,color,setspace,amsmath,amsfonts,amssymb}
+\usepackage[table]{xcolor}
+\usepackage{bm,ltablex,microtype}
+
+\usepackage[pdftex]{graphicx}
+
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{lmodern}         % Latin Modern fonts derived from Computer Modern
+
+% Hyperlinks in PDF:
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=black,
+    filecolor=black,
+    %filecolor=blue,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+    }
+%\hyperbaseurl{}   % hyperlinks are relative to this root
+
+\setcounter{tocdepth}{2}  % levels in table of contents
+
+% --- fancyhdr package for fancy headers ---
+\usepackage{fancyhdr}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[LE,RO]{\thepage}
+% Ensure copyright on titlepage (article style) and chapter pages (book style)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2017, "Computational Physics I FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+%  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+% Ensure copyright on titlepages with \thispagestyle{empty}
+\fancypagestyle{empty}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2017, "Computational Physics I FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+
+\pagestyle{fancy}
+
+
+% prevent orhpans and widows
+\clubpenalty = 10000
+\widowpenalty = 10000
+
+% --- end of standard preamble for documents ---
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+\usepackage[totoc]{idxlayout}   % for index in the toc
+\usepackage[nottoc]{tocbibind}  % for references/bibliography in the toc
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+% matching end for #ifdef PREAMBLE
+% #endif
+
+\newcommand{\exercisesection}[1]{\subsection*{#1}}
+
+\input{newcommands_keep}
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\thispagestyle{empty}
+
+\begin{center}
+{\LARGE\bf
+\begin{spacing}{1.25}
+Project 1, deadline  March 10 
+\end{spacing}
+}
+\end{center}
+
+% ----------------- author(s) -------------------------
+
+\begin{center}
+{\bf \href{{http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html}}{Computational Physics I FYS4411/FYS9411}}
+\end{center}
+
+    \begin{center}
+% List of all institutions:
+\centerline{{\small Department of Physics, University of Oslo, Norway}}
+\end{center}
+    
+% ----------------- end author(s) -------------------------
+
+% --- begin date ---
+\begin{center}
+Spring semester 2017
+\end{center}
+% --- end date ---
+
+\vspace{1cm}
+
+
+\subsection{Introduction}
+
+We will deal only with a system of 
+two electrons in a quantum dot with a frequency of $\hbar\omega = 1$. 
+The reason for this is that we have exact closed form expressions 
+for the ground state energy from Taut's work for selected values of $\omega$, 
+see M. Taut, Phys. Rev. A \textbf{48}, 3561 (1993).
+The energy is given by $3$ a.u.  (atomic units) when the interaction between the electrons is included.
+
+We consider a system of electrons confined in a pure two-dimensional 
+isotropic harmonic oscillator potential, with an idealized  total Hamiltonian given by
+
+\begin{equation}
+\label{eq:finalH}
+\OP{H}=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right)+\sum_{i<j}\frac{1}{r_{ij}},
+\end{equation}
+where natural units ($\hbar=c=e=m_e=1$) are used and all energies are in so-called atomic units a.u. We will study systems of many electrons $N$ as functions of the oscillator frequency  $\omega$ using the above Hamiltonian.  The Hamiltonian includes a standard harmonic oscillator part
+
+\begin{equation*}
+\OP{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),
+\end{equation*}
+and the repulsive interaction between two electrons given by
+
+\begin{equation*}
+\OP{H}_1=\sum_{i<j}\frac{1}{r_{ij}},
+\end{equation*}
+with the distance between electrons given by $r_{ij}=\sqrt{_r__1-_r__2}$. We define the 
+modulus of the positions of the electrons (for a given electron $i$) as $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$.
+
+
+
+If only the harmonic oscillator part of the Hamiltonian,
+the so-called unperturbed part,
+
+\begin{equation*} \OP{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),\end{equation*}
+the energy is $2$ a.u.
+The wave function for one electron in an oscillator potential in two dimensions is
+
+\begin{equation*}
+\phi_{n_x,n_y}(x,y) = A H_{n_x}(\sqrt{\omega}x)H_{n_y}(\sqrt{\omega}y)\exp{(-\omega(x^2+y^2)/2}.
+\end{equation*}
+The functions $H_{n_x}(\sqrt{\omega}x)$ are so-called Hermite polynomials, discussed in the appendix while $A$ is a normalization constant. 
+For the lowest-lying state we have $n_x=n_y=0$ and an energy $\epsilon_{n_x,n_y}=\omega(n_x+n_y+1) = \omega$.
+Convince yourself that the lowest-lying energy for the two-electron system  is simply $2\omega$.
+
+The unperturbed wave function for the ground state of the two-electron system is given by
+
+\begin{equation*}
+\Phi(_r_1_,_r_2_) = C\exp{\left(-\omega(r_1^2+r_2^2)/2\right)},
+\end{equation*}
+with $C$ being a normalization constant and $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$. Note that the vector $_r_i_$ 
+refers to the $x$ and $y$ position for a given particle.
+What is the total spin of this wave function? Find arguments for why the ground state should have
+this specific total spin. 
+
+The Hartree-Fock functional is written as
+
+\begin{equation*}
+  E[\Phi] 
+  = \sum_{\mu=1}^N \langle \mu | h | \mu\rangle+ \frac{1}{2}\sum_{\mu=1}^N\sum_{\nu=1}^N\left[\langle \mu\nu |\frac{1}{r_{ij}}|\mu\nu\rangle-\langle \mu\nu |\frac{1}{r_{ij}}|\nu\mu\rangle\right].
+\end{equation*}
+
+With the given functional, we can perform at least two types of variational strategies.
+
+\begin{itemize}
+  \item Vary the Slater determinant by changing the spatial part of the single-particle wave functions themselves.
+
+  \item Expand the single-particle functions in a known basis  and vary the coefficients,  that is, the new function single-particle wave function $|a\rangle$ is written as a linear expansion in terms of a fixed basis $\phi$ (harmonic oscillator, Laguerre polynomials etc)  
+\end{itemize}
+
+\noindent
+\begin{equation*} 
+\psi_a  = \sum_{\lambda} C_{a\lambda}\phi_{\lambda},
+\end{equation*}
+
+Both cases lead to a new Slater determinant which is related to the previous via  a unitary transformation.
+The second one is the one we will use in this project.
+
+
+Consider a Slater determinant built up of single-particle orbitals 
+$\psi_{\lambda}$,  with $\lambda = 1,2,\dots,N$.
+
+The unitary transformation
+
+\begin{equation*}
+\psi_a  = \sum_{\lambda} C_{a\lambda}\phi_{\lambda},
+\end{equation*}
+brings us into the new basis.  Show that the new basis is orthonormal.
+Show that the new Slater determinant constructed from the new single-particle wave functions can be
+written as the determinant based on the previous basis and the determinant of the matrix $C$.
+Show that the old and the new Slater determinants are equal up to a complex constant with absolute value unity.
+(Hint, $C$ is a unitary matrix). 
+
+
+
+Minimizing with respect to $C^*_{k\alpha}$, remembering that $C^*_{k\alpha}$ and $C_{k\alpha}$
+are independent and defining
+
+\begin{equation*}
+h_{\alpha\gamma}^{HF}=\langle \alpha | h | \gamma \rangle+
+\sum_{a=1}^N\sum_{\beta\delta} C^*_{a\beta}C_{a\delta}\langle \alpha\beta|V|\gamma\delta\rangle_{AS},
+\end{equation*}
+show that you can write the Hartree-Fock  equations as
+
+\begin{equation*}
+\sum_{\gamma}h_{\alpha\gamma}^{HF}C_{k\gamma}=\epsilon_kC_{k\alpha}.
+\label{eq:newhf}
+\end{equation*}
+Explain the meaning of the different terms.
+
+Set up the Hartree-Fock equations for the ground states of 
+
+There is no spin-orbit part in the two-body Hamiltonian.
+
+As basis functions for our calculations we will use hydrogen-like single-particle functions. 
+In the computations you will need to program the Coulomb interaction with matrix elements
+involving single-particle wave functions with $l=0$ and $l=1$ only, so-called $s$ and $p$-waves.
+For $s$-waves we need only the radial part since the 
+spherical harmonics for the $s$-waves are rather simple.
+Our radial wave functions for the $s$ waves are
+
+\begin{equation*}
+R_{n0}(r)=\left(\frac{2Z}{n}\right)^{3/2}\sqrt{\frac{(n-1)!}{2n\times n!}}L_{n-1}^1(\frac{2Zr}{n})\exp{(-\frac{Zr}{n})},
+\end{equation*}
+
+
+With the above ingredients we are now ready to solve 
+the Hartree-Fock equations  for the helium and beryllium atoms.  
+Write a program which solves the Hartree-Fock equations for helium and beryllium.
+You will need methods to find eigenvalues (see chapter 7 of lecture notes) and
+gaussian quadrature (chapter 7) to compute the integrals of the Coulomb interaction.
+Use as input for the first 
+iteration the hydrogen-like single-particle wave function.
+Compare the results (make a plot of the $1s$ and the $2s$ functions) 
+
+
+\paragraph{Project 1 a):}
+\paragraph{Project 1 b):}
+\paragraph{Project 1 c):}
+\paragraph{Project 1 d):}
+\section{Additional material on Hermite polynomials}
+
+The Hermite polynomials are the solutions of the following differential
+equation
+\be
+   \frac{d^2H(x)}{dx^2}-2x\frac{dH(x)}{dx}+
+       (\lambda-1)H(x)=0.
+   \label{eq:hermite}
+\ee
+The first few polynomials are
+
+\begin{equation*}
+   H_0(x)=1,
+\end{equation*}
+
+\begin{equation*}
+    H_1(x)=2x,
+\end{equation*}
+
+\begin{equation*}
+    H_2(x)=4x^2-2,
+\end{equation*}
+
+\begin{equation*}
+    H_3(x)=8x^3-12x,
+\end{equation*}
+and
+
+\begin{equation*}
+    H_4(x)=16x^4-48x^2+12.
+\end{equation*}
+They fulfil the orthogonality relation
+
+\begin{equation*}
+  \int_{-\infty}^{\infty}e^{-x^2}H_n(x)^2dx=2^nn!\sqrt{\pi},
+\end{equation*}
+and the recursion relation
+
+\begin{equation*}
+  H_{n+1}(x)=2xH_{n}(x)-2nH_{n-1}(x).
+\end{equation*}
+
+
+
+
+\section{Literature}
+
+\begin{itemize}
+  \item M. Taut, Phys. Rev. A \textbf{48}, 3561 (1993).
+
+  \item M. Pedersen Lohne, G. Hagen, M. Hjorth-Jensen, S. Kvaal, and F. Pederiva, Phys. Rev. B \textbf{71}, 3561 - 3566 (2011).
+\end{itemize}
+
+\noindent
+\subsection{Introduction to numerical projects}
+
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+
+\begin{itemize}
+  \item Give a short description of the nature of the problem and the eventual  numerical methods you have used.
+
+  \item Describe the algorithm you have used and/or developed. Here you may find it convenient to use pseudocoding. In many cases you can describe the algorithm in the program itself.
+
+  \item Include the source code of your program. Comment your program properly.
+
+  \item If possible, try to find analytic solutions, or known limits in order to test your program when developing the code.
+
+  \item Include your results either in figure form or in a table. Remember to        label your results. All tables and figures should have relevant captions        and labels on the axes.
+
+  \item Try to evaluate the reliabilty and numerical stability/precision of your results. If possible, include a qualitative and/or quantitative discussion of the numerical stability, eventual loss of precision etc.
+
+  \item Try to give an interpretation of you results in your answers to  the problems.
+
+  \item Critique: if possible include your comments and reflections about the  exercise, whether you felt you learnt something, ideas for improvements and  other thoughts you've made when solving the exercise. We wish to keep this course at the interactive level and your comments can help us improve it.
+
+  \item Try to establish a practice where you log your work at the  computerlab. You may find such a logbook very handy at later stages in your work, especially when you don't properly remember  what a previous test version  of your program did. Here you could also record  the time spent on solving the exercise, various algorithms you may have tested or other topics which you feel worthy of mentioning.
+\end{itemize}
+
+\noindent
+\subsection{Format for electronic delivery of report and programs}
+
+The preferred format for the report is a PDF file. You can also use DOC or postscript formats or as an ipython notebook file.  As programming language we prefer that you choose between C/C++, Fortran2008 or Python. The following prescription should be followed when preparing the report:
+
+\begin{itemize}
+  \item Use Devilry to hand in your projects, log in  at  \href{{http://devilry.ifi.uio.no}}{\nolinkurl{http://devilry.ifi.uio.no}} with your normal UiO username and password.
+
+  \item Upload \textbf{only} the report file!  For the source code file(s) you have developed please provide us with your link to your github domain.  The report file should include all of your discussions and a list of the codes you have developed.  The full version of the codes should be in your github repository.
+
+  \item In your github repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.
+
+  \item Still in your github make a folder where you place your codes. 
+
+  \item In this and all later projects, you should include tests (for example unit tests) of your code(s).
+
+  \item Comments  from us on your projects, approval or not, corrections to be made  etc can be found under your Devilry domain and are only visible to you and the teachers of the course.
+\end{itemize}
+
+\noindent
+Finally, 
+we encourage you to work two and two together. Optimal working groups consist of 
+2-3 students. You can then hand in a common report. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% ------------------- end of main content ---------------
+
+% #ifdef PREAMBLE
+\end{document}
+% #endif
+
