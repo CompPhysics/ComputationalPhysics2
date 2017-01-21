@@ -3,8 +3,33 @@
 %% (https://github.com/hplgit/doconce/)
 %%
 %%
+% #ifdef PTEX2TEX_EXPLANATION
+%%
+%% The file follows the ptex2tex extended LaTeX format, see
+%% ptex2tex: http://code.google.com/p/ptex2tex/
+%%
+%% Run
+%%      ptex2tex myfile
+%% or
+%%      doconce ptex2tex myfile
+%%
+%% to turn myfile.p.tex into an ordinary LaTeX file myfile.tex.
+%% (The ptex2tex program: http://code.google.com/p/ptex2tex)
+%% Many preprocess options can be added to ptex2tex or doconce ptex2tex
+%%
+%%      ptex2tex -DMINTED myfile
+%%      doconce ptex2tex myfile envir=minted
+%%
+%% ptex2tex will typeset code environments according to a global or local
+%% .ptex2tex.cfg configure file. doconce ptex2tex will typeset code
+%% according to options on the command line (just type doconce ptex2tex to
+%% see examples). If doconce ptex2tex has envir=minted, it enables the
+%% minted style without needing -DMINTED.
+% #endif
 
+% #define PREAMBLE
 
+% #ifdef PREAMBLE
 %-------------------- begin preamble ----------------------
 
 \documentclass[%
@@ -88,10 +113,10 @@ final,                   % draft: marks overfull hboxes, figures with paths
 \begin{document}
 
 % matching end for #ifdef PREAMBLE
+% #endif
 
 \newcommand{\exercisesection}[1]{\subsection*{#1}}
 
-\input{newcommands_keep}
 
 % ------------------- main content ----------------------
 
@@ -131,7 +156,7 @@ Spring semester 2017
 \vspace{1cm}
 
 
-\subsection*{Introduction}
+\subsection{Introduction}
 
 We will deal only with a system of 
 two electrons in a quantum dot with a frequency of $\hbar\omega = 1$. 
@@ -145,19 +170,19 @@ isotropic harmonic oscillator potential, with an idealized  total Hamiltonian gi
 
 \begin{equation}
 \label{eq:finalH}
-\OP{H}=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right)+\sum_{i<j}\frac{1}{r_{ij}},
+\hat{H}=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right)+\sum_{i<j}\frac{1}{r_{ij}},
 \end{equation}
 where natural units ($\hbar=c=e=m_e=1$) are used and all energies are in so-called atomic units a.u. We will study systems of many electrons $N$ as functions of the oscillator frequency  $\omega$ using the above Hamiltonian.  The Hamiltonian includes a standard harmonic oscillator part
 
 \begin{equation*}
-\OP{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),
+\hat{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),
 \end{equation*}
 and the repulsive interaction between two electrons given by
 
 \begin{equation*}
-\OP{H}_1=\sum_{i<j}\frac{1}{r_{ij}},
+\hat{H}_1=\sum_{i < j}\frac{1}{r_{ij}},
 \end{equation*}
-with the distance between electrons given by $r_{ij}=\sqrt{_r__1-_r__2}$. We define the 
+with the distance between electrons given by $r_{ij}=\sqrt{r_1-r_2}$. We define the 
 modulus of the positions of the electrons (for a given electron $i$) as $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$.
 
 
@@ -165,7 +190,7 @@ modulus of the positions of the electrons (for a given electron $i$) as $r_i = \
 If only the harmonic oscillator part of the Hamiltonian,
 the so-called unperturbed part,
 
-\begin{equation*} \OP{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),\end{equation*}
+\begin{equation*} \hat{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),\end{equation*}
 the energy is $2$ a.u.
 The wave function for one electron in an oscillator potential in two dimensions is
 
@@ -179,9 +204,9 @@ Convince yourself that the lowest-lying energy for the two-electron system  is s
 The unperturbed wave function for the ground state of the two-electron system is given by
 
 \begin{equation*}
-\Phi(_r_1_,_r_2_) = C\exp{\left(-\omega(r_1^2+r_2^2)/2\right)},
+\Phi(r_1,r_2) = C\exp{\left(-\omega(r_1^2+r_2^2)/2\right)},
 \end{equation*}
-with $C$ being a normalization constant and $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$. Note that the vector $_r_i_$ 
+with $C$ being a normalization constant and $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$. Note that the vector $r_i$ 
 refers to the $x$ and $y$ position for a given particle.
 What is the total spin of this wave function? Find arguments for why the ground state should have
 this specific total spin. 
@@ -271,15 +296,15 @@ Compare the results (make a plot of the $1s$ and the $2s$ functions)
 \paragraph{Project 1 b):}
 \paragraph{Project 1 c):}
 \paragraph{Project 1 d):}
-\section*{Additional material on Hermite polynomials}
+\section{Additional material on Hermite polynomials}
 
 The Hermite polynomials are the solutions of the following differential
 equation
-\begin{print}
+\begin{equation}
    \frac{d^2H(x)}{dx^2}-2x\frac{dH(x)}{dx}+
        (\lambda-1)H(x)=0.
    \label{eq:hermite}
-\end{print}
+\end{equation}
 The first few polynomials are
 
 \begin{equation*}
@@ -316,7 +341,7 @@ and the recursion relation
 
 
 
-\section*{Literature}
+\section{Literature}
 
 \begin{itemize}
   \item M. Taut, Phys. Rev. A \textbf{48}, 3561 (1993).
@@ -325,7 +350,7 @@ and the recursion relation
 \end{itemize}
 
 \noindent
-\subsection*{Introduction to numerical projects}
+\subsection{Introduction to numerical projects}
 
 Here follows a brief recipe and recommendation on how to write a report for each
 project.
@@ -351,7 +376,7 @@ project.
 \end{itemize}
 
 \noindent
-\subsection*{Format for electronic delivery of report and programs}
+\subsection{Format for electronic delivery of report and programs}
 
 The preferred format for the report is a PDF file. You can also use DOC or postscript formats or as an ipython notebook file.  As programming language we prefer that you choose between C/C++, Fortran2008 or Python. The following prescription should be followed when preparing the report:
 
@@ -400,5 +425,7 @@ we encourage you to work two and two together. Optimal working groups consist of
 
 % ------------------- end of main content ---------------
 
+% #ifdef PREAMBLE
 \end{document}
+% #endif
 
