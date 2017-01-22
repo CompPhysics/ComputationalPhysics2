@@ -802,6 +802,8 @@ which we will use as our starting point for the Hartree-Fock calculations.
 !split
 ===== Our system, quantum dots =====
 !bblock
+We will deal only with systems where all possible single-particle states below a certain level are filled up. Such systems are called closed shell systems, a naming inspired from atomic and nuclear physics. These closed shell systems define what is frequently named _magic numbers_. Quantum dots exhibit also magic numbers, meaning that the addition or removal of one eletron requires more energy than systems where the lowest-lying shells are not filled. Using the harmonic oscillator in two dimensions as basis functions (with degenerate single-particle energies) the magic numbers are $N=2$, $N=6$, $N=12$, $N=20$ etc, where $N$ is the number of electrons. See the table below for more details. 
+
 We write our Hamiltonian as a one-body part 
 !bt
 \[
@@ -828,19 +830,121 @@ where $n = 0,1,2,3,..$ and $m = 0, \pm 1, \pm 2,..$. The index $i$ runs from $0,
 !split
 ===== First tasks =====
 !bblock
-Set up the harmonic oscillator wave function in cartesian coordinates  for an electron with $n_x=n_y=0$ and find the oscillator energy.
-Use this result to find the unperturbed energy 
+
+The first project deals with setting up a Hartree-Fock program that is flexible enough to handle different magic numbers. Hartree-Fock is the simplest possible many-body method. We will use the harmonic oscillator functions as basis functions and via the Hartree-Fock method modify the potential which confines the motion of the electrons by accounting for the Coulomb repulsion between electrons. The Hartree-Fock method leads to a set of coupled single-particle equations. If properly written, the system can easily be extended to three-dimensional electronic systems or other fermionic many-body systems. 
+
+!eblock
+
+!split
+===== First tasks, single-particle basis =====
+!bblock
+
+If only the harmonic oscillator part of the Hamiltonian,
+the so-called unperturbed part is given by
+
+!bt
+\begin{equation*} \hat{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right).
+\end{equation*}
+!et
+The wave function for one electron in an oscillator potential in two dimensions is
+
+!bt
+\begin{equation*}
+\phi_{n_x,n_y}(x,y) = A H_{n_x}(\sqrt{\omega}x)H_{n_y}(\sqrt{\omega}y)\exp{(-\omega(x^2+y^2)/2}.
+\end{equation*}
+!et
+The functions $H_{n_x}(\sqrt{\omega}x)$ are so-called Hermite polynomials, discussed in the appendix while $A$ is a normalization constant. 
+For the lowest-lying state we have $n_x=n_y=0$ and an energy $\epsilon_{n_x,n_y}=\omega(n_x+n_y+1) = \omega$.
+
+!eblock
+
+!split
+===== Project 1 a): getting started ===== 
+!bblock
+Make a program that sets up all the quantum numbers for the single-particle basis using a harmonic oscillator in two dimensions. The list should contain the quantum numbers $n_x$ and $n_y$, spin and its projection and the single particle energies in atomic units. Define a cutoff in the list according to the harmonic oscillator excitation energy. 
+The table here lists the first four harmonic oscillator shells, with its pertinent degeneracies, and the total number of electrons which can be accomodated up to a given energy. These numbers are the so-called *magic numbers* for a two-dimensional quantum dot. The degeneracies take into account the two spin values an electron can take. Convince yourself about the correctness of this table and use it to check that your code is running correctly.
+
+|------------------------------------------------------------------|
+| Shell number | $(n_x, n_y)$  |  Energy  |  Degeneracy | $N$    |  
+|------------------------------------------------------------------|
+|   1          |  $(0,0)$        | $\hbar\omega$ |   2  |   2 | 
+|------------------------------------------------------------------|
+|   2          |  $(1,0)$, $(0,1)$ | $2\hbar\omega$ |   4  |   6 | 
+|------------------------------------------------------------------|
+|   3          |  $(2,0)$, $(0,2)$, $(1,1)$ | $3\hbar\omega$ |   6  |   12 |
+|------------------------------------------------------------------|
+|   3          |  $(3,0)$, $(0,3)$, $(2,1)$, $(1,2)$ | $4\hbar\omega$ |   8  |   20 | 
+|------------------------------------------------------------------|
+
+!eblock
+
+!split
+===== Project 1 b): Setting up the single-particle basis ===== 
+!bblock
+
+With the single-particle basis from the previous step, you should now write a class which encodes the information about the harmonic oscillator single-particle basis. This should include the single-particle energies, spin and its projections as well as the harmonic oscillator  functions that depend on $n_x$ and $n_y$. This class can then used for both the Monte Carlo and the Hartree-Fock calculations. 
+!eblock
+
+!split 
+===== Project 1 c): Computing the two-body matrix elements =====
+!bblock
+In the Hartree-Fock project we need to be able to compute the two-electron matrix elements of the two-body Coulomb interaction. 
+In order to set up the two-body matrix elements, we need to define the so-called direct and exchange matrix elements. This leads to what we call an anti-symmetrized matrix element.
+
+We introduce the following shorthands for the  integrals
 !bt
 \[
-  \int \Phi^*\hat{H_0}\Phi  d\mathbf{\tau}
-  = \sum_{\mu=1}^N \langle \mu | h | \mu \rangle.
+\langle pq|\hat{v}|rs\rangle =  \int \psi_{p}^*(x_i)\psi_{q}^*(x_j)V(r_{ij})\psi_{r}(x_i)\psi_{s}(x_j)
+    dx_idx_j,
 \]
 !et
-for two electrons with the same quantum numbers. 
+which defines the so-called direct matrix element 
+and
+!bt 
+\[
+\langle pq|\hat{v}|sr\rangle = \int \psi_{p}^*(x_i)\psi_{q}^*(x_j)
+  V(r_{ij})\psi_{s}(x_i)\psi_{r}(x_j)
+  dx_idx_j,  
+\]
+!et
+which defines the exchange element. The variables $pqrs$ define all the single-particle quantum numbers. In our case these are $n_x$, $n_y$ and spin and its projections.
+!eblock
 
-* Repeat for six electrons (find the relevant harmonic oscillator quantum numbers)
-* Repeat for 12 and 20 electrons
-* Write now a program which sets up all relevant quantum numbers for the single-particle basis
+
+!split
+===== Two-body matrix elements =====
+!bblock
+
+These matrix elements are defined in terms of two-body quantum numbers. Which quantum numbers are conserved?
+Which are  the possible values the total spin of a two-body state can have?
+
+The direct and exchange matrix elements can be  brought together if we define the anti-symmetrized matrix element
+!bt
+\[
+\langle pq|\hat{v}|rs\rangle_{\mathrm{AS}}= \langle pq|\hat{v}|rs\rangle-\langle pq|\hat{v}|sr\rangle.
+\]
+!et
+It has the symmetry property
+!bt
+\[
+\langle pq|\hat{v}|rs\rangle_{\mathrm{AS}}= -\langle pq|\hat{v}|sr\rangle_{\mathrm{AS}}=-\langle qp|\hat{v}|rs\rangle_{\mathrm{AS}},
+\]
+!et
+and
+!bt
+\[
+\langle pq|\hat{v}|rs\rangle_{\mathrm{AS}}= \langle qp|\hat{v}|sr\rangle_{\mathrm{AS}}.
+\]
+!et
+Your task is to write a function which calculates the integral 
+!bt
+\[
+\langle pq|\hat{v}|rs\rangle =  \int \psi_{p}^*(x_i)\psi_{q}^*(x_j)V(r_{ij})\psi_{r}(x_i)\psi_{s}(x_j)
+    dx_idx_j,
+\]
+!et
+and then assemble the direct and exchange terms in order to construct the anti-symmetrized matrix elements to be used in the Hartree-Fock calculations. The integral is four-dimensional but can eventually be simplified. Your task is to figure out how. You should also consider whether it is appropriate to store the matrix elements for the Hartree-Fock calculations.  "Chapter five":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Literature/lectures2015.pdf" of the lecture notes discusses Gaussian quadrature. You may find it convenient to use Hermite   polynomials in order to set up the integration points ad weights as well parallelizing the calculations of the integrals. 
+
 !eblock
 
 
