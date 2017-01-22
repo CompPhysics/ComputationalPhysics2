@@ -116,10 +116,10 @@ The two projects this year focus on properties of confined and interacting syste
 We will deal only with systems where all possible single-particle states below a certain level are filled up. Such systems are called closed shell systems, a naming inspired from atomic and nuclear physics. These closed shell systems define what is frequently named <b>magic numbers</b>. Quantum dots exhibit also magic numbers, meaning that the addition or removal of one eletron requires more energy than systems where the lowest-lying shells are not filled. Using the harmonic oscillator in two dimensions as basis functions (with degenerate single-particle energies) the magic numbers are \( N=2 \), \( N=6 \), \( N=12 \), \( N=20 \) etc, where \( N \) is the number of electrons. See the table below for more details.
 
 <p>
-The first project deals with setting up a Hartree-Fock program that is flexible enough to handle different magic numbers. Hartree-Fock is the simplest possible many-body method. We will use the harmonic oscillator functions as basis functions and via the Hartree-Fock method modify the potential which confines the motion of the electrons by accounting forthe Coulomb repulsion between electrons. The Hartree-Fock method leads to a set of coupled single-particle equations. If properly written, the system can easily be extended to three-dimensional electronic systems.
+The first project deals with setting up a Hartree-Fock program that is flexible enough to handle different magic numbers. Hartree-Fock is the simplest possible many-body method. We will use the harmonic oscillator functions as basis functions and via the Hartree-Fock method modify the potential which confines the motion of the electrons by accounting for the Coulomb repulsion between electrons. The Hartree-Fock method leads to a set of coupled single-particle equations. If properly written, the system can easily be extended to three-dimensional electronic systems or other fermionic many-body systems.
 
 <p>
-The second project deals with so-called post Hartree-Fock methods, where additional correlations are introduced via different methods. We will focus on the variational Monte Carlo (VMC) approach, using the optimal Hartree-Fock basis from project 1 as input. If somebody wants to focus on other methods like Coupled-Cluster theory or in-medium Similarity renormalization group <a href="https://github.com/ManyBodyPhysics/LectureNotesPhysics/blob/master/doc/src/lnp.pdf" target="_blank">method</a> (see chapters 8 and 11 of this reference), this can be tailored more specifically. In general, the VMC is much easier to implement and gives excellent approximations to the exact solutions.
+The second project deals with so-called post Hartree-Fock methods, where additional correlations are introduced via different methods. We will focus on the variational Monte Carlo (VMC) approach, using the optimal Hartree-Fock basis from project 1 as input. If somebody wants to focus on other methods like Coupled-Cluster theory or in-medium Similarity renormalization group <a href="https://github.com/ManyBodyPhysics/LectureNotesPhysics/blob/master/doc/src/lnp.pdf" target="_blank">method</a> (see chapters 8 and 11 of this reference), this can be tailored to your specific interests. In general, the VMC is much easier to implement and gives excellent approximations to the ground state properties.
 
 <p>
 We consider a system of electrons confined in a pure two-dimensional 
@@ -128,7 +128,7 @@ isotropic harmonic oscillator potential, with an idealized  total Hamiltonian gi
 $$
 \begin{equation}
 \label{eq:finalH}
-\hat{H}=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right)+\sum_{i < j}\frac{1}{r_{ij}},
+\hat{H}=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right)+\sum_{i < j}^{N}\frac{1}{r_{ij}},
 \end{equation}
 $$
 
@@ -144,11 +144,11 @@ and the repulsive interaction between two electrons given by
 
 $$
 \begin{equation*}
-\hat{H}_1=\sum_{i < j}\frac{1}{r_{ij}},
+\hat{H}_I=\sum_{i < j}^{N}\frac{1}{r_{ij}},
 \end{equation*}
 $$
 
-with the distance between electrons given by \( r_{ij}=\sqrt{r_1-r_2} \). We define the 
+with the distance between electrons given by \( r_{ij}=\sqrt{\boldsymbol{r}_1-\boldsymbol{r}_2} \). We define the 
 modulus of the positions of the electrons (for a given electron \( i \)) as \( r_i = \sqrt{r_{i_x}^2+r_{i_y}^2} \).
 There is no spin-orbit part in the two-body Hamiltonian and the different parts of the Hamiltonian have no spin operators. This means that the spin of a single-particle state or a many-particle state is a conserved quantity.
 
@@ -204,7 +204,7 @@ With the single-particle basis from the previous step, you should now write a cl
 <h3 id="___sec3">Project 1 c): Computing the two-body matrix elements </h3>
 
 In the Hartree-Fock project we need to be able to compute the two-electron matrix elements of the two-body Coulomb interaction. 
-In order to set up the two-body matrix elements, we need to define the so-called direct and exchange matrix elements. This leads what we call an anti-symmetrized matrix element.
+In order to set up the two-body matrix elements, we need to define the so-called direct and exchange matrix elements. This leads to what we call an anti-symmetrized matrix element.
 
 <p>
 We introduce the following shorthands for the  integrals
@@ -221,11 +221,11 @@ $$
   dx_idx_j,  
 $$
 
-which defines the exchange element. The variables \( pqrs \) define all the single-particle quantum numbers. In our case these are \( n_x \), \( n_y \), spin and its projections and the single-particle energies.
+which defines the exchange element. The variables \( pqrs \) define all the single-particle quantum numbers. In our case these are \( n_x \), \( n_y \) and spin and its projections.
 
 <p>
 These matrix elements are defined in terms of two-body quantum numbers. Which quantum numbers are conserved?
-What is the total spin
+Which are  the possible values the total spin of a two-body state can have?
 
 <p>
 The direct and exchange matrix elements can be  brought together if we define the anti-symmetrized matrix element
@@ -238,6 +238,7 @@ $$
 \langle pq|\hat{v}|rs\rangle_{\mathrm{AS}}= -\langle pq|\hat{v}|sr\rangle_{\mathrm{AS}}=-\langle qp|\hat{v}|rs\rangle_{\mathrm{AS}},
 $$
 
+and
 $$
 \langle pq|\hat{v}|rs\rangle_{\mathrm{AS}}= \langle qp|\hat{v}|sr\rangle_{\mathrm{AS}}.
 $$
@@ -248,7 +249,7 @@ $$
     dx_idx_j,
 $$
 
-and then assemble the direct and exchange terms in order to construct the anti-symmetrized matrix elements to be used in the Hartree-Fock calculations. The integral is four-dimensional but can be simplified. Your task is to figure out how. You should also consider whether it is appropriate to store the matrix elements for the Hartree-Fock calculations.
+and then assemble the direct and exchange terms in order to construct the anti-symmetrized matrix elements to be used in the Hartree-Fock calculations. The integral is four-dimensional but can eventually be simplified. Your task is to figure out how. You should also consider whether it is appropriate to store the matrix elements for the Hartree-Fock calculations.  <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Literature/lectures2015.pdf" target="_blank">Chapter five</a> of the lecture notes discusses Gaussian quadrature. You may find it convenient to use Hermite   polynomials in order to set up the integration points ad weights as well parallelizing the calculations of the integrals.
 
 <h3 id="___sec4">Project 1 d): Hartree-Fock equations  </h3>
 
@@ -302,13 +303,13 @@ Show that the old and the new Slater determinants are equal up to a complex cons
 (Hint, \( C \) is a unitary matrix).
 
 <p>
-Minimizing with respect to \( C^*_{k\alpha} \), remembering that \( C^*_{k\alpha} \) and \( C_{k\alpha} \)
+Minimizing with respect to \( C^*_{p\alpha} \), remembering that \( C^*_{p\alpha} \) and \( C_{p\alpha} \)
 are independent and defining
 
 $$
 \begin{equation*}
 h_{\alpha\gamma}^{HF}=\langle \alpha | \hat{h}_0 | \gamma \rangle+
-\sum_{a=1}^N\sum_{\beta\delta} C^*_{a\beta}C_{a\delta}\langle \alpha\beta|\hat{v}|\gamma\delta\rangle_{AS},
+\sum_{j\le F}\sum_{\beta\delta} C^*_{j\beta}C_{j\delta}\langle \alpha\beta|\hat{v}|\gamma\delta\rangle_{AS},
 \end{equation*}
 $$
 
@@ -316,7 +317,7 @@ show that you can write the Hartree-Fock  equations as
 
 $$
 \begin{equation*}
-\sum_{\gamma}h_{\alpha\gamma}^{HF}C_{k\gamma}=\epsilon_kC_{k\alpha}.
+\sum_{\gamma}h_{\alpha\gamma}^{HF}C_{p\gamma}=\epsilon_p C_{p\alpha}.
 \label{eq:newhf}
 \end{equation*}
 $$
@@ -342,7 +343,7 @@ $$
 
 The Hartree-Fock eigenvalue problem
 $$
-\sum_{\beta}\hat{h}_{\alpha\beta}^{HF}C_{i\beta}=\epsilon_i^{\mathrm{HF}}C_{i\alpha},
+\sum_{\beta}\hat{h}_{\alpha\beta}^{HF}C_{p\beta}=\epsilon_p^{\mathrm{HF}}C_{p\alpha},
 $$
 
 can be written out in a more compact form as
