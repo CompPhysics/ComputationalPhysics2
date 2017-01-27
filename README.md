@@ -6,7 +6,7 @@ A theoretical understanding of the behavior of quantum-mechanical many-body syst
 The aim of this course is to present applications of, through various computational projects, some of the most widely used many-body methods with pertinent algorithms and high-performance computing topics such as advanced parallelization techniques and object orientation.
 The methods and algorithms that will be studied may vary from year to year depending on the interests of the participants, but the main focus will be on systems from computational material science, solid-state physics, atomic and molecular physics, nuclear physics and quantum chemistry. The most relevant algorithms and methods are microscopic mean-field theories (Hartree-Fock and Kohn-Sham theories and density functional theories), large-scale diagonalization methods, coupled-cluster theory, and quantum Monte Carlo like Variational Monte Carlo and Diffusion Monte Carlo approaches. Methods to study phase transitions for both fermionic and bosonic systems can also be studied.
 # Piazza link at 
-  # piazza.com/msu/spring2016/nuclearstructure/home
+  piazza.com/msu/spring2016/nuclearstructure/home
 
 # Recordings of lectures  2017
   # First Lecture January 26    https://connect.uninett.no/p9qkkygco92/
