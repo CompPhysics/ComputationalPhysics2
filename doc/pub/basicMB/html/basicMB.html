@@ -122,46 +122,46 @@ div { text-align: justify; text-justify: inter-word; }
                None,
                '___sec43'),
               ('Two-body matrix elements', 2, None, '___sec44'),
-              ('Reminder on Variational Calculus and Lagrangian Multipliers',
+              ('"Program example for numerical integration":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/ParallelizationOpenMP/Project1Integration.cpp"',
                2,
                None,
                '___sec45'),
-              ('Variational Calculus and Lagrangian Multipliers, simple example',
+              ('Reminder on Variational Calculus and Lagrangian Multipliers',
                2,
                None,
                '___sec46'),
-              ('Manipulating terms', 2, None, '___sec47'),
-              ('Adding the Lagrangian multiplier', 2, None, '___sec48'),
+              ('Variational Calculus and Lagrangian Multipliers, simple example',
+               2,
+               None,
+               '___sec47'),
+              ('Manipulating terms', 2, None, '___sec48'),
+              ('Adding the Lagrangian multiplier', 2, None, '___sec49'),
               ('And with the Euler-Lagrange equations we get',
                2,
                None,
-               '___sec49'),
+               '___sec50'),
               ('Hartree-Fock by varying the coefficients of a wave function expansion',
                2,
                None,
-               '___sec50'),
-              ('More on linear algebra', 2, None, '___sec51'),
+               '___sec51'),
+              ('More on linear algebra', 2, None, '___sec52'),
               ('Coefficients of a wave function expansion',
                2,
                None,
-               '___sec52'),
+               '___sec53'),
               ('More Basic Matrix Features, simple $2 \\times 2$ determinant, useful property of determinants',
                2,
                None,
-               '___sec53'),
+               '___sec54'),
               ('More Basic Matrix Features, $n \\times n$ determinant',
                2,
                None,
-               '___sec54'),
+               '___sec55'),
               ('More Basic Matrix Features, a general $n \\times n$ determinant',
                2,
                None,
-               '___sec55'),
-              ('A general Slater determinant', 2, None, '___sec56'),
-              ('Hartree-Fock by varying the coefficients of a wave function expansion',
-               2,
-               None,
-               '___sec57'),
+               '___sec56'),
+              ('A general Slater determinant', 2, None, '___sec57'),
               ('Hartree-Fock by varying the coefficients of a wave function expansion',
                2,
                None,
@@ -190,14 +190,14 @@ div { text-align: justify; text-justify: inter-word; }
                2,
                None,
                '___sec64'),
-              ('Hartree-Fock algorithm', 2, None, '___sec65'),
+              ('Hartree-Fock by varying the coefficients of a wave function expansion',
+               2,
+               None,
+               '___sec65'),
               ('Hartree-Fock algorithm', 2, None, '___sec66'),
               ('Hartree-Fock algorithm', 2, None, '___sec67'),
               ('Hartree-Fock algorithm', 2, None, '___sec68'),
-              ("Analysis of Hartree-Fock equations and Koopman's theorem",
-               2,
-               None,
-               '___sec69'),
+              ('Hartree-Fock algorithm', 2, None, '___sec69'),
               ("Analysis of Hartree-Fock equations and Koopman's theorem",
                2,
                None,
@@ -218,15 +218,19 @@ div { text-align: justify; text-justify: inter-word; }
                2,
                None,
                '___sec74'),
-              ('Exercise 1: Hartree-Fock Slater determinant',
+              ("Analysis of Hartree-Fock equations and Koopman's theorem",
                2,
                None,
                '___sec75'),
-              ('Exercise 2: Matrix elements for the Hartree-Fock method and the nuclear shell model',
+              ('Exercise 1: Hartree-Fock Slater determinant',
                2,
                None,
                '___sec76'),
-              ('Developing a  Hartree-Fock program', 2, None, '___sec77')]}
+              ('Exercise 2: Matrix elements for the Hartree-Fock method and the nuclear shell model',
+               2,
+               None,
+               '___sec77'),
+              ('Developing a  Hartree-Fock program', 2, None, '___sec78')]}
 end of tocinfo -->
 
 <body>
@@ -1399,7 +1403,134 @@ and then assemble the direct and exchange terms in order to construct the anti-s
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec45">Reminder on Variational Calculus and Lagrangian Multipliers  </h2>
+<h2 id="___sec45"><a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/ParallelizationOpenMP/Project1Integration.cpp" target="_blank">Program example for numerical integration</a> </h2>
+The following program shows the integration of a first-order Hermite polynomial for
+the four-dimensional case. The Hermite polynomials have the following norm
+$$
+\begin{equation*}
+  \int_{-\infty}^{\infty}e^{-x^2}H_n(x)^2dx=2^nn!\sqrt{\pi}.
+\end{equation*}
+$$
+
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">// OpenMP code for numerical integration with Gauss-Hermite quadrature</span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;cstdlib&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iostream&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;cmath&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iomanip&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span>  <span style="color: #408080; font-style: italic">&lt;omp.h&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> std; 
+
+<span style="color: #408080; font-style: italic">// The integrand in Cartesian coordinates</span>
+<span style="color: #B00040">double</span> <span style="color: #0000FF">Integrand</span>(<span style="color: #B00040">double</span>, <span style="color: #B00040">double</span>,<span style="color: #B00040">double</span>, <span style="color: #B00040">double</span>);
+<span style="color: #408080; font-style: italic">// The Gauss Hermite integration function</span>
+<span style="color: #B00040">double</span>  <span style="color: #0000FF">GaussHermiteIntegration</span>(<span style="color: #B00040">int</span>);
+<span style="color: #408080; font-style: italic">// Getting the Gaussian quadrature weights and integration points</span>
+<span style="color: #B00040">void</span> <span style="color: #0000FF">GaussHermiteQuadrature</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>, <span style="color: #B00040">int</span>);
+<span style="color: #408080; font-style: italic">// Start main program</span>
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span> (<span style="color: #B00040">int</span> argc, <span style="color: #B00040">char</span><span style="color: #666666">*</span> argv[])
+{
+  <span style="color: #408080; font-style: italic">// read from terminal the number of integration points</span>
+  <span style="color: #B00040">int</span> n <span style="color: #666666">=</span> atoi(argv[<span style="color: #666666">1</span>]);
+  <span style="color: #B00040">int</span> thread_num;
+
+  <span style="color: #B00040">double</span> wtime;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  Compute 4d-integral using Gaussian quadrature with Hermite quadrature.&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+  omp_set_num_threads(<span style="color: #666666">4</span>);
+  thread_num <span style="color: #666666">=</span> omp_get_max_threads ();
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  The number of processors available = &quot;</span> <span style="color: #666666">&lt;&lt;</span> omp_get_num_procs () <span style="color: #666666">&lt;&lt;</span> endl ;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  The number of threads available    = &quot;</span> <span style="color: #666666">&lt;&lt;</span> thread_num <span style="color: #666666">&lt;&lt;</span>  endl;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;  The number of integration points                 = &quot;</span> <span style="color: #666666">&lt;&lt;</span> n <span style="color: #666666">&lt;&lt;</span> endl;
+  wtime <span style="color: #666666">=</span> omp_get_wtime ( );
+  <span style="color: #B00040">double</span> Integral <span style="color: #666666">=</span> GaussHermiteIntegration(n);
+  wtime <span style="color: #666666">=</span> omp_get_wtime ( ) <span style="color: #666666">-</span> wtime;
+  cout <span style="color: #666666">&lt;&lt;</span> setiosflags(ios<span style="color: #666666">::</span>showpoint <span style="color: #666666">|</span> ios<span style="color: #666666">::</span>uppercase);
+  cout <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">20</span>) <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Time used  integration=&quot;</span> <span style="color: #666666">&lt;&lt;</span> wtime  <span style="color: #666666">&lt;&lt;</span> endl;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Final Integral    = &quot;</span> <span style="color: #666666">&lt;&lt;</span> Integral <span style="color: #666666">&lt;&lt;</span> endl;
+  <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+} <span style="color: #408080; font-style: italic">// end main function</span>
+
+<span style="color: #408080; font-style: italic">// The integrand, here a first order Hermite polynomial for x1 only</span>
+<span style="color: #408080; font-style: italic">// The other variables are given by zeroth-order Hermite polynomials.</span>
+<span style="color: #B00040">double</span> <span style="color: #0000FF">Integrand</span>(<span style="color: #B00040">double</span> x1, <span style="color: #B00040">double</span> y1, <span style="color: #B00040">double</span> x2, <span style="color: #B00040">double</span> y2)
+{
+  <span style="color: #008000; font-weight: bold">return</span> (<span style="color: #666666">2*</span>x1)<span style="color: #666666">*</span>(<span style="color: #666666">2*</span>x1);
+}
+
+<span style="color: #408080; font-style: italic">//Plain Gauss-Hermite integration with cartesian variables, brute force</span>
+<span style="color: #B00040">double</span>  <span style="color: #0000FF">GaussHermiteIntegration</span>(<span style="color: #B00040">int</span> n)
+{
+  <span style="color: #B00040">double</span> <span style="color: #666666">*</span>x <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span> [n<span style="color: #666666">+1</span>];
+  <span style="color: #B00040">double</span> <span style="color: #666666">*</span>w <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span> [n];
+  GaussHermiteQuadrature(x, w, n);
+  <span style="color: #B00040">double</span> Integral <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+  <span style="color: #B00040">int</span> i, j, k, l;
+<span style="color: #BC7A00"># pragma omp parallel default(shared) private (i, j, k, l) reduction(+:Integral)</span>
+  {
+<span style="color: #BC7A00"># pragma omp for</span>
+    <span style="color: #008000; font-weight: bold">for</span> (i <span style="color: #666666">=</span> <span style="color: #666666">0</span>;  i <span style="color: #666666">&lt;</span> n; i<span style="color: #666666">++</span>){
+      <span style="color: #008000; font-weight: bold">for</span> (j <span style="color: #666666">=</span> <span style="color: #666666">0</span>;  j <span style="color: #666666">&lt;</span> n; j<span style="color: #666666">++</span>){
+	<span style="color: #008000; font-weight: bold">for</span> (k <span style="color: #666666">=</span> <span style="color: #666666">0</span>;  k <span style="color: #666666">&lt;</span> n; k<span style="color: #666666">++</span>){
+	  <span style="color: #008000; font-weight: bold">for</span> (l <span style="color: #666666">=</span> <span style="color: #666666">0</span>;  l <span style="color: #666666">&lt;</span> n; l<span style="color: #666666">++</span>){
+	    Integral <span style="color: #666666">+=</span> w[i]<span style="color: #666666">*</span>w[j]<span style="color: #666666">*</span>w[k]<span style="color: #666666">*</span>w[l]<span style="color: #666666">*</span>Integrand(x[i],x[j],x[k],x[l]);
+	  }
+	}
+      }
+    }
+  } <span style="color: #408080; font-style: italic">// end parallel region</span>
+  <span style="color: #008000; font-weight: bold">delete</span> [] x;
+  <span style="color: #008000; font-weight: bold">delete</span> [] w;
+  <span style="color: #008000; font-weight: bold">return</span> Integral;
+}
+
+
+<span style="color: #408080; font-style: italic">// Setting Gaussian quadrature weights and integration points</span>
+<span style="color: #B00040">void</span> <span style="color: #0000FF">GaussHermiteQuadrature</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>x, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>w, <span style="color: #B00040">int</span> n)
+{
+  <span style="color: #B00040">int</span> i,its,j,m;
+  <span style="color: #B00040">double</span> p1,p2,p3,pp,z,z1;
+  <span style="color: #B00040">double</span> Epsilon <span style="color: #666666">=</span> <span style="color: #666666">3.0e-14</span>, PIM4 <span style="color: #666666">=</span> <span style="color: #666666">0.7511255444649425</span>;
+  <span style="color: #B00040">int</span> MaxIterations <span style="color: #666666">=</span> <span style="color: #666666">10</span>;
+  m<span style="color: #666666">=</span>(n<span style="color: #666666">+1</span>)<span style="color: #666666">/2</span>;
+  <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=1</span>;i<span style="color: #666666">&lt;=</span>m;i<span style="color: #666666">++</span>) {
+    <span style="color: #008000; font-weight: bold">if</span> (i <span style="color: #666666">==</span> <span style="color: #666666">1</span>) {
+      z<span style="color: #666666">=</span>sqrt((<span style="color: #B00040">double</span>)(<span style="color: #666666">2*</span>n<span style="color: #666666">+1</span>))<span style="color: #666666">-1.85575*</span>pow((<span style="color: #B00040">double</span>)(<span style="color: #666666">2*</span>n<span style="color: #666666">+1</span>),<span style="color: #666666">-0.16667</span>);
+    } <span style="color: #008000; font-weight: bold">else</span> <span style="color: #008000; font-weight: bold">if</span> (i <span style="color: #666666">==</span> <span style="color: #666666">2</span>) {
+      z <span style="color: #666666">-=</span> <span style="color: #666666">1.14*</span>pow((<span style="color: #B00040">double</span>)n,<span style="color: #666666">0.426</span>)<span style="color: #666666">/</span>z;
+    } <span style="color: #008000; font-weight: bold">else</span> <span style="color: #008000; font-weight: bold">if</span> (i <span style="color: #666666">==</span> <span style="color: #666666">3</span>) {
+      z<span style="color: #666666">=1.86*</span>z<span style="color: #666666">-0.86*</span>x[<span style="color: #666666">0</span>];
+    } <span style="color: #008000; font-weight: bold">else</span> <span style="color: #008000; font-weight: bold">if</span> (i <span style="color: #666666">==</span> <span style="color: #666666">4</span>) {
+      z<span style="color: #666666">=1.91*</span>z<span style="color: #666666">-0.91*</span>x[<span style="color: #666666">1</span>];
+    } <span style="color: #008000; font-weight: bold">else</span> {
+      z<span style="color: #666666">=2.0*</span>z<span style="color: #666666">-</span>x[i<span style="color: #666666">-3</span>];
+    }
+    <span style="color: #008000; font-weight: bold">for</span> (its<span style="color: #666666">=1</span>;its<span style="color: #666666">&lt;=</span>MaxIterations;its<span style="color: #666666">++</span>) {
+      p1<span style="color: #666666">=</span>PIM4;
+      p2<span style="color: #666666">=0.0</span>;
+      <span style="color: #008000; font-weight: bold">for</span> (j<span style="color: #666666">=1</span>;j<span style="color: #666666">&lt;=</span>n;j<span style="color: #666666">++</span>) {
+	p3<span style="color: #666666">=</span>p2;
+	p2<span style="color: #666666">=</span>p1;
+	p1<span style="color: #666666">=</span>z<span style="color: #666666">*</span>sqrt(<span style="color: #666666">2.0/</span>j)<span style="color: #666666">*</span>p2<span style="color: #666666">-</span>sqrt(((<span style="color: #B00040">double</span>)(j<span style="color: #666666">-1</span>))<span style="color: #666666">/</span>j)<span style="color: #666666">*</span>p3;
+      }
+      pp<span style="color: #666666">=</span>sqrt((<span style="color: #B00040">double</span>)<span style="color: #666666">2*</span>n)<span style="color: #666666">*</span>p2;
+      z1<span style="color: #666666">=</span>z;
+      z<span style="color: #666666">=</span>z1<span style="color: #666666">-</span>p1<span style="color: #666666">/</span>pp;
+      <span style="color: #008000; font-weight: bold">if</span> (fabs(z<span style="color: #666666">-</span>z1) <span style="color: #666666">&lt;=</span> Epsilon) <span style="color: #008000; font-weight: bold">break</span>;
+    }
+    <span style="color: #008000; font-weight: bold">if</span> (its <span style="color: #666666">&gt;</span> MaxIterations) cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;too many iterations in Hermite quadrature&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+    x[i<span style="color: #666666">-1</span>]<span style="color: #666666">=</span>z;
+    x[n<span style="color: #666666">-</span>i] <span style="color: #666666">=</span> <span style="color: #666666">-</span>z;
+    w[i<span style="color: #666666">-1</span>]<span style="color: #666666">=2.0/</span>(pp<span style="color: #666666">*</span>pp);
+    w[n<span style="color: #666666">-</span>i]<span style="color: #666666">=</span>w[i<span style="color: #666666">-1</span>];
+  }
+} <span style="color: #408080; font-style: italic">// Gaussian quadrature weights and integration points</span>
+</pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec46">Reminder on Variational Calculus and Lagrangian Multipliers  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1426,7 +1557,7 @@ The constraints can be treated via the technique of Lagrangian multipliers
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec46">Variational Calculus and Lagrangian Multipliers, simple example  </h2>
+<h2 id="___sec47">Variational Calculus and Lagrangian Multipliers, simple example  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1453,7 +1584,7 @@ We will, for the sake of notational convenience,  skip the variables \( x,y,z \)
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec47">Manipulating terms  </h2>
+<h2 id="___sec48">Manipulating terms  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1474,7 +1605,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec48">Adding the Lagrangian multiplier  </h2>
+<h2 id="___sec49">Adding the Lagrangian multiplier  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1501,7 +1632,7 @@ where we have skipped the dependence on \( x,y,z \) and introduced the shorthand
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec49">And with the Euler-Lagrange equations we get  </h2>
+<h2 id="___sec50">And with the Euler-Lagrange equations we get  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1525,7 +1656,7 @@ a powerful method for obtaining approximate solutions of the wave function.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec50">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec51">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1548,7 +1679,7 @@ to truncate the above sum.  We assume that the basis \( \phi_{\lambda} \) is ort
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec51">More on linear algebra  </h2>
+<h2 id="___sec52">More on linear algebra  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1575,7 +1706,7 @@ $$
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec52">Coefficients of a wave function expansion </h2>
+<h2 id="___sec53">Coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1598,7 +1729,7 @@ This propertry is extremely useful when we build up a basis of many-body Stater 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec53">More Basic Matrix Features, simple \( 2 \times 2 \) determinant, useful property of determinants  </h2>
+<h2 id="___sec54">More Basic Matrix Features, simple \( 2 \times 2 \) determinant, useful property of determinants  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1619,7 +1750,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec54">More Basic Matrix Features, \( n \times n \) determinant </h2>
+<h2 id="___sec55">More Basic Matrix Features, \( n \times n \) determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1646,7 +1777,7 @@ This is a property we will use in our Hartree-Fock discussions.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec55">More Basic Matrix Features, a general \( n \times n \) determinant </h2>
+<h2 id="___sec56">More Basic Matrix Features, a general \( n \times n \) determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1672,7 +1803,7 @@ This is a property we will use in our Hartree-Fock discussions. Convince yoursel
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec56">A general Slater determinant </h2>
+<h2 id="___sec57">A general Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1705,7 +1836,7 @@ which is nothing but \( det(\mathbf{C})det(\Phi) \), with \( det(\Phi) \) being 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec57">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec58">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1726,7 +1857,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec58">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec59">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1739,7 +1870,7 @@ For general single-particle states we employ the labels \( pqrs\dots \).
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec59">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec60">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1768,7 +1899,7 @@ where \( \Phi^{HF} \) is the new Slater determinant defined by the new basis of 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec60">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec61">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1786,7 +1917,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec61">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec62">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1811,7 +1942,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec62">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec63">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1833,7 +1964,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec63">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec64">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1850,7 +1981,7 @@ Note that the sums over greek indices run over the number of basis set functions
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec64">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+<h2 id="___sec65">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1877,7 +2008,7 @@ It suffices to tabulate the matrix elements \( \langle \alpha | h | \beta \rangl
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec65">Hartree-Fock algorithm </h2>
+<h2 id="___sec66">Hartree-Fock algorithm </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1895,7 +2026,7 @@ The Hartree-Fock equations are solved in an iterative waym starting with a guess
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec66">Hartree-Fock algorithm </h2>
+<h2 id="___sec67">Hartree-Fock algorithm </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1921,7 +2052,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec67">Hartree-Fock algorithm </h2>
+<h2 id="___sec68">Hartree-Fock algorithm </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1944,7 +2075,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec68">Hartree-Fock algorithm </h2>
+<h2 id="___sec69">Hartree-Fock algorithm </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1973,7 +2104,7 @@ energies and \( m \) is the number of single-particle states.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec69">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+<h2 id="___sec70">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1996,7 +2127,7 @@ Our single-particle states \( ijk\dots \) are now single-particle states obtaine
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec70">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+<h2 id="___sec71">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2013,7 +2144,7 @@ This form will be used in our discussion of Koopman's theorem.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec71">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+<h2 id="___sec72">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Atomic physics case.</b>
 <p>
@@ -2040,7 +2171,7 @@ where we have removed a single-particle state \( k\le F \), that is a state belo
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec72">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+<h2 id="___sec73">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2066,7 +2197,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec73">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+<h2 id="___sec74">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2083,7 +2214,7 @@ Koopman's theorem states that for example the ionization energy of a closed-shel
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec74">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+<h2 id="___sec75">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2106,7 +2237,7 @@ in terms of the particles or degrees of freedom which we believe are the fundame
 <p>
 <!-- --- begin exercise --- -->
 
-<h2 id="___sec75">Exercise 1: Hartree-Fock Slater determinant </h2>
+<h2 id="___sec76">Exercise 1: Hartree-Fock Slater determinant </h2>
 
 <p>
 <div class="alert alert-block alert-block alert-text-normal">
@@ -2158,7 +2289,7 @@ Hint: \( C \) is a unitary matrix.
 <p>
 <!-- --- begin exercise --- -->
 
-<h2 id="___sec76">Exercise 2: Matrix elements for the Hartree-Fock method and the nuclear shell model </h2>
+<h2 id="___sec77">Exercise 2: Matrix elements for the Hartree-Fock method and the nuclear shell model </h2>
 
 <p>
 We will assume that we can build various Slater determinants using an orthogonal  single-particle basis \( \psi_{\lambda} \), 
@@ -2248,7 +2379,7 @@ These results simplify to a large extent shell-model calculations.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec77">Developing a  Hartree-Fock program  </h2>
+<h2 id="___sec78">Developing a  Hartree-Fock program  </h2>
 
 <p>
 The Hamiltonian for a system of \( N \) electrons confined in a
