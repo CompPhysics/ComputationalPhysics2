@@ -1075,6 +1075,936 @@ void GaussHermiteQuadrature(double *x, double *w, int n)
 
 !ec
 
+
+
+!split
+===== Gaussian Quadrature, main idea =====
+!bblock
+In general, an integration formula which is based on a Taylor series using $N$ points,
+will integrate exactly a polynomial $P$ of degree $N-1$. That is, the $N$ weights
+$\omega_n$ can be chosen to satisfy $N$ linear equations, see chapter 3 of Ref.\ [3]. 
+A greater precision for a given amount of numerical work can  be achieved
+if we are willing to give up the requirement of equally spaced integration points.  
+In Gaussian quadrature (hereafter GQ), both the mesh points and the weights are to
+be determined. The points will not be equally spaced.
+
+The theory behind GQ is to obtain an arbitrary weight $\omega$ through the use of
+so-called orthogonal polynomials. These polynomials are orthogonal in some
+interval say e.g., [-1,1]. Our points $x_i$ are chosen in some optimal sense subject
+only to the constraint that they should lie in this interval. Together with the weights
+we have then $2N$ ($N$ the number of points) parameters at our disposal.  
+!eblock
+
+
+!split
+===== Gaussian Quadrature =====
+!bblock
+Even though the integrand is not smooth, we could render it smooth by extracting
+from it the weight function of an orthogonal polynomial, i.e.,
+we are rewriting
+!bt
+\begin{equation}
+   I= \int_a^b f(x)dx =\int_a^b W(x)g(x)dx \approx \sum_{i=1}^N\omega_ig(x_i),  
+   label{eq:generalint}
+\end{equation}
+!et
+where $g$ is smooth and $W$ is the weight function, which is to  be associated with a given 
+orthogonal polynomial. Note that with a given weight function we end up evaluating the integrand
+for the function $g(x_i)$.
+!eblock
+
+!split
+===== Gaussian Quadrature, weight function =====
+!bblock
+The weight function $W$ is non-negative in the integration interval 
+$x\in [a,b]$ such that
+for any $n \ge 0$, the integral $\int_a^b |x|^n W(x) dx$ is integrable. The naming
+weight function arises from the fact that it may be used to give more emphasis
+to one part of the interval than another. 
+A quadrature formula 
+!bt
+\begin{equation} 
+   \int_a^b W(x)f(x)dx \approx \sum_{i=1}^N\omega_if(x_i), 
+\end{equation} 
+!et
+with $N$ distinct quadrature points (mesh points) is a called a Gaussian quadrature 
+formula if it integrates all polynomials $p\in P_{2N-1}$ exactly, that is
+!bt
+\begin{equation} 
+\int_a^bW(x)p(x)dx =\sum_{i=1}^N\omega_ip(x_i), 
+\end{equation}
+!et
+It is assumed that $W(x)$ is continuous and positive and that the integral
+!bt
+\begin{equation*} 
+\int_a^bW(x)dx
+\end{equation*}
+!et
+exists. Note that the replacement of $f\rightarrow Wg$ is normally a better approximation
+due to the fact that we may isolate possible singularities of $W$ and its 
+derivatives at the endpoints of the interval. 
+!eblock
+
+
+!split
+===== Gaussian Quadrature weights and integration points =====
+!bblock
+The quadrature weights or just weights (not to be confused with the weight function) 
+are positive and the sequence of Gaussian quadrature formulae is convergent 
+if the sequence $Q_N$ of quadrature formulae
+!bt
+\begin{equation*}
+   Q_N(f)\rightarrow Q(f)=\int_a^bf(x)dx,
+\end{equation*}
+!et
+in the limit $N\rightarrow \infty$. 
+!eblock
+
+!split
+===== Gaussian Quadrature =====
+!bblock
+Then  we say that the sequence
+!bt
+\begin{equation*} 
+Q_N(f) = \sum_{i=1}^N\omega_i^{(N)}f(x_i^{(N)}), 
+\end{equation*}
+!et
+is convergent for all polynomials $p$, that is
+!bt
+\begin{equation*}
+Q_N(p) = Q(p) 
+\end{equation*}
+!et
+if there exits a constant $C$ such that
+!bt
+\begin{equation*}
+ \sum_{i=1}^N|\omega_i^{(N)}| \le C,
+\end{equation*}
+!et
+for all $N$ which are natural numbers.
+!eblock
+
+!split
+===== Error in Gaussian Quadrature =====
+!bblock
+The error for the Gaussian quadrature formulae of order $N$ is given
+by
+
+!bt
+\begin{equation*}
+  \int_a^bW(x)f(x)dx-\sum_{k=1}^Nw_kf(x_k)=\frac{f^{2N}(\xi)}{(2N)!}\int_a^bW(x)[q_{N}(x)]^2dx
+\end{equation*}
+!et
+where $q_{N}$ is the chosen orthogonal polynomial and $\xi$ is a number in the interval $[a,b]$.
+We have assumed that $f\in C^{2N}[a,b]$, viz. the space of all real or complex  $2N$ times continuously
+differentiable functions. 
+!eblock
+
+!split
+===== Important polynomials in Gaussian Quadrature =====
+!bblock
+In science there are several important orthogonal polynomials which arise
+from the solution of differential equations. Well-known examples are the  
+Legendre, Hermite, Laguerre and Chebyshev polynomials. They have the following weight functions
+
+|--------------------------------------------------------------------------------------|
+| Weight function            | Interval                   | Polynomial                 |
+|-------------r---------------------------r---------------------------r----------------|
+| $W(x)=1$                   | $x\in [-1,1]$              | Legendre                   |
+| $W(x)=e^{-x^2}$            | $-\infty \le x \le \infty$ | Hermite                    |
+| $W(x)=x^{\alpha}e^{-x}$    | $0 \le x \le \infty$       | Laguerre                   |
+| $W(x)=1/(\sqrt{1-x^2})$    | $-1 \le x \le 1$           | Chebyshev                  |
+|--------------------------------------------------------------------------------------|
+
+
+The importance of the use of orthogonal polynomials in the evaluation
+of integrals can be summarized as follows.
+!eblock
+
+!split
+===== Gaussian Quadrature, win-win situation =====
+!bblock
+
+Methods based on Taylor series using $N$ points will  integrate exactly a polynomial $P$ of degree $N-1$. If a function $f(x)$ can be approximated with a polynomial of degree $N-1$          
+!bt 
+\begin{equation*}            
+f(x)\approx P_{N-1}(x),
+\end{equation*}
+!et
+with $N$ mesh points we should be able to integrate exactly the polynomial $P_{N-1}$. 
+
+Gaussian quadrature methods promise more than this. We can get a better          polynomial approximation with order greater than $N$  to $f(x)$ and still          get away with only $N$ mesh points. More precisely, we approximate           
+!bt 
+\begin{equation*}             
+f(x) \approx P_{2N-1}(x),
+\end{equation*}
+!et
+and with only $N$ mesh points these methods promise that
+!bt
+\begin{equation*}
+            \int f(x)dx \approx \int P_{2N-1}(x)dx=\sum_{i=0}^{N-1} P_{2N-1}(x_i)\omega_i,
+\end{equation*}
+!et
+!eblock
+
+!split
+===== Gaussian Quadrature, determining mesh points and weights =====
+!bblock
+
+The reason why we can represent a function $f(x)$ with a polynomial of degree
+$2N-1$ is due to the fact that we have $2N$ equations, $N$ for the mesh points and $N$
+for the weights. 
+
+*The mesh points are the zeros  of the chosen  orthogonal polynomial* of
+order $N$, and the weights are determined from the inverse of a matrix.
+An orthogonal polynomials of degree $N$ defined in an interval $[a,b]$
+has precisely $N$ distinct zeros on the open interval $(a,b)$. 
+ 
+Before we detail how to obtain mesh points and weights with orthogonal 
+polynomials, let us revisit some features of orthogonal polynomials
+by specializing to Legendre polynomials. In the text below, we reserve 
+hereafter the labelling
+$L_N$ for a Legendre polynomial of order $N$, while $P_N$ is an arbitrary polynomial
+of order $N$. 
+These polynomials form then the basis for the Gauss-Legendre method. 
+!eblock
+
+!split
+===== Orthogonal polynomials, Legendre ===== 
+
+
+The Legendre polynomials are the solutions of an important
+differential equation in Science, namely
+
+!bt
+\begin{equation*}
+C(1-x^2)P-m_l^2P+(1-x^2)\frac{d}{dx}\left((1-x^2)\frac{dP}{dx}\right)=0.
+\end{equation*}
+!et
+Here $C$ is a constant. For $m_l=0$ we obtain the Legendre polynomials
+as solutions, whereas $m_l \ne 0$ yields the so-called associated Legendre
+polynomials. This differential equation arises in for example the solution
+of the angular dependence of Schroedinger's 
+equation with spherically symmetric potentials such as
+the Coulomb potential. 
+
+
+!split
+===== Orthogonal polynomials, Legendre ===== 
+The corresponding polynomials $P$ are
+!bt
+\begin{equation*}
+   L_k(x)=\frac{1}{2^kk!}\frac{d^k}{dx^k}(x^2-1)^k \hspace{1cm} k=0,1,2,\dots,
+\end{equation*}
+!et
+which, up to a factor, are the Legendre polynomials $L_k$. 
+The latter fulfil the orthogonality relation
+!bt
+\begin{equation} 
+  \int_{-1}^1L_i(x)L_j(x)dx=\frac{2}{2i+1}\delta_{ij},
+  label{eq:ortholeg}
+\end{equation} 
+!et
+and the recursion relation
+!bt
+\begin{equation} 
+  (j+1)L_{j+1}(x)+jL_{j-1}(x)-(2j+1)xL_j(x)=0.
+  label{eq:legrecur}
+\end{equation} 
+!et
+
+!split
+===== Orthogonal polynomials, Legendre ===== 
+It is common to choose the normalization condition
+!bt
+\begin{equation*}
+    L_N(1)=1.
+\end{equation*}
+!et
+With these equations we can determine a Legendre polynomial of arbitrary order
+with input polynomials of order $N-1$ and $N-2$. 
+
+As an example, consider the determination of $L_0$, $L_1$ and $L_2$. 
+We have that
+!bt
+\begin{equation*}
+   L_0(x) = c,
+\end{equation*}
+!et
+with $c$ a constant. Using the normalization equation $L_0(1)=1$
+we get that
+
+!bt
+\begin{equation*}
+   L_0(x) = 1.
+\end{equation*}
+!et
+
+!split
+===== Orthogonal polynomials, Legendre ===== 
+For $L_1(x)$ we have the general expression
+!bt
+\begin{equation*}
+   L_1(x) = a+bx,
+\end{equation*}
+!et
+and using the orthogonality relation
+!bt
+\begin{equation*}
+  \int_{-1}^1L_0(x)L_1(x)dx=0,
+\end{equation*}
+!et
+we obtain $a=0$ and with the condition $L_1(1)=1$, we obtain $b=1$, yielding
+!bt
+\begin{equation*}
+   L_1(x) = x.
+\end{equation*}
+!et
+
+
+!split
+===== Orthogonal polynomials, Legendre ===== 
+We can proceed in a similar fashion in order to determine
+the coefficients of $L_2$
+!bt
+\begin{equation*}
+   L_2(x) = a+bx+cx^2,
+\end{equation*}
+!et
+using the orthogonality relations
+!bt
+\begin{equation*}
+  \int_{-1}^1L_0(x)L_2(x)dx=0,
+\end{equation*}
+!et
+and
+!bt
+\begin{equation*}
+  \int_{-1}^1L_1(x)L_2(x)dx=0,
+\end{equation*}
+!et
+and the condition
+$L_2(1)=1$ we would get 
+!bt
+\begin{equation}
+   L_2(x) = \frac{1}{2}\left(3x^2-1\right).
+   label{eq:l2}
+\end{equation}
+!et
+
+!split
+===== Orthogonal polynomials, Legendre ===== 
+We note that we have three equations to determine the three coefficients
+$a$, $b$ and $c$.
+
+Alternatively, we could have 
+employed the recursion relation of Eq. (ref{eq:legrecur}), resulting in
+
+!bt
+\begin{equation*}
+   2L_2(x)=3xL_1(x)-L_0,
+\end{equation*}
+!et
+which leads to Eq. (ref{eq:l2}).
+
+
+!split
+===== Orthogonal polynomials, Legendre ===== 
+The orthogonality relation above is important in our discussion
+on how to obtain the weights and mesh points. Suppose we have an arbitrary
+polynomial $Q_{N-1}$ of order $N-1$ and a Legendre polynomial $L_N(x)$ of
+order $N$. We could represent $Q_{N-1}$ 
+by the Legendre polynomials through 
+!bt
+\begin{equation}
+   Q_{N-1}(x)=\sum_{k=0}^{N-1}\alpha_kL_{k}(x),
+   label{eq:legexpansion}
+\end{equation}
+!et
+where $\alpha_k$'s are constants.  
+
+Using the orthogonality relation of Eq. (ref{eq:ortholeg}) we see that
+!bt
+\begin{equation}
+  \int_{-1}^1L_N(x)Q_{N-1}(x)dx=\sum_{k=0}^{N-1} \int_{-1}^1L_N(x) \alpha_kL_{k}(x)dx=0.
+  label{eq:ortholeg2}
+\end{equation}
+!et
+We will use this result in our construction of mesh points and weights 
+in the next subsection.
+ 
+!split
+===== Orthogonal polynomials, Legendre ===== 
+In summary, the first few Legendre polynomials are
+!bt
+\begin{equation*}
+   L_0(x) =1,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+  L_1(x) = x,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+  L_2(x) = (3x^2-1)/2,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+   L_3(x) = (5x^3-3x)/2,
+\end{equation*}
+!et
+and
+!bt
+\begin{equation*}
+   L_4(x) = (35x^4-30x^2+3)/8.
+\end{equation*}
+!et
+
+!split
+===== Orthogonal polynomials, simple code for Legendre polynomials ===== 
+The following simple function implements the above recursion relation
+of Eq. (ref{eq:legrecur}).
+for computing Legendre polynomials of order $N$.
+!bc cppcod
+//  This function computes the Legendre polynomial of degree N
+
+double Legendre( int n, double x) 
+{
+       double r, s, t;
+       int m;
+       r = 0; s = 1.;
+       //  Use recursion relation to generate p1 and p2
+       for (m=0; m < n; m++ )  
+       {
+          t = r; r = s; 
+          s = (2*m+1)*x*r - m*t;
+          s /= (m+1);
+	} // end of do loop 
+        return s;
+}   // end of function Legendre
+!ec
+The variable $s$ represents $L_{j+1}(x)$, while $r$ holds
+$L_j(x)$ and $t$ the value $L_{j-1}(x)$.
+
+
+
+!split
+===== Other orthogonal polynomials, Laguerre polynomials =====
+
+If we are able to rewrite our integral of Eq.  (ref{eq:generalint}) with a
+weight function $W(x)=x^{\alpha}e^{-x}$ with integration limits 
+$[0,\infty)$, we could then use the Laguerre polynomials.
+The polynomials form then the basis for the Gauss-Laguerre method which can be applied
+to integrals of the form
+
+!bt
+\begin{equation*} 
+   I=\int_0^{\infty}f(x)dx =\int_0^{\infty}x^{\alpha}e^{-x}g(x)dx.
+\end{equation*}
+!et
+
+!split
+===== Other orthogonal polynomials, Laguerre polynomials =====
+These polynomials arise from the solution of the differential
+equation
+
+!bt
+\begin{equation*}
+\left(\frac{d^2 }{dx^2}-\frac{d }{dx}+\frac{\lambda}{x}-\frac{l(l+1)}{x^2}\right){\cal L}(x)=0,
+\end{equation*}
+!et
+where $l$ is an integer $l\ge 0$ and $\lambda$ a constant. This equation
+arises for example from the solution of the radial Schr\"odinger equation with 
+a centrally symmetric potential such as the Coulomb potential.
+
+
+!split
+===== Other orthogonal polynomials, Laguerre polynomials =====
+The first few polynomials are
+!bt
+\begin{equation*}
+   {\cal L}_0(x)=1,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+    {\cal L}_1(x)=1-x,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+    {\cal L}_2(x)=2-4x+x^2,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+    {\cal L}_3(x)=6-18x+9x^2-x^3,
+\end{equation*}
+!et
+and
+!bt
+\begin{equation*}
+    {\cal L}_4(x)=x^4-16x^3+72x^2-96x+24.
+\end{equation*}
+!et
+
+
+!split
+===== Other orthogonal polynomials, Laguerre polynomials =====
+They fulfil the orthogonality relation
+!bt
+\begin{equation*}
+  \int_{0}^{\infty}e^{-x}{\cal L}_n(x)^2dx=1,
+\end{equation*}
+!et
+and the recursion relation
+!bt
+\begin{equation*}
+  (n+1){\cal L}_{n+1}(x)=(2n+1-x){\cal L}_{n}(x)-n{\cal L}_{n-1}(x).
+\end{equation*}
+!et
+
+!split
+===== Other orthogonal polynomials, Hermite polynomials =====
+
+In a similar way, for an integral which goes like
+!bt
+\begin{equation*} 
+   I=\int_{-\infty}^{\infty}f(x)dx =\int_{-\infty}^{\infty}e^{-x^2}g(x)dx.
+\end{equation*}
+!et
+we could use the Hermite polynomials in order to extract weights and mesh points.
+The Hermite polynomials are the solutions of the following differential
+equation
+
+!bt
+\begin{equation}
+   \frac{d^2H(x)}{dx^2}-2x\frac{dH(x)}{dx}+
+       (\lambda-1)H(x)=0.
+  label{eq:hermite}
+\end{equation}
+!et
+
+!split
+===== Other orthogonal polynomials, Hermite polynomials =====
+A typical example is again the solution of Schrodinger's
+equation, but this time with a harmonic oscillator potential.
+The first few polynomials are
+!bt
+\begin{equation*}
+   H_0(x)=1,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+    H_1(x)=2x,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+    H_2(x)=4x^2-2,
+\end{equation*}
+!et
+!bt
+\begin{equation*}
+    H_3(x)=8x^3-12,
+\end{equation*}
+!et
+and
+!bt
+\begin{equation*}
+    H_4(x)=16x^4-48x^2+12.
+\end{equation*}
+!et
+They fulfil the orthogonality relation
+!bt
+\begin{equation*}
+  \int_{-\infty}^{\infty}e^{-x^2}H_n(x)^2dx=2^nn!\sqrt{\pi},
+\end{equation*}
+!et
+and the recursion relation
+!bt
+\begin{equation*}
+  H_{n+1}(x)=2xH_{n}(x)-2nH_{n-1}(x).
+\end{equation*}
+!et
+
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+
+To understand how the weights and the mesh points are generated, we define first
+a polynomial of degree $2N-1$ (since we have $2N$ variables at hand, the mesh points
+and weights for $N$ points). This polynomial can be represented through polynomial
+division by
+
+!bt
+\begin{equation*}
+   P_{2N-1}(x)=L_N(x)P_{N-1}(x)+Q_{N-1}(x),
+\end{equation*}
+!et
+where $P_{N-1}(x)$ and $Q_{N-1}(x)$ are some polynomials of degree $N-1$ or less.
+The function $L_N(x)$ is a Legendre polynomial of order $N$. 
+
+Recall that we wanted to approximate  an arbitrary function $f(x)$ with a
+polynomial $P_{2N-1}$ in order to evaluate
+
+!bt
+\begin{equation*}
+   \int_{-1}^1f(x)dx\approx \int_{-1}^1P_{2N-1}(x)dx.
+\end{equation*}
+!et
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+We can use Eq. (ref{eq:ortholeg2})
+to rewrite the above integral as
+!bt
+\begin{equation*} 
+   \int_{-1}^1P_{2N-1}(x)dx=\int_{-1}^1(L_N(x)P_{N-1}(x)+Q_{N-1}(x))dx=\int_{-1}^1Q_{N-1}(x)dx,
+\end{equation*}
+!et
+due to the orthogonality properties of the Legendre polynomials. We see that it suffices
+to evaluate the integral over $\int_{-1}^1Q_{N-1}(x)dx$ in order to evaluate 
+$\int_{-1}^1P_{2N-1}(x)dx$. In addition, at the points $x_k$ where $L_N$ is zero, we have
+
+!bt
+\begin{equation*}
+    P_{2N-1}(x_k)=Q_{N-1}(x_k)\hspace{1cm} k=0,1,\dots, N-1,
+\end{equation*}
+!et
+and we see that through these $N$ points we can fully define $Q_{N-1}(x)$  and thereby the 
+integral. Note that we have chosen to let the numbering of the points run from $0$ to $N-1$.
+The reason for this choice is that we wish to have the same numbering as the order of a 
+polynomial of degree $N-1$.  This numbering will be useful below when  we introduce the matrix
+elements  which define the integration weights $w_i$.
+
+
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+We develope then $Q_{N-1}(x)$ in terms of Legendre polynomials,
+as done in Eq. (ref{eq:legexpansion}), 
+!bt
+\begin{equation} 
+  Q_{N-1}(x)=\sum_{i=0}^{N-1}\alpha_iL_i(x).
+  label{eq:lsum1}
+\end{equation}
+!et
+Using the orthogonality property of the Legendre polynomials we have
+!bt
+\begin{equation*} 
+  \int_{-1}^1Q_{N-1}(x)dx=\sum_{i=0}^{N-1}\alpha_i\int_{-1}^1L_0(x)L_i(x)dx=2\alpha_0,
+\end{equation*}
+!et 
+where we have just inserted $L_0(x)=1$!
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+Instead of an integration problem we need now to define the coefficient $\alpha_0$.
+Since we know the values of $Q_{N-1}$ at the zeros of $L_N$, we may rewrite  
+Eq.  (ref{eq:lsum1}) as
+!bt
+\begin{equation} 
+  Q_{N-1}(x_k)=\sum_{i=0}^{N-1}\alpha_iL_i(x_k)=\sum_{i=0}^{N-1}\alpha_iL_{ik} \hspace{1cm} k=0,1,\dots, N-1.
+  label{eq:lsum2}
+\end{equation}
+!et
+Since the Legendre polynomials are linearly independent of each other, none 
+of the columns in the matrix $L_{ik}$ are linear combinations of the others. 
+
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+This means that the matrix $L_{ik}$ has an inverse with the properties
+!bt
+\begin{equation*}
+   \hat{L}^{-1}\hat{L} = \hat{I}.
+\end{equation*}
+!et
+Multiplying both sides of Eq. (ref{eq:lsum2}) with $\sum_{j=0}^{N-1}L_{ji}^{-1}$ results in 
+!bt
+\begin{equation}
+  \sum_{i=0}^{N-1}(L^{-1})_{ki}Q_{N-1}(x_i)=\alpha_k.
+  label{eq:lsum3}
+\end{equation}
+!et
+
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+We can derive this result in an alternative way by defining the vectors
+!bt
+\begin{equation*}
+\hat{x}_k=\left(\begin{array} {c} x_0\\
+                                x_1\\
+                                .\\
+                                .\\
+                                x_{N-1}\end{array}\right) \hspace{0.5cm}
+\hat{\alpha}=\left(\begin{array} {c} \alpha_0\\
+                                \alpha_1\\
+                                .\\
+                                .\\
+                                \alpha_{N-1}\end{array}\right),
+\end{equation*}
+!et
+and the matrix
+!bt
+\begin{equation*}
+   \hat{L}=\left(\begin{array} {cccc} L_0(x_0)  & L_1(x_0) &\dots &L_{N-1}(x_0)\\
+                                   L_0(x_1)  & L_1(x_1) &\dots &L_{N-1}(x_1)\\
+                                   \dots  & \dots &\dots &\dots\\
+L_0(x_{N-1})  & L_1(x_{N-1}) &\dots &L_{N-1}(x_{N-1})
+\end{array}\right).
+\end{equation*}
+!et
+
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+We have then
+!bt
+\begin{equation*}
+Q_{N-1}(\hat{x}_k) = \hat{L}\hat{\alpha},
+\end{equation*}
+!et
+yielding (if $\hat{L}$ has an inverse)
+!bt
+\begin{equation*}
+\hat{L}^{-1}Q_{N-1}(\hat{x}_k) = \hat{\alpha},
+\end{equation*}
+!et
+which is Eq. (ref{eq:lsum3}).
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+Using the above results and the fact that
+!bt
+\begin{equation*} 
+   \int_{-1}^1P_{2N-1}(x)dx=\int_{-1}^1Q_{N-1}(x)dx,
+\end{equation*}
+!et
+we get
+!bt
+\begin{equation*} 
+   \int_{-1}^1P_{2N-1}(x)dx=\int_{-1}^1Q_{N-1}(x)dx=2\alpha_0=
+   2\sum_{i=0}^{N-1}(L^{-1})_{0i}P_{2N-1}(x_i).
+\end{equation*}
+!et
+
+!split
+===== Integration points and weights with orthogonal polynomials =====
+If we identify the weights with $2(L^{-1})_{0i}$, where the points $x_i$ are
+the zeros of $L_N$, we have an integration formula of the type
+!bt
+\begin{equation*}
+   \int_{-1}^1P_{2N-1}(x)dx=\sum_{i=0}^{N-1}\omega_iP_{2N-1}(x_i)  
+\end{equation*}
+!et
+and if our function $f(x)$  can be approximated by a polynomial $P$ of degree
+$2N-1$, we have finally that
+!bt
+\begin{equation*}
+    \int_{-1}^1f(x)dx\approx \int_{-1}^1P_{2N-1}(x)dx=\sum_{i=0}^{N-1}\omega_iP_{2N-1}(x_i)  .
+\end{equation*}
+!et
+In summary, the mesh points $x_i$ are defined by the zeros of an orthogonal polynomial of degree $N$, that is 
+$L_N$, while the weights are
+given by $2(L^{-1})_{0i}$. 
+
+
+!split
+===== Application to the case $N=2$ =====
+
+Let us apply the above formal results to the case $N=2$. 
+This means that we can approximate a function $f(x)$ with a
+polynomial $P_3(x)$ of order $2N-1=3$. 
+
+The mesh points are the zeros of $L_2(x)=1/2(3x^2-1)$. 
+These points are $x_0=-1/\sqrt{3}$ and $x_1=1/\sqrt{3}$.
+
+Specializing Eq. (ref{eq:lsum2})
+
+!bt
+\begin{equation*} 
+  Q_{N-1}(x_k)=\sum_{i=0}^{N-1}\alpha_iL_i(x_k) \hspace{1cm} k=0,1,\dots, N-1.
+\end{equation*}
+!et
+to $N=2$ yields
+
+!bt
+\begin{equation*}
+   Q_1(x_0)=\alpha_0-\alpha_1\frac{1}{\sqrt{3}},
+\end{equation*}
+!et
+and
+
+!bt
+\begin{equation*}
+   Q_1(x_1)=\alpha_0+\alpha_1\frac{1}{\sqrt{3}},
+\end{equation*}
+!et
+since $L_0(x=\pm 1/\sqrt{3})=1$ and $L_1(x=\pm 1/\sqrt{3})=\pm 1/\sqrt{3}$. 
+
+
+!split
+===== Application to the case $N=2$ =====
+The matrix $L_{ik}$ defined in Eq. (ref{eq:lsum2}) is then
+
+!bt
+\begin{equation*}
+   \hat{L}=\left(\begin{array} {cc} 1  & -\frac{1}{\sqrt{3}}\\
+                                   1  & \frac{1}{\sqrt{3}}\end{array}\right),
+\end{equation*}
+!et
+with an inverse given by
+
+!bt
+\begin{equation*}
+   \hat{L}^{-1}=\frac{\sqrt{3}}{2}\left(\begin{array} {cc} \frac{1}{\sqrt{3}}  & \frac{1}{\sqrt{3}}\\
+                                   -1  & 1\end{array}\right).
+\end{equation*}
+!et
+The weights are given by the matrix elements $2(L_{0k})^{-1}$. We have thence
+$\omega_0=1$ and $\omega_1=1$. 
+
+!split
+===== Application to the case $N=2$ =====
+Obviously, there is no problem in changing the numbering of the matrix elements $i,k=0,1,2,\dots,N-1$ to
+$i,k=1,2,\dots,N$.  We have chosen to start from zero, since we deal with polynomials of degree $N-1$.
+
+Summarizing, for Legendre polynomials with $N=2$ we have
+weights
+!bt
+\begin{equation*}
+   \omega : \left\{1,1\right\},
+\end{equation*}
+!et
+and mesh points
+
+!bt
+\begin{equation*}
+   x : \left\{-\frac{1}{\sqrt{3}},\frac{1}{\sqrt{3}}\right\}.
+\end{equation*}
+!et
+
+!split
+===== Application to the case $N=2$ =====
+If we wish to integrate
+!bt
+\begin{equation*}
+   \int_{-1}^1f(x)dx,
+\end{equation*}
+!et
+with $f(x)=x^2$, we approximate
+!bt
+\begin{equation*} 
+   I=\int_{-1}^1x^2dx \approx \sum_{i=0}^{N-1}\omega_ix_i^2.  
+\end{equation*}
+!et
+
+!split
+===== Application to the case $N=2$ =====
+The exact answer is $2/3$. Using $N=2$ with the above two weights 
+and mesh points we get
+
+!bt
+\begin{equation*} 
+   I=\int_{-1}^1x^2dx =\sum_{i=0}^{1}\omega_ix_i^2=\frac{1}{3}+\frac{1}{3}=\frac{2}{3},  
+\end{equation*}
+!et
+the exact answer!
+
+If we were to emply the trapezoidal rule we would get
+
+!bt
+\begin{equation*} 
+   I=\int_{-1}^1x^2dx =\frac{b-a}{2}\left((a)^2+(b)^2\right)/2=
+                       \frac{1-(-1)}{2}\left((-1)^2+(1)^2\right)/2=1!
+\end{equation*}
+!et
+With just two points we can calculate exactly the integral for a second-order
+polynomial since our methods approximates the exact function with higher
+order polynomial. 
+How many points do you need with the trapezoidal rule in order to achieve a
+similar accuracy?
+
+
+!split
+===== Back to Hermite polynomials and our type of integrals  =====
+!bblock 
+Our type of integrals will involve expressions on the form (in one dimension as an example)
+!bt
+\[
+I = \int_{-\infty}^{\infty}\exp{(-x^2/2)}f(x)dx.
+\]
+!et
+When we use Gauss-Hermite quadrature, the exponential function is absorbed into the weight points. We need however to keep in mind that the basic form is given by
+!bt
+\[
+I = \int_{-\infty}^{\infty}\exp{(-x^2)}g(x)dx\approx \sum_{i=1}^nw_ig(x_i).
+\]
+!et
+This means that we need to make a change of variables $u^2=x^2/2$ in the first equation so that we end up with 
+!bt
+\[
+I = \int_{-\infty}^{\infty}\exp{(-x^2/2)}f(x)dx=\sqrt{2}\int_{-\infty}^{\infty}\exp{(-u^2)}f(\sqrt{2}u)du\approx \sqrt{2}\sum_{i=1}^nw_if(\sqrt{2}u_i).
+\]
+!et
+For Gauss-Hermite quadrature, the weights have a simple analytic expression in terms of Hermite polynomials
+!bt
+\[
+w_i = \frac{2^{n1}n!\sqrt{\pi}}{n^2[H_{n-1}(x_i)]^2}.
+\]
+!et
+
+!eblock
+
+!split
+===== Our integrals  =====
+!bblock 
+We will need to deal with following type of four dimensional integrals
+!bt
+\[
+\langle pq \vert \hat{v} \vert rs \rangle = A\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \exp{[-(x_1^2+x_2^2+y_1^2+y_2^2)/2]}f(x_1,y_1,x_2,y_2)dx_1dy_1dx_2dy_2,
+\]
+!et
+where $A$ is a normalization constant and 
+!bt
+\[
+f(x_1,y_1,x_2,y_2) = H_{n_{x_p}}(x_1)H_{n_{y_p}}(y_1)H_{n_{x_q}}(x_2)H_{n_{y_r}}(y_2)H_{n_{x_r}}(x_1)H_{n_{y_r}}(y_1)H_{n_{x_s}}(x_2)H_{n_{y_s}}(y_2)\frac{1}{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2}},
+\]
+!et
+where $H_n$ are the various Hermite polynomials. 
+For the case where all $n_{x,y}=0$ the above integral simplifies to
+!bt
+\[
+\langle pq \vert \hat{v} \vert rs \rangle = A\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \frac{\exp{[-(x_1^2+x_2^2+y_1^2+y_2^2)/2]} }{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2}}dx_1dy_1dx_2dy_2.
+\]
+!et
+Changing from the laboratory frame to the relative and center of mass frame, with 
+!bt
+\[
+\bm{R} = \frac{\bf{r}_1+\bm{r}_2}{2} \hspace{1cm} \bm{r} = \bf{r}_1-\bm{r}_2 
+\]
+!et
+and introducing polar coordinates the above integral can be written as 
+!bt
+\[
+I = 4\pi^2 A\int_{0}^{\infty}\exp{(-R^2)}RdR \int_{0}^{\infty} \exp{(-r^2)}rdr\frac{1}{r}=2A\pi^{5/2}. 
+\]
+!et
+This provides a useful check of our program. 
+
+!eblock
+
+
+
+
+
 !split
 ===== Reminder on Variational Calculus and Lagrangian Multipliers  =====
 !bblock 
@@ -1862,6 +2792,9 @@ It means that we can rewrite the Hartree-Fock Hamiltonian as
 \]
 !et
 It is convenient to use the density matrix since we can precalculate in every iteration the product of two eigenvector components $C$. 
+
+
+
 
 
 
