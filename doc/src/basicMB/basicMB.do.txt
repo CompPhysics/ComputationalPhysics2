@@ -2002,8 +2002,160 @@ This provides a useful check of our program.
 !eblock
 
 
+!split
+===== Our integrals  =====
+!bblock 
+The integral
+!bt
+\[
+\langle pq \vert \hat{v} \vert rs \rangle = A\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \exp{[-(x_1^2+x_2^2+y_1^2+y_2^2)/2]}f(x_1,y_1,x_2,y_2)dx_1dy_1dx_2dy_2,
+\]
+!et
+can be calculate in analytical form if we switch to polar coordinates. 
+
+!eblock
 
 
+!split
+===== Single-particle functions in polar coordinates  =====
+
+Instead of Hermite polynomials which we will need for the Variational Monte Carlo, it is more convenient for the Hartree-Fock calculations to use polar coordinates.
+
+
+Using polar coordinates
+!bt
+\begin{align}
+x &= r \cos \theta \\
+y &= r \sin \theta \\
+r &= \sqrt{x^2 + y^2},
+\end{align}
+!et
+the normalized solution for the angular part in two dimensions is
+!bt
+\[
+Y(\theta) = \frac{1}{\sqrt{2\pi}} e^{im\theta}
+  \label{normalized angular part}
+\]
+!et
+
+The total wavefunction must satisfy the physical condition that $\psi(r,\theta) = \psi(r,\theta+2\pi)$ This makes a restriction on the quantum number $m$ which can take integral values
+!bt
+\[
+m = 0, \pm 1, \pm 2, ...
+\]
+!et
+
+!split 
+===== Eigenfunctions in two dimensions =====
+
+The time-independent part of the wave function  is separated in an angular and a radial part
+!bt
+\[
+\psi(r,\theta) = R(r) \frac{1}{\sqrt{2\pi}} e^{im\theta}, \qquad m=0,\pm 1, \pm 2,... 
+\]
+!et
+
+The solution of the radial equation is
+!bt
+\[
+R_{nm}(r) = \sqrt{\frac{2n!}{(n+|m|)!}}\beta^{\frac{1}{2}(|m|+1)}r^{|m|}e^{-\frac{1}{2}\beta r^2} L_n^{|m|} (\beta r^2)
+\]
+!et
+Here the subscript $n$ denote the principal quantum number, and $m$ is the angular momentum number
+!bt
+\begin{align}
+  n &= 0, 1, 2, 3, .... \\
+  m &= 0, \pm 1, \pm, 2, \pm 3,...
+\end{align}
+!et
+$L_n^{|m|}$ is the associated Laguerre polynomials discussed above, and $\beta$ is defined as
+!bt
+\[
+\beta = \frac{m\omega}{\hbar}
+\]
+!et
+
+
+!split
+===== Final expression for the eigenfunction =====
+
+The final eigenfunction for an electron moving in a two-dimensional harmonic oscillator is then
+!bt
+\[
+ \psi(r,\theta) = \sqrt{\frac{n!}{\pi(n+|m|)!}}\beta^{\frac{1}{2}(|m|+1)}r^{|m|}e^{-\frac{1}{2}\beta r^2} L_n^{|m|} (\beta r^2) e^{im\theta},
+\]
+!et
+with the  eigenvalue
+!bt
+\[
+E = \hbar \omega(2n+|m|+1)
+\]
+!et
+which is the same as the energy with cartesian coordinates but now in terms of $n_x$ and $n_y$, that is
+!bt
+\[
+E = \hbar \omega(n_x+n_y+1).
+\]
+!et
+
+!split
+===== Program for computing the Coulomb interaction in polar coordinates =====
+
+The program is based on the analytical expression given by "Anisimova and Matulis":"http://iopscience.iop.org/article/10.1088/0953-8984/10/3/013/pdf". It returns the value of the integral (without checking for spin values, you need to add this test) using as input the quantum numbers
+$n_i$ and $m_i$, that is 
+!bt
+\[
+\langle pq \vert \hat{v} \vert rs \rangle =\langle (n_pm_p)(n_qm_q) \vert \hat{v} \vert (n_rm_r)(n_sm_s) \rangle, 
+\]
+!et  
+and the main code is (click on the above link for the full code)
+!bc cppcod
+#include "Coulomb_Functions.hpp"
+
+int main(int argc, char * argv[])
+{
+  if(argc != 10){ std::cerr << "Wrong Input: should be ./QD_Coulomb  hw  n1  ml1  n2  ml2  n3  ml3  n4  ml4" << std::endl; exit(1); }
+  double hw = std::atof(argv[1]);
+  int n1 = std::atoi(argv[2]);
+  int ml1 = std::atoi(argv[3]);
+  int n2 = std::atoi(argv[4]);
+  int ml2 = std::atoi(argv[5]);
+  int n3 = std::atoi(argv[6]);
+  int ml3 = std::atoi(argv[7]);
+  int n4 = std::atoi(argv[8]);
+  int ml4 = std::atoi(argv[9]);
+
+  double TBME = Coulomb_HO(hw, n1, ml1, n2, ml2, n3, ml3, n4, ml4);
+  std::cout << std::setprecision(12);
+  std::cout << "< " << n1 << "," << ml1 << " ; " << n2 << "," << ml2 << " || V || " << n3 << "," << ml3 << " ; " << n4 << "," << ml4 << " > = " << TBME << std::endl;
+  
+  return 0;
+}
+!ec
+
+!split
+===== Conserved quantum numbers =====
+
+When setting up the matrix elements 
+!bt
+\[
+\langle pq \vert \hat{v} \vert rs \rangle =\langle (n_pm_p)(n_qm_q) \vert \hat{v} \vert (n_rm_r)(n_sm_s) \rangle, 
+\]
+!et  
+you need to take into account that there are conserved two-electron quantum numbers since the Hamiltonian is invariant under rotations, namely
+!bt
+\[
+m_p+m_q = M = m_r+m_s,
+\]
+!et
+and the total spin projection which is not included in the above code. You need to add this as a test, that is check that
+!bt
+\[
+\sigma_p+\sigma_q = S_z = \sigma_r+\sigma_s.
+\]
+!et
+Finally, you need to ensure that the single-particle spinors satisfy  $\sigma_p=\sigma_r$ 
+and $\sigma_q=\sigma_s$. Pay in particular attention to this when you compute the exchange matrix elements. 
 
 !split
 ===== Reminder on Variational Calculus and Lagrangian Multipliers  =====
