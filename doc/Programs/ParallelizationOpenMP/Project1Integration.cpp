@@ -29,7 +29,7 @@ int main (int argc, char* argv[])
   int thread_num;
   double wtime;
   cout << "  Compute 4d-integral using Gaussian quadrature with Hermite quadrature." << endl;
-  omp_set_num_threads(8);
+  omp_set_num_threads(4);
   thread_num = omp_get_max_threads ();
   cout << "  The number of processors available = " << omp_get_num_procs () << endl ;
   cout << "  The number of threads available    = " << thread_num <<  endl;
@@ -47,10 +47,12 @@ int main (int argc, char* argv[])
 // The other variables are given by zeroth-order Hermite polynomials.
 double Integrand(double x1, double y1, double x2, double y2)
 {
-  if  (2.0*(x1-x2)*(x1-x2)+2.0*(y1-y2)*(y1-y2) != 0.0)
-    return 4.0/(sqrt(2.0*(x1-x2)*(x1-x2)+2.0*(y1-y2)*(y1-y2)));
-  else
-    return 0.0;
+  return 4*x1*x1;  //  (H_1(x)*H_1(x), h_1(x) = 2x, the other polynomials are H_0(x) = 1
+  //   final result   2 * sqrt(pi)^4  = 2 * pi^2
+  //  if  (2.0*(x1-x2)*(x1-x2)+2.0*(y1-y2)*(y1-y2) != 0.0)
+  //  return 4.0/(sqrt(2.0*(x1-x2)*(x1-x2)+2.0*(y1-y2)*(y1-y2)));
+  //else
+  //  return 0.0;
 }
 
 //Plain Gauss-Hermite integration with cartesian variables, brute force
