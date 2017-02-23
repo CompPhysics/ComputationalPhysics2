@@ -3055,5 +3055,265 @@ if __name__ == '__main__':
 !ec
 
 
+!split 
+===== Practicalities with the Hartree-Fock code development, basis construction =====
+When  setting up the Hartree-Fock algorithm you will find it convenient to number the basis states
+by filling the lowest subshells. For the first two shells we could then have the following mapping.
+!bt
+\begin{align*}
+  \vert 0\rangle & = \{n=0, m=0, m_s = -0.5\} \\ 
+  \vert 1\rangle & = \{n=0, m=0, m_s = 0.5\} \\
+  \vert 2\rangle & = \{n=0, m=-1, m_s = -0.5\} \\
+  \vert 3\rangle & = \{n=0, m=-1, m_s = 0.5\} \\
+  \vert 4\rangle & = \{n=0, m=+1, m_s = -0.5\} \\
+  \vert 5\rangle & = \{n=0, m=+1, m_s = 0.5\}   
+\end{align*}
+!et
+
+!split 
+===== Practicalities with the Hartree-Fock code development, two-body basis construction, brute force =====
+In the setup of the two-body matrix elements we can typically opt between two alternatives. We can read the matrix elements from file or calculate the matrix elements on the fly. The latter requires simply that we 
+call the abovementioned function for setting up the two-body matrix elements when we run our Hartree-Fock code. 
+
+If we however wish to read from file, we can store the matrix elements in two ways:
+* Brute force
+* Organize according to conserved two-body quantum numbers
+
+The brute force way is easy to implement. 
+
+!split 
+===== Two-body interaction, brute force part I =====
+We can read in from file the two-body interaction matrix elements or compute once and for all and store in
+memory.
+The elements are
+!bt
+\[
+\langle pr | \hat{v}|qs\rangle.
+\]
+!et
+
+The time-consuming part in the Hartree-Fock calculations
+involves the calculation of the two-body matrix. Furthermore, the
+storage of these matrix elements plays also an important role, in
+particular we wish to access the table of matrix elements as fast as
+possible.  
+
+!split 
+===== Two-body interaction, brute force part II =====
+In a brute force algorithm for storing the matrix elements, if we have $d$ basis functions, we end up with the need of storing 
+$d^4$ matrix elements. We can reduce this considerably by the following considerations.
+In the calculation of the two-body matrix elements $\langle pr | \hat{v}|qs\rangle$ we have the following symmetries
+
+o  Invariance under permutations, that is
+!bt
+\[
+\langle pq | \hat{v}|rs\rangle = \langle qp | \hat{v}|sr\rangle.
+\]
+!et
+o  The functions entering the evaluation of the integrals are all real, meaning that if we interchange $p\leftrightarrow q$ or  $r\leftrightarrow s$, we end up with the same matrix element.
+
+This reduces by a factor of eight the total number of matrix elements to be stored if we also use that 
+we can store only for $p < q$ and $ r < s$. 
 
 
+!split 
+===== Two-body interaction, brute force part III =====
+
+Furthermore, in setting up a table for the two-body matrix elements we can convert the need of using four indices $pqrs$ of 
+!bt
+\[
+\langle pr | \hat{v}|qs\rangle,
+\]
+!et
+ which in a brute forces way could be coded as a four-dimensional array, to 
+a two-dimensional array $V_{lm}$, where $l$ and $m$ stand for all possible two-body configurations $pq$.
+ 
+Each number $l$ and $m$ in $V_{lm}$  should then point to a set of single-particle  states $(p,q)$ and $(r,s)$.  
+
+In our case, since we have 
+symmetries which allow us to set $p\le q$, we have, with $d$ single particle states a total of $d(d+1)/2$ two-body configurations.
+
+!split 
+===== Two-body interaction, brute force part IV =====
+
+How do we store such a matrix? The simplest thing to do is to convert it into a one-dimensional array. How do we achieve that? 
+
+We now have a matrix $V$ of dimension $n\times n$ and we want to store the elements $V_{lm}$ as a one-dimensional array $A$ using
+$0 \le l \le m \le n-1$. For
+o $l=0$ we have $n$ elements
+o $l=1$ we have $n-1$ elements
+o $\dots$
+o $l=\nu$ we have $n-\nu$ elements
+o $\dots$
+o $l=n-1$ we have $1$ element,
+and the total number is  
+!bt
+\[
+\sum_{\nu =0}^{n-1}\left(n-\nu\right)=\frac{n(n+1)}{2}.
+\] 
+!et
+
+
+!split 
+===== Two-body interaction, brute force part V =====
+
+To find the number ($\mathrm{number}(l,m)$) in a one-dimensional array $A$ which corresponds to a matrix element $V_{lm}$, we note that
+!bt
+\[
+\mathrm{number}(l,m)=\sum_{\nu =0}^{l-1}\left(n-\nu\right)+m-l=\frac{l(2n-l-1)}{2}+m.
+\] 
+!et
+The first matrix element $V(0,0)$ is obviously given by the element $A(0)$. 
+
+We have thus reduced a four dimensional array to a one-dimensional array, where the given pairs $(p,q)$ and $(r,s)$ point to the matrix indices $l$
+and $m$, respectively. The latter are used to find the explicit number $\mathrm{number}(l,m)$ which points to the desired matrix element stored 
+in a one-dimensional array.
+
+
+!split 
+===== Practicalities with the Hartree-Fock code development, two-body basis construction =====
+
+Another way to store the matrix elements is to organize the matrix elements according to conserved quantum numbers.
+This means setting up a block structure and to look up matrix elements using two-body conserved quantum numbers.
+For quantum dots, the two-body quantum numbers that are conserved are
+The total orbital momentum projection
+!bt
+\[
+M = m_1 + m_2,
+\]
+!et
+and the total spin projection
+!bt
+\[
+M_s = m_{s_1} + m_{s_2}
+\]
+!et
+
+!split 
+===== Two-body basis construction =====
+
+For 2 shells we have
+
+|-------------------------------------|
+|$M$ | $M_s$ | $\alpha$ | State|
+|-------------------------------------|
+| -2 |  0 |  1  |$\vert 3,2\rangle$ |
+| -1 | -1  | 3  |$\vert 2,0\rangle$ |
+| -1 |  0 |  4  |$\vert 3,0\rangle$ |
+| -1 |  0  | 4  |$\vert 2,1\rangle$ |
+| -1 |  1 |  5  |$\vert 3,1\rangle$ |
+|  0 | -1 |  6  |$\vert 4,2\rangle$ |
+|  0 |  0 |  7  |$\vert 1,0\rangle$ |
+|  0 |  0 | 7   |$\vert 5,2\rangle$ |
+|  0 |  0 | 7   |$\vert 4,3\rangle$|
+|  0 |  1 |  8  |$\vert 5,3\rangle$|
+|  1 | -1 |  9  |$\vert 4,0\rangle$ |
+|  1 |  0 | 10  |$\vert 5,0\rangle$|
+|  1 |  0 | 10  |$\vert 4,1\rangle$|
+|  1 |  1 |  11 |$\vert 5,1\rangle$ |
+|  2 |  0 | 13  |$\vert 5,4\rangle$ |
+|-------------------------------------|
+
+In this table we have paired orbitals with same $M$ and $M_s$. Where $\alpha \in \{0,...,N\}$ and $N$ is the number of pairs $\{M,M_s\}$. Notice that for $\alpha = 1$ we only have one pair, and for $\alpha = 4$, we have two pairs.
+
+
+
+!split 
+===== Hartree-Fock code =====
+In developing our Hartree-Fock code, we can define a configuration class with the following mapping for a single-particle state
+!bt
+\[
+  \vert \alpha\rangle \rightarrow \vert n m m_s\rangle,
+\]
+!et
+and a similar mapping for a two-body state
+!bt
+\[
+  \vert \alpha \beta\rangle \rightarrow \vert M M_s\rangle,
+\]
+!et
+where $M$ is the total angualar momentum 
+!bt
+\[
+M = m_\alpha + m_\beta,
+\]
+!et
+and the $M_s$ is the total spin
+!bt
+\[
+M_s = m_{s_1} + m_{s_2}.
+\]
+!et
+
+
+
+!split 
+===== Hartree-Fock code, setting up tables of matrix elements  =====
+The single-particle part is diagonal for the harmonic oscillator basis, that is
+!bt
+\[
+\langle \alpha\vert \hat{h}_0\vert \beta\rangle = \delta_{\alpha \beta} \epsilon_\alpha
+\]
+!et
+with 
+!bt
+\[
+\epsilon_\alpha  = \hbar\omega (2n_{\alpha}+\vert m_{\alpha}\vert +1).
+\]
+!et
+The two-body matrix elements are diagonal in the $M$ and $M_s$, that is
+!bt
+\[
+  \langle M M_s\vert \hat{v}\vert M' M_s'\rangle = \delta_{M,M'}\delta_{M_s,M_s'}\langle MM_s\vert \hat{v}\vert MM_s\rangle.
+\]
+!et
+
+
+!split 
+===== Example calculations, $N=6$ and $\omega =1.0$ a.u.  =====
+
+We list here some selected Hartree-Fock results for $N=6$ electrons as function of the number of major shells $R$
+included. Here we have $\omega =1$ a.u.
+
+|--------------------------------------------------|
+|    $R$      |   $E_0^{HF}$                       |
+|--------------------------------------------------|
+|3 | 21.59320 |
+|4 | 20.76692 |
+|5 | 20.7484 |
+|6 | 20.72026 |
+|7 | 20.72013 |
+|8 | 20.71925 |
+|9 | 20.71925 |
+|10 | 20.71922 |
+|11 | 20.71922 |
+|12 |20.71922 |
+| 13 | 20.71922 |
+|--------------------------------------------------|
+
+The results are practically converged for approximately $R=10-13$. 
+
+
+
+!split 
+===== Example calculations, $N=6$ and $\omega =0.1$ a.u.  =====
+
+We list here some selected Hartree-Fock results for $N=6$ electrons as function of the number of major shells $R$
+included. Here we have $\omega =0.1$ a.u.
+
+|--------------------------------------------------|
+|    $R$      |   $E_0^{HF}$                       |
+|--------------------------------------------------|
+|4 | 4.01979   |
+| 5 | 3.96315  |
+| 6 | 3.87062  |
+| 7 | 3.86314  |
+| 8 | 3.85288  |
+| 9 | 3.85259  |
+| 10 | 3.85239 |
+| 11 | 3.85239 |
+| 12 | 3.85238 |
+| 13 | 3.85238 |
+|--------------------------------------------------|
+
+Again, the results are practically converged for approximately $R=10-13$. 

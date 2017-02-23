@@ -315,7 +315,53 @@ div { text-align: justify; text-justify: inter-word; }
               ('"Program for computing the Coulomb interaction in polar coordinates":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/HFcode/python/hf.py"',
                2,
                None,
-               '___sec125')]}
+               '___sec125'),
+              ('Practicalities with the Hartree-Fock code development, basis construction',
+               2,
+               None,
+               '___sec126'),
+              ('Practicalities with the Hartree-Fock code development, two-body basis construction, brute force',
+               2,
+               None,
+               '___sec127'),
+              ('Two-body interaction, brute force part I',
+               2,
+               None,
+               '___sec128'),
+              ('Two-body interaction, brute force part II',
+               2,
+               None,
+               '___sec129'),
+              ('Two-body interaction, brute force part III',
+               2,
+               None,
+               '___sec130'),
+              ('Two-body interaction, brute force part IV',
+               2,
+               None,
+               '___sec131'),
+              ('Two-body interaction, brute force part V',
+               2,
+               None,
+               '___sec132'),
+              ('Practicalities with the Hartree-Fock code development, two-body basis construction',
+               2,
+               None,
+               '___sec133'),
+              ('Two-body basis construction', 2, None, '___sec134'),
+              ('Hartree-Fock code', 2, None, '___sec135'),
+              ('Hartree-Fock code, setting up tables of matrix elements',
+               2,
+               None,
+               '___sec136'),
+              ('Example calculations, $N=6$ and $\\omega =1.0$ a.u.',
+               2,
+               None,
+               '___sec137'),
+              ('Example calculations, $N=6$ and $\\omega =0.1$ a.u.',
+               2,
+               None,
+               '___sec138')]}
 end of tocinfo -->
 
 <body>
@@ -3588,6 +3634,302 @@ Here we show a simple code in python for a Hartree-Fock calculation using precal
 		hf_count += <span style="color: #B452CD">1</span>
 </pre></div>
 <p>
+<!-- !split  -->
+
+<h2 id="___sec126">Practicalities with the Hartree-Fock code development, basis construction </h2>
+When  setting up the Hartree-Fock algorithm you will find it convenient to number the basis states
+by filling the lowest subshells. For the first two shells we could then have the following mapping.
+$$
+\begin{align*}
+  \vert 0\rangle & = \{n=0, m=0, m_s = -0.5\} \\ 
+  \vert 1\rangle & = \{n=0, m=0, m_s = 0.5\} \\
+  \vert 2\rangle & = \{n=0, m=-1, m_s = -0.5\} \\
+  \vert 3\rangle & = \{n=0, m=-1, m_s = 0.5\} \\
+  \vert 4\rangle & = \{n=0, m=+1, m_s = -0.5\} \\
+  \vert 5\rangle & = \{n=0, m=+1, m_s = 0.5\}   
+\end{align*}
+$$
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec127">Practicalities with the Hartree-Fock code development, two-body basis construction, brute force </h2>
+In the setup of the two-body matrix elements we can typically opt between two alternatives. We can read the matrix elements from file or calculate the matrix elements on the fly. The latter requires simply that we 
+call the abovementioned function for setting up the two-body matrix elements when we run our Hartree-Fock code.
+
+<p>
+If we however wish to read from file, we can store the matrix elements in two ways:
+
+<ul>
+<li> Brute force</li>
+<li> Organize according to conserved two-body quantum numbers</li>
+</ul>
+
+The brute force way is easy to implement.
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec128">Two-body interaction, brute force part I </h2>
+We can read in from file the two-body interaction matrix elements or compute once and for all and store in
+memory.
+The elements are
+$$
+\langle pr | \hat{v}|qs\rangle.
+$$
+
+<p>
+The time-consuming part in the Hartree-Fock calculations
+involves the calculation of the two-body matrix. Furthermore, the
+storage of these matrix elements plays also an important role, in
+particular we wish to access the table of matrix elements as fast as
+possible.
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec129">Two-body interaction, brute force part II </h2>
+In a brute force algorithm for storing the matrix elements, if we have \( d \) basis functions, we end up with the need of storing 
+\( d^4 \) matrix elements. We can reduce this considerably by the following considerations.
+In the calculation of the two-body matrix elements \( \langle pr | \hat{v}|qs\rangle \) we have the following symmetries
+
+<ol>
+<li> Invariance under permutations, that is</li>
+</ol>
+
+$$
+\langle pq | \hat{v}|rs\rangle = \langle qp | \hat{v}|sr\rangle.
+$$
+
+
+<ol>
+<li> The functions entering the evaluation of the integrals are all real, meaning that if we interchange \( p\leftrightarrow q \) or  \( r\leftrightarrow s \), we end up with the same matrix element.</li>
+</ol>
+
+This reduces by a factor of eight the total number of matrix elements to be stored if we also use that 
+we can store only for \( p < q \) and $ r < s$.
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec130">Two-body interaction, brute force part III </h2>
+
+<p>
+Furthermore, in setting up a table for the two-body matrix elements we can convert the need of using four indices \( pqrs \) of 
+$$
+\langle pr | \hat{v}|qs\rangle,
+$$
+
+ which in a brute forces way could be coded as a four-dimensional array, to 
+a two-dimensional array \( V_{lm} \), where \( l \) and \( m \) stand for all possible two-body configurations \( pq \).
+
+<p>
+Each number \( l \) and \( m \) in \( V_{lm} \)  should then point to a set of single-particle  states \( (p,q) \) and \( (r,s) \).
+
+<p>
+In our case, since we have 
+symmetries which allow us to set \( p\le q \), we have, with \( d \) single particle states a total of \( d(d+1)/2 \) two-body configurations.
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec131">Two-body interaction, brute force part IV </h2>
+
+<p>
+How do we store such a matrix? The simplest thing to do is to convert it into a one-dimensional array. How do we achieve that?
+
+<p>
+We now have a matrix \( V \) of dimension \( n\times n \) and we want to store the elements \( V_{lm} \) as a one-dimensional array \( A \) using
+\( 0 \le l \le m \le n-1 \). For
+
+<ol>
+<li> \( l=0 \) we have \( n \) elements</li>
+<li> \( l=1 \) we have \( n-1 \) elements</li>
+<li> \( \dots \)</li>
+<li> \( l=\nu \) we have \( n-\nu \) elements</li>
+<li> \( \dots \)</li>
+<li> \( l=n-1 \) we have \( 1 \) element,</li>
+</ol>
+
+and the total number is  
+$$
+\sum_{\nu =0}^{n-1}\left(n-\nu\right)=\frac{n(n+1)}{2}.
+$$
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec132">Two-body interaction, brute force part V </h2>
+
+<p>
+To find the number (\( \mathrm{number}(l,m) \)) in a one-dimensional array \( A \) which corresponds to a matrix element \( V_{lm} \), we note that
+$$
+\mathrm{number}(l,m)=\sum_{\nu =0}^{l-1}\left(n-\nu\right)+m-l=\frac{l(2n-l-1)}{2}+m.
+$$
+
+The first matrix element \( V(0,0) \) is obviously given by the element \( A(0) \).
+
+<p>
+We have thus reduced a four dimensional array to a one-dimensional array, where the given pairs \( (p,q) \) and \( (r,s) \) point to the matrix indices \( l \)
+and \( m \), respectively. The latter are used to find the explicit number \( \mathrm{number}(l,m) \) which points to the desired matrix element stored 
+in a one-dimensional array.
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec133">Practicalities with the Hartree-Fock code development, two-body basis construction </h2>
+
+<p>
+Another way to store the matrix elements is to organize the matrix elements according to conserved quantum numbers.
+This means setting up a block structure and to look up matrix elements using two-body conserved quantum numbers.
+For quantum dots, the two-body quantum numbers that are conserved are
+The total orbital momentum projection
+$$
+M = m_1 + m_2,
+$$
+
+and the total spin projection
+$$
+M_s = m_{s_1} + m_{s_2}
+$$
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec134">Two-body basis construction </h2>
+
+<p>
+For 2 shells we have
+
+<p>
+<table border="1">
+<thead>
+<tr><td align="center">\( M \)</td> <td align="center">\( M_s \)</td> <td align="center">\( \alpha \)</td> <th align="center">        State         </th> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   -2         </td> <td align="center">   0            </td> <td align="center">   1               </td> <td align="center">   \( \vert 3,2\rangle \)    </td> </tr>
+<tr><td align="center">   -1         </td> <td align="center">   -1           </td> <td align="center">   3               </td> <td align="center">   \( \vert 2,0\rangle \)    </td> </tr>
+<tr><td align="center">   -1         </td> <td align="center">   0            </td> <td align="center">   4               </td> <td align="center">   \( \vert 3,0\rangle \)    </td> </tr>
+<tr><td align="center">   -1         </td> <td align="center">   0            </td> <td align="center">   4               </td> <td align="center">   \( \vert 2,1\rangle \)    </td> </tr>
+<tr><td align="center">   -1         </td> <td align="center">   1            </td> <td align="center">   5               </td> <td align="center">   \( \vert 3,1\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   -1           </td> <td align="center">   6               </td> <td align="center">   \( \vert 4,2\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   0            </td> <td align="center">   7               </td> <td align="center">   \( \vert 1,0\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   0            </td> <td align="center">   7               </td> <td align="center">   \( \vert 5,2\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   0            </td> <td align="center">   7               </td> <td align="center">   \( \vert 4,3\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   1            </td> <td align="center">   8               </td> <td align="center">   \( \vert 5,3\rangle \)    </td> </tr>
+<tr><td align="center">   1          </td> <td align="center">   -1           </td> <td align="center">   9               </td> <td align="center">   \( \vert 4,0\rangle \)    </td> </tr>
+<tr><td align="center">   1          </td> <td align="center">   0            </td> <td align="center">   10              </td> <td align="center">   \( \vert 5,0\rangle \)    </td> </tr>
+<tr><td align="center">   1          </td> <td align="center">   0            </td> <td align="center">   10              </td> <td align="center">   \( \vert 4,1\rangle \)    </td> </tr>
+<tr><td align="center">   1          </td> <td align="center">   1            </td> <td align="center">   11              </td> <td align="center">   \( \vert 5,1\rangle \)    </td> </tr>
+<tr><td align="center">   2          </td> <td align="center">   0            </td> <td align="center">   13              </td> <td align="center">   \( \vert 5,4\rangle \)    </td> </tr>
+</tbody>
+</table>
+<p>
+In this table we have paired orbitals with same \( M \) and \( M_s \). Where \( \alpha \in \{0,...,N\} \) and \( N \) is the number of pairs \( \{M,M_s\} \). Notice that for \( \alpha = 1 \) we only have one pair, and for \( \alpha = 4 \), we have two pairs.
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec135">Hartree-Fock code </h2>
+In developing our Hartree-Fock code, we can define a configuration class with the following mapping for a single-particle state
+$$
+  \vert \alpha\rangle \rightarrow \vert n m m_s\rangle,
+$$
+
+and a similar mapping for a two-body state
+$$
+  \vert \alpha \beta\rangle \rightarrow \vert M M_s\rangle,
+$$
+
+where \( M \) is the total angualar momentum 
+$$
+M = m_\alpha + m_\beta,
+$$
+
+and the \( M_s \) is the total spin
+$$
+M_s = m_{s_1} + m_{s_2}.
+$$
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec136">Hartree-Fock code, setting up tables of matrix elements  </h2>
+The single-particle part is diagonal for the harmonic oscillator basis, that is
+$$
+\langle \alpha\vert \hat{h}_0\vert \beta\rangle = \delta_{\alpha \beta} \epsilon_\alpha
+$$
+
+with 
+$$
+\epsilon_\alpha  = \hbar\omega (2n_{\alpha}+\vert m_{\alpha}\vert +1).
+$$
+
+The two-body matrix elements are diagonal in the \( M \) and \( M_s \), that is
+$$
+  \langle M M_s\vert \hat{v}\vert M' M_s'\rangle = \delta_{M,M'}\delta_{M_s,M_s'}\langle MM_s\vert \hat{v}\vert MM_s\rangle.
+$$
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec137">Example calculations, \( N=6 \) and \( \omega =1.0 \) a.u.  </h2>
+
+<p>
+We list here some selected Hartree-Fock results for \( N=6 \) electrons as function of the number of major shells \( R \)
+included. Here we have \( \omega =1 \) a.u.
+
+<p>
+<table border="1">
+<thead>
+<tr><td align="center">\( R \)</td> <td align="center">\( E_0^{HF} \)</td> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   3          </td> <td align="center">   21.59320          </td> </tr>
+<tr><td align="center">   4          </td> <td align="center">   20.76692          </td> </tr>
+<tr><td align="center">   5          </td> <td align="center">   20.7484           </td> </tr>
+<tr><td align="center">   6          </td> <td align="center">   20.72026          </td> </tr>
+<tr><td align="center">   7          </td> <td align="center">   20.72013          </td> </tr>
+<tr><td align="center">   8          </td> <td align="center">   20.71925          </td> </tr>
+<tr><td align="center">   9          </td> <td align="center">   20.71925          </td> </tr>
+<tr><td align="center">   10         </td> <td align="center">   20.71922          </td> </tr>
+<tr><td align="center">   11         </td> <td align="center">   20.71922          </td> </tr>
+<tr><td align="center">   12         </td> <td align="center">   20.71922          </td> </tr>
+<tr><td align="center">   13         </td> <td align="center">   20.71922          </td> </tr>
+</tbody>
+</table>
+<p>
+The results are practically converged for approximately \( R=10-13 \).
+
+<p>
+<!-- !split  -->
+
+<h2 id="___sec138">Example calculations, \( N=6 \) and \( \omega =0.1 \) a.u.  </h2>
+
+<p>
+We list here some selected Hartree-Fock results for \( N=6 \) electrons as function of the number of major shells \( R \)
+included. Here we have \( \omega =0.1 \) a.u.
+
+<p>
+<table border="1">
+<thead>
+<tr><td align="center">\( R \)</td> <td align="center">\( E_0^{HF} \)</td> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   4          </td> <td align="center">   4.01979           </td> </tr>
+<tr><td align="center">   5          </td> <td align="center">   3.96315           </td> </tr>
+<tr><td align="center">   6          </td> <td align="center">   3.87062           </td> </tr>
+<tr><td align="center">   7          </td> <td align="center">   3.86314           </td> </tr>
+<tr><td align="center">   8          </td> <td align="center">   3.85288           </td> </tr>
+<tr><td align="center">   9          </td> <td align="center">   3.85259           </td> </tr>
+<tr><td align="center">   10         </td> <td align="center">   3.85239           </td> </tr>
+<tr><td align="center">   11         </td> <td align="center">   3.85239           </td> </tr>
+<tr><td align="center">   12         </td> <td align="center">   3.85238           </td> </tr>
+<tr><td align="center">   13         </td> <td align="center">   3.85238           </td> </tr>
+</tbody>
+</table>
+<p>
+Again, the results are practically converged for approximately \( R=10-13 \). 
 
 <!-- ------------------- end of main content --------------- -->
 
