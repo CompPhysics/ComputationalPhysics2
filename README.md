@@ -9,4 +9,4 @@ The methods and algorithms that will be studied may vary from year to year depen
   https://piazza.com/uio.no/spring2017/fys4411/home
 
 # Recordings of lectures  2017
-  # First Lecture January 26    https://connect.uninett.no/p9qkkygco92/
+  # The lectures are available from https://www.uio.no/studier/emner/matnat/fys/FYS4411/v17/index.html
