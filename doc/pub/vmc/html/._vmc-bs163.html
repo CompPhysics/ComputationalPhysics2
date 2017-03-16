@@ -388,22 +388,27 @@ Automatically generated HTML file from DocOnce source
               ('Time Auto-correlation Function', 2, None, '___sec159'),
               ('Time Auto-correlation Function', 2, None, '___sec160'),
               ('Correlation Time', 2, None, '___sec161'),
-              ('What is blocking?', 2, None, '___sec162'),
+              ('Code to demonstrate the calculation of the autocorrelation function',
+               2,
+               None,
+               '___sec162'),
               ('What is blocking?', 2, None, '___sec163'),
               ('What is blocking?', 2, None, '___sec164'),
-              ('Implementation', 2, None, '___sec165'),
+              ('What is blocking?', 2, None, '___sec165'),
+              ('Implementation', 2, None, '___sec166'),
               ('Actual implementation with code, main function',
                2,
                None,
-               '___sec166'),
+               '___sec167'),
               ('Actual implementation with code, mean value and variance',
                2,
                None,
-               '___sec167'),
+               '___sec168'),
               ('Actual implementation with code, blocking part',
                2,
                None,
-               '___sec168')]}
+               '___sec169'),
+              ('The Bootstrap method', 2, None, '___sec170')]}
 end of tocinfo -->
 
 <body>
@@ -603,13 +608,15 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._vmc-bs160.html#___sec159" style="font-size: 80%;">Time Auto-correlation Function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs161.html#___sec160" style="font-size: 80%;">Time Auto-correlation Function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs162.html#___sec161" style="font-size: 80%;">Correlation Time</a></li>
-     <!-- navigation toc: --> <li><a href="#___sec162" style="font-size: 80%;">What is blocking?</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec162" style="font-size: 80%;">Code to demonstrate the calculation of the autocorrelation function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs164.html#___sec163" style="font-size: 80%;">What is blocking?</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs165.html#___sec164" style="font-size: 80%;">What is blocking?</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs166.html#___sec165" style="font-size: 80%;">Implementation</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs167.html#___sec166" style="font-size: 80%;">Actual implementation with code, main function</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs168.html#___sec167" style="font-size: 80%;">Actual implementation with code, mean value and variance</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs169.html#___sec168" style="font-size: 80%;">Actual implementation with code, blocking part</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs166.html#___sec165" style="font-size: 80%;">What is blocking?</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs167.html#___sec166" style="font-size: 80%;">Implementation</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs168.html#___sec167" style="font-size: 80%;">Actual implementation with code, main function</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs169.html#___sec168" style="font-size: 80%;">Actual implementation with code, mean value and variance</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs170.html#___sec169" style="font-size: 80%;">Actual implementation with code, blocking part</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs171.html#___sec170" style="font-size: 80%;">The Bootstrap method</a></li>
 
         </ul>
       </li>
@@ -625,34 +632,91 @@ MathJax.Hub.Config({
 <a name="part0163"></a>
 <!-- !split -->
 
-<h2 id="___sec162" class="anchor">What is blocking? </h2>
-<div class="panel panel-default">
-<div class="panel-body">
-<p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
+<h2 id="___sec162" class="anchor">Code to demonstrate the calculation of the autocorrelation function </h2>
+The following code computes the autocorrelation function, the covariance and the standard deviation
+for standard RNG. 
+The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking/autocorrelation.cpp" target="_self">following  file</a> gives the code.
+<p>
 
-<ul>
-    <li> Say that we have a set of samples from a Monte Carlo experiment</li>
-    <li> Assuming (wrongly) that our samples are uncorrelated our best estimate of the standard deviation of the mean \( \langle \mathbf{M}\rangle \) is given by</li>
-</ul>
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">//  This function computes the autocorrelation function for </span>
+<span style="color: #408080; font-style: italic">//  the Mersenne random number generator with a uniform distribution</span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iostream&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;fstream&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iomanip&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;cstdlib&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;random&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;armadillo&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;string&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;cmath&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span>  std;
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> arma;
+<span style="color: #408080; font-style: italic">// output file</span>
+ofstream ofile;
 
-$$
-\sigma=\sqrt{\frac{1}{n}\left(\langle \mathbf{M}^2\rangle-\langle \mathbf{M}\rangle^2\right)} 
-$$
+<span style="color: #408080; font-style: italic">//     Main function begins here     </span>
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(<span style="color: #B00040">int</span> argc, <span style="color: #B00040">char</span><span style="color: #666666">*</span> argv[])
+{
+  <span style="color: #B00040">int</span> MonteCarloCycles;
+  string filename;
+  <span style="color: #008000; font-weight: bold">if</span> (argc <span style="color: #666666">&gt;</span> <span style="color: #666666">1</span>) {
+    filename<span style="color: #666666">=</span>argv[<span style="color: #666666">1</span>];
+    MonteCarloCycles <span style="color: #666666">=</span> atoi(argv[<span style="color: #666666">2</span>]);
+    string fileout <span style="color: #666666">=</span> filename;
+    string argument <span style="color: #666666">=</span> to_string(MonteCarloCycles);
+    fileout.append(argument);
+    ofile.open(fileout);
+  }
 
+  <span style="color: #408080; font-style: italic">// Compute the variance and the mean value of the uniform distribution</span>
+  <span style="color: #408080; font-style: italic">// Compute also the specific values x for each cycle in order to be able to</span>
+  <span style="color: #408080; font-style: italic">// compute the covariance and the correlation function  </span>
 
-<ul>
-    <li> If the samples are correlated we can rewrite our results to show  that</li>
-</ul>
+  vec X  <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>vec<span style="color: #666666">&gt;</span>(MonteCarloCycles);
+  <span style="color: #B00040">double</span> MCint <span style="color: #666666">=</span> <span style="color: #666666">0.</span>;      <span style="color: #B00040">double</span> MCintsqr2<span style="color: #666666">=0.</span>;
+  std<span style="color: #666666">::</span>random_device rd;
+  std<span style="color: #666666">::</span>mt19937_64 gen(rd());
+  <span style="color: #408080; font-style: italic">// Set up the uniform distribution for x \in [[0, 1]</span>
+  std<span style="color: #666666">::</span>uniform_real_distribution<span style="color: #666666">&lt;</span><span style="color: #B00040">double</span><span style="color: #666666">&gt;</span> RandomNumberGenerator(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>);
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>;  i <span style="color: #666666">&lt;</span> MonteCarloCycles; i<span style="color: #666666">++</span>){
+    <span style="color: #B00040">double</span> x <span style="color: #666666">=</span>   RandomNumberGenerator(gen); 
+    X(i) <span style="color: #666666">=</span> x;
+    MCint <span style="color: #666666">+=</span> x;
+    MCintsqr2 <span style="color: #666666">+=</span> x<span style="color: #666666">*</span>x;
+  }
+  <span style="color: #B00040">double</span> Mean <span style="color: #666666">=</span> MCint<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles );
+  MCintsqr2 <span style="color: #666666">=</span> MCintsqr2<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles );
+  <span style="color: #B00040">double</span> STDev <span style="color: #666666">=</span> sqrt(MCintsqr2<span style="color: #666666">-</span>Mean<span style="color: #666666">*</span>Mean);
+  <span style="color: #B00040">double</span> Variance <span style="color: #666666">=</span> MCintsqr2<span style="color: #666666">-</span>Mean<span style="color: #666666">*</span>Mean;
+  <span style="color: #408080; font-style: italic">//   Write mean value and variance</span>
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; Sample variance= &quot;</span> <span style="color: #666666">&lt;&lt;</span> Variance  <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; Mean value = &quot;</span> <span style="color: #666666">&lt;&lt;</span> Mean <span style="color: #666666">&lt;&lt;</span> endl;
+  <span style="color: #408080; font-style: italic">// Now we compute the autocorrelation function</span>
+  vec autocorrelation <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>vec<span style="color: #666666">&gt;</span>(MonteCarloCycles);
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> MonteCarloCycles; j<span style="color: #666666">++</span>){
+    <span style="color: #B00040">double</span> sum <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> k <span style="color: #666666">=</span> <span style="color: #666666">0</span>; k <span style="color: #666666">&lt;</span> (MonteCarloCycles<span style="color: #666666">-</span>j); k<span style="color: #666666">++</span>){
+      sum  <span style="color: #666666">+=</span> (X(k)<span style="color: #666666">-</span>Mean)<span style="color: #666666">*</span>(X(k<span style="color: #666666">+</span>j)<span style="color: #666666">-</span>Mean); 
+    }
+    autocorrelation(j) <span style="color: #666666">=</span> sum<span style="color: #666666">/</span>Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles );
+    ofile <span style="color: #666666">&lt;&lt;</span> setiosflags(ios<span style="color: #666666">::</span>showpoint <span style="color: #666666">|</span> ios<span style="color: #666666">::</span>uppercase);
+    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> j;
+    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> autocorrelation(j) <span style="color: #666666">&lt;&lt;</span> endl;
+  }
+  <span style="color: #408080; font-style: italic">// Now compute the exact covariance using the autocorrelation function</span>
+  <span style="color: #B00040">double</span> Covariance <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> MonteCarloCycles; j<span style="color: #666666">++</span>){
+    Covariance  <span style="color: #666666">+=</span> autocorrelation(j);
+  }
+  Covariance <span style="color: #666666">*=</span>  <span style="color: #666666">2.0/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles);
+  <span style="color: #408080; font-style: italic">// Compute now the total variance, including the covariance, and obtain the standard deviation</span>
+  <span style="color: #B00040">double</span> TotalVariance <span style="color: #666666">=</span> (Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles ))<span style="color: #666666">+</span>Covariance;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Covariance =&quot;</span> <span style="color: #666666">&lt;&lt;</span> Covariance <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Totalvariance= &quot;</span> <span style="color: #666666">&lt;&lt;</span> TotalVariance <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Sample Variance/n= &quot;</span> <span style="color: #666666">&lt;&lt;</span> (Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles )) <span style="color: #666666">&lt;&lt;</span> endl;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; STD from sample variance= &quot;</span> <span style="color: #666666">&lt;&lt;</span> sqrt(Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles )) <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; STD with covariance = &quot;</span> <span style="color: #666666">&lt;&lt;</span> sqrt(TotalVariance) <span style="color: #666666">&lt;&lt;</span> endl;
 
-$$
-\sigma=\sqrt{\frac{1+2\tau/\Delta t}{n}\left(\langle \mathbf{M}^2\rangle-\langle \mathbf{M}\rangle^2\right)}
-$$
-
-      where \( \tau \) is the correlation time (the time between a sample and the next uncorrelated sample) and \( \Delta t \) is time between each sample
-</div>
-</div>
-
-
+  ofile.close();  <span style="color: #408080; font-style: italic">// close output file</span>
+  <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}  <span style="color: #408080; font-style: italic">// end of main program </span>
+</pre></div>
 <p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
@@ -675,6 +739,8 @@ $$
   <li><a href="._vmc-bs167.html">168</a></li>
   <li><a href="._vmc-bs168.html">169</a></li>
   <li><a href="._vmc-bs169.html">170</a></li>
+  <li><a href="._vmc-bs170.html">171</a></li>
+  <li><a href="._vmc-bs171.html">172</a></li>
   <li><a href="._vmc-bs164.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->

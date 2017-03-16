@@ -3933,6 +3933,94 @@ called the integrated correlation time.
 
 
 !split
+===== Code to demonstrate the calculation of the autocorrelation function =====
+The following code computes the autocorrelation function, the covariance and the standard deviation
+for standard RNG. 
+The "following  file":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking/autocorrelation.cpp" gives the code.
+!bc cppcod
+//  This function computes the autocorrelation function for 
+//  the Mersenne random number generator with a uniform distribution
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <cstdlib>
+#include <random>
+#include <armadillo>
+#include <string>
+#include <cmath>
+using namespace  std;
+using namespace arma;
+// output file
+ofstream ofile;
+
+//     Main function begins here     
+int main(int argc, char* argv[])
+{
+  int MonteCarloCycles;
+  string filename;
+  if (argc > 1) {
+    filename=argv[1];
+    MonteCarloCycles = atoi(argv[2]);
+    string fileout = filename;
+    string argument = to_string(MonteCarloCycles);
+    fileout.append(argument);
+    ofile.open(fileout);
+  }
+
+  // Compute the variance and the mean value of the uniform distribution
+  // Compute also the specific values x for each cycle in order to be able to
+  // compute the covariance and the correlation function  
+
+  vec X  = zeros<vec>(MonteCarloCycles);
+  double MCint = 0.;      double MCintsqr2=0.;
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+  // Set up the uniform distribution for x \in [[0, 1]
+  std::uniform_real_distribution<double> RandomNumberGenerator(0.0,1.0);
+  for (int i = 0;  i < MonteCarloCycles; i++){
+    double x =   RandomNumberGenerator(gen); 
+    X(i) = x;
+    MCint += x;
+    MCintsqr2 += x*x;
+  }
+  double Mean = MCint/((double) MonteCarloCycles );
+  MCintsqr2 = MCintsqr2/((double) MonteCarloCycles );
+  double STDev = sqrt(MCintsqr2-Mean*Mean);
+  double Variance = MCintsqr2-Mean*Mean;
+  //   Write mean value and variance
+  cout << " Sample variance= " << Variance  << " Mean value = " << Mean << endl;
+  // Now we compute the autocorrelation function
+  vec autocorrelation = zeros<vec>(MonteCarloCycles);
+  for (int j = 0; j < MonteCarloCycles; j++){
+    double sum = 0.0;
+    for (int k = 0; k < (MonteCarloCycles-j); k++){
+      sum  += (X(k)-Mean)*(X(k+j)-Mean); 
+    }
+    autocorrelation(j) = sum/Variance/((double) MonteCarloCycles );
+    ofile << setiosflags(ios::showpoint | ios::uppercase);
+    ofile << setw(15) << setprecision(8) << j;
+    ofile << setw(15) << setprecision(8) << autocorrelation(j) << endl;
+  }
+  // Now compute the exact covariance using the autocorrelation function
+  double Covariance = 0.0;
+  for (int j = 0; j < MonteCarloCycles; j++){
+    Covariance  += autocorrelation(j);
+  }
+  Covariance *=  2.0/((double) MonteCarloCycles);
+  // Compute now the total variance, including the covariance, and obtain the standard deviation
+  double TotalVariance = (Variance/((double) MonteCarloCycles ))+Covariance;
+  cout << "Covariance =" << Covariance << "Totalvariance= " << TotalVariance << "Sample Variance/n= " << (Variance/((double) MonteCarloCycles )) << endl;
+  cout << " STD from sample variance= " << sqrt(Variance/((double) MonteCarloCycles )) << " STD with covariance = " << sqrt(TotalVariance) << endl;
+
+  ofile.close();  // close output file
+  return 0;
+}  // end of main program 
+
+
+!ec
+
+
+!split
 ===== What is blocking? =====
 !bblock Blocking
     * Say that we have a set of samples from a Monte Carlo experiment
@@ -3985,74 +4073,51 @@ called the integrated correlation time.
 !eblock
 
 
+
+
+
 !split
 ===== Actual implementation with code, main function =====
 When the file gets large, it can be useful to write your data in binary mode instead of ascii characters.
-The "following file":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking"   reads data from a binary file with the output from every Monte Carlo cycle.
-!bc cppcod
-int main (int nargs, char* args[])
-{
+The "following python file":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking/blocking.py"   reads data from a binary file with the output from every Monte Carlo cycle.
+!bc pycod
+import numpy as np
+import matplotlib.pyplot as plt
 
-  int min_block_size, max_block_size, n_block_samples;
-  //   Read from screen a possible new vaue of n
-  if (nargs > 3) {
-    min_block_size  = atoi(args[1]);
-    max_block_size  = atoi(args[2]);
-    n_block_samples = atoi(args[3]); 
-  }
-  else{
-    cerr << "usage: ./mcint_blocking.x <min_bloc_size> " 
-	 << "<max_block_size> <n_block_samples>" << endl;
-    exit(1);
-  }
+def block_mean(vec):
+    return sum(vec)/len(vec)
 
-  // get file size using stat
-  struct stat result;
-  int n;
-  // find number of data points
-  if(stat("result.dat", &result) == 0){
-    n = result.st_size/sizeof(double);
-  }
-  else{
-    cerr << "error in getting file size" << endl;
-    exit(1);
-  }
+def meanAndVariance(vec):
+    mean = sum(vec)/len(vec)
+    var = sum([i ** 2 for i in vec])/len(vec) - mean*mean
+    return mean, var
 
-  // get all mc results from file
-  double* mc_results = new double[n];
+data = [float( line.rstrip('\n')) for line in open('energy.txt')]
 
-  ifstream infile;
-  infile.open("result.dat", ios::in | ios::binary);
- //   additional lines omitted
-  infile.close();
-  }
-  double mean, sigma;
-  double res[2];
-  meanvar(mc_results, n, res);
-  mean = res[0]; sigma= res[1];
-  cout << "Value of integral = " <<  mean  <<  endl;
-  cout << "Value of variance = " << sigma << endl; 
-  cout << "Standard deviation = " <<  sqrt(sigma/(n-1.0)) << endl;
-  // Open file for writing, writing results in formated output for plotting:
-  ofstream outfile;
-  outfile.open("blockres.dat", ios::out);
-  outfile << setprecision(10);
-  double* block_results = new double[n_block_samples];
-  int block_size, block_step_length;
-  block_step_length = (max_block_size-min_block_size)/n_block_samples;
+n_blocks = 200
+block_size_min = 100
+block_size_max = len(data)/100
+block_step = int ((block_size_max - block_size_min + 1) / n_blocks)
 
-  // loop over block sizes
-  for(int i=0; i<n_block_samples; i++){
-    block_size = min_block_size+i*block_step_length;
-    blocking(mc_results, n, block_size, res);
-    mean  = res[0];
-    sigma = res[1];
-    // formated output
-    outfile << block_size << "\t" << sqrt(sigma/((n/block_size)-1.0)) << endl;
-  }
-  outfile.close();
-  return 0;
-}
+mean_vec = []
+var_vec = []
+block_sizes = []
+for i in range(0, n_blocks):
+    mean_temp_vec = []
+    start_point = 0
+    end_point = block_size_min + block_step*i
+    block_size = end_point
+    block_sizes.append(block_size)
+    while end_point <= len(data):		
+    	  mean_temp_vec.append(block_mean(data[start_point:end_point]))
+		start_point = end_point
+			    end_point += block_size_min + block_step*i
+			    mean, var = meanAndVariance(mean_temp_vec)
+			    mean_vec.append(mean)
+			    var_vec.append(np.sqrt(  var/(len(data)/float(block_size) - 1.0)     ))
+
+mean, var = meanAndVariance(data)
+#print len(data)
 
 !ec
 
@@ -4120,8 +4185,19 @@ void blocking(double *vals, int n_vals, int block_size, double *res){
 
 
 
+!split
+===== The Bootstrap method =====
 
+Or resampling is also very popular. It is very simple:
 
+o Start with your sample of measurements and compute the sample variance and the mean values
+o Then start again but pick in a random way the numbers in the sample and recalculate the mean and the sample variance.
+o Repeat this $n$ times.
+
+It can be shown, see the article by "Efron":"https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552"
+that it produces the correct standard deviation.
+
+This method is very useful for small ensembles of data points.  
 
 
 

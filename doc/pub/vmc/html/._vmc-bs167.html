@@ -388,22 +388,27 @@ Automatically generated HTML file from DocOnce source
               ('Time Auto-correlation Function', 2, None, '___sec159'),
               ('Time Auto-correlation Function', 2, None, '___sec160'),
               ('Correlation Time', 2, None, '___sec161'),
-              ('What is blocking?', 2, None, '___sec162'),
+              ('Code to demonstrate the calculation of the autocorrelation function',
+               2,
+               None,
+               '___sec162'),
               ('What is blocking?', 2, None, '___sec163'),
               ('What is blocking?', 2, None, '___sec164'),
-              ('Implementation', 2, None, '___sec165'),
+              ('What is blocking?', 2, None, '___sec165'),
+              ('Implementation', 2, None, '___sec166'),
               ('Actual implementation with code, main function',
                2,
                None,
-               '___sec166'),
+               '___sec167'),
               ('Actual implementation with code, mean value and variance',
                2,
                None,
-               '___sec167'),
+               '___sec168'),
               ('Actual implementation with code, blocking part',
                2,
                None,
-               '___sec168')]}
+               '___sec169'),
+              ('The Bootstrap method', 2, None, '___sec170')]}
 end of tocinfo -->
 
 <body>
@@ -603,13 +608,15 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._vmc-bs160.html#___sec159" style="font-size: 80%;">Time Auto-correlation Function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs161.html#___sec160" style="font-size: 80%;">Time Auto-correlation Function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs162.html#___sec161" style="font-size: 80%;">Correlation Time</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs163.html#___sec162" style="font-size: 80%;">What is blocking?</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs163.html#___sec162" style="font-size: 80%;">Code to demonstrate the calculation of the autocorrelation function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs164.html#___sec163" style="font-size: 80%;">What is blocking?</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs165.html#___sec164" style="font-size: 80%;">What is blocking?</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs166.html#___sec165" style="font-size: 80%;">Implementation</a></li>
-     <!-- navigation toc: --> <li><a href="#___sec166" style="font-size: 80%;">Actual implementation with code, main function</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs168.html#___sec167" style="font-size: 80%;">Actual implementation with code, mean value and variance</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs169.html#___sec168" style="font-size: 80%;">Actual implementation with code, blocking part</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs166.html#___sec165" style="font-size: 80%;">What is blocking?</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec166" style="font-size: 80%;">Implementation</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs168.html#___sec167" style="font-size: 80%;">Actual implementation with code, main function</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs169.html#___sec168" style="font-size: 80%;">Actual implementation with code, mean value and variance</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs170.html#___sec169" style="font-size: 80%;">Actual implementation with code, blocking part</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs171.html#___sec170" style="font-size: 80%;">The Bootstrap method</a></li>
 
         </ul>
       </li>
@@ -625,76 +632,25 @@ MathJax.Hub.Config({
 <a name="part0167"></a>
 <!-- !split -->
 
-<h2 id="___sec166" class="anchor">Actual implementation with code, main function </h2>
-When the file gets large, it can be useful to write your data in binary mode instead of ascii characters.
-The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking" target="_self">following file</a>   reads data from a binary file with the output from every Monte Carlo cycle.
-<p>
+<h2 id="___sec166" class="anchor">Implementation </h2>
+<div class="panel panel-default">
+<div class="panel-body">
+<p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
 
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #B00040">int</span> <span style="color: #0000FF">main</span> (<span style="color: #B00040">int</span> nargs, <span style="color: #B00040">char</span><span style="color: #666666">*</span> args[])
-{
+<ul>
+    <li> Do a Monte Carlo simulation, storing all samples to file</li>
+    <li> Do the statistical analysis on this file, independently of your Monte Carlo program</li>
+    <li> Read the file into an array</li>
+    <li> Loop over various block sizes</li>
+    <li> For each block size \( n_b \), loop over the array in steps of \( n_b \) taking the mean of elements \( i n_b,\ldots,(i+1) n_b \)</li>
+    <li> Take the mean and variance of the resulting array</li>
+    <li> Write the results for each block size to file for later
+      analysis</li>
+</ul>
+</div>
+</div>
 
-  <span style="color: #B00040">int</span> min_block_size, max_block_size, n_block_samples;
-  <span style="color: #408080; font-style: italic">//   Read from screen a possible new vaue of n</span>
-  <span style="color: #008000; font-weight: bold">if</span> (nargs <span style="color: #666666">&gt;</span> <span style="color: #666666">3</span>) {
-    min_block_size  <span style="color: #666666">=</span> atoi(args[<span style="color: #666666">1</span>]);
-    max_block_size  <span style="color: #666666">=</span> atoi(args[<span style="color: #666666">2</span>]);
-    n_block_samples <span style="color: #666666">=</span> atoi(args[<span style="color: #666666">3</span>]); 
-  }
-  <span style="color: #008000; font-weight: bold">else</span>{
-    cerr <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;usage: ./mcint_blocking.x &lt;min_bloc_size&gt; &quot;</span> 
-	 <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;&lt;max_block_size&gt; &lt;n_block_samples&gt;&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
-    exit(<span style="color: #666666">1</span>);
-  }
 
-  <span style="color: #408080; font-style: italic">// get file size using stat</span>
-  <span style="color: #008000; font-weight: bold">struct</span> stat result;
-  <span style="color: #B00040">int</span> n;
-  <span style="color: #408080; font-style: italic">// find number of data points</span>
-  <span style="color: #008000; font-weight: bold">if</span>(stat(<span style="color: #BA2121">&quot;result.dat&quot;</span>, <span style="color: #666666">&amp;</span>result) <span style="color: #666666">==</span> <span style="color: #666666">0</span>){
-    n <span style="color: #666666">=</span> result.st_size<span style="color: #666666">/</span><span style="color: #008000; font-weight: bold">sizeof</span>(<span style="color: #B00040">double</span>);
-  }
-  <span style="color: #008000; font-weight: bold">else</span>{
-    cerr <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;error in getting file size&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
-    exit(<span style="color: #666666">1</span>);
-  }
-
-  <span style="color: #408080; font-style: italic">// get all mc results from file</span>
-  <span style="color: #B00040">double</span><span style="color: #666666">*</span> mc_results <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span>[n];
-
-  ifstream infile;
-  infile.open(<span style="color: #BA2121">&quot;result.dat&quot;</span>, ios<span style="color: #666666">::</span>in <span style="color: #666666">|</span> ios<span style="color: #666666">::</span>binary);
- <span style="color: #408080; font-style: italic">//   additional lines omitted</span>
-  infile.close();
-  }
-  <span style="color: #B00040">double</span> mean, sigma;
-  <span style="color: #B00040">double</span> res[<span style="color: #666666">2</span>];
-  meanvar(mc_results, n, res);
-  mean <span style="color: #666666">=</span> res[<span style="color: #666666">0</span>]; sigma<span style="color: #666666">=</span> res[<span style="color: #666666">1</span>];
-  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of integral = &quot;</span> <span style="color: #666666">&lt;&lt;</span>  mean  <span style="color: #666666">&lt;&lt;</span>  endl;
-  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of variance = &quot;</span> <span style="color: #666666">&lt;&lt;</span> sigma <span style="color: #666666">&lt;&lt;</span> endl; 
-  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Standard deviation = &quot;</span> <span style="color: #666666">&lt;&lt;</span>  sqrt(sigma<span style="color: #666666">/</span>(n<span style="color: #666666">-1.0</span>)) <span style="color: #666666">&lt;&lt;</span> endl;
-  <span style="color: #408080; font-style: italic">// Open file for writing, writing results in formated output for plotting:</span>
-  ofstream outfile;
-  outfile.open(<span style="color: #BA2121">&quot;blockres.dat&quot;</span>, ios<span style="color: #666666">::</span>out);
-  outfile <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">10</span>);
-  <span style="color: #B00040">double</span><span style="color: #666666">*</span> block_results <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span>[n_block_samples];
-  <span style="color: #B00040">int</span> block_size, block_step_length;
-  block_step_length <span style="color: #666666">=</span> (max_block_size<span style="color: #666666">-</span>min_block_size)<span style="color: #666666">/</span>n_block_samples;
-
-  <span style="color: #408080; font-style: italic">// loop over block sizes</span>
-  <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i<span style="color: #666666">=0</span>; i<span style="color: #666666">&lt;</span>n_block_samples; i<span style="color: #666666">++</span>){
-    block_size <span style="color: #666666">=</span> min_block_size<span style="color: #666666">+</span>i<span style="color: #666666">*</span>block_step_length;
-    blocking(mc_results, n, block_size, res);
-    mean  <span style="color: #666666">=</span> res[<span style="color: #666666">0</span>];
-    sigma <span style="color: #666666">=</span> res[<span style="color: #666666">1</span>];
-    <span style="color: #408080; font-style: italic">// formated output</span>
-    outfile <span style="color: #666666">&lt;&lt;</span> block_size <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;</span><span style="color: #BB6622; font-weight: bold">\t</span><span style="color: #BA2121">&quot;</span> <span style="color: #666666">&lt;&lt;</span> sqrt(sigma<span style="color: #666666">/</span>((n<span style="color: #666666">/</span>block_size)<span style="color: #666666">-1.0</span>)) <span style="color: #666666">&lt;&lt;</span> endl;
-  }
-  outfile.close();
-  <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
-}
-</pre></div>
 <p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
@@ -713,6 +669,8 @@ The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/
   <li class="active"><a href="._vmc-bs167.html">168</a></li>
   <li><a href="._vmc-bs168.html">169</a></li>
   <li><a href="._vmc-bs169.html">170</a></li>
+  <li><a href="._vmc-bs170.html">171</a></li>
+  <li><a href="._vmc-bs171.html">172</a></li>
   <li><a href="._vmc-bs168.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->

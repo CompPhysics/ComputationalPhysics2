@@ -388,22 +388,27 @@ Automatically generated HTML file from DocOnce source
               ('Time Auto-correlation Function', 2, None, '___sec159'),
               ('Time Auto-correlation Function', 2, None, '___sec160'),
               ('Correlation Time', 2, None, '___sec161'),
-              ('What is blocking?', 2, None, '___sec162'),
+              ('Code to demonstrate the calculation of the autocorrelation function',
+               2,
+               None,
+               '___sec162'),
               ('What is blocking?', 2, None, '___sec163'),
               ('What is blocking?', 2, None, '___sec164'),
-              ('Implementation', 2, None, '___sec165'),
+              ('What is blocking?', 2, None, '___sec165'),
+              ('Implementation', 2, None, '___sec166'),
               ('Actual implementation with code, main function',
                2,
                None,
-               '___sec166'),
+               '___sec167'),
               ('Actual implementation with code, mean value and variance',
                2,
                None,
-               '___sec167'),
+               '___sec168'),
               ('Actual implementation with code, blocking part',
                2,
                None,
-               '___sec168')]}
+               '___sec169'),
+              ('The Bootstrap method', 2, None, '___sec170')]}
 end of tocinfo -->
 
 <body>
@@ -603,13 +608,15 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._vmc-bs160.html#___sec159" style="font-size: 80%;">Time Auto-correlation Function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs161.html#___sec160" style="font-size: 80%;">Time Auto-correlation Function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs162.html#___sec161" style="font-size: 80%;">Correlation Time</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs163.html#___sec162" style="font-size: 80%;">What is blocking?</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs163.html#___sec162" style="font-size: 80%;">Code to demonstrate the calculation of the autocorrelation function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs164.html#___sec163" style="font-size: 80%;">What is blocking?</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs165.html#___sec164" style="font-size: 80%;">What is blocking?</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs166.html#___sec165" style="font-size: 80%;">Implementation</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs167.html#___sec166" style="font-size: 80%;">Actual implementation with code, main function</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs168.html#___sec167" style="font-size: 80%;">Actual implementation with code, mean value and variance</a></li>
-     <!-- navigation toc: --> <li><a href="#___sec168" style="font-size: 80%;">Actual implementation with code, blocking part</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs166.html#___sec165" style="font-size: 80%;">What is blocking?</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs167.html#___sec166" style="font-size: 80%;">Implementation</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs168.html#___sec167" style="font-size: 80%;">Actual implementation with code, main function</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec168" style="font-size: 80%;">Actual implementation with code, mean value and variance</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs170.html#___sec169" style="font-size: 80%;">Actual implementation with code, blocking part</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs171.html#___sec170" style="font-size: 80%;">The Bootstrap method</a></li>
 
         </ul>
       </li>
@@ -625,37 +632,37 @@ MathJax.Hub.Config({
 <a name="part0169"></a>
 <!-- !split -->
 
-<h2 id="___sec168" class="anchor">Actual implementation with code, blocking part </h2>
+<h2 id="___sec168" class="anchor">Actual implementation with code, mean value and variance </h2>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">// find mean and variance of blocks of size block_size.</span>
-<span style="color: #408080; font-style: italic">// mean and variance are stored in res</span>
-<span style="color: #B00040">void</span> <span style="color: #0000FF">blocking</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>vals, <span style="color: #B00040">int</span> n_vals, <span style="color: #B00040">int</span> block_size, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>res){
-
-  <span style="color: #408080; font-style: italic">// note: integer division will waste some values</span>
-  <span style="color: #B00040">int</span> n_blocks <span style="color: #666666">=</span> n_vals<span style="color: #666666">/</span>block_size;
-
-  <span style="color: #408080; font-style: italic">/*</span>
-<span style="color: #408080; font-style: italic">  cerr &lt;&lt; &quot;n_vals=&quot; &lt;&lt; n_vals &lt;&lt; &quot;, block_size=&quot; &lt;&lt; block_size &lt;&lt; endl;</span>
-<span style="color: #408080; font-style: italic">  if(n_vals%block_size &gt; 0)</span>
-<span style="color: #408080; font-style: italic">    cerr &lt;&lt; &quot;lost &quot; &lt;&lt; n_vals%block_size &lt;&lt; &quot; values due to integer division&quot; </span>
-<span style="color: #408080; font-style: italic">	 &lt;&lt; endl;</span>
-<span style="color: #408080; font-style: italic">  */</span>
-
-  <span style="color: #B00040">double</span><span style="color: #666666">*</span> block_vals <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span>[n_blocks];
-
-  <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i<span style="color: #666666">=0</span>; i<span style="color: #666666">&lt;</span>n_blocks; i<span style="color: #666666">++</span>){
-    block_vals[i] <span style="color: #666666">=</span> mean(vals<span style="color: #666666">+</span>i<span style="color: #666666">*</span>block_size, block_size);
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">// find mean of values in vals</span>
+<span style="color: #B00040">double</span> <span style="color: #0000FF">mean</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>vals, <span style="color: #B00040">int</span> n_vals){
+  
+  <span style="color: #B00040">double</span> m<span style="color: #666666">=0</span>;
+  <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i<span style="color: #666666">=0</span>; i<span style="color: #666666">&lt;</span>n_vals; i<span style="color: #666666">++</span>){
+    m<span style="color: #666666">+=</span>vals[i];
   }
 
-  meanvar(block_vals, n_blocks, res);
+  <span style="color: #008000; font-weight: bold">return</span> m<span style="color: #666666">/</span><span style="color: #B00040">double</span>(n_vals);
+}
 
-  <span style="color: #008000; font-weight: bold">delete</span> block_vals;
+<span style="color: #408080; font-style: italic">// calculate mean and variance of vals, results stored in res</span>
+<span style="color: #B00040">void</span> <span style="color: #0000FF">meanvar</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>vals, <span style="color: #B00040">int</span> n_vals, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>res){
+  <span style="color: #B00040">double</span> m2<span style="color: #666666">=0</span>, m<span style="color: #666666">=0</span>, val;
+  <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i<span style="color: #666666">=0</span>; i<span style="color: #666666">&lt;</span>n_vals; i<span style="color: #666666">++</span>){
+    val<span style="color: #666666">=</span>vals[i];
+    m<span style="color: #666666">+=</span>val;
+    m2<span style="color: #666666">+=</span>val<span style="color: #666666">*</span>val;
+  }
+  m  <span style="color: #666666">/=</span> <span style="color: #B00040">double</span>(n_vals);
+  m2 <span style="color: #666666">/=</span> <span style="color: #B00040">double</span>(n_vals);
+  res[<span style="color: #666666">0</span>] <span style="color: #666666">=</span> m;
+  res[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> m2<span style="color: #666666">-</span>(m<span style="color: #666666">*</span>m);
+
 }
 </pre></div>
 <p>
-
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
@@ -671,6 +678,9 @@ MathJax.Hub.Config({
   <li><a href="._vmc-bs167.html">168</a></li>
   <li><a href="._vmc-bs168.html">169</a></li>
   <li class="active"><a href="._vmc-bs169.html">170</a></li>
+  <li><a href="._vmc-bs170.html">171</a></li>
+  <li><a href="._vmc-bs171.html">172</a></li>
+  <li><a href="._vmc-bs170.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 

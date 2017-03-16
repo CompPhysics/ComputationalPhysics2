@@ -388,22 +388,27 @@ Automatically generated HTML file from DocOnce source
               ('Time Auto-correlation Function', 2, None, '___sec159'),
               ('Time Auto-correlation Function', 2, None, '___sec160'),
               ('Correlation Time', 2, None, '___sec161'),
-              ('What is blocking?', 2, None, '___sec162'),
+              ('Code to demonstrate the calculation of the autocorrelation function',
+               2,
+               None,
+               '___sec162'),
               ('What is blocking?', 2, None, '___sec163'),
               ('What is blocking?', 2, None, '___sec164'),
-              ('Implementation', 2, None, '___sec165'),
+              ('What is blocking?', 2, None, '___sec165'),
+              ('Implementation', 2, None, '___sec166'),
               ('Actual implementation with code, main function',
                2,
                None,
-               '___sec166'),
+               '___sec167'),
               ('Actual implementation with code, mean value and variance',
                2,
                None,
-               '___sec167'),
+               '___sec168'),
               ('Actual implementation with code, blocking part',
                2,
                None,
-               '___sec168')]}
+               '___sec169'),
+              ('The Bootstrap method', 2, None, '___sec170')]}
 end of tocinfo -->
 
 <body>
@@ -603,13 +608,15 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._vmc-bs160.html#___sec159" style="font-size: 80%;">Time Auto-correlation Function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs161.html#___sec160" style="font-size: 80%;">Time Auto-correlation Function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs162.html#___sec161" style="font-size: 80%;">Correlation Time</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs163.html#___sec162" style="font-size: 80%;">What is blocking?</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs163.html#___sec162" style="font-size: 80%;">Code to demonstrate the calculation of the autocorrelation function</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs164.html#___sec163" style="font-size: 80%;">What is blocking?</a></li>
      <!-- navigation toc: --> <li><a href="._vmc-bs165.html#___sec164" style="font-size: 80%;">What is blocking?</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs166.html#___sec165" style="font-size: 80%;">Implementation</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs167.html#___sec166" style="font-size: 80%;">Actual implementation with code, main function</a></li>
-     <!-- navigation toc: --> <li><a href="#___sec167" style="font-size: 80%;">Actual implementation with code, mean value and variance</a></li>
-     <!-- navigation toc: --> <li><a href="._vmc-bs169.html#___sec168" style="font-size: 80%;">Actual implementation with code, blocking part</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs166.html#___sec165" style="font-size: 80%;">What is blocking?</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs167.html#___sec166" style="font-size: 80%;">Implementation</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec167" style="font-size: 80%;">Actual implementation with code, main function</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs169.html#___sec168" style="font-size: 80%;">Actual implementation with code, mean value and variance</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs170.html#___sec169" style="font-size: 80%;">Actual implementation with code, blocking part</a></li>
+     <!-- navigation toc: --> <li><a href="._vmc-bs171.html#___sec170" style="font-size: 80%;">The Bootstrap method</a></li>
 
         </ul>
       </li>
@@ -625,35 +632,49 @@ MathJax.Hub.Config({
 <a name="part0168"></a>
 <!-- !split -->
 
-<h2 id="___sec167" class="anchor">Actual implementation with code, mean value and variance </h2>
+<h2 id="___sec167" class="anchor">Actual implementation with code, main function </h2>
+When the file gets large, it can be useful to write your data in binary mode instead of ascii characters.
+The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking/blocking.py" target="_self">following python file</a>   reads data from a binary file with the output from every Monte Carlo cycle.
 <p>
 
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">// find mean of values in vals</span>
-<span style="color: #B00040">double</span> <span style="color: #0000FF">mean</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>vals, <span style="color: #B00040">int</span> n_vals){
-  
-  <span style="color: #B00040">double</span> m<span style="color: #666666">=0</span>;
-  <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i<span style="color: #666666">=0</span>; i<span style="color: #666666">&lt;</span>n_vals; i<span style="color: #666666">++</span>){
-    m<span style="color: #666666">+=</span>vals[i];
-  }
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
 
-  <span style="color: #008000; font-weight: bold">return</span> m<span style="color: #666666">/</span><span style="color: #B00040">double</span>(n_vals);
-}
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">block_mean</span>(vec):
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">sum</span>(vec)<span style="color: #666666">/</span><span style="color: #008000">len</span>(vec)
 
-<span style="color: #408080; font-style: italic">// calculate mean and variance of vals, results stored in res</span>
-<span style="color: #B00040">void</span> <span style="color: #0000FF">meanvar</span>(<span style="color: #B00040">double</span> <span style="color: #666666">*</span>vals, <span style="color: #B00040">int</span> n_vals, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>res){
-  <span style="color: #B00040">double</span> m2<span style="color: #666666">=0</span>, m<span style="color: #666666">=0</span>, val;
-  <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i<span style="color: #666666">=0</span>; i<span style="color: #666666">&lt;</span>n_vals; i<span style="color: #666666">++</span>){
-    val<span style="color: #666666">=</span>vals[i];
-    m<span style="color: #666666">+=</span>val;
-    m2<span style="color: #666666">+=</span>val<span style="color: #666666">*</span>val;
-  }
-  m  <span style="color: #666666">/=</span> <span style="color: #B00040">double</span>(n_vals);
-  m2 <span style="color: #666666">/=</span> <span style="color: #B00040">double</span>(n_vals);
-  res[<span style="color: #666666">0</span>] <span style="color: #666666">=</span> m;
-  res[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> m2<span style="color: #666666">-</span>(m<span style="color: #666666">*</span>m);
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">meanAndVariance</span>(vec):
+    mean <span style="color: #666666">=</span> <span style="color: #008000">sum</span>(vec)<span style="color: #666666">/</span><span style="color: #008000">len</span>(vec)
+    var <span style="color: #666666">=</span> <span style="color: #008000">sum</span>([i <span style="color: #666666">**</span> <span style="color: #666666">2</span> <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> vec])<span style="color: #666666">/</span><span style="color: #008000">len</span>(vec) <span style="color: #666666">-</span> mean<span style="color: #666666">*</span>mean
+    <span style="color: #008000; font-weight: bold">return</span> mean, var
 
-}
+data <span style="color: #666666">=</span> [<span style="color: #008000">float</span>( line<span style="color: #666666">.</span>rstrip(<span style="color: #BA2121">&#39;</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&#39;</span>)) <span style="color: #008000; font-weight: bold">for</span> line <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">open</span>(<span style="color: #BA2121">&#39;energy.txt&#39;</span>)]
+
+n_blocks <span style="color: #666666">=</span> <span style="color: #666666">200</span>
+block_size_min <span style="color: #666666">=</span> <span style="color: #666666">100</span>
+block_size_max <span style="color: #666666">=</span> <span style="color: #008000">len</span>(data)<span style="color: #666666">/100</span>
+block_step <span style="color: #666666">=</span> <span style="color: #008000">int</span> ((block_size_max <span style="color: #666666">-</span> block_size_min <span style="color: #666666">+</span> <span style="color: #666666">1</span>) <span style="color: #666666">/</span> n_blocks)
+
+mean_vec <span style="color: #666666">=</span> []
+var_vec <span style="color: #666666">=</span> []
+block_sizes <span style="color: #666666">=</span> []
+<span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">0</span>, n_blocks):
+    mean_temp_vec <span style="color: #666666">=</span> []
+    start_point <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+    end_point <span style="color: #666666">=</span> block_size_min <span style="color: #666666">+</span> block_step<span style="color: #666666">*</span>i
+    block_size <span style="color: #666666">=</span> end_point
+    block_sizes<span style="color: #666666">.</span>append(block_size)
+    <span style="color: #008000; font-weight: bold">while</span> end_point <span style="color: #666666">&lt;=</span> <span style="color: #008000">len</span>(data):		
+    	  mean_temp_vec<span style="color: #666666">.</span>append(block_mean(data[start_point:end_point]))
+		start_point <span style="color: #666666">=</span> end_point
+			    end_point <span style="color: #666666">+=</span> block_size_min <span style="color: #666666">+</span> block_step<span style="color: #666666">*</span>i
+			    mean, var <span style="color: #666666">=</span> meanAndVariance(mean_temp_vec)
+			    mean_vec<span style="color: #666666">.</span>append(mean)
+			    var_vec<span style="color: #666666">.</span>append(np<span style="color: #666666">.</span>sqrt(  var<span style="color: #666666">/</span>(<span style="color: #008000">len</span>(data)<span style="color: #666666">/</span><span style="color: #008000">float</span>(block_size) <span style="color: #666666">-</span> <span style="color: #666666">1.0</span>)     ))
+
+mean, var <span style="color: #666666">=</span> meanAndVariance(data)
+<span style="color: #408080; font-style: italic">#print len(data)</span>
 </pre></div>
 <p>
 <p>
@@ -672,6 +693,8 @@ MathJax.Hub.Config({
   <li><a href="._vmc-bs167.html">168</a></li>
   <li class="active"><a href="._vmc-bs168.html">169</a></li>
   <li><a href="._vmc-bs169.html">170</a></li>
+  <li><a href="._vmc-bs170.html">171</a></li>
+  <li><a href="._vmc-bs171.html">172</a></li>
   <li><a href="._vmc-bs169.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->

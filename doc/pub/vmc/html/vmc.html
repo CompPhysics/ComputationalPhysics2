@@ -413,22 +413,27 @@ div { text-align: justify; text-justify: inter-word; }
               ('Time Auto-correlation Function', 2, None, '___sec159'),
               ('Time Auto-correlation Function', 2, None, '___sec160'),
               ('Correlation Time', 2, None, '___sec161'),
-              ('What is blocking?', 2, None, '___sec162'),
+              ('Code to demonstrate the calculation of the autocorrelation function',
+               2,
+               None,
+               '___sec162'),
               ('What is blocking?', 2, None, '___sec163'),
               ('What is blocking?', 2, None, '___sec164'),
-              ('Implementation', 2, None, '___sec165'),
+              ('What is blocking?', 2, None, '___sec165'),
+              ('Implementation', 2, None, '___sec166'),
               ('Actual implementation with code, main function',
                2,
                None,
-               '___sec166'),
+               '___sec167'),
               ('Actual implementation with code, mean value and variance',
                2,
                None,
-               '___sec167'),
+               '___sec168'),
               ('Actual implementation with code, blocking part',
                2,
                None,
-               '___sec168')]}
+               '___sec169'),
+              ('The Bootstrap method', 2, None, '___sec170')]}
 end of tocinfo -->
 
 <body>
@@ -4978,7 +4983,95 @@ called the integrated correlation time.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec162">What is blocking? </h2>
+<h2 id="___sec162">Code to demonstrate the calculation of the autocorrelation function </h2>
+The following code computes the autocorrelation function, the covariance and the standard deviation
+for standard RNG. 
+The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking/autocorrelation.cpp" target="_blank">following  file</a> gives the code.
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">//  This function computes the autocorrelation function for </span>
+<span style="color: #408080; font-style: italic">//  the Mersenne random number generator with a uniform distribution</span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iostream&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;fstream&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iomanip&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;cstdlib&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;random&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;armadillo&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;string&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;cmath&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span>  std;
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> arma;
+<span style="color: #408080; font-style: italic">// output file</span>
+ofstream ofile;
+
+<span style="color: #408080; font-style: italic">//     Main function begins here     </span>
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(<span style="color: #B00040">int</span> argc, <span style="color: #B00040">char</span><span style="color: #666666">*</span> argv[])
+{
+  <span style="color: #B00040">int</span> MonteCarloCycles;
+  string filename;
+  <span style="color: #008000; font-weight: bold">if</span> (argc <span style="color: #666666">&gt;</span> <span style="color: #666666">1</span>) {
+    filename<span style="color: #666666">=</span>argv[<span style="color: #666666">1</span>];
+    MonteCarloCycles <span style="color: #666666">=</span> atoi(argv[<span style="color: #666666">2</span>]);
+    string fileout <span style="color: #666666">=</span> filename;
+    string argument <span style="color: #666666">=</span> to_string(MonteCarloCycles);
+    fileout.append(argument);
+    ofile.open(fileout);
+  }
+
+  <span style="color: #408080; font-style: italic">// Compute the variance and the mean value of the uniform distribution</span>
+  <span style="color: #408080; font-style: italic">// Compute also the specific values x for each cycle in order to be able to</span>
+  <span style="color: #408080; font-style: italic">// compute the covariance and the correlation function  </span>
+
+  vec X  <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>vec<span style="color: #666666">&gt;</span>(MonteCarloCycles);
+  <span style="color: #B00040">double</span> MCint <span style="color: #666666">=</span> <span style="color: #666666">0.</span>;      <span style="color: #B00040">double</span> MCintsqr2<span style="color: #666666">=0.</span>;
+  std<span style="color: #666666">::</span>random_device rd;
+  std<span style="color: #666666">::</span>mt19937_64 gen(rd());
+  <span style="color: #408080; font-style: italic">// Set up the uniform distribution for x \in [[0, 1]</span>
+  std<span style="color: #666666">::</span>uniform_real_distribution<span style="color: #666666">&lt;</span><span style="color: #B00040">double</span><span style="color: #666666">&gt;</span> RandomNumberGenerator(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>);
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>;  i <span style="color: #666666">&lt;</span> MonteCarloCycles; i<span style="color: #666666">++</span>){
+    <span style="color: #B00040">double</span> x <span style="color: #666666">=</span>   RandomNumberGenerator(gen); 
+    X(i) <span style="color: #666666">=</span> x;
+    MCint <span style="color: #666666">+=</span> x;
+    MCintsqr2 <span style="color: #666666">+=</span> x<span style="color: #666666">*</span>x;
+  }
+  <span style="color: #B00040">double</span> Mean <span style="color: #666666">=</span> MCint<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles );
+  MCintsqr2 <span style="color: #666666">=</span> MCintsqr2<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles );
+  <span style="color: #B00040">double</span> STDev <span style="color: #666666">=</span> sqrt(MCintsqr2<span style="color: #666666">-</span>Mean<span style="color: #666666">*</span>Mean);
+  <span style="color: #B00040">double</span> Variance <span style="color: #666666">=</span> MCintsqr2<span style="color: #666666">-</span>Mean<span style="color: #666666">*</span>Mean;
+  <span style="color: #408080; font-style: italic">//   Write mean value and variance</span>
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; Sample variance= &quot;</span> <span style="color: #666666">&lt;&lt;</span> Variance  <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; Mean value = &quot;</span> <span style="color: #666666">&lt;&lt;</span> Mean <span style="color: #666666">&lt;&lt;</span> endl;
+  <span style="color: #408080; font-style: italic">// Now we compute the autocorrelation function</span>
+  vec autocorrelation <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>vec<span style="color: #666666">&gt;</span>(MonteCarloCycles);
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> MonteCarloCycles; j<span style="color: #666666">++</span>){
+    <span style="color: #B00040">double</span> sum <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> k <span style="color: #666666">=</span> <span style="color: #666666">0</span>; k <span style="color: #666666">&lt;</span> (MonteCarloCycles<span style="color: #666666">-</span>j); k<span style="color: #666666">++</span>){
+      sum  <span style="color: #666666">+=</span> (X(k)<span style="color: #666666">-</span>Mean)<span style="color: #666666">*</span>(X(k<span style="color: #666666">+</span>j)<span style="color: #666666">-</span>Mean); 
+    }
+    autocorrelation(j) <span style="color: #666666">=</span> sum<span style="color: #666666">/</span>Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles );
+    ofile <span style="color: #666666">&lt;&lt;</span> setiosflags(ios<span style="color: #666666">::</span>showpoint <span style="color: #666666">|</span> ios<span style="color: #666666">::</span>uppercase);
+    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> j;
+    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> autocorrelation(j) <span style="color: #666666">&lt;&lt;</span> endl;
+  }
+  <span style="color: #408080; font-style: italic">// Now compute the exact covariance using the autocorrelation function</span>
+  <span style="color: #B00040">double</span> Covariance <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> MonteCarloCycles; j<span style="color: #666666">++</span>){
+    Covariance  <span style="color: #666666">+=</span> autocorrelation(j);
+  }
+  Covariance <span style="color: #666666">*=</span>  <span style="color: #666666">2.0/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles);
+  <span style="color: #408080; font-style: italic">// Compute now the total variance, including the covariance, and obtain the standard deviation</span>
+  <span style="color: #B00040">double</span> TotalVariance <span style="color: #666666">=</span> (Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles ))<span style="color: #666666">+</span>Covariance;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Covariance =&quot;</span> <span style="color: #666666">&lt;&lt;</span> Covariance <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Totalvariance= &quot;</span> <span style="color: #666666">&lt;&lt;</span> TotalVariance <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Sample Variance/n= &quot;</span> <span style="color: #666666">&lt;&lt;</span> (Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles )) <span style="color: #666666">&lt;&lt;</span> endl;
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; STD from sample variance= &quot;</span> <span style="color: #666666">&lt;&lt;</span> sqrt(Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>) MonteCarloCycles )) <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; STD with covariance = &quot;</span> <span style="color: #666666">&lt;&lt;</span> sqrt(TotalVariance) <span style="color: #666666">&lt;&lt;</span> endl;
+
+  ofile.close();  <span style="color: #408080; font-style: italic">// close output file</span>
+  <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}  <span style="color: #408080; font-style: italic">// end of main program </span>
+</pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec163">What is blocking? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Blocking.</b>
 <p>
@@ -5008,7 +5101,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec163">What is blocking? </h2>
+<h2 id="___sec164">What is blocking? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Blocking.</b>
 <p>
@@ -5027,7 +5120,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec164">What is blocking? </h2>
+<h2 id="___sec165">What is blocking? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Blocking.</b>
 <p>
@@ -5044,7 +5137,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec165">Implementation </h2>
+<h2 id="___sec166">Implementation </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5065,80 +5158,54 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec166">Actual implementation with code, main function </h2>
+<h2 id="___sec167">Actual implementation with code, main function </h2>
 When the file gets large, it can be useful to write your data in binary mode instead of ascii characters.
-The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking" target="_blank">following file</a>   reads data from a binary file with the output from every Monte Carlo cycle.
+The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking/blocking.py" target="_blank">following python file</a>   reads data from a binary file with the output from every Monte Carlo cycle.
 <p>
 
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #B00040">int</span> <span style="color: #0000FF">main</span> (<span style="color: #B00040">int</span> nargs, <span style="color: #B00040">char</span><span style="color: #666666">*</span> args[])
-{
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
 
-  <span style="color: #B00040">int</span> min_block_size, max_block_size, n_block_samples;
-  <span style="color: #408080; font-style: italic">//   Read from screen a possible new vaue of n</span>
-  <span style="color: #008000; font-weight: bold">if</span> (nargs <span style="color: #666666">&gt;</span> <span style="color: #666666">3</span>) {
-    min_block_size  <span style="color: #666666">=</span> atoi(args[<span style="color: #666666">1</span>]);
-    max_block_size  <span style="color: #666666">=</span> atoi(args[<span style="color: #666666">2</span>]);
-    n_block_samples <span style="color: #666666">=</span> atoi(args[<span style="color: #666666">3</span>]); 
-  }
-  <span style="color: #008000; font-weight: bold">else</span>{
-    cerr <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;usage: ./mcint_blocking.x &lt;min_bloc_size&gt; &quot;</span> 
-	 <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;&lt;max_block_size&gt; &lt;n_block_samples&gt;&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
-    exit(<span style="color: #666666">1</span>);
-  }
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">block_mean</span>(vec):
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #008000">sum</span>(vec)<span style="color: #666666">/</span><span style="color: #008000">len</span>(vec)
 
-  <span style="color: #408080; font-style: italic">// get file size using stat</span>
-  <span style="color: #008000; font-weight: bold">struct</span> stat result;
-  <span style="color: #B00040">int</span> n;
-  <span style="color: #408080; font-style: italic">// find number of data points</span>
-  <span style="color: #008000; font-weight: bold">if</span>(stat(<span style="color: #BA2121">&quot;result.dat&quot;</span>, <span style="color: #666666">&amp;</span>result) <span style="color: #666666">==</span> <span style="color: #666666">0</span>){
-    n <span style="color: #666666">=</span> result.st_size<span style="color: #666666">/</span><span style="color: #008000; font-weight: bold">sizeof</span>(<span style="color: #B00040">double</span>);
-  }
-  <span style="color: #008000; font-weight: bold">else</span>{
-    cerr <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;error in getting file size&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
-    exit(<span style="color: #666666">1</span>);
-  }
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">meanAndVariance</span>(vec):
+    mean <span style="color: #666666">=</span> <span style="color: #008000">sum</span>(vec)<span style="color: #666666">/</span><span style="color: #008000">len</span>(vec)
+    var <span style="color: #666666">=</span> <span style="color: #008000">sum</span>([i <span style="color: #666666">**</span> <span style="color: #666666">2</span> <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> vec])<span style="color: #666666">/</span><span style="color: #008000">len</span>(vec) <span style="color: #666666">-</span> mean<span style="color: #666666">*</span>mean
+    <span style="color: #008000; font-weight: bold">return</span> mean, var
 
-  <span style="color: #408080; font-style: italic">// get all mc results from file</span>
-  <span style="color: #B00040">double</span><span style="color: #666666">*</span> mc_results <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span>[n];
+data <span style="color: #666666">=</span> [<span style="color: #008000">float</span>( line<span style="color: #666666">.</span>rstrip(<span style="color: #BA2121">&#39;</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&#39;</span>)) <span style="color: #008000; font-weight: bold">for</span> line <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">open</span>(<span style="color: #BA2121">&#39;energy.txt&#39;</span>)]
 
-  ifstream infile;
-  infile.open(<span style="color: #BA2121">&quot;result.dat&quot;</span>, ios<span style="color: #666666">::</span>in <span style="color: #666666">|</span> ios<span style="color: #666666">::</span>binary);
- <span style="color: #408080; font-style: italic">//   additional lines omitted</span>
-  infile.close();
-  }
-  <span style="color: #B00040">double</span> mean, sigma;
-  <span style="color: #B00040">double</span> res[<span style="color: #666666">2</span>];
-  meanvar(mc_results, n, res);
-  mean <span style="color: #666666">=</span> res[<span style="color: #666666">0</span>]; sigma<span style="color: #666666">=</span> res[<span style="color: #666666">1</span>];
-  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of integral = &quot;</span> <span style="color: #666666">&lt;&lt;</span>  mean  <span style="color: #666666">&lt;&lt;</span>  endl;
-  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of variance = &quot;</span> <span style="color: #666666">&lt;&lt;</span> sigma <span style="color: #666666">&lt;&lt;</span> endl; 
-  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Standard deviation = &quot;</span> <span style="color: #666666">&lt;&lt;</span>  sqrt(sigma<span style="color: #666666">/</span>(n<span style="color: #666666">-1.0</span>)) <span style="color: #666666">&lt;&lt;</span> endl;
-  <span style="color: #408080; font-style: italic">// Open file for writing, writing results in formated output for plotting:</span>
-  ofstream outfile;
-  outfile.open(<span style="color: #BA2121">&quot;blockres.dat&quot;</span>, ios<span style="color: #666666">::</span>out);
-  outfile <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">10</span>);
-  <span style="color: #B00040">double</span><span style="color: #666666">*</span> block_results <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> <span style="color: #B00040">double</span>[n_block_samples];
-  <span style="color: #B00040">int</span> block_size, block_step_length;
-  block_step_length <span style="color: #666666">=</span> (max_block_size<span style="color: #666666">-</span>min_block_size)<span style="color: #666666">/</span>n_block_samples;
+n_blocks <span style="color: #666666">=</span> <span style="color: #666666">200</span>
+block_size_min <span style="color: #666666">=</span> <span style="color: #666666">100</span>
+block_size_max <span style="color: #666666">=</span> <span style="color: #008000">len</span>(data)<span style="color: #666666">/100</span>
+block_step <span style="color: #666666">=</span> <span style="color: #008000">int</span> ((block_size_max <span style="color: #666666">-</span> block_size_min <span style="color: #666666">+</span> <span style="color: #666666">1</span>) <span style="color: #666666">/</span> n_blocks)
 
-  <span style="color: #408080; font-style: italic">// loop over block sizes</span>
-  <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i<span style="color: #666666">=0</span>; i<span style="color: #666666">&lt;</span>n_block_samples; i<span style="color: #666666">++</span>){
-    block_size <span style="color: #666666">=</span> min_block_size<span style="color: #666666">+</span>i<span style="color: #666666">*</span>block_step_length;
-    blocking(mc_results, n, block_size, res);
-    mean  <span style="color: #666666">=</span> res[<span style="color: #666666">0</span>];
-    sigma <span style="color: #666666">=</span> res[<span style="color: #666666">1</span>];
-    <span style="color: #408080; font-style: italic">// formated output</span>
-    outfile <span style="color: #666666">&lt;&lt;</span> block_size <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;</span><span style="color: #BB6622; font-weight: bold">\t</span><span style="color: #BA2121">&quot;</span> <span style="color: #666666">&lt;&lt;</span> sqrt(sigma<span style="color: #666666">/</span>((n<span style="color: #666666">/</span>block_size)<span style="color: #666666">-1.0</span>)) <span style="color: #666666">&lt;&lt;</span> endl;
-  }
-  outfile.close();
-  <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
-}
+mean_vec <span style="color: #666666">=</span> []
+var_vec <span style="color: #666666">=</span> []
+block_sizes <span style="color: #666666">=</span> []
+<span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">0</span>, n_blocks):
+    mean_temp_vec <span style="color: #666666">=</span> []
+    start_point <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+    end_point <span style="color: #666666">=</span> block_size_min <span style="color: #666666">+</span> block_step<span style="color: #666666">*</span>i
+    block_size <span style="color: #666666">=</span> end_point
+    block_sizes<span style="color: #666666">.</span>append(block_size)
+    <span style="color: #008000; font-weight: bold">while</span> end_point <span style="color: #666666">&lt;=</span> <span style="color: #008000">len</span>(data):		
+    	  mean_temp_vec<span style="color: #666666">.</span>append(block_mean(data[start_point:end_point]))
+		start_point <span style="color: #666666">=</span> end_point
+			    end_point <span style="color: #666666">+=</span> block_size_min <span style="color: #666666">+</span> block_step<span style="color: #666666">*</span>i
+			    mean, var <span style="color: #666666">=</span> meanAndVariance(mean_temp_vec)
+			    mean_vec<span style="color: #666666">.</span>append(mean)
+			    var_vec<span style="color: #666666">.</span>append(np<span style="color: #666666">.</span>sqrt(  var<span style="color: #666666">/</span>(<span style="color: #008000">len</span>(data)<span style="color: #666666">/</span><span style="color: #008000">float</span>(block_size) <span style="color: #666666">-</span> <span style="color: #666666">1.0</span>)     ))
+
+mean, var <span style="color: #666666">=</span> meanAndVariance(data)
+<span style="color: #408080; font-style: italic">#print len(data)</span>
 </pre></div>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec167">Actual implementation with code, mean value and variance </h2>
+<h2 id="___sec168">Actual implementation with code, mean value and variance </h2>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
@@ -5171,7 +5238,7 @@ The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec168">Actual implementation with code, blocking part </h2>
+<h2 id="___sec169">Actual implementation with code, blocking part </h2>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
@@ -5200,6 +5267,26 @@ The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/
   <span style="color: #008000; font-weight: bold">delete</span> block_vals;
 }
 </pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec170">The Bootstrap method </h2>
+
+<p>
+Or resampling is also very popular. It is very simple:
+
+<ol>
+<li> Start with your sample of measurements and compute the sample variance and the mean values</li>
+<li> Then start again but pick in a random way the numbers in the sample and recalculate the mean and the sample variance.</li>
+<li> Repeat this \( n \) times.</li>
+</ol>
+
+It can be shown, see the article by <a href="https://projecteuclid.org/download/pdf_1/euclid.aos/1176344552" target="_blank">Efron</a>
+that it produces the correct standard deviation.
+
+<p>
+This method is very useful for small ensembles of data points.
+
 <p>
 
 <!-- ------------------- end of main content --------------- -->
