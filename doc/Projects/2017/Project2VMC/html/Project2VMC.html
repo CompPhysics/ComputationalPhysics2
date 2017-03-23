@@ -51,12 +51,14 @@ div { text-align: justify; text-justify: inter-word; }
               ('Project 2 e):', 3, None, '___sec6'),
               ('Project 2 f):', 3, None, '___sec7'),
               ('Project 2 g):', 3, None, '___sec8'),
-              ('Literature', 3, None, '___sec9'),
-              ('Introduction to numerical projects', 2, None, '___sec10'),
+              ('Project 2 h):', 3, None, '___sec9'),
+              ('Project 2 i):', 3, None, '___sec10'),
+              ('Literature', 3, None, '___sec11'),
+              ('Introduction to numerical projects', 2, None, '___sec12'),
               ('Format for electronic delivery of report and programs',
                2,
                None,
-               '___sec11')]}
+               '___sec13')]}
 end of tocinfo -->
 
 <body>
@@ -106,8 +108,8 @@ MathJax.Hub.Config({
 The aim of this project is to use the Variational Monte
 Carlo (VMC) method to evaluate 
 the ground state energy, onebody densities, expectation values of the kinetic and potential energies 
- and single-particle energies of 
-quantum dots with \( N=2 \), \( N=6 \), \( N=12 \) and \( N=20 \) electrons, so-called closed shell systems.
+ and single-particle denisties of 
+quantum dots with \( N=2 \), \( N=6 \), \( N=12 \) and \( N=20 \) electrons. These are so-called closed shell systems.
 
 <h2 id="___sec1">Theoretical background and description of the physical system </h2>
 
@@ -144,7 +146,7 @@ modulus of the positions of the electrons (for a given electron \( i \)) as \( r
 <h3 id="___sec2">Project 2 a): </h3>
 
 <p>
-In exercises a-d we will deal only with a system of
+In exercises a-f we will deal only with a system of
 two electrons in a quantum dot with a frequency of \( \hbar\omega = 1 \). 
 The reason for this is that we have exact closed form expressions 
 for the ground state energy from Taut's work for selected values of \( \omega \), 
@@ -166,7 +168,7 @@ $$
 \end{equation*}
 $$
 
-The functions \( H_{n_x}(\sqrt{\omega}x) \) are so-called Hermite polynomials, discussed in the last section below  while \( A \) is a normalization constant. 
+The functions \( H_{n_x}(\sqrt{\omega}x) \) are so-called Hermite polynomials, discussed in connection with project 1  while \( A \) is a normalization constant. 
 For the lowest-lying state we have \( n_x=n_y=0 \) and an energy \( \epsilon_{n_x,n_y}=\omega(n_x+n_y+1) = \omega \).
 Convince yourself that the lowest-lying energy for the two-electron system  is simply \( 2\omega \).
 
@@ -200,7 +202,7 @@ $$
 \end{equation}
 $$
 
-where \( a \) is equal to one when the two electrons have anti-parallel spins and \( 1/3 \) when the spins are parallel. Finally, \( \alpha \) and \( \beta \) are our variational parameters. Note well the dependence n \( \alpha \) for the single-particle part of the trial function. It is important to remember this when you use higher-order Hermite polynomials.
+where \( a \) is equal to one when the two electrons have anti-parallel spins and \( 1/3 \) when the spins are parallel. Finally, \( \alpha \) and \( \beta \) are our variational parameters. Note well the dependence on \( \alpha \) for the single-particle part of the trial function. It is important to remember this when you use higher-order Hermite polynomials.
 Find the analytical expressions for the local energy.
 
 <h3 id="___sec4">Project 2 c): </h3>
@@ -218,35 +220,48 @@ $$
 \end{equation}
 $$
 
-Use importance sampling with the analytical expression for the local energy, including blocking and 
-optimization of the parameters using for example the conjugate gradient method from project 1. 
-All elements from project 1 can be used for project 2 as well.
-In addition, you should parallelize your program using MPI and set it up to run on Smaug.
+Compute the expectation value of the energy using both the analytical expression for the local energy and numerical derivation of the kinetic energy. Compare the time usage between the two approaches.
+Perform these calculations without importance sampling and also without the Jastrow factor. For the calculations without the Jastrow factor and repulsive Coulomb potential, your energy should equal 2.0 a.u. and your variance should be exactly equal to zero.
 
 <h3 id="___sec5">Project 2 d): </h3>
 
 <p>
-Find the  energy minimum and discuss your results compared with the analytical solution from
-Taut's work, see Ref. [1]. Compute also the mean distance
-\( r_{12}=\vert \boldsymbol{r}_1-\boldsymbol{r}_2\vert \) (with \( r_i = \sqrt{r_{i_x}^2+r_{i_y}^2} \)) between the two electrons for the optimal set of the variational parameters.
-
-<ul>
-  <li> [1d)]  With the optimal parameters for the ground state wave function, compute the onebody density. Discuss your results and compare the results with those obtained with a pure harmonic oscillator wave functions. Run a Monte Carlo calculations without the Jastrow factor as well</li>
-</ul>
-
-and compute the same quantities. How important are the correlations induced by the Jastrow factor?
-Compute also the expectation value of the kinetic energy and potential energy using \( \omega=0.01 \), \( \omega=0.05 \),
-\( \omega=0.1 \), \( \omega=0.5 \) and \( \omega=1.0 \). Comment your results. Hint, think of the virial theorem.
+Add now importance sampling and repeat the calculations from the previous exercise but use only
+the analytical expression for the local energy. Perform also a blocking analysis in order to obtain the optimal
+standard deviation. Compare your results with the those without importance sampling and comment your results.
 
 <h3 id="___sec6">Project 2 e): </h3>
 
 <p>
+Using either the steepest descent method or the conjugate gradient method, find the optimal variational 
+parameters and perform your Monte Carlo calculations using these.  
+In addition, you should parallelize your program using MPI and set it up to run on Smaug.
+
+<h3 id="___sec7">Project 2 f): </h3>
+
+<p>
+Finally, we wil now analyze and interpret our results for the two-electron systems.
+Find the  energy minimum and discuss your results compared with the analytical solution from
+Taut's work, see reference [1] below. Compute also the mean distance
+\( r_{12}=\vert \boldsymbol{r}_1-\boldsymbol{r}_2\vert \) (with \( r_i = \sqrt{r_{i_x}^2+r_{i_y}^2} \)) between the two electrons for the optimal set of the variational parameters.
+With the optimal parameters for the ground state wave function, compute the onebody density. Discuss your results and compare the results with those obtained with a pure harmonic oscillator wave functions. Run a Monte Carlo calculations without the Jastrow factor as well
+and compute the same quantities. How important are the correlations induced by the Jastrow factor?
+Compute also the expectation value of the kinetic energy and potential energy using \( \omega=0.01 \), \( \omega=0.05 \),
+\( \omega=0.1 \), \( \omega=0.5 \) and \( \omega=1.0 \). Comment your results. Hint, think of the virial theorem.
+
+<p>
+Discuss also your results with those obtained with Hartree-Fock theory for two electrons from project 1.
+
+<h3 id="___sec8">Project 2 g): </h3>
+
+<p>
 The previous exercises have prepared you for extending your calculational machinery  to other systems.
-Here we will focus on quantum dots with \( N=6 \), \( N=12 \) and \( N=20 \) electrons.
+Here we will focus on quantum dots with \( N=6 \) and \( N=12 \) electrons.
 
 <p>
 The new item you need to pay attention to is the calculation of the Slater Determinant. This is an additional complication
-to your VMC calculations.
+to your VMC calculations.  You will also need to use replace the single-particle functions of the Slater determinant
+with those obtained from your Hartree-Fock calculations of project 1.
 If we stick to harmonic oscillator like wave functions,
 the trial wave function for say an \( N=6 \) electron quantum dot can be written as
 
@@ -275,19 +290,18 @@ $$
 $$
 
 In this case you need to include the \( n_x=2 \) and \( n_y=2 \) wave functions as well.
-Observe that \( r_i = \sqrt{r_{i_x}^2+r_{i_y}^2} \).  Use the Hermite polynomials defined in the appendix.
-For \( N=20 \) you will also need the \( n_x,n_y=3 \) Hermite polynomials.  Reference [5] gives benchmark results for closed-shell systems up to \( N=20 \).
+Observe that \( r_i = \sqrt{r_{i_x}^2+r_{i_y}^2} \).  Use the Hermite polynomials defined in project 1 and related them to the Hartree-Fock calculations from project 1. Reference [5] gives benchmark results for closed-shell systems up to \( N=20 \).
 
 <p>
-Write a function which sets up the Slater determinant. Find the Hermite polynomials which are needed for \( n_x=0,1,2,3 \) and obviously \( n_y \) as well.
-Compute the ground state energies of quantum dots for \( N=6 \), \( N=12 \) and \( N=20 \) electrons, following the same set up as in the previous exercises for \( \omega=0.01 \), \( \omega=0.05 \),
+Write a function which sets up the Slater determinant. Find the Hermite polynomials which are needed for \( n_x=0,1,2 \) and obviously \( n_y \) as well.  Relate these to the results from project 1.
+Compute the ground state energies of quantum dots for \( N=6 \) and \( N=12 \) electrons, following the same set up as in the previous exercises for \( \omega=0.01 \), \( \omega=0.05 \),
 \( \omega=0.1 \), \( \omega=0.5 \), and \( \omega=1.0 \).
 The calculations should include  parallelization, blocking, importance sampling and energy minimization using the conjugate gradient approach or similar approaches.
 To test your Slater determinant code, you should reproduce the unperturbed single-particle energies
-when the electron-electron repulsion is switched off. Convince yourself that the unperturbed ground state energies for \( N=6 \) is \( 10\omega \) and for \( N=12 \) we obtain \( 28\omega \).  What is the unperturbed result for \( N=20 \)? What is the expected total 
+when the electron-electron repulsion is switched off. Convince yourself that the unperturbed ground state energies for \( N=6 \) is \( 10\omega \) and for \( N=12 \) we obtain \( 28\omega \). What is the expected total 
 spin of the ground states?
 
-<h3 id="___sec7">Project 2 f): </h3>
+<h3 id="___sec9">Project 2 h): </h3>
 
 With the optimal parameters for the ground state wave function, compute again the onebody density. Discuss your results and compare the results with those obtained with a pure harmonic oscillator
 wave functions. Run a Monte Carlo calculations without the Jastrow factor as well
@@ -295,7 +309,7 @@ and compute the same quantities. How important are the correlations induced by t
 Compute also the expectation value of the kinetic energy and potential energy using \( \omega=0.01 \),
 \( \omega=0.05 \), \( \omega=0.1 \), \( \omega=0.5 \), and \( \omega=1.0 \). Comment your results.
 
-<h3 id="___sec8">Project 2 g): </h3>
+<h3 id="___sec10">Project 2 i): </h3>
 
 <p>
 The last exercise  is a performance analysis of your code(s) for the case of \( N=6 \) electrons. Make a perfroamnce analysis by timing your serial code
@@ -307,17 +321,17 @@ Compare thereafter your serial code(s)  with the speedup you get by parallelizin
 Do you get a near \( 100\% \) speedup with the parallel version? Comment again your results and perform timing benchmarks several times in order 
 to extract  an average performance time.
 
-<h3 id="___sec9">Literature </h3>
+<h3 id="___sec11">Literature </h3>
 
-<ul>
-  <li> M. Taut, Phys. Rev. A <b>48</b>, 3561 - 3566 (1993).</li>
-  <li> B. L. Hammond, W. A. Lester and P. J. Reynolds, <em>Monte Carlo methods in Ab Initio Quantum Chemistry</em>, World Scientific, Singapore, 1994, chapters 2-5 and appendix B.</li>
-  <li> B.H. Bransden and C.J. Joachain, Physics of Atoms and molecules, Longman, 1986. Chapters 6, 7 and 9.</li>
-  <li> A. K.  Rajagopal and J. C. Kimball, see Phys. Rev. B <b>15</b>, 2819 (1977).</li>
-  <li> M. .L. Pedersen, G. Hagen, M. Hjorth-Jensen, S. Kvaal,  and F. Pederiva, Phys. Rev. B <b>84</b>, 115302 (2011)</li>
-</ul>
+<ol>
+<li> M. Taut, Phys. Rev. A <b>48</b>, 3561 - 3566 (1993).</li>
+<li> B. L. Hammond, W. A. Lester and P. J. Reynolds, <em>Monte Carlo methods in Ab Initio Quantum Chemistry</em>, World Scientific, Singapore, 1994, chapters 2-5 and appendix B.</li>
+<li> B.H. Bransden and C.J. Joachain, Physics of Atoms and molecules, Longman, 1986. Chapters 6, 7 and 9.</li>
+<li> A. K.  Rajagopal and J. C. Kimball, see Phys. Rev. B <b>15</b>, 2819 (1977).</li>
+<li> M. .L. Pedersen, G. Hagen, M. Hjorth-Jensen, S. Kvaal,  and F. Pederiva, Phys. Rev. B <b>84</b>, 115302 (2011)</li>
+</ol>
 
-<h2 id="___sec10">Introduction to numerical projects </h2>
+<h2 id="___sec12">Introduction to numerical projects </h2>
 
 <p>
 Here follows a brief recipe and recommendation on how to write a report for each
@@ -335,7 +349,7 @@ project.
   <li> Try to establish a practice where you log your work at the  computerlab. You may find such a logbook very handy at later stages in your work, especially when you don't properly remember  what a previous test version  of your program did. Here you could also record  the time spent on solving the exercise, various algorithms you may have tested or other topics which you feel worthy of mentioning.</li>
 </ul>
 
-<h2 id="___sec11">Format for electronic delivery of report and programs </h2>
+<h2 id="___sec13">Format for electronic delivery of report and programs </h2>
 
 <p>
 The preferred format for the report is a PDF file. You can also use DOC or postscript formats or as an ipython notebook file.  As programming language we prefer that you choose between C/C++, Fortran2008 or Python. The following prescription should be followed when preparing the report:
