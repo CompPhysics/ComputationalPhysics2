@@ -2,9 +2,9 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
-<meta name="description" content="Computational Physics 2:  Definitions of the many-body problem">
+<meta name="description" content="Computational Physics:  Hartree-Fock methods and introduction to Many-body Theory">
 
-<title>Computational Physics 2:  Definitions of the many-body problem</title>
+<title>Computational Physics:  Hartree-Fock methods and introduction to Many-body Theory</title>
 
 
 
@@ -129,56 +129,118 @@ MathJax.Hub.Config({
 <section>
 <!-- ------------------- main content ---------------------- -->
 
-<!-- Slides for FYS4411 -->
 
 
-<center><h1 style="text-align: center;">Computational Physics 2:  Definitions of the many-body problem</h1></center>  <!-- document title -->
+<center><h1 style="text-align: center;">Computational Physics:  Hartree-Fock methods and introduction to Many-body Theory</h1></center>  <!-- document title -->
 
 <p>
-<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
+<!-- author(s): Morten Hjorth-Jensen -->
 
 <center>
-<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
+<b>Morten Hjorth-Jensen</b> [1, 2]
 </center>
 
 <p>&nbsp;<br>
 <!-- institution(s) -->
 
-<center>[1] <b>Department of Physics, University of Oslo</b></center>
-<center>[2] <b>Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University</b></center>
+<center>[1] <b><a href="http://www.nscl.msu.edu/" target="_blank">National Superconducting Cyclotron Laboratory</a> and <a href="https://www.pa.msu.edu/" target="_blank">Department of Physics and Astronomy</a>, <a href="http://www.msu.edu/" target="_blank">Michigan State University</a>, East Lansing, MI 48824, USA</b></center>
+<center>[2] <b>Department of Physics, University of Oslo, Oslo, Norway</b></center>
 <br>
 <p>&nbsp;<br>
-<center><h4>Spring 2016</h4></center> <!-- date -->
+<center><h4>Spring 2017</h4></center> <!-- date -->
 <br>
 <p>
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2016, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 2013-2017, Morten Hjorth-Jensen. Released under CC Attribution-NonCommercial 4.0 license
 </center>
 </section>
 
 
 <section>
-<h2 id="___sec0">Quantum Many-particle Methods </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec0">Why Hartree-Fock?  </h2>
+
+<p>
+Hartree-Fock (HF) theory is an algorithm for finding an approximative expression for the ground state of a given Hamiltonian. The basic ingredients are
+
 <ul>
-<p><li> Large-scale diagonalization (Iterative methods, Lanczo's method, dimensionalities \( 10^{10} \) states), discussed in <a href="http://www.uio.no/studier/emner/matnat/fys/FYS-KJM4480/" target="_blank">FYS-KJM4480</a></li>
-<p><li> Coupled cluster theory, favoured method in quantum chemistry, molecular and atomic physics. Applications to ab initio calculations in nuclear physics as well for large nuclei, discussed in <a href="http://www.uio.no/studier/emner/matnat/fys/FYS-KJM4480/" target="_blank">FYS-KJM4480</a></li>
-<p><li> Perturbative many-body methods, discussed in <a href="http://www.uio.no/studier/emner/matnat/fys/FYS-KJM4480/" target="_blank">FYS-KJM4480</a></li>
-<p><li> Density functional theories/Mean-field theory and Hartree-Fock theory,also  discussed in <a href="http://www.uio.no/studier/emner/matnat/fys/FYS-KJM4480/" target="_blank">FYS-KJM4480</a></li>
-<p><li> Monte-Carlo methods (Only in FYS4411, Computational quantum mechanics)</li>
-<p><li> Green's function theories (depending on interest)</li>
-<p><li> and other. The physics of the system hints at which many-body methods to use.</li>
+
+<p><li> Define a single-particle basis \( \{\psi_{\alpha}\} \) so that</li>
 </ul>
-</div>
+<p>&nbsp;<br>
+$$ 
+\hat{h}^{\mathrm{HF}}\psi_{\alpha} = \varepsilon_{\alpha}\psi_{\alpha}
+$$
+<p>&nbsp;<br>
+
+with the Hartree-Fock Hamiltonian defined as
+<p>&nbsp;<br>
+$$
+\hat{h}^{\mathrm{HF}}=\hat{t}+\hat{u}_{\mathrm{ext}}+\hat{u}^{\mathrm{HF}}
+$$
+<p>&nbsp;<br>
+
+
+<ul>
+
+<p><li> The term  \( \hat{u}^{\mathrm{HF}} \) is a single-particle potential to be determined by the HF algorithm.</li>
+
+<p><li> The HF algorithm means to choose \( \hat{u}^{\mathrm{HF}} \) in order to have</li> 
+</ul>
+<p>&nbsp;<br>
+$$ \langle \hat{H} \rangle = E^{\mathrm{HF}}= \langle \Phi_0 | \hat{H}|\Phi_0 \rangle
+$$
+<p>&nbsp;<br>
+
+that is to find a local minimum with a Slater determinant \( \Phi_0 \) being the ansatz for the ground state. 
+
+<ul>
+
+<p><li> The variational principle ensures that \( E^{\mathrm{HF}} \ge E_0 \), with \( E_0 \) the exact ground state energy.</li>
+</ul>
 </section>
 
 
 <section>
-<h2 id="___sec1">Selected Texts and Many-body theory </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec1">Why Hartree-Fock?  </h2>
+
+<p>
+We will show that the Hartree-Fock Hamiltonian \( \hat{h}^{\mathrm{HF}} \) equals our definition of the operator \( \hat{f} \) discussed in connection with the new definition of the normal-ordered Hamiltonian (see later lectures), that is we have, for a specific matrix element
+<p>&nbsp;<br>
+$$
+\langle p |\hat{h}^{\mathrm{HF}}| q \rangle =\langle p |\hat{f}| q \rangle=\langle p|\hat{t}+\hat{u}_{\mathrm{ext}}|q \rangle +\sum_{i\le F} \langle pi | \hat{V} | qi\rangle_{AS},
+$$
+<p>&nbsp;<br>
+
+meaning that
+<p>&nbsp;<br>
+$$
+\langle p|\hat{u}^{\mathrm{HF}}|q\rangle = \sum_{i\le F} \langle pi | \hat{V} | qi\rangle_{AS}.
+$$
+<p>&nbsp;<br>
+
+The so-called Hartree-Fock potential \( \hat{u}^{\mathrm{HF}} \) brings an explicit medium dependence due to the summation over all single-particle states below the Fermi level \( F \). It brings also in an explicit dependence on the two-body interaction (in nuclear physics we can also have complicated three- or higher-body forces). The two-body interaction, with its contribution from the other bystanding fermions, creates an effective mean field in which a given fermion moves, in addition to the external potential \( \hat{u}_{\mathrm{ext}} \) which confines the motion of the fermion. For systems like nuclei, there is no external confining potential. Nuclei are examples of self-bound systems, where the binding arises due to the intrinsic nature of the strong force. For nuclear systems thus, there would be no external one-body potential in the Hartree-Fock Hamiltonian.
+</section>
+
+
+<section>
+<h2 id="___sec2">Quantum Many-particle Methods </h2>
+
+<ul>
+<p><li> Large-scale diagonalization (Iterative methods, Lanczo's method, dimensionalities \( 10^{10} \) states)</li>
+<p><li> Coupled cluster theory, favoured method in quantum chemistry, molecular and atomic physics. Applications to ab initio calculations in nuclear physics as well for large nuclei</li>
+<p><li> Perturbative many-body methods</li>
+<p><li> Density functional theories/Mean-field theory and Hartree-Fock theory</li>
+<p><li> Monte-Carlo methods (Only in FYS4411, Computational quantum mechanics)</li>
+<p><li> Green's function theories</li>
+<p><li> and other. The physics of the system hints at which many-body methods to use.</li>
+</ul>
+</section>
+
+
+<section>
+<h2 id="___sec3">Selected Texts and Many-body theory </h2>
+
 <ul>
 <p><li> Blaizot and Ripka, <em>Quantum Theory of Finite systems</em>, MIT press 1986</li>
 <p><li> Negele and Orland, <em>Quantum Many-Particle Systems</em>, Addison-Wesley, 1987.</li>
@@ -187,14 +249,12 @@ MathJax.Hub.Config({
 <p><li> Mattuck, <em>Guide to Feynman Diagrams in the Many-Body Problem</em>, Dover, 1971.</li>
 <p><li> Dickhoff and Van Neck, <em>Many-Body Theory Exposed</em>, World Scientific, 2006.</li>
 </ul>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec2">Definitions </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec4">Definitions </h2>
+
 <p>
 An operator is defined as \( \hat{O} \) throughout. Unless otherwise specified the number of particles is
 always \( N \) and \( d \) is the dimension of the system.  In nuclear physics
@@ -204,27 +264,25 @@ protons. In case of other baryons such isobars \( \Delta \) or various
 hyperons such as \( \Lambda \) or \( \Sigma \), one needs to add their
 definitions.  Hereafter, \( N \) is reserved for the total number of
 particles, unless otherwise specificied.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec3">Definitions </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec5">Definitions </h2>
+
 <p>
 The quantum numbers of a single-particle state in coordinate space are
 defined by the variable 
 <p>&nbsp;<br>
 $$
-x=({\bf r},\sigma), 
+x=(\boldsymbol{r},\sigma), 
 $$
 <p>&nbsp;<br>
 
 where 
 <p>&nbsp;<br>
 $$
-{\bf r}\in {\mathbb{R}}^{d},
+\boldsymbol{r}\in {\mathbb{R}}^{d},
 $$
 <p>&nbsp;<br>
 
@@ -235,21 +293,19 @@ $$
 $$
 <p>&nbsp;<br>
 
-and the integral \( \int dx = \sum_{\sigma}\int d^dr = \sum_{\sigma}\int d{\bf r} \),
+and the integral \( \int dx = \sum_{\sigma}\int d^dr = \sum_{\sigma}\int d\boldsymbol{r} \),
 and
 <p>&nbsp;<br>
 $$
 \int d^Nx= \int dx_1\int dx_2\dots\int dx_N.
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec4">Definitions </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec6">Definitions </h2>
+
 <p>
 The quantum mechanical wave function of a given state with quantum numbers \( \lambda \) (encompassing all quantum numbers needed to specify the system), ignoring time, is
 <p>&nbsp;<br>
@@ -258,7 +314,7 @@ $$
 $$
 <p>&nbsp;<br>
 
-with \( x_i=({\bf r}_i,\sigma_i) \) and the projection of \( \sigma_i \) takes the values
+with \( x_i=(\boldsymbol{r}_i,\sigma_i) \) and the projection of \( \sigma_i \) takes the values
 \( \{-1/2,+1/2\} \) for particles with spin \( 1/2 \). 
 We will hereafter always refer to \( \Psi_{\lambda} \) as the exact wave function, and if the ground state is not degenerate we label it as 
 <p>&nbsp;<br>
@@ -266,14 +322,12 @@ $$
 \Psi_0=\Psi_0(x_1,x_2,\dots,x_N).
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec5">Definitions </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec7">Definitions </h2>
+
 <p>
 Since the solution \( \Psi_{\lambda} \) seldomly can be found in closed form, approximations are sought. Here we define an approximative wave function or an ansatz to the exact wave function as 
 <p>&nbsp;<br>
@@ -290,14 +344,12 @@ $$
 <p>&nbsp;<br>
 
 being the ansatz to the ground state.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec6">Definitions </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec8">Definitions </h2>
+
 <p>
 The wave function \( \Psi_{\lambda} \) is sought in the Hilbert space of either symmetric or anti-symmetric \( N \)-body functions, namely
 <p>&nbsp;<br>
@@ -314,14 +366,12 @@ $$
 {\cal H}_1:= L^2(\mathbb{R}^{d}\oplus (\sigma)).
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec7">Definitions </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec9">Definitions </h2>
+
 <p>
 Our Hamiltonian is invariant under the permutation (interchange) of two particles.
 Since we deal with fermions however, the total wave function is antisymmetric.
@@ -345,14 +395,12 @@ $$
 where \( \beta \) is the eigenvalue of \( \hat{P} \). We have introduced the suffix \( ij \) in order to indicate that we permute particles \( i \) and \( j \).
 The Pauli principle tells us that the total wave function for a system of fermions
 has to be antisymmetric, resulting in the eigenvalue \( \beta = -1 \).
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec8">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec10">Definitions and notations </h2>
+
 <p>
 The Schrodinger equation reads 
 <p>&nbsp;<br>
@@ -367,14 +415,12 @@ $$
 where the vector \( x_i \) represents the coordinates (spatial and spin) of particle \( i \), \( \lambda \) stands  for all the quantum
 numbers needed to classify a given \( N \)-particle state and \( \Psi_{\lambda} \) is the pertaining eigenfunction.  Throughout this course,
 \( \Psi \) refers to the exact eigenfunction, unless otherwise stated.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec9">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec11">Definitions and notations </h2>
+
 <p>
 We write the Hamilton operator, or Hamiltonian,  in a generic way 
 <p>&nbsp;<br>
@@ -403,14 +449,12 @@ $$
 
 Hereafter we use natural units, viz.&nbsp;\( \hbar=c=e=1 \), with \( e \) the elementary charge and \( c \) the speed of light. This means that momenta and masses
 have dimension energy.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec10">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec12">Definitions and notations </h2>
+
 <p>
 If one does quantum chemistry, after having introduced the  Born-Oppenheimer approximation which effectively freezes out the nucleonic degrees of freedom, the Hamiltonian for \( N=n_e \) electrons takes the following form 
 <p>&nbsp;<br>
@@ -420,14 +464,12 @@ $$
 <p>&nbsp;<br>
 
 with \( k=1.44 \) eVnm
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec11">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec13">Definitions and notations </h2>
+
 <p>
 We can rewrite this as
 <p>&nbsp;<br>
@@ -443,7 +485,7 @@ $$
 where  we have defined 
 <p>&nbsp;<br>
 $$
-r_{ij}=| {\bf r}_i-{\bf r}_j|,
+r_{ij}=| \boldsymbol{r}_i-\boldsymbol{r}_j|,
 $$
 <p>&nbsp;<br>
 
@@ -463,14 +505,12 @@ Hamiltonian \( \hat{h}_0 \) contains the kinetic energy operator of an
 electron and its potential energy due to the attraction of the
 nucleus. The second term, \( H_I \), is the sum of the \( n_e(n_e-1)/2 \)
 two-body interactions between each pair of electrons. Note that the double sum carries a restriction \( i < j \).
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec12">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec14">Definitions and notations </h2>
+
 <p>
 The potential energy term due to the attraction of the nucleus defines the onebody field \( u_i=u_{\mathrm{ext}}(x_i) \) of Eq.&nbsp;<a href="#mjx-eqn-2">(2)</a>.
 We have moved this term into the \( \hat{H}_0 \) part of the Hamiltonian, instead of keeping  it in \( \hat{V} \) as in  Eq.&nbsp;<a href="#mjx-eqn-2">(2)</a>.
@@ -485,14 +525,12 @@ $$
 with \( w_{\lambda} \) being the non-interacting energy. This energy is defined by the sum over single-particle energies to be defined below.
 For atoms the single-particle energies could be the hydrogen-like single-particle energies corrected for the charge \( Z \). For nuclei and quantum
 dots, these energies could be given by the harmonic oscillator in three and two dimensions, respectively.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec13">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec15">Definitions and notations </h2>
+
 <p>
 We will assume that the interacting part of the Hamiltonian
 can be approximated by a two-body interaction.
@@ -519,14 +557,12 @@ $$
 
 The onebody part \( u_{\mathrm{ext}}(x_i) \) is normally approximated by a harmonic oscillator potential or the Coulomb interaction an electron feels from the nucleus. However, other potentials are fully possible, such as 
 one derived from the self-consistent solution of the Hartree-Fock equations.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec14">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec16">Definitions and notations </h2>
+
 <p>
 Our Hamiltonian is invariant under the permutation (interchange) of two particles. % (exercise here, prove it)
 Since we deal with fermions however, the total wave function is antisymmetric.
@@ -550,14 +586,12 @@ $$
 where \( \beta \) is the eigenvalue of \( \hat{P} \). We have introduced the suffix \( ij \) in order to indicate that we permute particles \( i \) and \( j \).
 The Pauli principle tells us that the total wave function for a system of fermions
 has to be antisymmetric, resulting in the eigenvalue \( \beta = -1 \).
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec15">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec17">Definitions and notations </h2>
+
 <p>
 In our case we assume that  we can approximate the exact eigenfunction with a Slater determinant
 <p>&nbsp;<br>
@@ -575,14 +609,12 @@ $$
 
 where  \( x_i \)  stand for the coordinates and spin values of a particle \( i \) and \( \alpha,\beta,\dots, \gamma \) 
 are quantum numbers needed to describe remaining quantum numbers.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec16">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec18">Definitions and notations </h2>
+
 <p>
 The single-particle function \( \psi_{\alpha}(x_i) \)  are eigenfunctions of the onebody
 Hamiltonian \( h_i \), that is
@@ -602,14 +634,12 @@ $$
 The energies \( \varepsilon_{\alpha} \) are the so-called non-interacting single-particle energies, or unperturbed energies. 
 The total energy is in this case the sum over all  single-particle energies, if no two-body or more complicated
 many-body interactions are present.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec17">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec19">Definitions and notations </h2>
+
 <p>
 Let us denote the ground state energy by \( E_0 \). According to the
 variational principle we have
@@ -627,14 +657,12 @@ $$
 <p>&nbsp;<br>
 
 where we have used the shorthand \( d\mathbf{\tau}=d\mathbf{r}_1d\mathbf{r}_2\dots d\mathbf{r}_N \).
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec18">Brief reminder on some linear algebra properties </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec20">Brief reminder on some linear algebra properties </h2>
+
 <p>
 Before we proceed with a more compact representation of a Slater determinant, we would like to repeat some linear algebra properties which will be useful for our derivations of the energy as function of a Slater determinant, Hartree-Fock theory and later the nuclear shell model.
 
@@ -661,16 +689,15 @@ $$
 \mathbf{A}=\mathbf{A}^{\dagger}. 
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec19">Basic Matrix Features </h2>
+<h2 id="___sec21">Basic Matrix Features </h2>
 
 <p>
-<div class="alert alert-block alert-block alert-text-normal">
-<b>Matrix Properties Reminder.</b>
+ Matrix Properties Reminder
+
 <p>
 <table border="1">
 <thead>
@@ -684,15 +711,12 @@ $$
 <tr><td align="center">   \( A = \left (A^{\dagger} \right )^{-1} \)    </td> <td align="center">   unitary            </td> <td align="center">   \( \sum_k a_{ik} a_{jk}^{ * } = \sum_k a_{ki}^{ * } a_{kj} = \delta_{ij} \)    </td> </tr>
 </tbody>
 </table>
-
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec20">Basic Matrix Features </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec22">Basic Matrix Features </h2>
+
 <p>
 Since we will deal with Fermions (identical and indistinguishable particles) we will 
 form an ansatz for a given state in terms of so-called Slater determinants determined
@@ -720,14 +744,12 @@ $$
 
 where \( \hat{P}_i \) is a permutation operator which permutes the column indices \( 1,2,3,\dots,n \)
 and the sum runs over all \( n! \) permutations.  The quantity \( p_i \) represents the number of transpositions of column indices that are needed in order to bring a given permutation back to its initial ordering, in our case given by \( a_{11}a_{22}\dots a_{nn} \) here.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec21">Basic Matrix Features, simple \( 2 \times 2 \) determinant  </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec23">Basic Matrix Features, simple \( 2 \times 2 \) determinant  </h2>
+
 <p>
 A simple \( 2\times 2 \) determinant illustrates this. We have
 <p>&nbsp;<br>
@@ -739,14 +761,12 @@ $$
 <p>&nbsp;<br>
 
 where in the last term we have interchanged the column indices \( 1 \) and \( 2 \). The natural ordering we have chosen is \( a_{11}a_{22} \).
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec22">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec24">Definitions and notations </h2>
+
 <p>
 With the above we can rewrite our Slater determinant in a more compact form.
 In the Hartree-Fock method the trial function is the Slater
@@ -760,14 +780,12 @@ $$
 
 where we have introduced the antisymmetrization operator \( \hat{A} \) defined by the 
 summation over all possible permutations of two particles.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec23">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec25">Definitions and notations </h2>
+
 <p>
 It is defined as
 <p>&nbsp;<br>
@@ -788,14 +806,12 @@ $$
     \psi_{\beta}(x_2)\dots\psi_{\nu}(x_N).
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec24">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec26">Definitions and notations </h2>
+
 <p>
 Both \( \hat{H}_0 \) and \( \hat{H}_I \) are invariant under all possible permutations of any two particles
 and hence commute with \( \hat{A} \)
@@ -818,14 +834,12 @@ $$
 
 since every permutation of the Slater
 determinant reproduces it.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec25">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec27">Definitions and notations </h2>
+
 <p>
 The expectation value of \( \hat{H}_0 \) 
 <p>&nbsp;<br>
@@ -854,14 +868,12 @@ $$
   \Phi_H^*\hat{h}_0\hat{P}\Phi_H d\mathbf{\tau}.
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec26">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec28">Definitions and notations </h2>
+
 <p>
 The integral vanishes if two or more particles are permuted in only one
 of the Hartree-functions \( \Phi_H \) because the individual single-particle wave functions are
@@ -885,14 +897,12 @@ $$
 \end{equation}
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec27">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec29">Definitions and notations </h2>
+
 <p>
 We introduce the following shorthand for the above integral
 <p>&nbsp;<br>
@@ -911,14 +921,12 @@ $$
 \end{equation}
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec28">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec30">Definitions and notations </h2>
+
 <p>
 The expectation value of the two-body part of the Hamiltonian is obtained in a
 similar manner. We have
@@ -940,14 +948,12 @@ $$
 
 by following the same arguments as for the one-body
 Hamiltonian.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec29">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec31">Definitions and notations </h2>
+
 <p>
 Because of the dependence on the inter-particle distance \( r_{ij} \),  permutations of
 any two particles no longer vanish, and we get
@@ -962,14 +968,12 @@ $$
 where \( P_{ij} \) is the permutation operator that interchanges
 particle \( i \) and particle \( j \). Again we use the assumption that the single-particle wave functions
 are orthogonal.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec30">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec32">Definitions and notations </h2>
+
 <p>
 We obtain
 <p>&nbsp;<br>
@@ -994,14 +998,12 @@ while the second is due to the Pauli principle and is called
 the exchange term or just the Fock term.
 The factor  \( 1/2 \) is introduced because we now run over
 all pairs twice.
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec31">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec33">Definitions and notations </h2>
+
 <p>
 The last equation allows us to  introduce some further definitions.  
 The single-particle wave functions \( \psi_{\mu}(x) \), defined by the quantum numbers \( \mu \) and \( x \)
@@ -1011,14 +1013,12 @@ $$
    \psi_{\alpha}(x)  = \langle x | \alpha \rangle .
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec32">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec34">Definitions and notations </h2>
+
 <p>
 We introduce the following shorthands for the above two integrals
 <p>&nbsp;<br>
@@ -1036,14 +1036,12 @@ $$
   dx_idx_j.  
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec33">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec35">Definitions and notations </h2>
+
 <p>
 The direct and exchange matrix elements can be  brought together if we define the antisymmetrized matrix element
 <p>&nbsp;<br>
@@ -1066,14 +1064,12 @@ $$
 \langle \mu\nu|\hat{v}|\sigma\tau\rangle_{\mathrm{AS}}= -\langle \mu\nu|\hat{v}|\tau\sigma\rangle_{\mathrm{AS}}=-\langle \nu\mu|\hat{v}|\sigma\tau\rangle_{\mathrm{AS}}.
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec34">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec36">Definitions and notations </h2>
+
 <p>
 The antisymmetric matrix element is also hermitian, implying 
 <p>&nbsp;<br>
@@ -1092,14 +1088,12 @@ $$
 \end{equation}
 $$
 <p>&nbsp;<br>
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec35">Definitions and notations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec37">Definitions and notations </h2>
+
 <p>
 Combining Eqs.&nbsp;<a href="#mjx-eqn-12">(12)</a> and
 <a href="#mjx-eqn-15">(15)</a> we obtain the energy functional 
@@ -1114,280 +1108,28 @@ $$
 $$
 <p>&nbsp;<br>
 
-which we will use as our starting point for the Hartree-Fock calculations later in this course.
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec36">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-We consider a system of electrons confined in a pure isotropic harmonic oscillator potential \( V(\mathbf{r})=m^* \omega_0^2 r^2/2 \), where \( m^* \) is the effective mass of the electrons in the host semiconductor, \( \omega_0 \) is the oscillator frequency of the confining potential, and \( \mathbf{r}=(x,y,z) \) denotes the position of the particle.
-
-<p>
-The Hamiltonian of a single particle trapped in this harmonic oscillator potential simply reads
-<p>&nbsp;<br>
-$$
-  \hat{H}= \frac{\textbf{p}^2}{2m^*}  + \frac{1}{2} m^* \omega_0^2 {\textbf{r}}^2
-$$
-<p>&nbsp;<br>
-
-where \( \textbf{p} \) is the canonical momentum of the particle.
-
-
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec37">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-When considering several particles trapped in the same quantum dot, the Coulomb repulsion between those electrons has to be added to the single particle Hamiltonian which gives
-<p>&nbsp;<br>
-$$
-\hat{H}=\sum_{i=1}^{N_e} \left( \frac{\mathbf{p_i}^2}{2m^*}+ \frac{1}{2} m^* \omega_0^2 {\mathbf{r_i}}^2 \right) + \frac{e^2}{4 \pi \epsilon_0 \epsilon_r} \sum_{i < j} \frac{1}{{\mathbf{r_i}-\mathbf{r_j}}},
-$$
-<p>&nbsp;<br>
-
-where \( N_e \) is the number of electrons, \( -e \;  (e>0) \) is the charge of the electron, \( \epsilon_0 \) and \( \epsilon_r \) are respectively the free space permittivity and the relative permittivity of the host material (also called dielectric constant), and the index \( i \) labels the electrons.
-
-
-</div>
+which we will use as our starting point for the Hartree-Fock calculations.
 </section>
 
 
 <section>
 <h2 id="___sec38">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-We assume that the magnetic field \( \mathbf{B} \) is static and along the \( z \) axis.
-At first we ignore the spin-dependent terms. The Hamiltonian of these electrons in a magnetic field now reads
-<p>&nbsp;<br>
-$$
-\begin{align}
-  \hat{H}=&\sum_{i=1}^{N_e}\left(  \frac{(\mathbf{p_i}+e\mathbf{A})^2}{2m^*}  + \frac{1}{2} m^* \omega_0^2 {\mathbf{r_i}}^2  \right) + \frac{e^2}{4 \pi \epsilon_0 \epsilon_r} \sum_{i < j}\frac{1}{{\mathbf{r_i}-\mathbf{r_j}}}, 
-\tag{17}\\
-=&\sum_{i=1}^{N_e}\left(  \frac{\mathbf{p_i}^2}{2m^*} + \frac{e}{2m^*}(\mathbf{A}\cdot \mathbf{p_i}+\mathbf{p_i}\cdot \mathbf{A}) + \frac{e^2}{2m^*}\mathbf{A}^2  + \frac{1}{2} m^* \omega_0^2 {\mathbf{r_i}}^2  \right) 
-\tag{18}\\
- &+ \frac{e^2}{4 \pi \epsilon_0 \epsilon_r} \sum_{i < j}\frac{1}{{\mathbf{r_i}-\mathbf{r_j}}},
-\tag{19}
-\end{align}
-$$
-<p>&nbsp;<br>
-
-where \( \mathbf{A} \) is the vector potential defined by \( \mathbf{B}=\nabla \times \mathbf{A} \).
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec39">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-In coordinate space, \( \mathbf{p}_i \) is the operator \( -i \hbar \nabla_i \) and by applying the Hamiltonian on the total wave function \( \Psi(\mathbf{r}) \) in the Schroedinger equation, we obtain the following operator acting on \( \Psi(\mathbf{r}) \)
-<p>&nbsp;<br>
-$$
-\begin{align}
-\mathbf{A}\cdot \mathbf{p_i}+\mathbf{p_i}\cdot \mathbf{A} &= - i \hbar \left( \mathbf{A}\cdot \nabla_i+\nabla_i\cdot \mathbf{A} \right) \Psi 
-\tag{20}\\
-&=  - i \hbar \left( \mathbf{A}\cdot  ( \nabla_i \Psi)+\nabla_i\cdot (\mathbf{A} \Psi) \right) 
-\tag{21}
-\end{align}
-$$
-<p>&nbsp;<br>
-
-
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec40">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-We note that if we use the product rule and the Coulomb gauge \( \nabla \cdot \mathbf{A} = 0 \) (by choosing the vector potential as \( \mathbf{A} = \frac{1}{2} \mathbf{B} \times \mathbf{r} \)), \( \mathbf{p_i} \) and \( \nabla_i \) commute and we obtain
-<p>&nbsp;<br>
-$$
- \nabla_i \cdot (\mathbf{A}\Psi) = \mathbf{A} \cdot (\nabla_i\Psi) + (\underbrace{\nabla_i \cdot \mathbf{A})}_0 \Psi=\mathbf{A} \cdot (\nabla_i\Psi) 
-$$
-<p>&nbsp;<br>
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec41">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-This leads us to the following Hamiltonian:
-<p>&nbsp;<br>
-$$
-  \hat{H}=\sum_{i=1}^{N_e}\left(  -\frac{ \hbar^2}{2m^*} \nabla_i^2- i \hbar \frac{e}{m^*} \mathbf{A}\cdot \nabla_i + \frac{e^2}{2m^*}\mathbf{A}^2  + \frac{1}{2} m^* \omega_0^2 {\mathbf{r_i}}^2  \right)
-+ \frac{e^2}{4 \pi \epsilon_0 \epsilon_r} \sum_{i < j}\frac{1}{{\mathbf{r_i}-\mathbf{r_j}}},
-$$
-<p>&nbsp;<br>
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec42">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-The linear term in \( \mathbf{A} \) becomes, in terms of \( \mathbf{B} \):
-<p>&nbsp;<br>
-$$
-\begin{align}
-\tag{22}
-\frac{-i \hbar e}{m^*} \mathbf{A} \cdot \nabla_i &= -\frac{i \hbar e}{2m^*} (\mathbf{B} \times \mathbf{r_i}) \cdot \nabla_i \\
-&= \frac{-i \hbar e}{2m^*} \mathbf{B} \cdot( \mathbf{r_i} \times \nabla_i)  
-\tag{23}\\
-&= \frac{ e}{2m^*} \mathbf{B} \cdot \mathbf{L} 
-\tag{24}
-\end{align}
-$$
-<p>&nbsp;<br>
-
-where \( \mathbf{L}=-i \hbar (\mathbf{r_i} \times \nabla_i) \) is the orbital angular momentum operator of the electron \( i \).
 
 <p>
-If we assume that the electrons are confined in the \( xy \)-plane, the quadratic term in \( \mathbf{A} \) can be written as
-<p>&nbsp;<br>
-$$
-\frac{e^2}{2m^*} \mathbf{A}^2 = \frac{e^2}{8m^*} (\mathbf{B} \times \mathbf{r})^2
-= \frac{e^2}{8m^*} B^2 r_i^2
-$$
-<p>&nbsp;<br>
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec43">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-Until this point we have neglected the intrinsic magnetic moment of the electrons which is due to the electron spin in the host material. We will now add its effect to the Hamiltonian. This intrinsic magnetic moment is given by 
-<p>&nbsp;<br>
-$$
-M_s=-g_s (e \mathbf{S})/(2m), 
-$$
-<p>&nbsp;<br>
-
-where \( g_s \) is the effective spin gyromagnetic ratio.
+We will deal only with systems where all possible single-particle states below a certain level are filled up. Such systems are called closed shell systems, a naming inspired from atomic and nuclear physics. These closed shell systems define what is frequently named <b>magic numbers</b>. Quantum dots exhibit also magic numbers, meaning that the addition or removal of one eletron requires more energy than systems where the lowest-lying shells are not filled. Using the harmonic oscillator in two dimensions as basis functions (with degenerate single-particle energies) the magic numbers are \( N=2 \), \( N=6 \), \( N=12 \), \( N=20 \) etc, where \( N \) is the number of electrons. See the table below for more details.
 
 <p>
-We see that the spin magnetic moment \( M_s \) gives rise to an additional interaction energy linear in the magnetic field,
-<p>&nbsp;<br>
-$$
-  \hat{H}_s= - M_s \cdot \mathbf{B} = g_s \frac{e}{2 m} B \hat{S}_z= g_s \frac{\omega_c}{2} \hat{S}_z
-$$
-<p>&nbsp;<br>
-
-
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec44">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-In order to simplify the computation, the Hamiltonian can be rewritten on dimensionless form.
-For this purpose, we introduce the following constants:
-
-<ul>
-<p><li> The oscillator frequency \( \omega = \omega_0\sqrt{1+\omega_c^2/ (4\omega_0^2)} \),</li>
-<p><li> A new energy unit \( \hbar \omega \),</li>
-<p><li> A new length unit, the oscillator length defined by \( l=\sqrt{\hbar /(m^* \omega)} \), also called the characteristic length unit.</li>
-</ul>
-<p>
-
-We rewrite the Hamiltonian in dimensionless units using
-<p>&nbsp;<br>
-$$\mathbf{r} \longrightarrow \frac{\mathbf{r}}{l}, \quad \nabla \longrightarrow l \;\nabla \quad \text{and} \quad \hat{L}_z \longrightarrow \hat{L}_z$$
-<p>&nbsp;<br>
-
-
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec45">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-A new dimensionless parameter \( \lambda=l / a_0^* \) (where \( a_0^*= 4 \pi \epsilon_0 \epsilon_r \hbar^2 / (e^2 m^*) \) is the effective Bohr radius) describes the strength of the electron-electron interaction.
-Large \( \lambda \) implies strong interaction and/or large quantum dot.
-
-<p>
-Since both \( \hat{L_z} \) and \( \hat{S_z} \) commute with the Hamiltonian we can perform the calculations separately in subspaces of given quantum numbers \( L_z \) and \( S_z \).
-
-<p>
-The simplified dimensionless Hamiltonian becomes
-<p>&nbsp;<br>
-$$
-  \hat{H}=\sum_{i=1}^{N_e} \left[  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} r_i^2  \right]+ \lambda \sum_{i < j}\frac{1}{r_{ij}} +  \sum_{i=1}^{N_e} \left(  \frac{1}{2}  \frac{\omega_c}{\hbar \omega} L_z^{(i)}+ \frac{1  }{2} g_s^* \frac{\omega_c}{\hbar \omega} S_z^{(i)}\right),
-$$
-<p>&nbsp;<br>
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec46">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-The last sum which is proportional to the magnetic field involves only the quantum numbers \( L_z \) and \( S_z \) and not the operators themselves. Therefore these terms can be put aside during the resolution, the squizzing effect of the magnetic field being included simply in the parameter \( \lambda \). The contribution of these terms will be added when the other part has been solved. This brings us to the simple and general form of the Hamiltonian
-<p>&nbsp;<br>
-$$
-\hat{H}=\sum_{i=1}^{N_e} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} r_i^2  \right)+ \lambda \sum_{i < j}\frac{1}{r_{ij}}.
-$$
-<p>&nbsp;<br>
-
-<p>
-The form
-<p>&nbsp;<br>
-$$
-\hat{H}=\sum_{i=1}^{N_e} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} r_i^2  \right)+ \lambda \sum_{i < j}\frac{1}{r_{ij}},
-$$
-<p>&nbsp;<br>
-
-is however not so practical since the interaction carries a strength \( \lambda \). Why?
-
-
-</div>
-</section>
-
-
-<section>
-<h2 id="___sec47">Our system, quantum dots </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-We rewrite it as a one-body part 
+We write our Hamiltonian as a one-body part 
 <p>&nbsp;<br>
 $$
 \hat{H}_0=\sum_{i=1}^{N_e}\left(-{\frac{1}{2}}\nabla^2_{i}+\frac{ \omega^2}{2}r^2_{i} \right),
 $$
 <p>&nbsp;<br>
 
-and interacting part
+and an interacting part
 <p>&nbsp;<br>
 $$
-\hat{V}=\sum_{i < j}^{N_e}\frac{1}{|{\bf r}_i-{\bf r}_j|}.
+\hat{V}=\sum_{i < j}^{N_e}\frac{1}{|\boldsymbol{r}_i-\boldsymbol{r}_j|}.
 $$
 <p>&nbsp;<br>
 
@@ -1399,33 +1141,3090 @@ $$
 <p>&nbsp;<br>
 
 where \( n = 0,1,2,3,.. \) and \( m = 0, \pm 1, \pm 2,.. \). The index \( i \) runs from \( 0,1,2,\dots \).
-
-
-</div>
 </section>
 
 
 <section>
-<h2 id="___sec48">Small tasks </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
+<h2 id="___sec39">First tasks </h2>
+
 <p>
-Set up the harmonic oscillator wave function in cartesian coordinates  for an electron with \( n_x=n_y=0 \) and find the oscillator energy.
-Use this result to find the unperturbed energy 
+The first project deals with setting up a Hartree-Fock program that is flexible enough to handle different magic numbers. Hartree-Fock is the simplest possible many-body method. We will use the harmonic oscillator functions as basis functions and via the Hartree-Fock method modify the potential which confines the motion of the electrons by accounting for the Coulomb repulsion between electrons. The Hartree-Fock method leads to a set of coupled single-particle equations. If properly written, the system can easily be extended to three-dimensional electronic systems or other fermionic many-body systems.
+</section>
+
+
+<section>
+<h2 id="___sec40">First tasks, single-particle basis </h2>
+
+<p>
+If only the harmonic oscillator part of the Hamiltonian,
+the so-called unperturbed part is given by
+
 <p>&nbsp;<br>
 $$
-  \int \Phi^*\hat{H_0}\Phi  d\mathbf{\tau}
-  = \sum_{\mu=1}^N \langle \mu | h | \mu \rangle.
+\begin{equation*} \hat{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right).
+\end{equation*}
 $$
 <p>&nbsp;<br>
 
-for two electrons with the same quantum numbers. 
+The wave function for one electron in an oscillator potential in two dimensions is
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+\phi_{n_x,n_y}(x,y) = A H_{n_x}(\sqrt{\omega}x)H_{n_y}(\sqrt{\omega}y)\exp{(-\omega(x^2+y^2)/2}.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+The functions \( H_{n_x}(\sqrt{\omega}x) \) are so-called Hermite polynomials, discussed in the appendix while \( A \) is a normalization constant. 
+For the lowest-lying state we have \( n_x=n_y=0 \) and an energy \( \epsilon_{n_x,n_y}=\omega(n_x+n_y+1) = \omega \).
+</section>
+
+
+<section>
+<h2 id="___sec41">Project 1 a): getting started </h2>
+
+<p>
+Make a program that sets up all the quantum numbers for the single-particle basis using a harmonic oscillator in two dimensions. The list should contain the quantum numbers \( n_x \) and \( n_y \), spin and its projection and the single particle energies in atomic units. Define a cutoff in the list according to the harmonic oscillator excitation energy. 
+The table here lists the first four harmonic oscillator shells, with its pertinent degeneracies, and the total number of electrons which can be accomodated up to a given energy. These numbers are the so-called <em>magic numbers</em> for a two-dimensional quantum dot. The degeneracies take into account the two spin values an electron can take. Convince yourself about the correctness of this table and use it to check that your code is running correctly.
+
+<p>
+<table border="1">
+<thead>
+<tr><th align="center">Shell number</th> <td align="center">                 \( (n_x, n_y) \)                 </td> <th align="center">      Energy      </th> <th align="center">Degeneracy</th> <td align="center">\( N \)</td> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   1               </td> <td align="center">   \( (0,0) \)                                           </td> <td align="center">   \( \hbar\omega \)     </td> <td align="center">   2             </td> <td align="center">   2          </td> </tr>
+<tr><td align="center">   2               </td> <td align="center">   \( (1,0) \), \( (0,1) \)                              </td> <td align="center">   \( 2\hbar\omega \)    </td> <td align="center">   4             </td> <td align="center">   6          </td> </tr>
+<tr><td align="center">   3               </td> <td align="center">   \( (2,0) \), \( (0,2) \), \( (1,1) \)                 </td> <td align="center">   \( 3\hbar\omega \)    </td> <td align="center">   6             </td> <td align="center">   12         </td> </tr>
+<tr><td align="center">   3               </td> <td align="center">   \( (3,0) \), \( (0,3) \), \( (2,1) \), \( (1,2) \)    </td> <td align="center">   \( 4\hbar\omega \)    </td> <td align="center">   8             </td> <td align="center">   20         </td> </tr>
+</tbody>
+</table>
+</section>
+
+
+<section>
+<h2 id="___sec42">Project 1 b): Setting up the single-particle basis </h2>
+
+<p>
+With the single-particle basis from the previous step, you should now write a class which encodes the information about the harmonic oscillator single-particle basis. This should include the single-particle energies, spin and its projections as well as the harmonic oscillator  functions that depend on \( n_x \) and \( n_y \). This class can then used for both the Monte Carlo and the Hartree-Fock calculations.
+</section>
+
+
+<section>
+<h2 id="___sec43">Project 1 c): Computing the two-body matrix elements </h2>
+
+<p>
+In the Hartree-Fock project we need to be able to compute the two-electron matrix elements of the two-body Coulomb interaction. 
+In order to set up the two-body matrix elements, we need to define the so-called direct and exchange matrix elements. This leads to what we call an anti-symmetrized matrix element.
+
+<p>
+We introduce the following shorthands for the  integrals
+<p>&nbsp;<br>
+$$
+\langle pq|\hat{v}|rs\rangle =  \int \psi_{p}^*(x_i)\psi_{q}^*(x_j)V(r_{ij})\psi_{r}(x_i)\psi_{s}(x_j)
+    dx_idx_j,
+$$
+<p>&nbsp;<br>
+
+which defines the so-called direct matrix element 
+and
+<p>&nbsp;<br>
+$$
+\langle pq|\hat{v}|sr\rangle = \int \psi_{p}^*(x_i)\psi_{q}^*(x_j)
+  V(r_{ij})\psi_{s}(x_i)\psi_{r}(x_j)
+  dx_idx_j,  
+$$
+<p>&nbsp;<br>
+
+which defines the exchange element. The variables \( pqrs \) define all the single-particle quantum numbers. In our case these are \( n_x \), \( n_y \) and spin and its projections.
+</section>
+
+
+<section>
+<h2 id="___sec44">Two-body matrix elements </h2>
+
+<p>
+These matrix elements are defined in terms of two-body quantum numbers. Which quantum numbers are conserved?
+Which are  the possible values the total spin of a two-body state can have?
+
+<p>
+The direct and exchange matrix elements can be  brought together if we define the anti-symmetrized matrix element
+<p>&nbsp;<br>
+$$
+\langle pq|\hat{v}|rs\rangle_{\mathrm{AS}}= \langle pq|\hat{v}|rs\rangle-\langle pq|\hat{v}|sr\rangle.
+$$
+<p>&nbsp;<br>
+
+It has the symmetry property
+<p>&nbsp;<br>
+$$
+\langle pq|\hat{v}|rs\rangle_{\mathrm{AS}}= -\langle pq|\hat{v}|sr\rangle_{\mathrm{AS}}=-\langle qp|\hat{v}|rs\rangle_{\mathrm{AS}},
+$$
+<p>&nbsp;<br>
+
+and
+<p>&nbsp;<br>
+$$
+\langle pq|\hat{v}|rs\rangle_{\mathrm{AS}}= \langle qp|\hat{v}|sr\rangle_{\mathrm{AS}}.
+$$
+<p>&nbsp;<br>
+
+Your task is to write a function which calculates the integral 
+<p>&nbsp;<br>
+$$
+\langle pq|\hat{v}|rs\rangle =  \int \psi_{p}^*(x_i)\psi_{q}^*(x_j)V(r_{ij})\psi_{r}(x_i)\psi_{s}(x_j)
+    dx_idx_j,
+$$
+<p>&nbsp;<br>
+
+and then assemble the direct and exchange terms in order to construct the anti-symmetrized matrix elements to be used in the Hartree-Fock calculations. The integral is four-dimensional but can eventually be simplified. Your task is to figure out how. You should also consider whether it is appropriate to store the matrix elements for the Hartree-Fock calculations.  <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Literature/lectures2015.pdf" target="_blank">Chapter five</a> of the lecture notes discusses Gaussian quadrature. You may find it convenient to use Hermite   polynomials in order to set up the integration points ad weights as well parallelizing the calculations of the integrals.
+</section>
+
+
+<section>
+<h2 id="___sec45"><a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/ParallelizationOpenMP/Project1Integration.cpp" target="_blank">Program example for numerical integration</a> </h2>
+The following program shows the integration of a first-order Hermite polynomial for
+the four-dimensional case. The Hermite polynomials have the following norm
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  \int_{-\infty}^{\infty}e^{-x^2}H_n(x)^2dx=2^nn!\sqrt{\pi}.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span><span style="color: #228B22">// OpenMP code for numerical integration with Gauss-Hermite quadrature</span>
+<span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;cstdlib&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;iostream&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;cmath&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;iomanip&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #1e889b">#include</span>  <span style="color: #228B22">&lt;omp.h&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #8B008B; font-weight: bold">using</span> <span style="color: #8B008B; font-weight: bold">namespace</span> std; 
+
+<span style="color: #228B22">// The integrand in Cartesian coordinates</span>
+<span style="color: #a7a7a7; font-weight: bold">double</span> <span style="color: #008b45">Integrand</span>(<span style="color: #a7a7a7; font-weight: bold">double</span>, <span style="color: #a7a7a7; font-weight: bold">double</span>,<span style="color: #a7a7a7; font-weight: bold">double</span>, <span style="color: #a7a7a7; font-weight: bold">double</span>);
+<span style="color: #228B22">// The Gauss Hermite integration function</span>
+<span style="color: #a7a7a7; font-weight: bold">double</span>  <span style="color: #008b45">GaussHermiteIntegration</span>(<span style="color: #a7a7a7; font-weight: bold">int</span>);
+<span style="color: #228B22">// Getting the Gaussian quadrature weights and integration points</span>
+<span style="color: #a7a7a7; font-weight: bold">void</span> <span style="color: #008b45">GaussHermiteQuadrature</span>(<span style="color: #a7a7a7; font-weight: bold">double</span> *, <span style="color: #a7a7a7; font-weight: bold">double</span> *, <span style="color: #a7a7a7; font-weight: bold">int</span>);
+<span style="color: #228B22">// Start main program</span>
+<span style="color: #a7a7a7; font-weight: bold">int</span> <span style="color: #008b45">main</span> (<span style="color: #a7a7a7; font-weight: bold">int</span> argc, <span style="color: #a7a7a7; font-weight: bold">char</span>* argv[])
+{
+  <span style="color: #228B22">// read from terminal the number of integration points</span>
+  <span style="color: #a7a7a7; font-weight: bold">int</span> n = atoi(argv[<span style="color: #B452CD">1</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> thread_num;
+
+  <span style="color: #a7a7a7; font-weight: bold">double</span> wtime;
+  cout &lt;&lt; <span style="color: #CD5555">&quot;  Compute 4d-integral using Gaussian quadrature with Hermite quadrature.&quot;</span> &lt;&lt; endl;
+  omp_set_num_threads(<span style="color: #B452CD">4</span>);
+  thread_num = omp_get_max_threads ();
+  cout &lt;&lt; <span style="color: #CD5555">&quot;  The number of processors available = &quot;</span> &lt;&lt; omp_get_num_procs () &lt;&lt; endl ;
+  cout &lt;&lt; <span style="color: #CD5555">&quot;  The number of threads available    = &quot;</span> &lt;&lt; thread_num &lt;&lt;  endl;
+  cout &lt;&lt; <span style="color: #CD5555">&quot;  The number of integration points                 = &quot;</span> &lt;&lt; n &lt;&lt; endl;
+  wtime = omp_get_wtime ( );
+  <span style="color: #a7a7a7; font-weight: bold">double</span> Integral = GaussHermiteIntegration(n);
+  wtime = omp_get_wtime ( ) - wtime;
+  cout &lt;&lt; setiosflags(ios::showpoint | ios::uppercase);
+  cout &lt;&lt; setprecision(<span style="color: #B452CD">15</span>) &lt;&lt; setw(<span style="color: #B452CD">20</span>) &lt;&lt; <span style="color: #CD5555">&quot;Time used  integration=&quot;</span> &lt;&lt; wtime  &lt;&lt; endl;
+  cout &lt;&lt; <span style="color: #CD5555">&quot;Final Integral    = &quot;</span> &lt;&lt; Integral &lt;&lt; endl;
+  <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0</span>;
+} <span style="color: #228B22">// end main function</span>
+
+<span style="color: #228B22">// The integrand, here a first order Hermite polynomial for x1 only</span>
+<span style="color: #228B22">// The other variables are given by zeroth-order Hermite polynomials.</span>
+<span style="color: #a7a7a7; font-weight: bold">double</span> <span style="color: #008b45">Integrand</span>(<span style="color: #a7a7a7; font-weight: bold">double</span> x1, <span style="color: #a7a7a7; font-weight: bold">double</span> y1, <span style="color: #a7a7a7; font-weight: bold">double</span> x2, <span style="color: #a7a7a7; font-weight: bold">double</span> y2)
+{
+  <span style="color: #8B008B; font-weight: bold">return</span> (<span style="color: #B452CD">2</span>*x1)*(<span style="color: #B452CD">2</span>*x1);
+}
+
+<span style="color: #228B22">//Plain Gauss-Hermite integration with cartesian variables, brute force</span>
+<span style="color: #a7a7a7; font-weight: bold">double</span>  <span style="color: #008b45">GaussHermiteIntegration</span>(<span style="color: #a7a7a7; font-weight: bold">int</span> n)
+{
+  <span style="color: #a7a7a7; font-weight: bold">double</span> *x = <span style="color: #8B008B; font-weight: bold">new</span> <span style="color: #a7a7a7; font-weight: bold">double</span> [n+<span style="color: #B452CD">1</span>];
+  <span style="color: #a7a7a7; font-weight: bold">double</span> *w = <span style="color: #8B008B; font-weight: bold">new</span> <span style="color: #a7a7a7; font-weight: bold">double</span> [n];
+  GaussHermiteQuadrature(x, w, n);
+  <span style="color: #a7a7a7; font-weight: bold">double</span> Integral = <span style="color: #B452CD">0.0</span>;
+  <span style="color: #a7a7a7; font-weight: bold">int</span> i, j, k, l;
+<span style="color: #1e889b"># pragma omp parallel default(shared) private (i, j, k, l) reduction(+:Integral)</span>
+  {
+<span style="color: #1e889b"># pragma omp for</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> (i = <span style="color: #B452CD">0</span>;  i &lt; n; i++){
+      <span style="color: #8B008B; font-weight: bold">for</span> (j = <span style="color: #B452CD">0</span>;  j &lt; n; j++){
+	<span style="color: #8B008B; font-weight: bold">for</span> (k = <span style="color: #B452CD">0</span>;  k &lt; n; k++){
+	  <span style="color: #8B008B; font-weight: bold">for</span> (l = <span style="color: #B452CD">0</span>;  l &lt; n; l++){
+	    Integral += w[i]*w[j]*w[k]*w[l]*Integrand(x[i],x[j],x[k],x[l]);
+	  }
+	}
+      }
+    }
+  } <span style="color: #228B22">// end parallel region</span>
+  <span style="color: #8B008B; font-weight: bold">delete</span> [] x;
+  <span style="color: #8B008B; font-weight: bold">delete</span> [] w;
+  <span style="color: #8B008B; font-weight: bold">return</span> Integral;
+}
+
+
+<span style="color: #228B22">// Setting Gaussian quadrature weights and integration points</span>
+<span style="color: #a7a7a7; font-weight: bold">void</span> <span style="color: #008b45">GaussHermiteQuadrature</span>(<span style="color: #a7a7a7; font-weight: bold">double</span> *x, <span style="color: #a7a7a7; font-weight: bold">double</span> *w, <span style="color: #a7a7a7; font-weight: bold">int</span> n)
+{
+  <span style="color: #a7a7a7; font-weight: bold">int</span> i,its,j,m;
+  <span style="color: #a7a7a7; font-weight: bold">double</span> p1,p2,p3,pp,z,z1;
+  <span style="color: #a7a7a7; font-weight: bold">double</span> Epsilon = <span style="color: #B452CD">3.0e-14</span>, PIM4 = <span style="color: #B452CD">0.7511255444649425</span>;
+  <span style="color: #a7a7a7; font-weight: bold">int</span> MaxIterations = <span style="color: #B452CD">10</span>;
+  m=(n+<span style="color: #B452CD">1</span>)/<span style="color: #B452CD">2</span>;
+  <span style="color: #8B008B; font-weight: bold">for</span> (i=<span style="color: #B452CD">1</span>;i&lt;=m;i++) {
+    <span style="color: #8B008B; font-weight: bold">if</span> (i == <span style="color: #B452CD">1</span>) {
+      z=sqrt((<span style="color: #a7a7a7; font-weight: bold">double</span>)(<span style="color: #B452CD">2</span>*n+<span style="color: #B452CD">1</span>))-<span style="color: #B452CD">1.85575</span>*pow((<span style="color: #a7a7a7; font-weight: bold">double</span>)(<span style="color: #B452CD">2</span>*n+<span style="color: #B452CD">1</span>),-<span style="color: #B452CD">0.16667</span>);
+    } <span style="color: #8B008B; font-weight: bold">else</span> <span style="color: #8B008B; font-weight: bold">if</span> (i == <span style="color: #B452CD">2</span>) {
+      z -= <span style="color: #B452CD">1.14</span>*pow((<span style="color: #a7a7a7; font-weight: bold">double</span>)n,<span style="color: #B452CD">0.426</span>)/z;
+    } <span style="color: #8B008B; font-weight: bold">else</span> <span style="color: #8B008B; font-weight: bold">if</span> (i == <span style="color: #B452CD">3</span>) {
+      z=<span style="color: #B452CD">1.86</span>*z-<span style="color: #B452CD">0.86</span>*x[<span style="color: #B452CD">0</span>];
+    } <span style="color: #8B008B; font-weight: bold">else</span> <span style="color: #8B008B; font-weight: bold">if</span> (i == <span style="color: #B452CD">4</span>) {
+      z=<span style="color: #B452CD">1.91</span>*z-<span style="color: #B452CD">0.91</span>*x[<span style="color: #B452CD">1</span>];
+    } <span style="color: #8B008B; font-weight: bold">else</span> {
+      z=<span style="color: #B452CD">2.0</span>*z-x[i-<span style="color: #B452CD">3</span>];
+    }
+    <span style="color: #8B008B; font-weight: bold">for</span> (its=<span style="color: #B452CD">1</span>;its&lt;=MaxIterations;its++) {
+      p1=PIM4;
+      p2=<span style="color: #B452CD">0.0</span>;
+      <span style="color: #8B008B; font-weight: bold">for</span> (j=<span style="color: #B452CD">1</span>;j&lt;=n;j++) {
+	p3=p2;
+	p2=p1;
+	p1=z*sqrt(<span style="color: #B452CD">2.0</span>/j)*p2-sqrt(((<span style="color: #a7a7a7; font-weight: bold">double</span>)(j-<span style="color: #B452CD">1</span>))/j)*p3;
+      }
+      pp=sqrt((<span style="color: #a7a7a7; font-weight: bold">double</span>)<span style="color: #B452CD">2</span>*n)*p2;
+      z1=z;
+      z=z1-p1/pp;
+      <span style="color: #8B008B; font-weight: bold">if</span> (fabs(z-z1) &lt;= Epsilon) <span style="color: #8B008B; font-weight: bold">break</span>;
+    }
+    <span style="color: #8B008B; font-weight: bold">if</span> (its &gt; MaxIterations) cout &lt;&lt; <span style="color: #CD5555">&quot;too many iterations in Hermite quadrature&quot;</span> &lt;&lt; endl;
+    x[i-<span style="color: #B452CD">1</span>]=z;
+    x[n-i] = -z;
+    w[i-<span style="color: #B452CD">1</span>]=<span style="color: #B452CD">2.0</span>/(pp*pp);
+    w[n-i]=w[i-<span style="color: #B452CD">1</span>];
+  }
+} <span style="color: #228B22">// Gaussian quadrature weights and integration points</span>
+</pre></div>
+</section>
+
+
+<section>
+<h2 id="___sec46">Gaussian Quadrature, main idea </h2>
+
+<p>
+In general, an integration formula which is based on a Taylor series using \( N \) points,
+will integrate exactly a polynomial \( P \) of degree \( N-1 \). That is, the \( N \) weights
+\( \omega_n \) can be chosen to satisfy \( N \) linear equations, see chapter 3 of Ref.\ [3]. 
+A greater precision for a given amount of numerical work can  be achieved
+if we are willing to give up the requirement of equally spaced integration points.  
+In Gaussian quadrature (hereafter GQ), both the mesh points and the weights are to
+be determined. The points will not be equally spaced.
+
+<p>
+The theory behind GQ is to obtain an arbitrary weight \( \omega \) through the use of
+so-called orthogonal polynomials. These polynomials are orthogonal in some
+interval say e.g., [-1,1]. Our points \( x_i \) are chosen in some optimal sense subject
+only to the constraint that they should lie in this interval. Together with the weights
+we have then \( 2N \) (\( N \) the number of points) parameters at our disposal.
+</section>
+
+
+<section>
+<h2 id="___sec47">Gaussian Quadrature </h2>
+
+<p>
+Even though the integrand is not smooth, we could render it smooth by extracting
+from it the weight function of an orthogonal polynomial, i.e.,
+we are rewriting
+<p>&nbsp;<br>
+$$
+\begin{equation}
+   I= \int_a^b f(x)dx =\int_a^b W(x)g(x)dx \approx \sum_{i=1}^N\omega_ig(x_i),  
+\tag{17}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+where \( g \) is smooth and \( W \) is the weight function, which is to  be associated with a given 
+orthogonal polynomial. Note that with a given weight function we end up evaluating the integrand
+for the function \( g(x_i) \).
+</section>
+
+
+<section>
+<h2 id="___sec48">Gaussian Quadrature, weight function </h2>
+
+<p>
+The weight function \( W \) is non-negative in the integration interval 
+\( x\in [a,b] \) such that
+for any \( n \ge 0 \), the integral \( \int_a^b |x|^n W(x) dx \) is integrable. The naming
+weight function arises from the fact that it may be used to give more emphasis
+to one part of the interval than another. 
+A quadrature formula 
+<p>&nbsp;<br>
+$$
+\begin{equation} 
+   \int_a^b W(x)f(x)dx \approx \sum_{i=1}^N\omega_if(x_i), 
+\tag{18}
+\end{equation} 
+$$
+<p>&nbsp;<br>
+
+with \( N \) distinct quadrature points (mesh points) is a called a Gaussian quadrature 
+formula if it integrates all polynomials \( p\in P_{2N-1} \) exactly, that is
+<p>&nbsp;<br>
+$$
+\begin{equation} 
+\int_a^bW(x)p(x)dx =\sum_{i=1}^N\omega_ip(x_i), 
+\tag{19}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+It is assumed that \( W(x) \) is continuous and positive and that the integral
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+\int_a^bW(x)dx
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+exists. Note that the replacement of \( f\rightarrow Wg \) is normally a better approximation
+due to the fact that we may isolate possible singularities of \( W \) and its 
+derivatives at the endpoints of the interval.
+</section>
+
+
+<section>
+<h2 id="___sec49">Gaussian Quadrature weights and integration points </h2>
+
+<p>
+The quadrature weights or just weights (not to be confused with the weight function) 
+are positive and the sequence of Gaussian quadrature formulae is convergent 
+if the sequence \( Q_N \) of quadrature formulae
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   Q_N(f)\rightarrow Q(f)=\int_a^bf(x)dx,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+in the limit \( N\rightarrow \infty \).
+</section>
+
+
+<section>
+<h2 id="___sec50">Gaussian Quadrature </h2>
+
+<p>
+Then  we say that the sequence
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+Q_N(f) = \sum_{i=1}^N\omega_i^{(N)}f(x_i^{(N)}), 
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+is convergent for all polynomials \( p \), that is
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+Q_N(p) = Q(p) 
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+if there exits a constant \( C \) such that
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+ \sum_{i=1}^N|\omega_i^{(N)}| \le C,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+for all \( N \) which are natural numbers.
+</section>
+
+
+<section>
+<h2 id="___sec51">Error in Gaussian Quadrature </h2>
+
+<p>
+The error for the Gaussian quadrature formulae of order \( N \) is given
+by
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  \int_a^bW(x)f(x)dx-\sum_{k=1}^Nw_kf(x_k)=\frac{f^{2N}(\xi)}{(2N)!}\int_a^bW(x)[q_{N}(x)]^2dx
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+where \( q_{N} \) is the chosen orthogonal polynomial and \( \xi \) is a number in the interval \( [a,b] \).
+We have assumed that \( f\in C^{2N}[a,b] \), viz. the space of all real or complex  \( 2N \) times continuously
+differentiable functions.
+</section>
+
+
+<section>
+<h2 id="___sec52">Important polynomials in Gaussian Quadrature </h2>
+
+<p>
+In science there are several important orthogonal polynomials which arise
+from the solution of differential equations. Well-known examples are the  
+Legendre, Hermite, Laguerre and Chebyshev polynomials. They have the following weight functions
+
+<p>
+<table border="1">
+<thead>
+<tr><th align="center">      Weight function      </th> <th align="center">           Interval           </th> <th align="center">Polynomial</th> </tr>
+</thead>
+<tbody>
+<tr><td align="right">   \( W(x)=1 \)                   </td> <td align="right">   \( x\in [-1,1] \)                 </td> <td align="right">   Legendre      </td> </tr>
+<tr><td align="right">   \( W(x)=e^{-x^2} \)            </td> <td align="right">   \( -\infty \le x \le \infty \)    </td> <td align="right">   Hermite       </td> </tr>
+<tr><td align="right">   \( W(x)=x^{\alpha}e^{-x} \)    </td> <td align="right">   \( 0 \le x \le \infty \)          </td> <td align="right">   Laguerre      </td> </tr>
+<tr><td align="right">   \( W(x)=1/(\sqrt{1-x^2}) \)    </td> <td align="right">   \( -1 \le x \le 1 \)              </td> <td align="right">   Chebyshev     </td> </tr>
+</tbody>
+</table>
+<p>
+The importance of the use of orthogonal polynomials in the evaluation
+of integrals can be summarized as follows.
+</section>
+
+
+<section>
+<h2 id="___sec53">Gaussian Quadrature, win-win situation </h2>
+
+<p>
+Methods based on Taylor series using \( N \) points will  integrate exactly a polynomial \( P \) of degree \( N-1 \). If a function \( f(x) \) can be approximated with a polynomial of degree \( N-1 \)
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}            
+f(x)\approx P_{N-1}(x),
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+with \( N \) mesh points we should be able to integrate exactly the polynomial \( P_{N-1} \).
+
+<p>
+Gaussian quadrature methods promise more than this. We can get a better          polynomial approximation with order greater than \( N \)  to \( f(x) \) and still          get away with only \( N \) mesh points. More precisely, we approximate
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}             
+f(x) \approx P_{2N-1}(x),
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and with only \( N \) mesh points these methods promise that
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+            \int f(x)dx \approx \int P_{2N-1}(x)dx=\sum_{i=0}^{N-1} P_{2N-1}(x_i)\omega_i,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec54">Gaussian Quadrature, determining mesh points and weights </h2>
+
+<p>
+The reason why we can represent a function \( f(x) \) with a polynomial of degree
+\( 2N-1 \) is due to the fact that we have \( 2N \) equations, \( N \) for the mesh points and \( N \)
+for the weights.
+
+<p>
+<em>The mesh points are the zeros  of the chosen  orthogonal polynomial</em> of
+order \( N \), and the weights are determined from the inverse of a matrix.
+An orthogonal polynomials of degree \( N \) defined in an interval \( [a,b] \)
+has precisely \( N \) distinct zeros on the open interval \( (a,b) \).
+
+<p>
+Before we detail how to obtain mesh points and weights with orthogonal 
+polynomials, let us revisit some features of orthogonal polynomials
+by specializing to Legendre polynomials. In the text below, we reserve 
+hereafter the labelling
+\( L_N \) for a Legendre polynomial of order \( N \), while \( P_N \) is an arbitrary polynomial
+of order \( N \). 
+These polynomials form then the basis for the Gauss-Legendre method.
+</section>
+
+
+<section>
+<h2 id="___sec55">Orthogonal polynomials, Legendre </h2>
+
+<p>
+The Legendre polynomials are the solutions of an important
+differential equation in Science, namely
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+C(1-x^2)P-m_l^2P+(1-x^2)\frac{d}{dx}\left((1-x^2)\frac{dP}{dx}\right)=0.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+Here \( C \) is a constant. For \( m_l=0 \) we obtain the Legendre polynomials
+as solutions, whereas \( m_l \ne 0 \) yields the so-called associated Legendre
+polynomials. This differential equation arises in for example the solution
+of the angular dependence of Schroedinger's 
+equation with spherically symmetric potentials such as
+the Coulomb potential.
+</section>
+
+
+<section>
+<h2 id="___sec56">Orthogonal polynomials, Legendre </h2>
+The corresponding polynomials \( P \) are
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_k(x)=\frac{1}{2^kk!}\frac{d^k}{dx^k}(x^2-1)^k \hspace{1cm} k=0,1,2,\dots,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+which, up to a factor, are the Legendre polynomials \( L_k \). 
+The latter fulfil the orthogonality relation
+<p>&nbsp;<br>
+$$
+\begin{equation} 
+  \int_{-1}^1L_i(x)L_j(x)dx=\frac{2}{2i+1}\delta_{ij},
+\tag{20}
+\end{equation} 
+$$
+<p>&nbsp;<br>
+
+and the recursion relation
+<p>&nbsp;<br>
+$$
+\begin{equation} 
+  (j+1)L_{j+1}(x)+jL_{j-1}(x)-(2j+1)xL_j(x)=0.
+\tag{21}
+\end{equation} 
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec57">Orthogonal polynomials, Legendre </h2>
+It is common to choose the normalization condition
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    L_N(1)=1.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+With these equations we can determine a Legendre polynomial of arbitrary order
+with input polynomials of order \( N-1 \) and \( N-2 \).
+
+<p>
+As an example, consider the determination of \( L_0 \), \( L_1 \) and \( L_2 \). 
+We have that
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_0(x) = c,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+with \( c \) a constant. Using the normalization equation \( L_0(1)=1 \)
+we get that
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_0(x) = 1.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec58">Orthogonal polynomials, Legendre </h2>
+For \( L_1(x) \) we have the general expression
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_1(x) = a+bx,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and using the orthogonality relation
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  \int_{-1}^1L_0(x)L_1(x)dx=0,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+we obtain \( a=0 \) and with the condition \( L_1(1)=1 \), we obtain \( b=1 \), yielding
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_1(x) = x.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec59">Orthogonal polynomials, Legendre </h2>
+We can proceed in a similar fashion in order to determine
+the coefficients of \( L_2 \)
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_2(x) = a+bx+cx^2,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+using the orthogonality relations
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  \int_{-1}^1L_0(x)L_2(x)dx=0,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  \int_{-1}^1L_1(x)L_2(x)dx=0,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and the condition
+\( L_2(1)=1 \) we would get 
+<p>&nbsp;<br>
+$$
+\begin{equation}
+   L_2(x) = \frac{1}{2}\left(3x^2-1\right).
+\tag{22}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec60">Orthogonal polynomials, Legendre </h2>
+We note that we have three equations to determine the three coefficients
+\( a \), \( b \) and \( c \).
+
+<p>
+Alternatively, we could have 
+employed the recursion relation of Eq. <a href="#mjx-eqn-21">(21)</a>, resulting in
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   2L_2(x)=3xL_1(x)-L_0,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+which leads to Eq. <a href="#mjx-eqn-22">(22)</a>.
+</section>
+
+
+<section>
+<h2 id="___sec61">Orthogonal polynomials, Legendre </h2>
+The orthogonality relation above is important in our discussion
+on how to obtain the weights and mesh points. Suppose we have an arbitrary
+polynomial \( Q_{N-1} \) of order \( N-1 \) and a Legendre polynomial \( L_N(x) \) of
+order \( N \). We could represent \( Q_{N-1} \) 
+by the Legendre polynomials through 
+<p>&nbsp;<br>
+$$
+\begin{equation}
+   Q_{N-1}(x)=\sum_{k=0}^{N-1}\alpha_kL_{k}(x),
+\tag{23}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+where \( \alpha_k \)'s are constants.
+
+<p>
+Using the orthogonality relation of Eq. <a href="#mjx-eqn-20">(20)</a> we see that
+<p>&nbsp;<br>
+$$
+\begin{equation}
+  \int_{-1}^1L_N(x)Q_{N-1}(x)dx=\sum_{k=0}^{N-1} \int_{-1}^1L_N(x) \alpha_kL_{k}(x)dx=0.
+\tag{24}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+We will use this result in our construction of mesh points and weights 
+in the next subsection.
+</section>
+
+
+<section>
+<h2 id="___sec62">Orthogonal polynomials, Legendre </h2>
+In summary, the first few Legendre polynomials are
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_0(x) =1,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  L_1(x) = x,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  L_2(x) = (3x^2-1)/2,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_3(x) = (5x^3-3x)/2,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   L_4(x) = (35x^4-30x^2+3)/8.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec63">Orthogonal polynomials, simple code for Legendre polynomials </h2>
+The following simple function implements the above recursion relation
+of Eq. <a href="#mjx-eqn-21">(21)</a>.
+for computing Legendre polynomials of order \( N \).
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span><span style="color: #228B22">//  This function computes the Legendre polynomial of degree N</span>
+
+<span style="color: #a7a7a7; font-weight: bold">double</span> <span style="color: #008b45">Legendre</span>( <span style="color: #a7a7a7; font-weight: bold">int</span> n, <span style="color: #a7a7a7; font-weight: bold">double</span> x) 
+{
+       <span style="color: #a7a7a7; font-weight: bold">double</span> r, s, t;
+       <span style="color: #a7a7a7; font-weight: bold">int</span> m;
+       r = <span style="color: #B452CD">0</span>; s = <span style="color: #B452CD">1.</span>;
+       <span style="color: #228B22">//  Use recursion relation to generate p1 and p2</span>
+       <span style="color: #8B008B; font-weight: bold">for</span> (m=<span style="color: #B452CD">0</span>; m &lt; n; m++ )  
+       {
+          t = r; r = s; 
+          s = (<span style="color: #B452CD">2</span>*m+<span style="color: #B452CD">1</span>)*x*r - m*t;
+          s /= (m+<span style="color: #B452CD">1</span>);
+	} <span style="color: #228B22">// end of do loop </span>
+        <span style="color: #8B008B; font-weight: bold">return</span> s;
+}   <span style="color: #228B22">// end of function Legendre</span>
+</pre></div>
+<p>
+The variable \( s \) represents \( L_{j+1}(x) \), while \( r \) holds
+\( L_j(x) \) and \( t \) the value \( L_{j-1}(x) \).
+</section>
+
+
+<section>
+<h2 id="___sec64">Other orthogonal polynomials, Laguerre polynomials </h2>
+
+<p>
+If we are able to rewrite our integral of Eq.  <a href="#mjx-eqn-17">(17)</a> with a
+weight function \( W(x)=x^{\alpha}e^{-x} \) with integration limits 
+\( [0,\infty) \), we could then use the Laguerre polynomials.
+The polynomials form then the basis for the Gauss-Laguerre method which can be applied
+to integrals of the form
+
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+   I=\int_0^{\infty}f(x)dx =\int_0^{\infty}x^{\alpha}e^{-x}g(x)dx.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec65">Other orthogonal polynomials, Laguerre polynomials </h2>
+These polynomials arise from the solution of the differential
+equation
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+\left(\frac{d^2 }{dx^2}-\frac{d }{dx}+\frac{\lambda}{x}-\frac{l(l+1)}{x^2}\right){\cal L}(x)=0,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+where \( l \) is an integer \( l\ge 0 \) and \( \lambda \) a constant. This equation
+arises for example from the solution of the radial Schr\"odinger equation with 
+a centrally symmetric potential such as the Coulomb potential.
+</section>
+
+
+<section>
+<h2 id="___sec66">Other orthogonal polynomials, Laguerre polynomials </h2>
+The first few polynomials are
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   {\cal L}_0(x)=1,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    {\cal L}_1(x)=1-x,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    {\cal L}_2(x)=2-4x+x^2,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    {\cal L}_3(x)=6-18x+9x^2-x^3,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    {\cal L}_4(x)=x^4-16x^3+72x^2-96x+24.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec67">Other orthogonal polynomials, Laguerre polynomials </h2>
+They fulfil the orthogonality relation
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  \int_{0}^{\infty}e^{-x}{\cal L}_n(x)^2dx=1,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and the recursion relation
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  (n+1){\cal L}_{n+1}(x)=(2n+1-x){\cal L}_{n}(x)-n{\cal L}_{n-1}(x).
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec68">Other orthogonal polynomials, Hermite polynomials </h2>
+
+<p>
+In a similar way, for an integral which goes like
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+   I=\int_{-\infty}^{\infty}f(x)dx =\int_{-\infty}^{\infty}e^{-x^2}g(x)dx.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+we could use the Hermite polynomials in order to extract weights and mesh points.
+The Hermite polynomials are the solutions of the following differential
+equation
+
+<p>&nbsp;<br>
+$$
+\begin{equation}
+   \frac{d^2H(x)}{dx^2}-2x\frac{dH(x)}{dx}+
+       (\lambda-1)H(x)=0.
+\tag{25}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec69">Other orthogonal polynomials, Hermite polynomials </h2>
+A typical example is again the solution of Schrodinger's
+equation, but this time with a harmonic oscillator potential.
+The first few polynomials are
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   H_0(x)=1,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    H_1(x)=2x,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    H_2(x)=4x^2-2,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    H_3(x)=8x^3-12,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    H_4(x)=16x^4-48x^2+12.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+They fulfil the orthogonality relation
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  \int_{-\infty}^{\infty}e^{-x^2}H_n(x)^2dx=2^nn!\sqrt{\pi},
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and the recursion relation
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+  H_{n+1}(x)=2xH_{n}(x)-2nH_{n-1}(x).
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec70">Integration points and weights with orthogonal polynomials </h2>
+
+<p>
+To understand how the weights and the mesh points are generated, we define first
+a polynomial of degree \( 2N-1 \) (since we have \( 2N \) variables at hand, the mesh points
+and weights for \( N \) points). This polynomial can be represented through polynomial
+division by
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   P_{2N-1}(x)=L_N(x)P_{N-1}(x)+Q_{N-1}(x),
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+where \( P_{N-1}(x) \) and \( Q_{N-1}(x) \) are some polynomials of degree \( N-1 \) or less.
+The function \( L_N(x) \) is a Legendre polynomial of order \( N \).
+
+<p>
+Recall that we wanted to approximate  an arbitrary function \( f(x) \) with a
+polynomial \( P_{2N-1} \) in order to evaluate
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   \int_{-1}^1f(x)dx\approx \int_{-1}^1P_{2N-1}(x)dx.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec71">Integration points and weights with orthogonal polynomials </h2>
+We can use Eq. <a href="#mjx-eqn-24">(24)</a>
+to rewrite the above integral as
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+   \int_{-1}^1P_{2N-1}(x)dx=\int_{-1}^1(L_N(x)P_{N-1}(x)+Q_{N-1}(x))dx=\int_{-1}^1Q_{N-1}(x)dx,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+due to the orthogonality properties of the Legendre polynomials. We see that it suffices
+to evaluate the integral over \( \int_{-1}^1Q_{N-1}(x)dx \) in order to evaluate 
+\( \int_{-1}^1P_{2N-1}(x)dx \). In addition, at the points \( x_k \) where \( L_N \) is zero, we have
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    P_{2N-1}(x_k)=Q_{N-1}(x_k)\hspace{1cm} k=0,1,\dots, N-1,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and we see that through these \( N \) points we can fully define \( Q_{N-1}(x) \)  and thereby the 
+integral. Note that we have chosen to let the numbering of the points run from \( 0 \) to \( N-1 \).
+The reason for this choice is that we wish to have the same numbering as the order of a 
+polynomial of degree \( N-1 \).  This numbering will be useful below when  we introduce the matrix
+elements  which define the integration weights \( w_i \).
+</section>
+
+
+<section>
+<h2 id="___sec72">Integration points and weights with orthogonal polynomials </h2>
+We develope then \( Q_{N-1}(x) \) in terms of Legendre polynomials,
+as done in Eq. <a href="#mjx-eqn-23">(23)</a>, 
+<p>&nbsp;<br>
+$$
+\begin{equation} 
+  Q_{N-1}(x)=\sum_{i=0}^{N-1}\alpha_iL_i(x).
+\tag{26}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+Using the orthogonality property of the Legendre polynomials we have
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+  \int_{-1}^1Q_{N-1}(x)dx=\sum_{i=0}^{N-1}\alpha_i\int_{-1}^1L_0(x)L_i(x)dx=2\alpha_0,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+where we have just inserted \( L_0(x)=1 \)!
+</section>
+
+
+<section>
+<h2 id="___sec73">Integration points and weights with orthogonal polynomials </h2>
+Instead of an integration problem we need now to define the coefficient \( \alpha_0 \).
+Since we know the values of \( Q_{N-1} \) at the zeros of \( L_N \), we may rewrite  
+Eq.  <a href="#mjx-eqn-26">(26)</a> as
+<p>&nbsp;<br>
+$$
+\begin{equation} 
+  Q_{N-1}(x_k)=\sum_{i=0}^{N-1}\alpha_iL_i(x_k)=\sum_{i=0}^{N-1}\alpha_iL_{ik} \hspace{1cm} k=0,1,\dots, N-1.
+\tag{27}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+Since the Legendre polynomials are linearly independent of each other, none 
+of the columns in the matrix \( L_{ik} \) are linear combinations of the others.
+</section>
+
+
+<section>
+<h2 id="___sec74">Integration points and weights with orthogonal polynomials </h2>
+This means that the matrix \( L_{ik} \) has an inverse with the properties
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   \hat{L}^{-1}\hat{L} = \hat{I}.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+Multiplying both sides of Eq. <a href="#mjx-eqn-27">(27)</a> with \( \sum_{j=0}^{N-1}L_{ji}^{-1} \) results in 
+<p>&nbsp;<br>
+$$
+\begin{equation}
+  \sum_{i=0}^{N-1}(L^{-1})_{ki}Q_{N-1}(x_i)=\alpha_k.
+\tag{28}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec75">Integration points and weights with orthogonal polynomials </h2>
+We can derive this result in an alternative way by defining the vectors
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+\hat{x}_k=\left(\begin{array} {c} x_0\\
+                                x_1\\
+                                .\\
+                                .\\
+                                x_{N-1}\end{array}\right) \hspace{0.5cm}
+\hat{\alpha}=\left(\begin{array} {c} \alpha_0\\
+                                \alpha_1\\
+                                .\\
+                                .\\
+                                \alpha_{N-1}\end{array}\right),
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and the matrix
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   \hat{L}=\left(\begin{array} {cccc} L_0(x_0)  & L_1(x_0) &\dots &L_{N-1}(x_0)\\
+                                   L_0(x_1)  & L_1(x_1) &\dots &L_{N-1}(x_1)\\
+                                   \dots  & \dots &\dots &\dots\\
+L_0(x_{N-1})  & L_1(x_{N-1}) &\dots &L_{N-1}(x_{N-1})
+\end{array}\right).
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec76">Integration points and weights with orthogonal polynomials </h2>
+We have then
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+Q_{N-1}(\hat{x}_k) = \hat{L}\hat{\alpha},
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+yielding (if \( \hat{L} \) has an inverse)
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+\hat{L}^{-1}Q_{N-1}(\hat{x}_k) = \hat{\alpha},
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+which is Eq. <a href="#mjx-eqn-28">(28)</a>.
+</section>
+
+
+<section>
+<h2 id="___sec77">Integration points and weights with orthogonal polynomials </h2>
+Using the above results and the fact that
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+   \int_{-1}^1P_{2N-1}(x)dx=\int_{-1}^1Q_{N-1}(x)dx,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+we get
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+   \int_{-1}^1P_{2N-1}(x)dx=\int_{-1}^1Q_{N-1}(x)dx=2\alpha_0=
+   2\sum_{i=0}^{N-1}(L^{-1})_{0i}P_{2N-1}(x_i).
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec78">Integration points and weights with orthogonal polynomials </h2>
+If we identify the weights with \( 2(L^{-1})_{0i} \), where the points \( x_i \) are
+the zeros of \( L_N \), we have an integration formula of the type
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   \int_{-1}^1P_{2N-1}(x)dx=\sum_{i=0}^{N-1}\omega_iP_{2N-1}(x_i)  
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and if our function \( f(x) \)  can be approximated by a polynomial \( P \) of degree
+\( 2N-1 \), we have finally that
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+    \int_{-1}^1f(x)dx\approx \int_{-1}^1P_{2N-1}(x)dx=\sum_{i=0}^{N-1}\omega_iP_{2N-1}(x_i)  .
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+In summary, the mesh points \( x_i \) are defined by the zeros of an orthogonal polynomial of degree \( N \), that is 
+\( L_N \), while the weights are
+given by \( 2(L^{-1})_{0i} \).
+</section>
+
+
+<section>
+<h2 id="___sec79">Application to the case \( N=2 \) </h2>
+
+<p>
+Let us apply the above formal results to the case \( N=2 \). 
+This means that we can approximate a function \( f(x) \) with a
+polynomial \( P_3(x) \) of order \( 2N-1=3 \).
+
+<p>
+The mesh points are the zeros of \( L_2(x)=1/2(3x^2-1) \). 
+These points are \( x_0=-1/\sqrt{3} \) and \( x_1=1/\sqrt{3} \).
+
+<p>
+Specializing Eq. <a href="#mjx-eqn-27">(27)</a>
+
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+  Q_{N-1}(x_k)=\sum_{i=0}^{N-1}\alpha_iL_i(x_k) \hspace{1cm} k=0,1,\dots, N-1.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+to \( N=2 \) yields
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   Q_1(x_0)=\alpha_0-\alpha_1\frac{1}{\sqrt{3}},
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   Q_1(x_1)=\alpha_0+\alpha_1\frac{1}{\sqrt{3}},
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+since \( L_0(x=\pm 1/\sqrt{3})=1 \) and \( L_1(x=\pm 1/\sqrt{3})=\pm 1/\sqrt{3} \).
+</section>
+
+
+<section>
+<h2 id="___sec80">Application to the case \( N=2 \) </h2>
+The matrix \( L_{ik} \) defined in Eq. <a href="#mjx-eqn-27">(27)</a> is then
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   \hat{L}=\left(\begin{array} {cc} 1  & -\frac{1}{\sqrt{3}}\\
+                                   1  & \frac{1}{\sqrt{3}}\end{array}\right),
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+with an inverse given by
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   \hat{L}^{-1}=\frac{\sqrt{3}}{2}\left(\begin{array} {cc} \frac{1}{\sqrt{3}}  & \frac{1}{\sqrt{3}}\\
+                                   -1  & 1\end{array}\right).
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+The weights are given by the matrix elements \( 2(L_{0k})^{-1} \). We have thence
+\( \omega_0=1 \) and \( \omega_1=1 \).
+</section>
+
+
+<section>
+<h2 id="___sec81">Application to the case \( N=2 \) </h2>
+Obviously, there is no problem in changing the numbering of the matrix elements \( i,k=0,1,2,\dots,N-1 \) to
+\( i,k=1,2,\dots,N \).  We have chosen to start from zero, since we deal with polynomials of degree \( N-1 \).
+
+<p>
+Summarizing, for Legendre polynomials with \( N=2 \) we have
+weights
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   \omega : \left\{1,1\right\},
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+and mesh points
+
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   x : \left\{-\frac{1}{\sqrt{3}},\frac{1}{\sqrt{3}}\right\}.
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec82">Application to the case \( N=2 \) </h2>
+If we wish to integrate
+<p>&nbsp;<br>
+$$
+\begin{equation*}
+   \int_{-1}^1f(x)dx,
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+with \( f(x)=x^2 \), we approximate
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+   I=\int_{-1}^1x^2dx \approx \sum_{i=0}^{N-1}\omega_ix_i^2.  
+\end{equation*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec83">Application to the case \( N=2 \) </h2>
+The exact answer is \( 2/3 \). Using \( N=2 \) with the above two weights 
+and mesh points we get
+
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+   I=\int_{-1}^1x^2dx =\sum_{i=0}^{1}\omega_ix_i^2=\frac{1}{3}+\frac{1}{3}=\frac{2}{3},  
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+the exact answer!
+
+<p>
+If we were to emply the trapezoidal rule we would get
+
+<p>&nbsp;<br>
+$$
+\begin{equation*} 
+   I=\int_{-1}^1x^2dx =\frac{b-a}{2}\left((a)^2+(b)^2\right)/2=
+                       \frac{1-(-1)}{2}\left((-1)^2+(1)^2\right)/2=1!
+\end{equation*}
+$$
+<p>&nbsp;<br>
+
+With just two points we can calculate exactly the integral for a second-order
+polynomial since our methods approximates the exact function with higher
+order polynomial. 
+How many points do you need with the trapezoidal rule in order to achieve a
+similar accuracy?
+</section>
+
+
+<section>
+<h2 id="___sec84">Back to Hermite polynomials and our type of integrals  </h2>
+
+<p>
+Our type of integrals will involve expressions on the form (in one dimension as an example)
+<p>&nbsp;<br>
+$$
+I = \int_{-\infty}^{\infty}\exp{(-x^2/2)}f(x)dx.
+$$
+<p>&nbsp;<br>
+
+When we use Gauss-Hermite quadrature, the exponential function is absorbed into the weight points. We need however to keep in mind that the basic form is given by
+<p>&nbsp;<br>
+$$
+I = \int_{-\infty}^{\infty}\exp{(-x^2)}g(x)dx\approx \sum_{i=1}^nw_ig(x_i).
+$$
+<p>&nbsp;<br>
+
+This means that we need to make a change of variables \( u^2=x^2/2 \) in the first equation so that we end up with 
+<p>&nbsp;<br>
+$$
+I = \int_{-\infty}^{\infty}\exp{(-x^2/2)}f(x)dx=\sqrt{2}\int_{-\infty}^{\infty}\exp{(-u^2)}f(\sqrt{2}u)du\approx \sqrt{2}\sum_{i=1}^nw_if(\sqrt{2}u_i).
+$$
+<p>&nbsp;<br>
+
+For Gauss-Hermite quadrature, the weights have a simple analytic expression in terms of Hermite polynomials
+<p>&nbsp;<br>
+$$
+w_i = \frac{2^{n1}n!\sqrt{\pi}}{n^2[H_{n-1}(x_i)]^2}.
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec85">Our integrals  </h2>
+
+<p>
+We will need to deal with following type of four dimensional integrals
+<p>&nbsp;<br>
+$$
+\langle pq \vert \hat{v} \vert rs \rangle = A\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \exp{[-(x_1^2+x_2^2+y_1^2+y_2^2)/2]}f(x_1,y_1,x_2,y_2)dx_1dy_1dx_2dy_2,
+$$
+<p>&nbsp;<br>
+
+where \( A \) is a normalization constant and 
+<p>&nbsp;<br>
+$$
+f(x_1,y_1,x_2,y_2) = H_{n_{x_p}}(x_1)H_{n_{y_p}}(y_1)H_{n_{x_q}}(x_2)H_{n_{y_r}}(y_2)H_{n_{x_r}}(x_1)H_{n_{y_r}}(y_1)H_{n_{x_s}}(x_2)H_{n_{y_s}}(y_2)\frac{1}{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2}},
+$$
+<p>&nbsp;<br>
+
+where \( H_n \) are the various Hermite polynomials. 
+For the case where all \( n_{x,y}=0 \) the above integral simplifies to
+<p>&nbsp;<br>
+$$
+\langle pq \vert \hat{v} \vert rs \rangle = A\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \frac{\exp{[-(x_1^2+x_2^2+y_1^2+y_2^2)/2]} }{\sqrt{(x_1-x_2)^2+(y_1-y_2)^2}}dx_1dy_1dx_2dy_2.
+$$
+<p>&nbsp;<br>
+
+Changing from the laboratory frame to the relative and center of mass frame, with 
+<p>&nbsp;<br>
+$$
+\boldsymbol{R} = \frac{\bf{r}_1+\boldsymbol{r}_2}{2} \hspace{1cm} \boldsymbol{r} = \bf{r}_1-\boldsymbol{r}_2 
+$$
+<p>&nbsp;<br>
+
+and introducing polar coordinates the above integral can be written as 
+<p>&nbsp;<br>
+$$
+I = 4\pi^2 A\int_{0}^{\infty}\exp{(-R^2)}RdR \int_{0}^{\infty} \exp{(-r^2)}rdr\frac{1}{r}=2A\pi^{5/2}. 
+$$
+<p>&nbsp;<br>
+
+This provides a useful check of our program.
+</section>
+
+
+<section>
+<h2 id="___sec86">Our integrals  </h2>
+
+<p>
+The integral
+<p>&nbsp;<br>
+$$
+\langle pq \vert \hat{v} \vert rs \rangle = A\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \exp{[-(x_1^2+x_2^2+y_1^2+y_2^2)/2]}f(x_1,y_1,x_2,y_2)dx_1dy_1dx_2dy_2,
+$$
+<p>&nbsp;<br>
+
+can be calculate in analytical form if we switch to polar coordinates.
+</section>
+
+
+<section>
+<h2 id="___sec87">Single-particle functions in polar coordinates  </h2>
+
+<p>
+Instead of Hermite polynomials which we will need for the Variational Monte Carlo, it is more convenient for the Hartree-Fock calculations to use polar coordinates.
+
+<p>
+Using polar coordinates
+<p>&nbsp;<br>
+$$
+\begin{align}
+x &= r \cos \theta 
+\tag{29}\\
+y &= r \sin \theta 
+\tag{30}\\
+r &= \sqrt{x^2 + y^2},
+\tag{31}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+the normalized solution for the angular part in two dimensions is
+<p>&nbsp;<br>
+$$
+Y(\theta) = \frac{1}{\sqrt{2\pi}} e^{im\theta}
+  \tag{32}
+$$
+<p>&nbsp;<br>
+
+<p>
+The total wavefunction must satisfy the physical condition that \( \psi(r,\theta) = \psi(r,\theta+2\pi) \) This makes a restriction on the quantum number \( m \) which can take integral values
+<p>&nbsp;<br>
+$$
+m = 0, \pm 1, \pm 2, ...
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec88">Eigenfunctions in two dimensions </h2>
+
+<p>
+The time-independent part of the wave function  is separated in an angular and a radial part
+<p>&nbsp;<br>
+$$
+\psi(r,\theta) = R(r) \frac{1}{\sqrt{2\pi}} e^{im\theta}, \qquad m=0,\pm 1, \pm 2,... 
+$$
+<p>&nbsp;<br>
+
+<p>
+The solution of the radial equation is
+<p>&nbsp;<br>
+$$
+R_{nm}(r) = \sqrt{\frac{2n!}{(n+|m|)!}}\beta^{\frac{1}{2}(|m|+1)}r^{|m|}e^{-\frac{1}{2}\beta r^2} L_n^{|m|} (\beta r^2)
+$$
+<p>&nbsp;<br>
+
+Here the subscript \( n \) denote the principal quantum number, and \( m \) is the angular momentum number
+<p>&nbsp;<br>
+$$
+\begin{align}
+  n &= 0, 1, 2, 3, .... 
+\tag{33}\\
+  m &= 0, \pm 1, \pm, 2, \pm 3,...
+\tag{34}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+\( L_n^{|m|} \) is the associated Laguerre polynomials discussed above, and \( \beta \) is defined as
+<p>&nbsp;<br>
+$$
+\beta = \frac{m\omega}{\hbar}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec89">Final expression for the eigenfunction </h2>
+
+<p>
+The final eigenfunction for an electron moving in a two-dimensional harmonic oscillator is then
+<p>&nbsp;<br>
+$$
+ \psi(r,\theta) = \sqrt{\frac{n!}{\pi(n+|m|)!}}\beta^{\frac{1}{2}(|m|+1)}r^{|m|}e^{-\frac{1}{2}\beta r^2} L_n^{|m|} (\beta r^2) e^{im\theta},
+$$
+<p>&nbsp;<br>
+
+with the  eigenvalue
+<p>&nbsp;<br>
+$$
+E = \hbar \omega(2n+|m|+1)
+$$
+<p>&nbsp;<br>
+
+which is the same as the energy with cartesian coordinates but now in terms of \( n_x \) and \( n_y \), that is
+<p>&nbsp;<br>
+$$
+E = \hbar \omega(n_x+n_y+1).
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec90"><a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/QDCoulombPotential" target="_blank">Program for computing the Coulomb interaction in polar coordinates</a> </h2>
+
+<p>
+The program is based on the analytical expression given by <a href="http://iopscience.iop.org/article/10.1088/0953-8984/10/3/013/pdf" target="_blank">Anisimova and Matulis</a>. It returns the value of the integral (without checking for spin values, you need to add this test) using as input the quantum numbers
+\( n_i \) and \( m_i \), that is 
+<p>&nbsp;<br>
+$$
+\langle pq \vert \hat{v} \vert rs \rangle =\langle (n_pm_p)(n_qm_q) \vert \hat{v} \vert (n_rm_r)(n_sm_s) \rangle, 
+$$
+<p>&nbsp;<br>
+
+and the main code is (click on the above link for the full code)
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span><span style="color: #1e889b">#include</span> <span style="color: #228B22">&quot;Coulomb_Functions.hpp&quot;</span><span style="color: #1e889b"></span>
+
+<span style="color: #a7a7a7; font-weight: bold">int</span> <span style="color: #008b45">main</span>(<span style="color: #a7a7a7; font-weight: bold">int</span> argc, <span style="color: #a7a7a7; font-weight: bold">char</span> * argv[])
+{
+  <span style="color: #8B008B; font-weight: bold">if</span>(argc != <span style="color: #B452CD">10</span>){ std::cerr &lt;&lt; <span style="color: #CD5555">&quot;Wrong Input: should be ./QD_Coulomb  hw  n1  ml1  n2  ml2  n3  ml3  n4  ml4&quot;</span> &lt;&lt; std::endl; exit(<span style="color: #B452CD">1</span>); }
+  <span style="color: #a7a7a7; font-weight: bold">double</span> hw = std::atof(argv[<span style="color: #B452CD">1</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> n1 = std::atoi(argv[<span style="color: #B452CD">2</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> ml1 = std::atoi(argv[<span style="color: #B452CD">3</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> n2 = std::atoi(argv[<span style="color: #B452CD">4</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> ml2 = std::atoi(argv[<span style="color: #B452CD">5</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> n3 = std::atoi(argv[<span style="color: #B452CD">6</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> ml3 = std::atoi(argv[<span style="color: #B452CD">7</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> n4 = std::atoi(argv[<span style="color: #B452CD">8</span>]);
+  <span style="color: #a7a7a7; font-weight: bold">int</span> ml4 = std::atoi(argv[<span style="color: #B452CD">9</span>]);
+
+  <span style="color: #a7a7a7; font-weight: bold">double</span> TBME = Coulomb_HO(hw, n1, ml1, n2, ml2, n3, ml3, n4, ml4);
+  std::cout &lt;&lt; std::setprecision(<span style="color: #B452CD">12</span>);
+  std::cout &lt;&lt; <span style="color: #CD5555">&quot;&lt; &quot;</span> &lt;&lt; n1 &lt;&lt; <span style="color: #CD5555">&quot;,&quot;</span> &lt;&lt; ml1 &lt;&lt; <span style="color: #CD5555">&quot; ; &quot;</span> &lt;&lt; n2 &lt;&lt; <span style="color: #CD5555">&quot;,&quot;</span> &lt;&lt; ml2 &lt;&lt; <span style="color: #CD5555">&quot; || V || &quot;</span> &lt;&lt; n3 &lt;&lt; <span style="color: #CD5555">&quot;,&quot;</span> &lt;&lt; ml3 &lt;&lt; <span style="color: #CD5555">&quot; ; &quot;</span> &lt;&lt; n4 &lt;&lt; <span style="color: #CD5555">&quot;,&quot;</span> &lt;&lt; ml4 &lt;&lt; <span style="color: #CD5555">&quot; &gt; = &quot;</span> &lt;&lt; TBME &lt;&lt; std::endl;
+  
+  <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0</span>;
+}
+</pre></div>
+</section>
+
+
+<section>
+<h2 id="___sec91">Conserved quantum numbers </h2>
+
+<p>
+When setting up the matrix elements 
+<p>&nbsp;<br>
+$$
+\langle pq \vert \hat{v} \vert rs \rangle =\langle (n_pm_p)(n_qm_q) \vert \hat{v} \vert (n_rm_r)(n_sm_s) \rangle, 
+$$
+<p>&nbsp;<br>
+
+you need to take into account that there are conserved two-electron quantum numbers since the Hamiltonian is invariant under rotations, namely
+<p>&nbsp;<br>
+$$
+m_p+m_q = M = m_r+m_s,
+$$
+<p>&nbsp;<br>
+
+and the total spin projection which is not included in the above code. You need to add this as a test, that is check that
+<p>&nbsp;<br>
+$$
+\sigma_p+\sigma_q = S_z = \sigma_r+\sigma_s.
+$$
+<p>&nbsp;<br>
+
+Finally, you need to ensure that the single-particle spinors satisfy  \( \sigma_p=\sigma_r \) 
+and \( \sigma_q=\sigma_s \). Pay in particular attention to this when you compute the exchange matrix elements.
+</section>
+
+
+<section>
+<h2 id="___sec92">Reminder on Variational Calculus and Lagrangian Multipliers  </h2>
+
+<p>
+The calculus of variations involves 
+problems where the quantity to be minimized or maximized is an integral.
+
+<p>
+In the general case we have an integral of the type
+<p>&nbsp;<br>
+$$ 
+E[\Phi]= \int_a^b f(\Phi(x),\frac{\partial \Phi}{\partial x},x)dx,
+$$
+<p>&nbsp;<br>
+
+where \( E \) is the quantity which is sought minimized or maximized.
+The problem is that although \( f \) is a function of the variables \( \Phi \), \( \partial \Phi/\partial x \) and \( x \), the exact dependence of
+\( \Phi \) on \( x \) is not known.  This means again that even though the integral has fixed limits \( a \) and \( b \), the path of integration is
+not known. In our case the unknown quantities are the single-particle wave functions and we wish to choose an integration path which makes
+the functional \( E[\Phi] \) stationary. This means that we want to find minima, or maxima or saddle points. In physics we search normally for minima.
+Our task is therefore to find the minimum of \( E[\Phi] \) so that its variation \( \delta E \) is zero  subject to specific
+constraints. In our case the constraints appear as the integral which expresses the orthogonality of the  single-particle wave functions.
+The constraints can be treated via the technique of Lagrangian multipliers
+</section>
+
+
+<section>
+<h2 id="___sec93">Variational Calculus and Lagrangian Multipliers, simple example  </h2>
+
+<p>
+Let us specialize to the expectation value of the energy for one particle in three-dimensions.
+This expectation value reads
+<p>&nbsp;<br>
+$$
+  E=\int dxdydz \psi^*(x,y,z) \hat{H} \psi(x,y,z),
+$$
+<p>&nbsp;<br>
+
+with the constraint
+<p>&nbsp;<br>
+$$
+ \int dxdydz \psi^*(x,y,z) \psi(x,y,z)=1,
+$$
+<p>&nbsp;<br>
+
+and a Hamiltonian
+<p>&nbsp;<br>
+$$
+\hat{H}=-\frac{1}{2}\nabla^2+V(x,y,z).
+$$
+<p>&nbsp;<br>
+
+We will, for the sake of notational convenience,  skip the variables \( x,y,z \) below, and write for example \( V(x,y,z)=V \).
+</section>
+
+
+<section>
+<h2 id="___sec94">Manipulating terms  </h2>
+
+<p>
+The integral involving the kinetic energy can be written as, with the function \( \psi \) vanishing
+strongly for large values of \( x,y,z \) (given here by the limits \( a \) and \( b \)), 
+<p>&nbsp;<br>
+$$
+  \int_a^b dxdydz \psi^* \left(-\frac{1}{2}\nabla^2\right) \psi dxdydz = \psi^*\nabla\psi|_a^b+\int_a^b dxdydz\frac{1}{2}\nabla\psi^*\nabla\psi.
+$$
+<p>&nbsp;<br>
+
+We will drop the limits \( a \) and \( b \) in the remaining discussion. 
+Inserting this expression into the expectation value for the energy and taking the variational minimum  we obtain
+<p>&nbsp;<br>
+$$
+\delta E = \delta \left\{\int dxdydz\left( \frac{1}{2}\nabla\psi^*\nabla\psi+V\psi^*\psi\right)\right\} = 0.
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec95">Adding the Lagrangian multiplier  </h2>
+
+<p>
+The constraint appears in integral form as 
+<p>&nbsp;<br>
+$$
+ \int dxdydz \psi^* \psi=\mathrm{constant},
+$$
+<p>&nbsp;<br>
+
+and multiplying with a Lagrangian multiplier \( \lambda \) and taking the variational minimum we obtain the final variational equation
+<p>&nbsp;<br>
+$$
+\delta \left\{\int dxdydz\left( \frac{1}{2}\nabla\psi^*\nabla\psi+V\psi^*\psi-\lambda\psi^*\psi\right)\right\} = 0.
+$$
+<p>&nbsp;<br>
+
+We introduce the function  \( f \)
+<p>&nbsp;<br>
+$$
+  f =  \frac{1}{2}\nabla\psi^*\nabla\psi+V\psi^*\psi-\lambda\psi^*\psi=
+\frac{1}{2}(\psi^*_x\psi_x+\psi^*_y\psi_y+\psi^*_z\psi_z)+V\psi^*\psi-\lambda\psi^*\psi,
+$$
+<p>&nbsp;<br>
+
+where we have skipped the dependence on \( x,y,z \) and introduced the shorthand \( \psi_x \), \( \psi_y \) and \( \psi_z \)  for the various derivatives.
+</section>
+
+
+<section>
+<h2 id="___sec96">And with the Euler-Lagrange equations we get  </h2>
+
+<p>
+For \( \psi^* \) the Euler-Lagrange  equations yield
+<p>&nbsp;<br>
+$$
+\frac{\partial f}{\partial \psi^*}- \frac{\partial }{\partial x}\frac{\partial f}{\partial \psi^*_x}-\frac{\partial }{\partial y}\frac{\partial f}{\partial \psi^*_y}-\frac{\partial }{\partial z}\frac{\partial f}{\partial \psi^*_z}=0,
+$$
+<p>&nbsp;<br>
+
+which results in 
+<p>&nbsp;<br>
+$$
+    -\frac{1}{2}(\psi_{xx}+\psi_{yy}+\psi_{zz})+V\psi=\lambda \psi.
+$$
+<p>&nbsp;<br>
+
+We can then identify the  Lagrangian multiplier as the energy of the system. The last equation is 
+nothing but the standard 
+Schroedinger equation and the variational  approach discussed here provides 
+a powerful method for obtaining approximate solutions of the wave function.
+</section>
+
+
+<section>
+<h2 id="___sec97">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+In deriving the Hartree-Fock equations, we  will expand the single-particle functions in a known basis  and vary the coefficients, 
+that is, the new single-particle wave function is written as a linear expansion
+in terms of a fixed chosen orthogonal basis (for example the well-known harmonic oscillator functions or the hydrogen-like functions etc).
+We define our new Hartree-Fock single-particle basis by performing a unitary transformation 
+on our previous basis (labelled with greek indices) as
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\psi_p^{HF}  = \sum_{\lambda} C_{p\lambda}\phi_{\lambda}. \tag{35}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+In this case we vary the coefficients \( C_{p\lambda} \). If the basis has infinitely many solutions, we need
+to truncate the above sum.  We assume that the basis \( \phi_{\lambda} \) is orthogonal. A unitary transformation keeps the orthogonality, as discussed in exercise 1 below.
+</section>
+
+
+<section>
+<h2 id="___sec98">More on linear algebra  </h2>
+
+<p>
+In the previous slide we stated that a unitary transformation keeps the orthogonality, as discussed in exercise 1 below.  To see this consider first a basis of vectors \( \mathbf{v}_i \),
+<p>&nbsp;<br>
+$$
+\mathbf{v}_i = \begin{bmatrix} v_{i1} \\ \dots \\ \dots \\v_{in} \end{bmatrix}
+$$
+<p>&nbsp;<br>
+
+We assume that the basis is orthogonal, that is 
+<p>&nbsp;<br>
+$$
+\mathbf{v}_j^T\mathbf{v}_i = \delta_{ij}.
+$$
+<p>&nbsp;<br>
+
+An orthogonal or unitary transformation
+<p>&nbsp;<br>
+$$
+\mathbf{w}_i=\mathbf{U}\mathbf{v}_i,
+$$
+<p>&nbsp;<br>
+
+preserves the dot product and orthogonality since
+<p>&nbsp;<br>
+$$
+\mathbf{w}_j^T\mathbf{w}_i=(\mathbf{U}\mathbf{v}_j)^T\mathbf{U}\mathbf{v}_i=\mathbf{v}_j^T\mathbf{U}^T\mathbf{U}\mathbf{v}_i= \mathbf{v}_j^T\mathbf{v}_i = \delta_{ij}.
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec99">Coefficients of a wave function expansion </h2>
+
+<p>
+This means that if the coefficients \( C_{p\lambda} \) belong to a unitary or orthogonal trasformation (using the Dirac bra-ket notation)
+<p>&nbsp;<br>
+$$
+\vert p\rangle  = \sum_{\lambda} C_{p\lambda}\vert\lambda\rangle,
+$$
+<p>&nbsp;<br>
+
+orthogonality is preserved, that is \( \langle \alpha \vert \beta\rangle = \delta_{\alpha\beta} \)
+and \( \langle p \vert q\rangle = \delta_{pq} \).
+
+<p>
+This propertry is extremely useful when we build up a basis of many-body Stater determinant based states.
+
+<p>
+<b>Note also that although a basis \( \vert \alpha\rangle \) contains an infinity of states, for practical calculations we have always to make some truncations.</b>
+</section>
+
+
+<section>
+<h2 id="___sec100">More Basic Matrix Features, simple \( 2 \times 2 \) determinant, useful property of determinants  </h2>
+
+<p>
+Before we develop the Hartree-Fock equations, there is another very useful property of determinants that we will use both in connection with Hartree-Fock calculations and later shell-model calculations.
+
+<p>
+Consider the following determinant
+<p>&nbsp;<br>
+$$
+\left| \begin{array}{cc} \alpha_1b_{11}+\alpha_2sb_{12}& a_{12}\\
+                         \alpha_1b_{21}+\alpha_2b_{22}&a_{22}\end{array} \right|=\alpha_1\left|\begin{array}{cc} b_{11}& a_{12}\\
+                         b_{21}&a_{22}\end{array} \right|+\alpha_2\left| \begin{array}{cc} b_{12}& a_{12}\\b_{22}&a_{22}\end{array} \right|
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec101">More Basic Matrix Features, \( n \times n \) determinant </h2>
+
+<p>
+We can generalize this to  an \( n\times n \) matrix and have 
+<p>&nbsp;<br>
+$$
+\left| \begin{array}{cccccc} a_{11}& a_{12} & \dots & \sum_{k=1}^n c_k b_{1k} &\dots & a_{1n}\\
+a_{21}& a_{22} & \dots & \sum_{k=1}^n c_k b_{2k} &\dots & a_{2n}\\
+\dots & \dots & \dots & \dots & \dots & \dots \\
+\dots & \dots & \dots & \dots & \dots & \dots \\
+a_{n1}& a_{n2} & \dots & \sum_{k=1}^n c_k b_{nk} &\dots & a_{nn}\end{array} \right|=
+\sum_{k=1}^n c_k\left| \begin{array}{cccccc} a_{11}& a_{12} & \dots &  b_{1k} &\dots & a_{1n}\\
+a_{21}& a_{22} & \dots &  b_{2k} &\dots & a_{2n}\\
+\dots & \dots & \dots & \dots & \dots & \dots\\
+\dots & \dots & \dots & \dots & \dots & \dots\\
+a_{n1}& a_{n2} & \dots &  b_{nk} &\dots & a_{nn}\end{array} \right| .
+$$
+<p>&nbsp;<br>
+
+This is a property we will use in our Hartree-Fock discussions.
+</section>
+
+
+<section>
+<h2 id="___sec102">More Basic Matrix Features, a general \( n \times n \) determinant </h2>
+
+<p>
+We can generalize the previous results, now 
+with all elements \( a_{ij} \)  being given as functions of 
+linear combinations  of various coefficients \( c \) and elements \( b_{ij} \),
+<p>&nbsp;<br>
+$$
+\left| \begin{array}{cccccc} \sum_{k=1}^n b_{1k}c_{k1}& \sum_{k=1}^n b_{1k}c_{k2} & \dots & \sum_{k=1}^n b_{1k}c_{kj}  &\dots & \sum_{k=1}^n b_{1k}c_{kn}\\
+\sum_{k=1}^n b_{2k}c_{k1}& \sum_{k=1}^n b_{2k}c_{k2} & \dots & \sum_{k=1}^n b_{2k}c_{kj} &\dots & \sum_{k=1}^n b_{2k}c_{kn}\\
+\dots & \dots & \dots & \dots & \dots & \dots \\
+\dots & \dots & \dots & \dots & \dots &\dots \\
+\sum_{k=1}^n b_{nk}c_{k1}& \sum_{k=1}^n b_{nk}c_{k2} & \dots & \sum_{k=1}^n b_{nk}c_{kj} &\dots & \sum_{k=1}^n b_{nk}c_{kn}\end{array} \right|=det(\mathbf{C})det(\mathbf{B}),
+$$
+<p>&nbsp;<br>
+
+where \( det(\mathbf{C}) \) and \( det(\mathbf{B}) \) are the determinants of \( n\times n \) matrices
+with elements \( c_{ij} \) and \( b_{ij} \) respectively.  
+This is a property we will use in our Hartree-Fock discussions. Convince yourself about the correctness of the above expression by setting \( n=2 \).
+</section>
+
+
+<section>
+<h2 id="___sec103">A general Slater determinant </h2>
+
+<p>
+With our definition of the new basis in terms of an orthogonal basis we have
+<p>&nbsp;<br>
+$$
+\psi_p(x)  = \sum_{\lambda} C_{p\lambda}\phi_{\lambda}(x).
+$$
+<p>&nbsp;<br>
+
+If the coefficients \( C_{p\lambda} \) belong to an orthogonal or unitary matrix, the new basis
+is also orthogonal. 
+Our Slater determinant in the new basis \( \psi_p(x) \) is written as
+<p>&nbsp;<br>
+$$
+\frac{1}{\sqrt{A!}}
+\left| \begin{array}{ccccc} \psi_{p}(x_1)& \psi_{p}(x_2)& \dots & \dots & \psi_{p}(x_A)\\
+                            \psi_{q}(x_1)&\psi_{q}(x_2)& \dots & \dots & \psi_{q}(x_A)\\  
+                            \dots & \dots & \dots & \dots & \dots \\
+                            \dots & \dots & \dots & \dots & \dots \\
+                     \psi_{t}(x_1)&\psi_{t}(x_2)& \dots & \dots & \psi_{t}(x_A)\end{array} \right|=\frac{1}{\sqrt{A!}}
+\left| \begin{array}{ccccc} \sum_{\lambda} C_{p\lambda}\phi_{\lambda}(x_1)& \sum_{\lambda} C_{p\lambda}\phi_{\lambda}(x_2)& \dots & \dots & \sum_{\lambda} C_{p\lambda}\phi_{\lambda}(x_A)\\
+                            \sum_{\lambda} C_{q\lambda}\phi_{\lambda}(x_1)&\sum_{\lambda} C_{q\lambda}\phi_{\lambda}(x_2)& \dots & \dots & \sum_{\lambda} C_{q\lambda}\phi_{\lambda}(x_A)\\  
+                            \dots & \dots & \dots & \dots & \dots \\
+                            \dots & \dots & \dots & \dots & \dots \\
+                     \sum_{\lambda} C_{t\lambda}\phi_{\lambda}(x_1)&\sum_{\lambda} C_{t\lambda}\phi_{\lambda}(x_2)& \dots & \dots & \sum_{\lambda} C_{t\lambda}\phi_{\lambda}(x_A)\end{array} \right|,
+$$
+<p>&nbsp;<br>
+
+which is nothing but \( det(\mathbf{C})det(\Phi) \), with \( det(\Phi) \) being the determinant given by the basis functions \( \phi_{\lambda}(x) \).
+</section>
+
+
+<section>
+<h2 id="___sec104">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+It is normal to choose a single-particle basis defined as the eigenfunctions
+of parts of the full Hamiltonian. The typical situation consists of the solutions of the one-body part of the Hamiltonian, that is we have
+<p>&nbsp;<br>
+$$
+\hat{h}_0\phi_{\lambda}=\epsilon_{\lambda}\phi_{\lambda}.
+$$
+<p>&nbsp;<br>
+
+The single-particle wave functions \( \phi_{\lambda}(\boldsymbol{r}) \), defined by the quantum numbers \( \lambda \) and \( \boldsymbol{r} \)
+are defined as the overlap 
+<p>&nbsp;<br>
+$$
+   \phi_{\lambda}(\boldsymbol{r})  = \langle \boldsymbol{r} | \lambda \rangle .
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec105">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+In our discussions hereafter we will use our definitions of single-particle states above and below the Fermi (\( F \)) level given by the labels
+\( ijkl\dots \le F \) for so-called single-hole states and \( abcd\dots > F \) for so-called particle states.
+For general single-particle states we employ the labels \( pqrs\dots \).
+</section>
+
+
+<section>
+<h2 id="___sec106">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+In Eq.&nbsp;<a href="#mjx-eqn-16">(16)</a>, restated here
+<p>&nbsp;<br>
+$$
+  E[\Phi] 
+  = \sum_{\mu=1}^A \langle \mu | h | \mu \rangle +
+  \frac{1}{2}\sum_{{\mu}=1}^A\sum_{{\nu}=1}^A \langle \mu\nu|\hat{v}|\mu\nu\rangle_{AS},
+$$
+<p>&nbsp;<br>
+
+we found the expression for the energy functional in terms of the basis function \( \phi_{\lambda}(\boldsymbol{r}) \). We then  varied the above energy functional with respect to the basis functions \( |\mu \rangle \). 
+Now we are interested in defining a new basis defined in terms of
+a chosen basis as defined in Eq.&nbsp;<a href="#mjx-eqn-35">(35)</a>. We can then rewrite the energy functional as
+<p>&nbsp;<br>
+$$
+\begin{equation}
+  E[\Phi^{HF}] 
+  = \sum_{i=1}^A \langle i | h | i \rangle +
+  \frac{1}{2}\sum_{ij=1}^A\langle ij|\hat{v}|ij\rangle_{AS}, \tag{36}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+where \( \Phi^{HF} \) is the new Slater determinant defined by the new basis of Eq.&nbsp;<a href="#mjx-eqn-35">(35)</a>.
+</section>
+
+
+<section>
+<h2 id="___sec107">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+Using Eq.&nbsp;<a href="#mjx-eqn-35">(35)</a> we can rewrite Eq.&nbsp;<a href="#mjx-eqn-36">(36)</a> as 
+<p>&nbsp;<br>
+$$
+\begin{equation}
+  E[\Psi] 
+  = \sum_{i=1}^A \sum_{\alpha\beta} C^*_{i\alpha}C_{i\beta}\langle \alpha | h | \beta \rangle +
+  \frac{1}{2}\sum_{ij=1}^A\sum_{{\alpha\beta\gamma\delta}} C^*_{i\alpha}C^*_{j\beta}C_{i\gamma}C_{j\delta}\langle \alpha\beta|\hat{v}|\gamma\delta\rangle_{AS}. \tag{37}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec108">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+We wish now to minimize the above functional. We introduce again a set of Lagrange multipliers, noting that
+since \( \langle i | j \rangle = \delta_{i,j} \) and \( \langle \alpha | \beta \rangle = \delta_{\alpha,\beta} \), 
+the coefficients \( C_{i\gamma} \) obey the relation
+<p>&nbsp;<br>
+$$
+ \langle i | j \rangle=\delta_{i,j}=\sum_{\alpha\beta} C^*_{i\alpha}C_{i\beta}\langle \alpha | \beta \rangle=
+\sum_{\alpha} C^*_{i\alpha}C_{i\alpha},
+$$
+<p>&nbsp;<br>
+
+which allows us to define a functional to be minimized that reads
+<p>&nbsp;<br>
+$$
+\begin{equation}
+  F[\Phi^{HF}]=E[\Phi^{HF}] - \sum_{i=1}^A\epsilon_i\sum_{\alpha} C^*_{i\alpha}C_{i\alpha}.
+\tag{38}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec109">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+Minimizing with respect to \( C^*_{i\alpha} \), remembering that the equations for \( C^*_{i\alpha} \) and \( C_{i\alpha} \)
+can be written as two  independent equations, we obtain
+<p>&nbsp;<br>
+$$
+\frac{d}{dC^*_{i\alpha}}\left[  E[\Phi^{HF}] - \sum_{j}\epsilon_j\sum_{\alpha} C^*_{j\alpha}C_{j\alpha}\right]=0,
+$$
+<p>&nbsp;<br>
+
+which yields for every single-particle state \( i \) and index \( \alpha \) (recalling that the coefficients \( C_{i\alpha} \) are matrix elements of a unitary (or orthogonal for a real symmetric matrix) matrix)
+the following Hartree-Fock equations
+<p>&nbsp;<br>
+$$
+\sum_{\beta} C_{i\beta}\langle \alpha | h | \beta \rangle+
+\sum_{j=1}^A\sum_{\beta\gamma\delta} C^*_{j\beta}C_{j\delta}C_{i\gamma}\langle \alpha\beta|\hat{v}|\gamma\delta\rangle_{AS}=\epsilon_i^{HF}C_{i\alpha}.
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec110">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+We can rewrite this equation as (changing dummy variables)
+<p>&nbsp;<br>
+$$
+\sum_{\beta} \left\{\langle \alpha | h | \beta \rangle+
+\sum_{j}^A\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|\hat{v}|\beta\delta\rangle_{AS}\right\}C_{i\beta}=\epsilon_i^{HF}C_{i\alpha}.
+$$
+<p>&nbsp;<br>
+
+Note that the sums over greek indices run over the number of basis set functions (in principle an infinite number).
+</section>
+
+
+<section>
+<h2 id="___sec111">Hartree-Fock by varying the coefficients of a wave function expansion </h2>
+
+<p>
+Defining 
+<p>&nbsp;<br>
+$$
+h_{\alpha\beta}^{HF}=\langle \alpha | h | \beta \rangle+
+\sum_{j=1}^A\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|\hat{v}|\beta\delta\rangle_{AS},
+$$
+<p>&nbsp;<br>
+
+we can rewrite the new equations as 
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\sum_{\gamma}h_{\alpha\beta}^{HF}C_{i\beta}=\epsilon_i^{HF}C_{i\alpha}. \tag{39}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+The latter is nothing but a standard eigenvalue problem.
+
+<p>
+It suffices to tabulate the matrix elements \( \langle \alpha | h | \beta \rangle \) and \( \langle \alpha\gamma|\hat{v}|\beta\delta\rangle_{AS} \) once and for all. Successive iterations require thus only a look-up in tables over one-body and two-body matrix elements. These details will be discussed below when we solve the Hartree-Fock equations numerically.
+</section>
+
+
+<section>
+<h2 id="___sec112">Hartree-Fock algorithm </h2>
+
+<p>
+Our Hartree-Fock matrix  is thus
+<p>&nbsp;<br>
+$$
+\hat{h}_{\alpha\beta}^{HF}=\langle \alpha | \hat{h}_0 | \beta \rangle+
+\sum_{j=1}^A\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|\hat{v}|\beta\delta\rangle_{AS}.
+$$
+<p>&nbsp;<br>
+
+The Hartree-Fock equations are solved in an iterative waym starting with a guess for the coefficients \( C_{j\gamma}=\delta_{j,\gamma} \) and solving the equations by diagonalization till the new single-particle energies
+\( \epsilon_i^{\mathrm{HF}} \) do not change anymore by a prefixed quantity.
+</section>
+
+
+<section>
+<h2 id="___sec113">Hartree-Fock algorithm </h2>
+
+<p>
+Normally we assume that the single-particle basis \( |\beta\rangle \) forms an eigenbasis for the operator
+\( \hat{h}_0 \), meaning that the Hartree-Fock matrix becomes
+
+<p>&nbsp;<br>
+$$
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{j=1}^A\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|\hat{v}|\beta\delta\rangle_{AS}.
+$$
+<p>&nbsp;<br>
+
+The Hartree-Fock eigenvalue problem
+<p>&nbsp;<br>
+$$
+\sum_{\beta}\hat{h}_{\alpha\beta}^{HF}C_{i\beta}=\epsilon_i^{\mathrm{HF}}C_{i\alpha},
+$$
+<p>&nbsp;<br>
+
+can be written out in a more compact form as
+<p>&nbsp;<br>
+$$
+\hat{h}^{HF}\hat{C}=\epsilon^{\mathrm{HF}}\hat{C}. 
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec114">Hartree-Fock algorithm </h2>
+
+<p>
+The Hartree-Fock equations are, in their simplest form, solved in an iterative way, starting with a guess for the
+coefficients \( C_{i\alpha} \). We label the coefficients as \( C_{i\alpha}^{(n)} \), where the subscript \( n \) stands for iteration \( n \).
+To set up the algorithm we can proceed as follows:
 
 <ul>
-<p><li> Repeat for six electrons (find the relevant harmonic oscillator quantum numbers)</li>
-<p><li> Repeat for 12 and 20 electrons</li>
+ <p><li> We start with a guess \( C_{i\alpha}^{(0)}=\delta_{i,\alpha} \). Alternatively, we could have used random starting values as long as the vectors are normalized. Another possibility is to give states below the Fermi level a larger weight.</li>
+ <p><li> The Hartree-Fock matrix simplifies then to (assuming that the coefficients \( C_{i\alpha}  \)  are real)</li>
 </ul>
-</div>
+<p>&nbsp;<br>
+$$
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{j = 1}^A\sum_{\gamma\delta} C_{j\gamma}^{(0)}C_{j\delta}^{(0)}\langle \alpha\gamma|\hat{v}|\beta\delta\rangle_{AS}.
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec115">Hartree-Fock algorithm </h2>
+
+<p>
+Solving the Hartree-Fock eigenvalue problem yields then new eigenvectors \( C_{i\alpha}^{(1)} \) and eigenvalues
+\( \epsilon_i^{HF(1)} \). 
+
+<ul>
+ <p><li> With the new eigenvalues we can set up a new Hartree-Fock potential</li> 
+</ul>
+<p>&nbsp;<br>
+$$
+\sum_{j = 1}^A\sum_{\gamma\delta} C_{j\gamma}^{(1)}C_{j\delta}^{(1)}\langle \alpha\gamma|\hat{v}|\beta\delta\rangle_{AS}.
+$$
+<p>&nbsp;<br>
+
+The diagonalization with the new Hartree-Fock potential yields new eigenvectors and eigenvalues.
+This process is continued till for example
+<p>&nbsp;<br>
+$$
+\frac{\sum_{p} |\epsilon_i^{(n)}-\epsilon_i^{(n-1)}|}{m} \le \lambda,  
+$$
+<p>&nbsp;<br>
+
+where \( \lambda \) is a user prefixed quantity (\( \lambda \sim 10^{-8} \) or smaller) and \( p \) runs over all calculated single-particle
+energies and \( m \) is the number of single-particle states.
+</section>
+
+
+<section>
+<h2 id="___sec116">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+
+<p>
+We can rewrite the ground state energy by adding and subtracting \( \hat{u}^{HF}(x_i) \) 
+<p>&nbsp;<br>
+$$
+  E_0^{HF} =\langle \Phi_0 | \hat{H} | \Phi_0\rangle = 
+\sum_{i\le F}^A \langle i | \hat{h}_0 +\hat{u}^{HF}| j\rangle+ \frac{1}{2}\sum_{i\le F}^A\sum_{j \le F}^A\left[\langle ij |\hat{v}|ij \rangle-\langle ij|\hat{v}|ji\rangle\right]-\sum_{i\le F}^A \langle i |\hat{u}^{HF}| i\rangle,
+$$
+<p>&nbsp;<br>
+
+which results in
+<p>&nbsp;<br>
+$$
+  E_0^{HF}
+  = \sum_{i\le F}^A \varepsilon_i^{HF} + \frac{1}{2}\sum_{i\le F}^A\sum_{j \le F}^A\left[\langle ij |\hat{v}|ij \rangle-\langle ij|\hat{v}|ji\rangle\right]-\sum_{i\le F}^A \langle i |\hat{u}^{HF}| i\rangle.
+$$
+<p>&nbsp;<br>
+
+Our single-particle states \( ijk\dots \) are now single-particle states obtained from the solution of the Hartree-Fock equations.
+</section>
+
+
+<section>
+<h2 id="___sec117">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+
+<p>
+Using our definition of the Hartree-Fock single-particle energies we obtain then the following expression for the total ground-state energy
+<p>&nbsp;<br>
+$$
+  E_0^{HF}
+  = \sum_{i\le F}^A \varepsilon_i - \frac{1}{2}\sum_{i\le F}^A\sum_{j \le F}^A\left[\langle ij |\hat{v}|ij \rangle-\langle ij|\hat{v}|ji\rangle\right].
+$$
+<p>&nbsp;<br>
+
+This form will be used in our discussion of Koopman's theorem.
+</section>
+
+
+<section>
+<h2 id="___sec118">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+  Atomic physics case
+We have 
+<p>&nbsp;<br>
+$$
+  E[\Phi^{\mathrm{HF}}(N)] 
+  = \sum_{i=1}^H \langle i | \hat{h}_0 | i \rangle +
+  \frac{1}{2}\sum_{ij=1}^N\langle ij|\hat{v}|ij\rangle_{AS},
+$$
+<p>&nbsp;<br>
+
+where \( \Phi^{\mathrm{HF}}(N) \) is the new Slater determinant defined by the new basis of Eq.&nbsp;<a href="#mjx-eqn-35">(35)</a>
+for \( N \) electrons (same \( Z \)).  If we assume that the single-particle wave functions in the new basis do not change 
+when we remove one electron or add one electron, we can then define the corresponding energy for the \( N-1 \) systems as 
+<p>&nbsp;<br>
+$$
+  E[\Phi^{\mathrm{HF}}(N-1)] 
+  = \sum_{i=1; i\ne k}^N \langle i | \hat{h}_0 | i \rangle +
+  \frac{1}{2}\sum_{ij=1;i,j\ne k}^N\langle ij|\hat{v}|ij\rangle_{AS},
+$$
+<p>&nbsp;<br>
+
+where we have removed a single-particle state \( k\le F \), that is a state below the Fermi level.
+</section>
+
+
+<section>
+<h2 id="___sec119">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+
+<p>
+Calculating the difference 
+<p>&nbsp;<br>
+$$
+  E[\Phi^{\mathrm{HF}}(N)]-   E[\Phi^{\mathrm{HF}}(N-1)] = \langle k | \hat{h}_0 | k \rangle +
+  \frac{1}{2}\sum_{i=1;i\ne k}^N\langle ik|\hat{v}|ik\rangle_{AS}  \frac{1}{2}\sum_{j=1;j\ne k}^N\langle kj|\hat{v}|kj\rangle_{AS},
+$$
+<p>&nbsp;<br>
+
+we obtain
+<p>&nbsp;<br>
+$$
+  E[\Phi^{\mathrm{HF}}(N)]-   E[\Phi^{\mathrm{HF}}(N-1)] = \langle k | \hat{h}_0 | k \rangle +
+  \frac{1}{2}\sum_{j=1}^N\langle kj|\hat{v}|kj\rangle_{AS}
+$$
+<p>&nbsp;<br>
+
+which is just our definition of the Hartree-Fock single-particle energy
+<p>&nbsp;<br>
+$$
+  E[\Phi^{\mathrm{HF}}(N)]-   E[\Phi^{\mathrm{HF}}(N-1)] = \epsilon_k^{\mathrm{HF}} 
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec120">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+
+<p>
+Similarly, we can now compute the difference (we label the single-particle states above the Fermi level as \( abcd > F \))
+<p>&nbsp;<br>
+$$
+  E[\Phi^{\mathrm{HF}}(N+1)]-   E[\Phi^{\mathrm{HF}}(N)]= \epsilon_a^{\mathrm{HF}}. 
+$$
+<p>&nbsp;<br>
+
+These two equations can thus be used to the electron affinity or ionization energies, respectively. 
+Koopman's theorem states that for example the ionization energy of a closed-shell system is given by the energy of the highest occupied single-particle state.  If we assume that changing the number of electrons from \( N \) to \( N+1 \) does not change the Hartree-Fock single-particle energies and eigenfunctions, then Koopman's theorem simply states that the ionization energy of an atom is given by the single-particle energy of the last bound state. In a similar way, we can also define the electron affinities.
+</section>
+
+
+<section>
+<h2 id="___sec121">Analysis of Hartree-Fock equations and Koopman's theorem </h2>
+
+<p>
+As an example, consider a simple model for atomic sodium, Na. Neutral sodium has eleven electrons, 
+with the weakest bound one being confined the \( 3s \) single-particle quantum numbers. The energy needed to remove an electron from neutral sodium is rather small, 5.1391 eV, a feature which pertains to all alkali metals.
+Having performed a  Hartree-Fock calculation for neutral sodium would then allows us to compute the
+ionization energy by using the single-particle energy for the \( 3s \) states, namely \( \epsilon_{3s}^{\mathrm{HF}} \).
+
+<p>
+From these considerations, we see that Hartree-Fock theory allows us to make a connection between experimental 
+observables (here ionization and affinity energies) and the underlying interactions between particles.  
+In this sense, we are now linking the dynamics and structure of a many-body system with the laws of motion which govern the system. Our approach is a reductionistic one, meaning that we want to understand the laws of motion 
+in terms of the particles or degrees of freedom which we believe are the fundamental ones. Our Slater determinant, being constructed as the product of various single-particle functions, follows this philosophy.
+</section>
+
+
+<section>
+
+<p>
+<!-- --- begin exercise --- -->
+
+<h2 id="___sec122">Exercise 1: Hartree-Fock Slater determinant </h2>
+
+<p>
+Consider a Slater determinant built up of orthogonal single-particle orbitals \( \psi_{\lambda} \), 
+with \( \lambda = 1,2,\dots,A \).
+
+<p>
+The unitary transformation
+<p>&nbsp;<br>
+$$
+\psi_a  = \sum_{\lambda} C_{a\lambda}\phi_{\lambda},
+$$
+<p>&nbsp;<br>
+
+brings us into the new basis.  
+The new basis has quantum numbers \( a=1,2,\dots,A \).
+
+<p>
+<b>a)</b>
+Show that the new basis is orthogonal.
+
+<p>
+<b>b)</b>
+Show that the new Slater determinant constructed from the new single-particle wave functions can be
+written as the determinant based on the previous basis and the determinant of the matrix \( C \).
+
+<p>
+<b>c)</b>
+Show that the old and the new Slater determinants are equal up to a complex constant with absolute value unity.
+
+<p>
+<!-- --- begin hint in exercise --- -->
+
+<p>
+<b>Hint.</b>
+Hint: \( C \) is a unitary matrix.
+
+<p>
+<!-- --- end hint in exercise --- -->
+
+<p>
+<!-- --- end exercise --- -->
+</section>
+
+
+<section>
+
+<p>
+<!-- --- begin exercise --- -->
+
+<h2 id="___sec123">Exercise 2: Matrix elements for the Hartree-Fock method and the nuclear shell model </h2>
+
+<p>
+We will assume that we can build various Slater determinants using an orthogonal  single-particle basis \( \psi_{\lambda} \), 
+with \( \lambda = 1,2,\dots,A \).
+
+<p>
+The aim of this exercise is to set up specific matrix elements that will turn useful when we start our discussions of the nuclear shell model. In particular you will notice, depending on the character of the operator, that many matrix elements will actually be zero.
+
+<p>
+Consider three \( A \)-particle  Slater determinants  \( |\Phi_0 \), \( |\Phi_i^a\rangle \) and \( |\Phi_{ij}^{ab}\rangle \), where the notation means that 
+Slater determinant \( |\Phi_i^a\rangle \) differs from \( |\Phi_0\rangle \) by one single-particle state, that is a single-particle
+state \( \psi_i \) is replaced by a single-particle state \( \psi_a \). 
+It will later be interpreted as a so-called one-particle-one-hole excitation.
+Similarly, the Slater determinant \( |\Phi_{ij}^{ab}\rangle \)
+differs by two single-particle states from \( |\Phi_0\rangle \) and is normally thought of as a two-particle-two-hole excitation.
+
+<p>
+Define a general onebody operator \( \hat{F} = \sum_{i}^A\hat{f}(x_{i}) \) and a general  twobody operator \( \hat{G}=\sum_{i>j}^A\hat{g}(x_{i},x_{j}) \) with \( g \) being invariant under the interchange of the coordinates of particles \( i \) and \( j \). You can use here the results from the second exercise set, exercise 3.
+
+<p>
+<b>a)</b>
+Calculate
+<p>&nbsp;<br>
+$$
+\langle \Phi_0 \vert\hat{F}\vert\Phi_0\rangle,
+$$
+<p>&nbsp;<br>
+
+and
+<p>&nbsp;<br>
+$$
+\langle \Phi_0\vert\hat{G}|\Phi_0\rangle.
+$$
+<p>&nbsp;<br>
+
+<p>
+<b>b)</b>
+Find thereafter 
+<p>&nbsp;<br>
+$$
+\langle \Phi_0 |\hat{F}|\Phi_i^a\rangle,
+$$
+<p>&nbsp;<br>
+
+and
+<p>&nbsp;<br>
+$$
+\langle \Phi_0|\hat{G}|\Phi_i^a\rangle,
+$$
+<p>&nbsp;<br>
+
+<p>
+<b>c)</b>
+Finally, find
+<p>&nbsp;<br>
+$$
+\langle \Phi_0 |\hat{F}|\Phi_{ij}^{ab}\rangle,
+$$
+<p>&nbsp;<br>
+
+and
+<p>&nbsp;<br>
+$$
+\langle \Phi_0|\hat{G}|\Phi_{ij}^{ab}\rangle.
+$$
+<p>&nbsp;<br>
+
+What happens with the two-body operator if we have a transition probability  of the type
+<p>&nbsp;<br>
+$$
+\langle \Phi_0|\hat{G}|\Phi_{ijk}^{abc}\rangle,
+$$
+<p>&nbsp;<br>
+
+where the Slater determinant to the right of the operator differs by more than two single-particle states?
+
+<p>
+<b>d)</b>
+With an orthogonal basis of Slater determinants \( \Phi_{\lambda} \), we can now construct an exact many-body state as a linear expansion of Slater determinants, that is, a given exact state
+<p>&nbsp;<br>
+$$
+\Psi_i = \sum_{\lambda =0}^{\infty}C_{i\lambda}\Phi_{\lambda}.
+$$
+<p>&nbsp;<br>
+
+In all practical calculations the infinity is replaced by a given truncation in the sum.
+
+<p>
+If you are to compute the expectation value of (at most) a two-body Hamiltonian for the above
+exact state
+<p>&nbsp;<br>
+$$
+\langle \Psi_i \vert \hat{H} \vert \Psi_i\rangle,
+$$
+<p>&nbsp;<br>
+
+based on the calculations above, which are the only elements which will contribute?  (there is no need to perform any calculation here, use your results from exercises a), b), and c)).
+
+<p>
+These results simplify to a large extent shell-model calculations.
+
+<p>
+<!-- --- end exercise --- -->
+</section>
+
+
+<section>
+<h2 id="___sec124">Developing a  Hartree-Fock program  </h2>
+
+<p>
+The Hamiltonian for a system of \( N \) electrons confined in a
+harmonic potential reads
+<p>&nbsp;<br>
+$$
+\hat{H} = \sum_{i=1}^{N} \frac{\hat{p}_{i}^{2}}{2m}+\sum_{i=1}^{N} \frac{1}{2} m\omega {r}_{i}^{2}+\sum_{i < j} \hat{V}_{ij},
+$$
+<p>&nbsp;<br>
+
+with  \( \hat{V}_{ij} \) is the two-body potential whose 
+matrix elements are calculated on fly in your program. See expression below.
+
+<p>
+The Hartree-Fock algorithm can be broken down as follows. We recall that  our Hartree-Fock matrix  is 
+<p>&nbsp;<br>
+$$
+\hat{h}_{\alpha\beta}^{HF}=\langle \alpha \vert\hat{h}_0 \vert \beta \rangle+
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+$$
+<p>&nbsp;<br>
+
+Normally we assume that the single-particle basis \( \vert\beta\rangle \)
+forms an eigenbasis for the operator \( \hat{h}_0 \) (this is our case), meaning that the
+Hartree-Fock matrix becomes
+<p>&nbsp;<br>
+$$
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{j=1}^N\sum_{\gamma\delta} C^*_{j\gamma}C_{j\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+$$
+<p>&nbsp;<br>
+
+The Hartree-Fock eigenvalue problem
+<p>&nbsp;<br>
+$$
+\sum_{\beta}\hat{h}_{\alpha\beta}^{HF}C_{i\beta}=\epsilon_i^{\mathrm{HF}}C_{i\alpha},
+$$
+<p>&nbsp;<br>
+
+can be written out in a more compact form as
+<p>&nbsp;<br>
+$$
+\hat{h}^{HF}\hat{C}=\epsilon^{\mathrm{HF}}\hat{C}. 
+$$
+<p>&nbsp;<br>
+
+<p>
+The equations are often rewritten in terms of a so-called density matrix,
+which is defined as 
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\rho_{\gamma\delta}=\sum_{i=1}^{N}\langle\gamma|i\rangle\langle i|\delta\rangle = \sum_{i=1}^{N}C_{i\gamma}C^*_{i\delta}.
+\tag{40}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+It means that we can rewrite the Hartree-Fock Hamiltonian as
+<p>&nbsp;<br>
+$$
+\hat{h}_{\alpha\beta}^{HF}=\epsilon_{\alpha}\delta_{\alpha,\beta}+
+\sum_{\gamma\delta} \rho_{\gamma\delta}\langle \alpha\gamma|V|\beta\delta\rangle_{AS}.
+$$
+<p>&nbsp;<br>
+
+It is convenient to use the density matrix since we can precalculate in every iteration the product of two eigenvector components \( C \).
+</section>
+
+
+<section>
+<h2 id="___sec125"><a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/HFcode/python/hf.py" target="_blank">Program for computing the Coulomb interaction in polar coordinates</a> </h2>
+
+<p>
+Here we show a simple code in python for a Hartree-Fock calculation using precalculated matrix elements.
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span> 
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">decimal</span> <span style="color: #8B008B; font-weight: bold">import</span> Decimal
+<span style="color: #228B22"># expectation value for the one body part, Harmonic oscillator in three dimensions</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">onebody</span>(i, n, l):
+	homega = <span style="color: #B452CD">10.0</span>
+	<span style="color: #8B008B; font-weight: bold">return</span> homega*(<span style="color: #B452CD">2</span>*n[i] + l[i] + <span style="color: #B452CD">1.5</span>)
+
+<span style="color: #8B008B; font-weight: bold">if</span> __name__ == <span style="color: #CD5555">&#39;__main__&#39;</span>:
+	
+        Nparticles = <span style="color: #B452CD">16</span>
+	<span style="color: #CD5555">&quot;&quot;&quot; Read quantum numbers from file &quot;&quot;&quot;</span>
+        index = []
+	n = []
+        l = []
+        j = []	
+        mj = []
+        tz = []
+	spOrbitals = <span style="color: #B452CD">0</span>
+	<span style="color: #8B008B; font-weight: bold">with</span> <span style="color: #658b00">open</span>(<span style="color: #CD5555">&quot;nucleispnumbers.dat&quot;</span>, <span style="color: #CD5555">&quot;r&quot;</span>) <span style="color: #8B008B; font-weight: bold">as</span> qnumfile:
+		<span style="color: #8B008B; font-weight: bold">for</span> line <span style="color: #8B008B">in</span> qnumfile:
+			nums = line.split()
+			<span style="color: #8B008B; font-weight: bold">if</span> <span style="color: #658b00">len</span>(nums) != <span style="color: #B452CD">0</span>:
+				index.append(<span style="color: #658b00">int</span>(nums[<span style="color: #B452CD">0</span>]))
+				n.append(<span style="color: #658b00">int</span>(nums[<span style="color: #B452CD">1</span>]))
+				l.append(<span style="color: #658b00">int</span>(nums[<span style="color: #B452CD">2</span>]))
+				j.append(<span style="color: #658b00">int</span>(nums[<span style="color: #B452CD">3</span>]))
+				mj.append(<span style="color: #658b00">int</span>(nums[<span style="color: #B452CD">4</span>]))
+				tz.append(<span style="color: #658b00">int</span>(nums[<span style="color: #B452CD">5</span>]))
+				spOrbitals += <span style="color: #B452CD">1</span>
+
+
+	<span style="color: #CD5555">&quot;&quot;&quot; Read two-nucleon interaction elements (integrals) from file, brute force 4-dim array &quot;&quot;&quot;</span>
+	nninteraction = np.zeros([spOrbitals, spOrbitals, spOrbitals, spOrbitals])
+	<span style="color: #8B008B; font-weight: bold">with</span> <span style="color: #658b00">open</span>(<span style="color: #CD5555">&quot;nucleitwobody.dat&quot;</span>, <span style="color: #CD5555">&quot;r&quot;</span>) <span style="color: #8B008B; font-weight: bold">as</span> infile:
+		<span style="color: #8B008B; font-weight: bold">for</span> line <span style="color: #8B008B">in</span> infile:
+			number = line.split()
+			a = <span style="color: #658b00">int</span>(number[<span style="color: #B452CD">0</span>]) - <span style="color: #B452CD">1</span>
+			b = <span style="color: #658b00">int</span>(number[<span style="color: #B452CD">1</span>]) - <span style="color: #B452CD">1</span>
+			c = <span style="color: #658b00">int</span>(number[<span style="color: #B452CD">2</span>]) - <span style="color: #B452CD">1</span>
+			d = <span style="color: #658b00">int</span>(number[<span style="color: #B452CD">3</span>]) - <span style="color: #B452CD">1</span>
+			<span style="color: #228B22">#print a, b, c, d, float(l[4])</span>
+			nninteraction[a][b][c][d] = Decimal(number[<span style="color: #B452CD">4</span>])
+	<span style="color: #CD5555">&quot;&quot;&quot; Set up single-particle integral &quot;&quot;&quot;</span>
+	singleparticleH = np.zeros(spOrbitals)
+	<span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+		singleparticleH[i] = Decimal(onebody(i, n, l))
+	
+	<span style="color: #CD5555">&quot;&quot;&quot; Star HF-iterations, preparing variables and density matrix &quot;&quot;&quot;</span>
+
+        <span style="color: #CD5555">&quot;&quot;&quot; Coefficients for setting up density matrix, assuming only one along the diagonals &quot;&quot;&quot;</span>
+	C = np.eye(spOrbitals) <span style="color: #228B22"># HF coefficients</span>
+        DensityMatrix = np.zeros([spOrbitals,spOrbitals])
+        <span style="color: #8B008B; font-weight: bold">for</span> gamma <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+            <span style="color: #8B008B; font-weight: bold">for</span> delta <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+                <span style="color: #658b00">sum</span> = <span style="color: #B452CD">0.0</span>
+                <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Nparticles):
+                    <span style="color: #658b00">sum</span> += C[gamma][i]*C[delta][i]
+                DensityMatrix[gamma][delta] = Decimal(<span style="color: #658b00">sum</span>)
+        maxHFiter = <span style="color: #B452CD">100</span>
+        epsilon =  <span style="color: #B452CD">1.0e-5</span> 
+        difference = <span style="color: #B452CD">1.0</span>
+	hf_count = <span style="color: #B452CD">0</span>
+	oldenergies = np.zeros(spOrbitals)
+	newenergies = np.zeros(spOrbitals)
+	<span style="color: #8B008B; font-weight: bold">while</span> hf_count &lt; maxHFiter <span style="color: #8B008B">and</span> difference &gt; epsilon:
+		<span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&quot;############### Iteration %i ###############&quot;</span> % hf_count
+   	        HFmatrix = np.zeros([spOrbitals,spOrbitals])		
+		<span style="color: #8B008B; font-weight: bold">for</span> alpha <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+			<span style="color: #8B008B; font-weight: bold">for</span> beta <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+                            <span style="color: #CD5555">&quot;&quot;&quot;  If tests for three-dimensional systems, including isospin conservation &quot;&quot;&quot;</span>
+                            <span style="color: #8B008B; font-weight: bold">if</span> l[alpha] != l[beta] <span style="color: #8B008B">and</span> j[alpha] != j[beta] <span style="color: #8B008B">and</span> mj[alpha] != mj[beta] <span style="color: #8B008B">and</span> tz[alpha] != tz[beta]: <span style="color: #8B008B; font-weight: bold">continue</span>
+                            <span style="color: #CD5555">&quot;&quot;&quot;  Setting up the Fock matrix using the density matrix and antisymmetrized NN interaction in m-scheme &quot;&quot;&quot;</span>
+     		            sumFockTerm = <span style="color: #B452CD">0.0</span>
+                            <span style="color: #8B008B; font-weight: bold">for</span> gamma <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+                                <span style="color: #8B008B; font-weight: bold">for</span> delta <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+                                    <span style="color: #8B008B; font-weight: bold">if</span> (mj[alpha]+mj[gamma]) != (mj[beta]+mj[delta]) <span style="color: #8B008B">and</span> (tz[alpha]+tz[gamma]) != (tz[beta]+tz[delta]): <span style="color: #8B008B; font-weight: bold">continue</span>
+                                    sumFockTerm += DensityMatrix[gamma][delta]*nninteraction[alpha][gamma][beta][delta]
+                            HFmatrix[alpha][beta] = Decimal(sumFockTerm)
+                            <span style="color: #CD5555">&quot;&quot;&quot;  Adding the one-body term, here plain harmonic oscillator &quot;&quot;&quot;</span>
+                            <span style="color: #8B008B; font-weight: bold">if</span> beta == alpha:   HFmatrix[alpha][alpha] += singleparticleH[alpha]
+		spenergies, C = np.linalg.eigh(HFmatrix)
+                <span style="color: #CD5555">&quot;&quot;&quot; Setting up new density matrix in m-scheme &quot;&quot;&quot;</span>
+                DensityMatrix = np.zeros([spOrbitals,spOrbitals])
+                <span style="color: #8B008B; font-weight: bold">for</span> gamma <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+                    <span style="color: #8B008B; font-weight: bold">for</span> delta <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+                        <span style="color: #658b00">sum</span> = <span style="color: #B452CD">0.0</span>
+                        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Nparticles):
+                            <span style="color: #658b00">sum</span> += C[gamma][i]*C[delta][i]
+                        DensityMatrix[gamma][delta] = Decimal(<span style="color: #658b00">sum</span>)
+		newenergies = spenergies
+                <span style="color: #CD5555">&quot;&quot;&quot; Brute force computation of difference between previous and new sp HF energies &quot;&quot;&quot;</span>
+                <span style="color: #658b00">sum</span> =<span style="color: #B452CD">0.0</span>
+                <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+                    <span style="color: #658b00">sum</span> += (<span style="color: #658b00">abs</span>(newenergies[i]-oldenergies[i]))/spOrbitals
+                difference = <span style="color: #658b00">sum</span>
+                oldenergies = newenergies
+                <span style="color: #8B008B; font-weight: bold">print</span> <span style="color: #CD5555">&quot;Single-particle energies, ordering may have changed &quot;</span>
+                <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(spOrbitals):
+                    <span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&#39;{0:4d}  {1:.4f}&#39;</span>.format(i, Decimal(oldenergies[i])))
+		hf_count += <span style="color: #B452CD">1</span>
+</pre></div>
+</section>
+
+
+<section>
+<h2 id="___sec126">Practicalities with the Hartree-Fock code development, basis construction </h2>
+When  setting up the Hartree-Fock algorithm you will find it convenient to number the basis states
+by filling the lowest subshells. For the first two shells we could then have the following mapping.
+<p>&nbsp;<br>
+$$
+\begin{align*}
+  \vert 0\rangle & = \{n=0, m=0, m_s = -0.5\} \\ 
+  \vert 1\rangle & = \{n=0, m=0, m_s = 0.5\} \\
+  \vert 2\rangle & = \{n=0, m=-1, m_s = -0.5\} \\
+  \vert 3\rangle & = \{n=0, m=-1, m_s = 0.5\} \\
+  \vert 4\rangle & = \{n=0, m=+1, m_s = -0.5\} \\
+  \vert 5\rangle & = \{n=0, m=+1, m_s = 0.5\}   
+\end{align*}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec127">Practicalities with the Hartree-Fock code development, two-body basis construction, brute force </h2>
+In the setup of the two-body matrix elements we can typically opt between two alternatives. We can read the matrix elements from file or calculate the matrix elements on the fly. The latter requires simply that we 
+call the abovementioned function for setting up the two-body matrix elements when we run our Hartree-Fock code.
+
+<p>
+If we however wish to read from file, we can store the matrix elements in two ways:
+
+<ul>
+<p><li> Brute force</li>
+<p><li> Organize according to conserved two-body quantum numbers</li>
+</ul>
+<p>
+
+The brute force way is easy to implement.
+</section>
+
+
+<section>
+<h2 id="___sec128">Two-body interaction, brute force part I </h2>
+We can read in from file the two-body interaction matrix elements or compute once and for all and store in
+memory.
+The elements are
+<p>&nbsp;<br>
+$$
+\langle pr | \hat{v}|qs\rangle.
+$$
+<p>&nbsp;<br>
+
+<p>
+The time-consuming part in the Hartree-Fock calculations
+involves the calculation of the two-body matrix. Furthermore, the
+storage of these matrix elements plays also an important role, in
+particular we wish to access the table of matrix elements as fast as
+possible.
+</section>
+
+
+<section>
+<h2 id="___sec129">Two-body interaction, brute force part II </h2>
+In a brute force algorithm for storing the matrix elements, if we have \( d \) basis functions, we end up with the need of storing 
+\( d^4 \) matrix elements. We can reduce this considerably by the following considerations.
+In the calculation of the two-body matrix elements \( \langle pr | \hat{v}|qs\rangle \) we have the following symmetries
+
+<ol>
+<p><li> Invariance under permutations, that is</li>
+</ol>
+<p>&nbsp;<br>
+$$
+\langle pq | \hat{v}|rs\rangle = \langle qp | \hat{v}|sr\rangle.
+$$
+<p>&nbsp;<br>
+
+
+<ol>
+<p><li> The functions entering the evaluation of the integrals are all real, meaning that if we interchange \( p\leftrightarrow q \) or  \( r\leftrightarrow s \), we end up with the same matrix element.</li>
+</ol>
+<p>
+
+This reduces by a factor of eight the total number of matrix elements to be stored if we also use that 
+we can store only for \( p < q \) and $ r < s$.
+</section>
+
+
+<section>
+<h2 id="___sec130">Two-body interaction, brute force part III </h2>
+
+<p>
+Furthermore, in setting up a table for the two-body matrix elements we can convert the need of using four indices \( pqrs \) of 
+<p>&nbsp;<br>
+$$
+\langle pr | \hat{v}|qs\rangle,
+$$
+<p>&nbsp;<br>
+
+ which in a brute forces way could be coded as a four-dimensional array, to 
+a two-dimensional array \( V_{lm} \), where \( l \) and \( m \) stand for all possible two-body configurations \( pq \).
+
+<p>
+Each number \( l \) and \( m \) in \( V_{lm} \)  should then point to a set of single-particle  states \( (p,q) \) and \( (r,s) \).
+
+<p>
+In our case, since we have 
+symmetries which allow us to set \( p\le q \), we have, with \( d \) single particle states a total of \( d(d+1)/2 \) two-body configurations.
+</section>
+
+
+<section>
+<h2 id="___sec131">Two-body interaction, brute force part IV </h2>
+
+<p>
+How do we store such a matrix? The simplest thing to do is to convert it into a one-dimensional array. How do we achieve that?
+
+<p>
+We now have a matrix \( V \) of dimension \( n\times n \) and we want to store the elements \( V_{lm} \) as a one-dimensional array \( A \) using
+\( 0 \le l \le m \le n-1 \). For
+
+<ol>
+<p><li> \( l=0 \) we have \( n \) elements</li>
+<p><li> \( l=1 \) we have \( n-1 \) elements</li>
+<p><li> \( \dots \)</li>
+<p><li> \( l=\nu \) we have \( n-\nu \) elements</li>
+<p><li> \( \dots \)</li>
+<p><li> \( l=n-1 \) we have \( 1 \) element,</li>
+</ol>
+<p>
+
+and the total number is
+
+<p>&nbsp;<br>
+$$
+\sum_{\nu =0}^{n-1}\left(n-\nu\right)=\frac{n(n+1)}{2}.
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec132">Two-body interaction, brute force part V </h2>
+
+<p>
+To find the number (\( \mathrm{number}(l,m) \)) in a one-dimensional array \( A \) which corresponds to a matrix element \( V_{lm} \), we note that
+<p>&nbsp;<br>
+$$
+\mathrm{number}(l,m)=\sum_{\nu =0}^{l-1}\left(n-\nu\right)+m-l=\frac{l(2n-l-1)}{2}+m.
+$$
+<p>&nbsp;<br>
+
+The first matrix element \( V(0,0) \) is obviously given by the element \( A(0) \).
+
+<p>
+We have thus reduced a four dimensional array to a one-dimensional array, where the given pairs \( (p,q) \) and \( (r,s) \) point to the matrix indices \( l \)
+and \( m \), respectively. The latter are used to find the explicit number \( \mathrm{number}(l,m) \) which points to the desired matrix element stored 
+in a one-dimensional array.
+</section>
+
+
+<section>
+<h2 id="___sec133">Practicalities with the Hartree-Fock code development, two-body basis construction </h2>
+
+<p>
+Another way to store the matrix elements is to organize the matrix elements according to conserved quantum numbers.
+This means setting up a block structure and to look up matrix elements using two-body conserved quantum numbers.
+For quantum dots, the two-body quantum numbers that are conserved are
+The total orbital momentum projection
+<p>&nbsp;<br>
+$$
+M = m_1 + m_2,
+$$
+<p>&nbsp;<br>
+
+and the total spin projection
+<p>&nbsp;<br>
+$$
+M_s = m_{s_1} + m_{s_2}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec134">Two-body basis construction </h2>
+
+<p>
+For 2 shells we have
+
+<p>
+<table border="1">
+<thead>
+<tr><td align="center">\( M \)</td> <td align="center">\( M_s \)</td> <td align="center">\( \alpha \)</td> <th align="center">        State         </th> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   -2         </td> <td align="center">   0            </td> <td align="center">   1               </td> <td align="center">   \( \vert 3,2\rangle \)    </td> </tr>
+<tr><td align="center">   -1         </td> <td align="center">   -1           </td> <td align="center">   3               </td> <td align="center">   \( \vert 2,0\rangle \)    </td> </tr>
+<tr><td align="center">   -1         </td> <td align="center">   0            </td> <td align="center">   4               </td> <td align="center">   \( \vert 3,0\rangle \)    </td> </tr>
+<tr><td align="center">   -1         </td> <td align="center">   0            </td> <td align="center">   4               </td> <td align="center">   \( \vert 2,1\rangle \)    </td> </tr>
+<tr><td align="center">   -1         </td> <td align="center">   1            </td> <td align="center">   5               </td> <td align="center">   \( \vert 3,1\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   -1           </td> <td align="center">   6               </td> <td align="center">   \( \vert 4,2\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   0            </td> <td align="center">   7               </td> <td align="center">   \( \vert 1,0\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   0            </td> <td align="center">   7               </td> <td align="center">   \( \vert 5,2\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   0            </td> <td align="center">   7               </td> <td align="center">   \( \vert 4,3\rangle \)    </td> </tr>
+<tr><td align="center">   0          </td> <td align="center">   1            </td> <td align="center">   8               </td> <td align="center">   \( \vert 5,3\rangle \)    </td> </tr>
+<tr><td align="center">   1          </td> <td align="center">   -1           </td> <td align="center">   9               </td> <td align="center">   \( \vert 4,0\rangle \)    </td> </tr>
+<tr><td align="center">   1          </td> <td align="center">   0            </td> <td align="center">   10              </td> <td align="center">   \( \vert 5,0\rangle \)    </td> </tr>
+<tr><td align="center">   1          </td> <td align="center">   0            </td> <td align="center">   10              </td> <td align="center">   \( \vert 4,1\rangle \)    </td> </tr>
+<tr><td align="center">   1          </td> <td align="center">   1            </td> <td align="center">   11              </td> <td align="center">   \( \vert 5,1\rangle \)    </td> </tr>
+<tr><td align="center">   2          </td> <td align="center">   0            </td> <td align="center">   13              </td> <td align="center">   \( \vert 5,4\rangle \)    </td> </tr>
+</tbody>
+</table>
+<p>
+In this table we have paired orbitals with same \( M \) and \( M_s \). Where \( \alpha \in \{0,...,N\} \) and \( N \) is the number of pairs \( \{M,M_s\} \). Notice that for \( \alpha = 1 \) we only have one pair, and for \( \alpha = 4 \), we have two pairs.
+</section>
+
+
+<section>
+<h2 id="___sec135">Hartree-Fock code </h2>
+In developing our Hartree-Fock code, we can define a configuration class with the following mapping for a single-particle state
+<p>&nbsp;<br>
+$$
+  \vert \alpha\rangle \rightarrow \vert n m m_s\rangle,
+$$
+<p>&nbsp;<br>
+
+and a similar mapping for a two-body state
+<p>&nbsp;<br>
+$$
+  \vert \alpha \beta\rangle \rightarrow \vert M M_s\rangle,
+$$
+<p>&nbsp;<br>
+
+where \( M \) is the total angualar momentum 
+<p>&nbsp;<br>
+$$
+M = m_\alpha + m_\beta,
+$$
+<p>&nbsp;<br>
+
+and the \( M_s \) is the total spin
+<p>&nbsp;<br>
+$$
+M_s = m_{s_1} + m_{s_2}.
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec136">Hartree-Fock code, setting up tables of matrix elements  </h2>
+The single-particle part is diagonal for the harmonic oscillator basis, that is
+<p>&nbsp;<br>
+$$
+\langle \alpha\vert \hat{h}_0\vert \beta\rangle = \delta_{\alpha \beta} \epsilon_\alpha
+$$
+<p>&nbsp;<br>
+
+with 
+<p>&nbsp;<br>
+$$
+\epsilon_\alpha  = \hbar\omega (2n_{\alpha}+\vert m_{\alpha}\vert +1).
+$$
+<p>&nbsp;<br>
+
+The two-body matrix elements are diagonal in the \( M \) and \( M_s \), that is
+<p>&nbsp;<br>
+$$
+  \langle M M_s\vert \hat{v}\vert M' M_s'\rangle = \delta_{M,M'}\delta_{M_s,M_s'}\langle MM_s\vert \hat{v}\vert MM_s\rangle.
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="___sec137">Example calculations, \( N=6 \) and \( \omega =1.0 \) a.u.  </h2>
+
+<p>
+We list here some selected Hartree-Fock results for \( N=6 \) electrons as function of the number of major shells \( R \)
+included. Here we have \( \omega =1 \) a.u.
+
+<p>
+<table border="1">
+<thead>
+<tr><td align="center">\( R \)</td> <td align="center">\( E_0^{HF} \)</td> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   3          </td> <td align="center">   21.59320          </td> </tr>
+<tr><td align="center">   4          </td> <td align="center">   20.76692          </td> </tr>
+<tr><td align="center">   5          </td> <td align="center">   20.7484           </td> </tr>
+<tr><td align="center">   6          </td> <td align="center">   20.72026          </td> </tr>
+<tr><td align="center">   7          </td> <td align="center">   20.72013          </td> </tr>
+<tr><td align="center">   8          </td> <td align="center">   20.71925          </td> </tr>
+<tr><td align="center">   9          </td> <td align="center">   20.71925          </td> </tr>
+<tr><td align="center">   10         </td> <td align="center">   20.71922          </td> </tr>
+<tr><td align="center">   11         </td> <td align="center">   20.71922          </td> </tr>
+<tr><td align="center">   12         </td> <td align="center">   20.71922          </td> </tr>
+<tr><td align="center">   13         </td> <td align="center">   20.71922          </td> </tr>
+</tbody>
+</table>
+<p>
+The results are practically converged for approximately \( R=10-13 \).
+</section>
+
+
+<section>
+<h2 id="___sec138">Example calculations, \( N=6 \) and \( \omega =0.1 \) a.u.  </h2>
+
+<p>
+We list here some selected Hartree-Fock results for \( N=6 \) electrons as function of the number of major shells \( R \)
+included. Here we have \( \omega =0.1 \) a.u.
+
+<p>
+<table border="1">
+<thead>
+<tr><td align="center">\( R \)</td> <td align="center">\( E_0^{HF} \)</td> </tr>
+</thead>
+<tbody>
+<tr><td align="center">   4          </td> <td align="center">   4.01979           </td> </tr>
+<tr><td align="center">   5          </td> <td align="center">   3.96315           </td> </tr>
+<tr><td align="center">   6          </td> <td align="center">   3.87062           </td> </tr>
+<tr><td align="center">   7          </td> <td align="center">   3.86314           </td> </tr>
+<tr><td align="center">   8          </td> <td align="center">   3.85288           </td> </tr>
+<tr><td align="center">   9          </td> <td align="center">   3.85259           </td> </tr>
+<tr><td align="center">   10         </td> <td align="center">   3.85239           </td> </tr>
+<tr><td align="center">   11         </td> <td align="center">   3.85239           </td> </tr>
+<tr><td align="center">   12         </td> <td align="center">   3.85238           </td> </tr>
+<tr><td align="center">   13         </td> <td align="center">   3.85238           </td> </tr>
+</tbody>
+</table>
+<p>
+Again, the results are practically converged for approximately \( R=10-13 \).
 </section>
 
 

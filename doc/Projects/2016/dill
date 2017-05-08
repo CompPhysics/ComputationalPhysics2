@@ -1,0 +1,333 @@
+# #ifdef LATEX2DOCONCE
+This is the result of the doconce latex2doconce program.
+The translation from LaTeX is just a helper. The text must
+be carefully examined! (Be prepared that some text might also
+be lost in the translation - in seldom cases.)
+
+
+## search for CHECK to see if auto editing was correct
+
+# #endif
+\documentclass[10pt]{article}
+\usepackage{a4wide}
+
+
+======= Introduction to numerical projects =======
+
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+
+  * Give a short description of the nature of the problem and the eventual  numerical methods you have used.
+
+  * Describe the algorithm you have used and/or developed. Here you may find it convenient to use pseudocoding. In many cases you can describe the algorithm in the program itself.
+
+  * Include the source code of your program. Comment your program properly.
+
+  * If possible, try to find analytic solutions, or known limits in order to test your program when developing the code.
+
+  * Include your results either in figure form or in a table. Remember to        label your results. All tables and figures should have relevant captions        and labels on the axes.
+
+  * Try to evaluate the reliabilty and numerical stability/precision of your results. If possible, include a qualitative and/or quantitative discussion of the numerical stability, eventual loss of precision etc.
+
+  * Try to give an interpretation of you results in your answers to  the problems.
+
+  * Critique: if possible include your comments and reflections about the  exercise, whether you felt you learnt something, ideas for improvements and  other thoughts you've made when solving the exercise. We wish to keep this course at the interactive level and your comments can help us improve it.
+
+  * Try to establish a practice where you log your work at the  computerlab. You may find such a logbook very handy at later stages in your work, especially when you don't properly remember  what a previous test version  of your program did. Here you could also record  the time spent on solving the exercise, various algorithms you may have tested or other topics which you feel worthy of mentioning.
+
+
+
+
+
+======= Format for electronic delivery of report and programs =======
+# 
+The preferred format for the report is a PDF file. You can also
+use DOC or postscript formats or send the report as an ipython notebook file. 
+As programming language we prefer that you choose between C/C++, Fortran2008 or Python.
+The following prescription should be followed when preparing the report:
+
+  * Use Devilry to hand in your projects, log in  at \url{http://devilry.ifi.uio.no} with your normal UiO username and password and choose FYS4411. There you can load up the files within the deadline.
+
+  * Upload _only_ the report file!  For the source code file(s) you have developed please provide us with your link to your github domain.  The report file should include all of your discussions and a list of the codes you have developed.  Do not include library files which are available at the course homepage, unless you have made specific changes to them.
+
+  * In your git repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.
+
+  * In all projects, you should include a discussion of tests and possibly unit testing of your code(s).
+
+  * Comments  from us on your projects, approval or not, corrections to be made  etc can be found under your Devilry domain and are only visible to you and the teachers of the course.
+
+
+
+Finally, 
+we encourage you to work two and two together. Optimal working groups consist of 
+2-3 students. You can then hand in a common report. 
+
+
+======= Project 2, Variational Monte Carlo studies of electronic systems, The deadline for project 2 is May 31  =======
+
+The aim of this project is to use the Variational Monte
+Carlo (VMC) method to evaluate 
+the ground state energy, onebody densities, expectation values of the kinetic and potential energies 
+ and single-particle energies of 
+quantum dots with $N=2$, $N=6$, $N=12$ and $N=20$ electrons, so-called closed shell systems.
+
+======= Variational Monte Carlo calculations of quantum dots =======
+
+===== Theoretical background and description of the physical system =====
+
+We consider a system of electrons confined in a pure two-dimensional 
+isotropic harmonic oscillator potential, with an idealized  total Hamiltonian given by
+
+!bt
+\begin{equation}
+label{eq:finalH}
+\OP{H}=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right)+\sum_{i<j}\frac{1}{r_{ij}},
+\end{equation}
+!et
+where natural units ($\hbar=c=e=m_e=1$) are used and all energies are in so-called atomic units a.u. We will study systems of many electrons $N$ as functions of the oscillator frequency  $\omega$ using the above Hamiltonian.  The Hamiltonian includes a standard harmonic oscillator part
+
+!bt
+\begin{equation*}
+\OP{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),
+\end{equation*}
+!et
+and the repulsive interaction between two electrons given by
+
+!bt
+\begin{equation*}
+\OP{H}_1=\sum_{i<j}\frac{1}{r_{ij}},
+\end{equation*}
+!et
+with the distance between electrons given by $r_{ij}=\vert _r__1-_r__2\vert$. We define the 
+modulus of the positions of the electrons (for a given electron $i$) as $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$.
+
+
+
+
+  * [1a)]  In exercises 1a-1d we will deal only with a system of
+two electrons in a quantum dot with a frequency of $\hbar\omega = 1$. 
+The reason for this is that we have exact closed form expressions 
+for the ground state energy from Taut's work for selected values of $\omega$, 
+see M. Taut, Phys. Rev. A _48_, 3561 (1993).
+The energy is given by $3$ a.u.  (atomic units) when the interaction between the electrons is included.
+If only the harmonic oscillator part of the Hamiltonian,
+the so-called unperturbed part,
+
+!bt
+\begin{equation*} \OP{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),\end{equation*}
+!et
+the energy is $2$ a.u.
+The wave function for one electron in an oscillator potential in two dimensions is
+
+!bt
+\begin{equation*}
+\phi_{n_x,n_y}(x,y) = A H_{n_x}(\sqrt{\omega}x)H_{n_y}(\sqrt{\omega}y)\exp{(-\omega(x^2+y^2)/2}.
+\end{equation*}
+!et
+The functions $H_{n_x}(\sqrt{\omega}x)$ are so-called Hermite polynomials, discussed in the last section below  while $A$ is a normalization constant. 
+For the lowest-lying state we have $n_x=n_y=0$ and an energy $\epsilon_{n_x,n_y}=\omega(n_x+n_y+1) = \omega$.
+Convince yourself that the lowest-lying energy for the two-electron system  is simply $2\omega$.
+
+The unperturbed wave function for the ground state of the two-electron system is given by
+
+!bt
+\begin{equation*}
+\Phi(_r_1_,_r_2_) = C\exp{\left(-\omega(r_1^2+r_2^2)/2\right)},
+\end{equation*}
+!et
+with $C$ being a normalization constant and $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$. Note that the vector $_r_i_$ 
+refers to the $x$ and $y$ position for a given particle.
+What is the total spin of this wave function? Find arguments for why the ground state should have
+this specific total spin. 
+
+  * [1b)] We want to perform  a Variational Monte Carlo calculation of the ground state of two electrons in a quantum dot well with different oscillator energies, assuming total spin $S=0$ using the Hamiltonian of
+Eq. (ref{eq:finalH}). 
+In our code we can now use most of the machinery from project 1. 
+Our trial wave function which has the following form
+
+!bt
+\begin{equation}
+   \psi_{T}(_r_1_,_r_2_) = 
+   C\exp{\left(-\alpha\omega(r_1^2+r_2^2)/2\right)}
+   \exp{\left(\frac{ar_{12}}{(1+\beta r_{12})}\right)}, 
+label{eq:trial}
+\end{equation}
+!et
+where $a$ is equal to one when the two electrons have anti-parallel spins and $1/3$ when the spins are parallel. Finally, $\alpha$ and $\beta$ are our variational parameters. Note well the dependence n $\alpha$ for the single-particle part of the trial function. It is important to remember this when you use higher-order Hermite polynomials.
+Find the analytical expressions for the local energy as you did in project 1, but now using the above trial function.
+
+  * [1c)]
+Your task is to perform a Variational Monte Carlo calculation
+using the Metropolis algorithm to compute the integral
+
+!bt
+\begin{equation}
+   \langle E \rangle =
+   \frac{\int d_r_1_d_r_2_\psi^{\ast}_T(_r_1_,_r_2_)\OP{H}(_r_1_,_r_2_)\psi_T(_r_1_,_r_2_)}
+        {\int d_r_1_d_r_2_\psi^{\ast}_T(_r_1_,_r_2_)\psi_T(_r_1_,_r_2_)}.
+\end{equation}
+!et
+Use importance sampling with the analytical expression for the local energy, including blocking and 
+optimization of the parameters using for example the conjugate gradient method from project 1. 
+All elements from project 1 can be used for project 2 as well.
+In addition, you should parallelize your program using MPI and set it up to run on Smaug.
+
+
+Find the  energy minimum and discuss your results compared with the analytical solution from
+Taut's work, see Ref. [1]. Compute also the mean distance
+$r_{12}=\vert _r__1-_r__2\vert$ (with $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$) between the two electrons for the optimal set of the variational parameters.
+  * [1d)]  With the optimal parameters for the ground state wave function, compute the onebody density. Discuss your results and compare the results with those obtained with a pure harmonic oscillator wave functions. Run a Monte Carlo calculations without the Jastrow factor as well
+and compute the same quantities. How important are the correlations induced by the Jastrow factor?
+Compute also the expectation value of the kinetic energy and potential energy using $\omega=0.01$, $\omega=0.05$,
+$\omega=0.1$, $\omega=0.5$ and $\omega=1.0$. Comment your results. Hint, think of the virial theorem. 
+
+The previous exercises have prepared you for extending your calculational machinery  to other systems.
+Here we will focus on quantum dots with $N=6$, $N=12$ and $N=20$ electrons.
+
+The new item you need to pay attention to is the calculation of the Slater Determinant. This is an additional complication
+to your VMC calculations.
+If we stick to harmonic oscillator like wave functions,
+the trial wave function for say an $N=6$ electron quantum dot can be written as
+
+!bt
+\begin{equation}
+   \psi_{T}(_r_1_,_r_2_,\dots, _r_6_) = 
+   Det\left(\phi_{1}(_r_1_),\phi_{2}(_r_2_),
+   \dots,\phi_{6}(_r_6_)\right)
+   \prod_{i<j}^{6}\exp{\left(\frac{a r_{ij}}{(1+\beta r_{ij})}\right)}, 
+\end{equation}
+!et
+where $Det$ is a Slater determinant and the single-particle wave functions
+are the harmonic oscillator wave functions for the $n_x=0,1$ and $n_y=0,1$ orbitals. 
+Similarly, for the $N=12$ quantum dot, the trial wave function can take the form
+
+!bt
+\begin{equation}
+   \psi_{T}(_r_1_,_r_2_, \dots,_r_{12_}) = 
+   Det\left(\phi_{1}(_r_1_),\phi_{2}(_r_2_),
+   \dots,\phi_{12}(_r_{12_})\right)
+   \prod_{i<j}^{12}\exp{\left(\frac{ar_{ij}}{(1+\beta r_{ij})}\right)}, 
+\end{equation}
+!et
+In this case you need to include the $n_x=2$ and $n_y=2$ wave functions as well.
+Observe that $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$.  Use the Hermite polynomials defined in the appendix.
+For $N=20$ you will also need the $n_x,n_y=3$ Hermite polynomials.  Reference [5] gives benchmark results for closed-shell systems up to $N=20$. 
+
+
+  * [(1e)]   Write a function which sets up the Slater determinant. Find the Hermite polynomials which are needed for $n_x=0,1,2,3$ and obviously $n_y$ as well.
+Compute the ground state energies of quantum dots for $N=6$, $N=12$ and $N=20$ electrons, following the same set up as in the previous exercises for $\omega=0.01$, $\omega=0.05$,
+$\omega=0.1$, $\omega=0.5$, and $\omega=1.0$.
+The calculations should include  parallelization, blocking, importance sampling and energy minimization using the conjugate gradient approach or similar approaches.
+To test your Slater determinant code, you should reproduce the unperturbed single-particle energies
+when the electron-electron repulsion is switched off. Convince yourself that the unperturbed ground state energies for $N=6$ is $10\omega$ and for $N=12$ we obtain $28\omega$.  What is the unperturbed result for $N=20$? What is the expected total 
+spin of the ground states?
+  
+  * [1f)]  With the optimal parameters for the ground state wave function, compute again the onebody density. Discuss your results and compare the results with those obtained with a pure harmonic oscillator
+wave functions. Run a Monte Carlo calculations without the Jastrow factor as well
+and compute the same quantities. How important are the correlations induced by the Jastrow factor?
+Compute also the expectation value of the kinetic energy and potential energy using $\omega=0.01$,
+$\omega=0.05$, $\omega=0.1$, $\omega=0.5$, and $\omega=1.0$. Comment your results.
+
+  * [1g)] The last exercise  is a performance analysis of your code(s) for the case of $N=6$ electrons. Make a perfroamnce analysis by timing your serial code
+with and without vectorization. Perform several runs with the same number of Monte carlo cycles and compute an average timing analysis
+with and without vectorization. Comment your results. Use at least $10^6$ Monte Carlo samples. 
+
+Compare thereafter your serial code(s)  with the speedup you get by parallelizing your code, running either OpenMP or MPI or both.
+Do you get a near $100\%$ speedup with the parallel version? Comment again your results and perform timing benchmarks several times in order 
+to extract  an average performance time. 
+
+
+
+
+
+
+
+
+
+======= Additional material on Hermite polynomials =======
+
+The Hermite polynomials are the solutions of the following differential
+equation
+
+!bt
+\begin{equation}
+   \frac{d^2H(x)}{dx^2}-2x\frac{dH(x)}{dx}+(\lambda-1)H(x)=0.
+   label{eq:hermite}
+\end{equation}
+!et
+The first few polynomials are
+
+!bt
+\begin{equation*}
+   H_0(x)=1,
+\end{equation*}
+!et
+
+!bt
+\begin{equation*}
+    H_1(x)=2x,
+\end{equation*}
+!et
+
+!bt
+\begin{equation*}
+    H_2(x)=4x^2-2,
+\end{equation*}
+!et
+
+!bt
+\begin{equation*}
+    H_3(x)=8x^3-12x,
+\end{equation*}
+!et
+and
+
+!bt
+\begin{equation*}
+    H_4(x)=16x^4-48x^2+12.
+\end{equation*}
+!et
+They fulfil the orthogonality relation
+
+!bt
+\begin{equation*}
+  \int_{-\infty}^{\infty}e^{-x^2}H_n(x)^2dx=2^nn!\sqrt{\pi},
+\end{equation*}
+!et
+and the recursion relation
+
+!bt
+\begin{equation*}
+  H_{n+1}(x)=2xH_{n}(x)-2nH_{n-1}(x).
+\end{equation*}
+!et
+
+
+
+
+======= Literature =======
+
+  * M. Taut, Phys. Rev. A _48_, 3561 - 3566 (1993).
+
+  * B. L. Hammond, W. A. Lester and P. J. Reynolds, *Monte Carlo methods in Ab Initio Quantum Chemistry*, World Scientific, Singapore, 1994, chapters 2-5 and appendix B.
+
+  * B.H. Bransden and C.J. Joachain, Physics of Atoms and molecules, Longman, 1986. Chapters 6, 7 and 9.
+
+  * A. K.  Rajagopal and J. C. Kimball, see Phys. Rev. B _15_, 2819 (1977).
+
+  * M. .L. Pedersen, G. Hagen, M. Hjorth-Jensen, S. Kvaal,  and F. Pederiva, Phys. Rev. B _84_, 115302 (2011)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
