@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
   int TotalNumberMCsamples = NumberMCsamples*NumberProcesses; 
   // Loop over variational parameters
   for (double alpha = 0.5; alpha <= 1.5; alpha +=0.1){
-    for (double beta = 0.1; beta <= 0.5; alpha +=0.1){
+    for (double beta = 0.1; beta <= 0.5; beta +=0.05){
       VariationalParameters(0) = alpha;  // value of alpha
       VariationalParameters(1) = beta;  // value of beta
       //  Do the mc sampling  and accumulate data with MPI_Reduce
