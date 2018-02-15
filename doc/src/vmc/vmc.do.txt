@@ -1731,6 +1731,67 @@ we have
 !eblock
 
 !split
+===== Use the "C++ random class for random number generations":"http://www.cplusplus.com/reference/random/"  =====
+!bblock  
+
+!bc cppcod
+ // Initialize the seed and call the Mersienne algo
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+  // Set up the uniform distribution for x \in [[0, 1]
+  std::uniform_real_distribution<double> UniformNumberGenerator(0.0,1.0);
+  std::normal_distribution<double> Normaldistribution(0.0,1.0);
+
+!ec
+!eblock
+
+
+!split
+===== Use the C++ random class for RNGs, the Mersenne twister class  =====
+!bblock  
+_Finding the new position for importance sampling_
+!bc cppcod
+ for (int cycles = 1; cycles <= NumberMCsamples; cycles++){ 
+    // new position 
+    for (int i = 0; i < NumberParticles; i++) { 
+      for (int j = 0; j < Dimension; j++) {
+        // gaussian deviate to compute new positions using a given timestep
+        NewPosition(i,j) = OldPosition(i,j) + Normaldistribution(gen)*sqrt(timestep)+OldQuantumForce(i,j)*timestep*D;
+
+      }  
+!ec
+!eblock
+
+
+!split
+===== Use the C++ random class for RNGs, the Metropolis test  =====
+!bblock  
+_Using the uniform distribution for the Metropolis test_
+!bc cppcod
+      //  Metropolis-Hastings algorithm
+      double GreensFunction = 0.0;            
+      for (int j = 0; j < Dimension; j++) {
+        GreensFunction += 0.5*(OldQuantumForce(i,j)+NewQuantumForce(i,j))*
+          (D*timestep*0.5*(OldQuantumForce(i,j)-NewQuantumForce(i,j))-NewPosition(i,j)+OldPosition(i,j));
+      }
+      GreensFunction = exp(GreensFunction);
+      // The Metropolis test is performed by moving one particle at the time
+      if(UniformNumberGenerator(gen) <= GreensFunction*NewWaveFunction*NewWaveFunction/OldWaveFunction/OldWaveFunction ) { 
+        for (int  j = 0; j < Dimension; j++) {
+          OldPosition(i,j) = NewPosition(i,j);
+          OldQuantumForce(i,j) = NewQuantumForce(i,j);
+        }
+        OldWaveFunction = NewWaveFunction;
+      }
+!ec
+!eblock
+
+
+
+
+
+
+!split
 ===== Importance sampling, Fokker-Planck and Langevin equations =====
 !bblock 
 A stochastic process is simply a function of two variables, one is the time,
