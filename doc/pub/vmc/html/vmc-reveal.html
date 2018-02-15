@@ -148,7 +148,7 @@ MathJax.Hub.Config({
 <center>[2] <b>Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University</b></center>
 <br>
 <p>&nbsp;<br>
-<center><h4>Jan 18, 2018</h4></center> <!-- date -->
+<center><h4>Feb 15, 2018</h4></center> <!-- date -->
 <br>
 <p>
 
@@ -2230,7 +2230,79 @@ $$
 
 
 <section>
-<h2 id="___sec62">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec62">Use the <a href="http://www.cplusplus.com/reference/random/" target="_blank">C++ random class for random number generations</a>  </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span> <span style="color: #228B22">// Initialize the seed and call the Mersienne algo</span>
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+  <span style="color: #228B22">// Set up the uniform distribution for x \in [[0, 1]</span>
+  std::uniform_real_distribution&lt;<span style="color: #00688B; font-weight: bold">double</span>&gt; UniformNumberGenerator(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>);
+  std::normal_distribution&lt;<span style="color: #00688B; font-weight: bold">double</span>&gt; Normaldistribution(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>);
+</pre></div>
+
+</div>
+</section>
+
+
+<section>
+<h2 id="___sec63">Use the C++ random class for RNGs, the Mersenne twister class  </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<b>Finding the new position for importance sampling</b>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span> <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> cycles = <span style="color: #B452CD">1</span>; cycles &lt;= NumberMCsamples; cycles++){ 
+    <span style="color: #228B22">// new position </span>
+    <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> i = <span style="color: #B452CD">0</span>; i &lt; NumberParticles; i++) { 
+      <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> j = <span style="color: #B452CD">0</span>; j &lt; Dimension; j++) {
+        <span style="color: #228B22">// gaussian deviate to compute new positions using a given timestep</span>
+        NewPosition(i,j) = OldPosition(i,j) + Normaldistribution(gen)*sqrt(timestep)+OldQuantumForce(i,j)*timestep*D;
+
+      }  
+</pre></div>
+
+</div>
+</section>
+
+
+<section>
+<h2 id="___sec64">Use the C++ random class for RNGs, the Metropolis test  </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<b>Using the uniform distribution for the Metropolis test</b>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span>      <span style="color: #228B22">//  Metropolis-Hastings algorithm</span>
+      <span style="color: #00688B; font-weight: bold">double</span> GreensFunction = <span style="color: #B452CD">0.0</span>;            
+      <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> j = <span style="color: #B452CD">0</span>; j &lt; Dimension; j++) {
+        GreensFunction += <span style="color: #B452CD">0.5</span>*(OldQuantumForce(i,j)+NewQuantumForce(i,j))*
+          (D*timestep*<span style="color: #B452CD">0.5</span>*(OldQuantumForce(i,j)-NewQuantumForce(i,j))-NewPosition(i,j)+OldPosition(i,j));
+      }
+      GreensFunction = exp(GreensFunction);
+      <span style="color: #228B22">// The Metropolis test is performed by moving one particle at the time</span>
+      <span style="color: #8B008B; font-weight: bold">if</span>(UniformNumberGenerator(gen) &lt;= GreensFunction*NewWaveFunction*NewWaveFunction/OldWaveFunction/OldWaveFunction ) { 
+        <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span>  j = <span style="color: #B452CD">0</span>; j &lt; Dimension; j++) {
+          OldPosition(i,j) = NewPosition(i,j);
+          OldQuantumForce(i,j) = NewQuantumForce(i,j);
+        }
+        OldWaveFunction = NewWaveFunction;
+      }
+</pre></div>
+
+</div>
+</section>
+
+
+<section>
+<h2 id="___sec65">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2254,7 +2326,7 @@ in the range \( [x, x + dx] \) .
 
 
 <section>
-<h2 id="___sec63">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec66">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2286,7 +2358,7 @@ sample functions.
 
 
 <section>
-<h2 id="___sec64">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec67">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2314,7 +2386,7 @@ the reverse \( W(y\rightarrow y') \) may be very different.
 
 
 <section>
-<h2 id="___sec65">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec68">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2343,7 +2415,7 @@ which goes to zero when \( T \) tends to zero.
 
 
 <section>
-<h2 id="___sec66">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec69">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2380,7 +2452,7 @@ function \( \delta(\mathbf{x}) \) at  \( t=0 \).
 
 
 <section>
-<h2 id="___sec67">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec70">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2416,7 +2488,7 @@ that is no time-dependence. Note our change of notation for \( W \)
 
 
 <section>
-<h2 id="___sec68">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec71">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2449,7 +2521,7 @@ $$
 
 
 <section>
-<h2 id="___sec69">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec72">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2474,7 +2546,7 @@ $$
 
 
 <section>
-<h2 id="___sec70">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec73">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2499,7 +2571,7 @@ $$
 
 
 <section>
-<h2 id="___sec71">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec74">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2529,7 +2601,7 @@ to the diffusion equation.
 
 
 <section>
-<h2 id="___sec72">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec75">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2563,7 +2635,7 @@ $$
 
 
 <section>
-<h2 id="___sec73">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec76">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2588,7 +2660,7 @@ $$
 
 
 <section>
-<h2 id="___sec74">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec77">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2611,7 +2683,7 @@ $$
 
 
 <section>
-<h2 id="___sec75">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec78">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2628,7 +2700,7 @@ We assume that \( W(\mathbf{x},\tau|\mathbf{x}-\xi) \) takes non-negligible valu
 
 
 <section>
-<h2 id="___sec76">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec79">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2647,7 +2719,7 @@ $$
 
 
 <section>
-<h2 id="___sec77">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec80">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2667,7 +2739,7 @@ we get simply \( W(\mathbf{x},s|\mathbf{x}_0) \) due to normalization.
 
 
 <section>
-<h2 id="___sec78">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec81">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2686,7 +2758,7 @@ $$
 
 
 <section>
-<h2 id="___sec79">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec82">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2708,7 +2780,7 @@ we get simply \( W(\mathbf{x},s|\mathbf{x}_0) \) due to normalization.
 
 
 <section>
-<h2 id="___sec80">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec83">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2733,7 +2805,7 @@ $$
 
 
 <section>
-<h2 id="___sec81">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec84">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2756,7 +2828,7 @@ $$
 
 
 <section>
-<h2 id="___sec82">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec85">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2776,7 +2848,7 @@ position with velocity (momentum).
 
 
 <section>
-<h2 id="___sec83">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec86">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Langevin equation.</b>
 <p>
@@ -2792,7 +2864,7 @@ The equations of motion are
 
 
 <section>
-<h2 id="___sec84">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec87">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Langevin equation.</b>
 <p>
@@ -2817,7 +2889,7 @@ $$
 
 
 <section>
-<h2 id="___sec85">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec88">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Langevin equation.</b>
 <p>
@@ -2841,7 +2913,7 @@ $$
 
 
 <section>
-<h2 id="___sec86">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec89">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Langevin equation.</b>
 <p>
@@ -2882,7 +2954,7 @@ This result is called the fluctuation-dissipation theorem .
 
 
 <section>
-<h2 id="___sec87">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec90">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Langevin equation.</b>
 <p>
@@ -2912,7 +2984,7 @@ $$
 
 
 <section>
-<h2 id="___sec88">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="___sec91">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Langevin equation.</b>
 <p>
@@ -2937,7 +3009,7 @@ where we have used \( \langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =6Dt \).
 
 
 <section>
-<h2 id="___sec89">Why blocking? </h2>
+<h2 id="___sec92">Why blocking? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Statistical analysis.</b>
 <ul>
@@ -2958,7 +3030,7 @@ A very good article which explains blocking is H.&nbsp;Flyvbjerg and H.&nbsp;G.&
 
 
 <section>
-<h2 id="___sec90">Why blocking? </h2>
+<h2 id="___sec93">Why blocking? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Statistical analysis.</b>
 <ul>
@@ -2980,7 +3052,7 @@ A very good article which explains blocking is H.&nbsp;Flyvbjerg and H.&nbsp;G.&
 
 
 <section>
-<h2 id="___sec91">Statistics and blocking </h2>
+<h2 id="___sec94">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3014,7 +3086,7 @@ selection of a large set of these numbers reproduces this PDF.
 
 
 <section>
-<h2 id="___sec92">Statistics and blocking </h2>
+<h2 id="___sec95">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3037,7 +3109,7 @@ $$
 
 
 <section>
-<h2 id="___sec93">Statistics and blocking </h2>
+<h2 id="___sec96">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3063,7 +3135,7 @@ $$
 
 
 <section>
-<h2 id="___sec94">Statistics and blocking </h2>
+<h2 id="___sec97">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3104,7 +3176,7 @@ qualitatively as the <em>spread</em> of \( p \) around its mean.
 
 
 <section>
-<h2 id="___sec95">Statistics and blocking </h2>
+<h2 id="___sec98">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3138,7 +3210,7 @@ $$
 
 
 <section>
-<h2 id="___sec96">Statistics and blocking </h2>
+<h2 id="___sec99">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3171,7 +3243,7 @@ $$
 
 
 <section>
-<h2 id="___sec97">Statistics and blocking </h2>
+<h2 id="___sec100">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3200,7 +3272,7 @@ $$
 
 
 <section>
-<h2 id="___sec98">Statistics and blocking </h2>
+<h2 id="___sec101">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3237,7 +3309,7 @@ value of a set of measurements.
 
 
 <section>
-<h2 id="___sec99">Statistics and blocking </h2>
+<h2 id="___sec102">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3266,7 +3338,7 @@ interested in finding the few lowest moments, like the mean
 
 
 <section>
-<h2 id="___sec100">Statistics and blocking </h2>
+<h2 id="___sec103">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3297,7 +3369,7 @@ $$
 
 
 <section>
-<h2 id="___sec101">Statistics and blocking </h2>
+<h2 id="___sec104">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3317,7 +3389,7 @@ and covariance \( \mathrm{cov}(X,Y) \).
 
 
 <section>
-<h2 id="___sec102">Statistics and blocking </h2>
+<h2 id="___sec105">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3350,7 +3422,7 @@ true PDFs behind, which we usually do not have.
 
 
 <section>
-<h2 id="___sec103">Statistics and blocking </h2>
+<h2 id="___sec106">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3369,7 +3441,7 @@ correlational effects.
 
 
 <section>
-<h2 id="___sec104">Statistics and blocking </h2>
+<h2 id="___sec107">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3392,7 +3464,7 @@ means.
 
 
 <section>
-<h2 id="___sec105">Statistics and blocking </h2>
+<h2 id="___sec108">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3414,7 +3486,7 @@ And in particular we are interested in its variance \( \mathrm{var}(\overline X_
 
 
 <section>
-<h2 id="___sec106">Statistics and blocking </h2>
+<h2 id="___sec109">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3440,7 +3512,7 @@ $$
 
 
 <section>
-<h2 id="___sec107">Statistics and blocking </h2>
+<h2 id="___sec110">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3470,7 +3542,7 @@ estimate of the PDF of each of the \( X_i \), estimating all properties of
 
 
 <section>
-<h2 id="___sec108">Statistics and blocking </h2>
+<h2 id="___sec111">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3502,7 +3574,7 @@ $$
 
 
 <section>
-<h2 id="___sec109">Statistics and blocking </h2>
+<h2 id="___sec112">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3546,7 +3618,7 @@ measurements in the sample.
 
 
 <section>
-<h2 id="___sec110">Statistics and blocking </h2>
+<h2 id="___sec113">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3582,7 +3654,7 @@ cannot overlook the always present correlations.
 
 
 <section>
-<h2 id="___sec111">Statistics and blocking </h2>
+<h2 id="___sec114">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3614,7 +3686,7 @@ measurements. For uncorrelated measurements this second term is zero.
 
 
 <section>
-<h2 id="___sec112">Statistics and blocking </h2>
+<h2 id="___sec115">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3637,7 +3709,7 @@ have to be stored throughout the experiment.
 
 
 <section>
-<h2 id="___sec113">Statistics and blocking </h2>
+<h2 id="___sec116">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3675,7 +3747,7 @@ starting always at \( 1 \) for \( d=0 \).
 
 
 <section>
-<h2 id="___sec114">Statistics and blocking </h2>
+<h2 id="___sec117">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3711,7 +3783,7 @@ $$
 
 
 <section>
-<h2 id="___sec115">Statistics and blocking </h2>
+<h2 id="___sec118">Statistics and blocking </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3737,7 +3809,7 @@ measurements is very large.
 
 
 <section>
-<h2 id="___sec116">Can we understand this? Time Auto-correlation Function </h2>
+<h2 id="___sec119">Can we understand this? Time Auto-correlation Function </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3771,7 +3843,7 @@ $$
 
 
 <section>
-<h2 id="___sec117">Time Auto-correlation Function </h2>
+<h2 id="___sec120">Time Auto-correlation Function </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3798,7 +3870,7 @@ uncorrelated and \( \phi(t) \) should be zero.
 
 
 <section>
-<h2 id="___sec118">Time Auto-correlation Function </h2>
+<h2 id="___sec121">Time Auto-correlation Function </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3837,7 +3909,7 @@ the eigenvector \( \mathbf{\hat{v}}_i \).
 
 
 <section>
-<h2 id="___sec119">Time Auto-correlation Function </h2>
+<h2 id="___sec122">Time Auto-correlation Function </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3869,7 +3941,7 @@ various microstates \( \mu \).
 
 
 <section>
-<h2 id="___sec120">Time Auto-correlation Function </h2>
+<h2 id="___sec123">Time Auto-correlation Function </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3915,7 +3987,7 @@ $$
 
 
 <section>
-<h2 id="___sec121">Time Auto-correlation Function </h2>
+<h2 id="___sec124">Time Auto-correlation Function </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3947,7 +4019,7 @@ which is appropriate for all times.
 
 
 <section>
-<h2 id="___sec122">Correlation Time </h2>
+<h2 id="___sec125">Correlation Time </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -3977,7 +4049,7 @@ called the integrated correlation time.
 
 
 <section>
-<h2 id="___sec123">What is blocking? </h2>
+<h2 id="___sec126">What is blocking? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Blocking.</b>
 <ul>
@@ -4009,7 +4081,7 @@ $$
 
 
 <section>
-<h2 id="___sec124">What is blocking? </h2>
+<h2 id="___sec127">What is blocking? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Blocking.</b>
 <ul>
@@ -4031,7 +4103,7 @@ $$
 
 
 <section>
-<h2 id="___sec125">What is blocking? </h2>
+<h2 id="___sec128">What is blocking? </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Blocking.</b>
 <ul>
@@ -4049,7 +4121,7 @@ $$
 
 
 <section>
-<h2 id="___sec126">Implementation </h2>
+<h2 id="___sec129">Implementation </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <ul>
@@ -4074,7 +4146,7 @@ $$
 
 
 <section>
-<h2 id="___sec127">Actual implementation with code, main function </h2>
+<h2 id="___sec130">Actual implementation with code, main function </h2>
 When the file gets large, it can be useful to write your data in binary mode instead of ascii characters.
 The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/LecturePrograms/programs/Blocking" target="_blank">following file</a>   reads data from a binary file with the output from every Monte Carlo cycle.
 <p>
@@ -4148,7 +4220,7 @@ The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/
 
 
 <section>
-<h2 id="___sec128">Actual implementation with code, mean value and variance </h2>
+<h2 id="___sec131">Actual implementation with code, mean value and variance </h2>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
@@ -4182,7 +4254,7 @@ The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/
 
 
 <section>
-<h2 id="___sec129">Actual implementation with code, blocking part </h2>
+<h2 id="___sec132">Actual implementation with code, blocking part </h2>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
@@ -4215,7 +4287,7 @@ The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/
 
 
 <section>
-<h2 id="___sec130">Project 2, VMC for fermions: Efficient calculation of Slater determinants </h2>
+<h2 id="___sec133">Project 2, VMC for fermions: Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4239,7 +4311,7 @@ This poses serious hindrances to the overall efficiency of our code.
 
 
 <section>
-<h2 id="___sec131">Matrix elements of Slater determinants </h2>
+<h2 id="___sec134">Matrix elements of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4261,7 +4333,7 @@ while the rows stand for the various quantum numbers.
 
 
 <section>
-<h2 id="___sec132">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec135">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4281,7 +4353,7 @@ the <em>inverse</em> of the Slater matrix.
 
 
 <section>
-<h2 id="___sec133">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec136">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4309,7 +4381,7 @@ Notice that the interchanged indices indicate that the matrix of cofactors is to
 
 
 <section>
-<h2 id="___sec134">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec137">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4330,7 +4402,7 @@ $$
 
 
 <section>
-<h2 id="___sec135">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec138">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4358,7 +4430,7 @@ $$
 
 
 <section>
-<h2 id="___sec136">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec139">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4387,7 +4459,7 @@ $$
 
 
 <section>
-<h2 id="___sec137">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec140">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4416,7 +4488,7 @@ $$
 
 
 <section>
-<h2 id="___sec138">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec141">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4449,7 +4521,7 @@ need to do is to maintain the inverse matrix \( \hat{D}^{-1}(\mathbf{x}^{\mathrm
 
 
 <section>
-<h2 id="___sec139">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec142">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4476,7 +4548,7 @@ $$
 
 
 <section>
-<h2 id="___sec140">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec143">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4502,7 +4574,7 @@ $$
 
 
 <section>
-<h2 id="___sec141">Efficient calculation of Slater determinants </h2>
+<h2 id="___sec144">Efficient calculation of Slater determinants </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4535,7 +4607,7 @@ to the coordinates of a single particle  \( \mathbf{r}_i \) changes only the
 
 
 <section>
-<h2 id="___sec142">The gradient and the Laplacian </h2>
+<h2 id="___sec145">The gradient and the Laplacian </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4561,7 +4633,7 @@ $$
 
 
 <section>
-<h2 id="___sec143">How to compute the derivates of the Slater determinant </h2>
+<h2 id="___sec146">How to compute the derivates of the Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4585,7 +4657,7 @@ for them.
 
 
 <section>
-<h2 id="___sec144">The Slater determinant  </h2>
+<h2 id="___sec147">The Slater determinant  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4609,7 +4681,7 @@ But we can rewrite it as the product of two Slater determinants, one for spin up
 
 
 <section>
-<h2 id="___sec145">Rewriting the Slater determinant </h2>
+<h2 id="___sec148">Rewriting the Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4656,7 +4728,7 @@ The total determinant is still zero!
 
 
 <section>
-<h2 id="___sec146">Splitting the Slater determinant </h2>
+<h2 id="___sec149">Splitting the Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4694,7 +4766,7 @@ As long as the Hamiltonian is spin independent, the above is correct. It is rath
 
 
 <section>
-<h2 id="___sec147">Spin up and spin down parts </h2>
+<h2 id="___sec150">Spin up and spin down parts </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4714,7 +4786,7 @@ $$
 
 
 <section>
-<h2 id="___sec148">Factorization </h2>
+<h2 id="___sec151">Factorization </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4745,7 +4817,7 @@ half the size of the original one.
 
 
 <section>
-<h2 id="___sec149">Number of operations </h2>
+<h2 id="___sec152">Number of operations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4767,7 +4839,7 @@ obviously unaffected by the change so that it cancels from the ratio
 
 
 <section>
-<h2 id="___sec150">Counting the number of FLOPS </h2>
+<h2 id="___sec153">Counting the number of FLOPS </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4795,7 +4867,7 @@ at once.
 
 
 <section>
-<h2 id="___sec151">Computation of ratios </h2>
+<h2 id="___sec154">Computation of ratios </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4823,7 +4895,7 @@ $$
 
 
 <section>
-<h2 id="___sec152">Scaling properties </h2>
+<h2 id="___sec155">Scaling properties </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4842,7 +4914,7 @@ determinant matrix once. This can be done by standard LU decomposition methods.
 
 
 <section>
-<h2 id="___sec153">How to get the determinant </h2>
+<h2 id="___sec156">How to get the determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4871,7 +4943,7 @@ You need to transfer the Slater matrix and its dimension. You get back an LU dec
 
 
 <section>
-<h2 id="___sec154">LU decomposition and determinant </h2>
+<h2 id="___sec157">LU decomposition and determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4907,7 +4979,7 @@ $$
 
 
 <section>
-<h2 id="___sec155">Determinant of a matrix </h2>
+<h2 id="___sec158">Determinant of a matrix </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4927,7 +4999,7 @@ $$
 
 
 <section>
-<h2 id="___sec156">Expectation value of the kinetic energy </h2>
+<h2 id="___sec159">Expectation value of the kinetic energy </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4973,7 +5045,7 @@ $$
 
 
 <section>
-<h2 id="___sec157">Second derivative of the Jastrow factor </h2>
+<h2 id="___sec160">Second derivative of the Jastrow factor </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -4997,7 +5069,7 @@ $$
 
 
 <section>
-<h2 id="___sec158">Functional form </h2>
+<h2 id="___sec161">Functional form </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5022,7 +5094,7 @@ $$
 
 
 <section>
-<h2 id="___sec159">Second derivative of the Jastrow factor </h2>
+<h2 id="___sec162">Second derivative of the Jastrow factor </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5049,7 +5121,7 @@ $$
 
 
 <section>
-<h2 id="___sec160">Gradient and Laplacian </h2>
+<h2 id="___sec163">Gradient and Laplacian </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5082,7 +5154,7 @@ $$
 
 
 <section>
-<h2 id="___sec161">The gradient for the determinant  </h2>
+<h2 id="___sec164">The gradient for the determinant  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5104,7 +5176,7 @@ $$
 
 
 <section>
-<h2 id="___sec162">Jastrow gradient in quantum force </h2>
+<h2 id="___sec165">Jastrow gradient in quantum force </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5131,7 +5203,7 @@ which is rather easy to code.  Remember to sum over all particles  when you comp
 
 
 <section>
-<h2 id="___sec163">Metropolis Hastings part </h2>
+<h2 id="___sec166">Metropolis Hastings part </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5161,7 +5233,7 @@ need to do is to maintain the inverse matrix
 
 
 <section>
-<h2 id="___sec164">Single-particle states </h2>
+<h2 id="___sec167">Single-particle states </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5183,7 +5255,7 @@ The single-particle energy with no interactions should give \( -Z^2/2n^2 \).
 
 
 <section>
-<h2 id="___sec165">Single-particle states </h2>
+<h2 id="___sec168">Single-particle states </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5209,7 +5281,7 @@ We use \( a_0=1 \).
 
 
 <section>
-<h2 id="___sec166">Problems with neon states for VMC </h2>
+<h2 id="___sec169">Problems with neon states for VMC </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5239,7 +5311,7 @@ $$
 
 
 <section>
-<h2 id="___sec167">Problems with neon states for VMC </h2>
+<h2 id="___sec170">Problems with neon states for VMC </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5272,7 +5344,7 @@ $$
 
 
 <section>
-<h2 id="___sec168">Spherical harmonics </h2>
+<h2 id="___sec171">Spherical harmonics </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5300,7 +5372,7 @@ $$
 
 
 <section>
-<h2 id="___sec169">Examples of spherical harmonics </h2>
+<h2 id="___sec172">Examples of spherical harmonics </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5333,7 +5405,7 @@ for  \( l=1 \) og \( m_l=\pm 1 \).
 
 
 <section>
-<h2 id="___sec170">Problems with spherical harmonics </h2>
+<h2 id="___sec173">Problems with spherical harmonics </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5375,7 +5447,7 @@ $$
 
 
 <section>
-<h2 id="___sec171">Real solid harmonics </h2>
+<h2 id="___sec174">Real solid harmonics </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5403,7 +5475,7 @@ $$
 
 
 <section>
-<h2 id="___sec172">Solid harmonics </h2>
+<h2 id="___sec175">Solid harmonics </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5422,7 +5494,7 @@ alter the solid harmonics.
 
 
 <section>
-<h2 id="___sec173">Relation between solid harmonics and spherical harmonics </h2>
+<h2 id="___sec176">Relation between solid harmonics and spherical harmonics </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5458,7 +5530,7 @@ for \( m_l> 0 \).
 
 
 <section>
-<h2 id="___sec174">The lowest-order real solid harmonics </h2>
+<h2 id="___sec177">The lowest-order real solid harmonics </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5482,7 +5554,7 @@ for \( m_l> 0 \).
 
 
 <section>
-<h2 id="___sec175">Proof for updating algorithm for Slater determinant </h2>
+<h2 id="___sec178">Proof for updating algorithm for Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5510,7 +5582,7 @@ $$
 
 
 <section>
-<h2 id="___sec176">Proof for updating algorithm for Slater determinant </h2>
+<h2 id="___sec179">Proof for updating algorithm for Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5528,7 +5600,7 @@ $$
 
 
 <section>
-<h2 id="___sec177">Proof for updating algorithm for Slater determinant </h2>
+<h2 id="___sec180">Proof for updating algorithm for Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5549,7 +5621,7 @@ $$
 
 
 <section>
-<h2 id="___sec178">Proof for updating algorithm for Slater determinant </h2>
+<h2 id="___sec181">Proof for updating algorithm for Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5572,7 +5644,7 @@ $$
 
 
 <section>
-<h2 id="___sec179">Proof for updating algorithm for Slater determinant </h2>
+<h2 id="___sec182">Proof for updating algorithm for Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5591,7 +5663,7 @@ $$\frac{\mathbf{D}^{-1}(\mathbf{x^{old}})}{\mathbf{D}^{-1}(\mathbf{x^{new}})} = 
 
 
 <section>
-<h2 id="___sec180">Proof for updating algorithm for Slater determinant </h2>
+<h2 id="___sec183">Proof for updating algorithm for Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -5614,7 +5686,7 @@ $$
 
 
 <section>
-<h2 id="___sec181">Proof for updating algorithm for Slater determinant </h2>
+<h2 id="___sec184">Proof for updating algorithm for Slater determinant </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
