@@ -2,19 +2,19 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include "vectormatrixclass.h"
+#include <armadillo>
 
 using namespace  std;
+using namespace arma;
+double E_function(vec &x);
 
-double E_function(Vector &x);
+void  dE_function(vec &x, vec &g);
 
-void  dE_function(Vector &x, Vector &g);
+void lnsrch(int n, vec &xold, double fold, vec &g, vec &p, vec &x,
+		 double *f, double stpmax, int *check, double (*func)(vec &p));
 
-void lnsrch(int n, Vector &xold, double fold, Vector &g, Vector &p, Vector &x,
-		 double *f, double stpmax, int *check, double (*func)(Vector &p));
-
-void dfpmin(Vector &p, int n, double gtol, int *iter, double *fret,
-	    double(*func)(Vector &p), void (*dfunc)(Vector &p, Vector &g));
+void dfpmin(vec &p, int n, double gtol, int *iter, double *fret,
+	    double(*func)(vec &p), void (*dfunc)(vec &p, vec &g));
 
 static double sqrarg;
 #define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg)
@@ -25,14 +25,14 @@ static double maxarg1,maxarg2;
         (maxarg1) : (maxarg2))
 
 //  this function defines the Energy function
-double E_function(Vector  &x)
+double E_function(vec  &x)
 {
   double value = x(0)*x(0)*0.5+1.0/(8*x(0)*x(0));
   return value;
 } // end of function to evaluate
 
 //  this function defines the derivative of the energy 
-void dE_function(Vector &x, Vector &g)
+void dE_function(vec &x, vec &g)
 {
 
   g(0) = x(0)-1.0/(4*x(0)*x(0)*x(0));
@@ -48,14 +48,14 @@ void dE_function(Vector &x, Vector &g)
 #define STPMX 100.0
 
 
-void dfpmin(Vector &p, int n, double gtol, int *iter, double *fret,
-	    double(*func)(Vector &p), void (*dfunc)(Vector &p, Vector &g))
+void dfpmin(vec &p, int n, double gtol, int *iter, double *fret,
+	    double(*func)(vec &p), void (*dfunc)(vec &p, vec &g))
 {
 
   int check,i,its,j;
   double den,fac,fad,fae,fp,stpmax,sum=0.0,sumdg,sumxi,temp,test;
-  Vector dg(n), g(n), hdg(n), pnew(n), xi(n);
-  Matrix hessian(n,n);
+  vec dg(n), g(n), hdg(n), pnew(n), xi(n);
+  mat hessian(n,n);
 
   fp=(*func)(p);
   (*dfunc)(p,g);
@@ -131,8 +131,8 @@ void dfpmin(Vector &p, int n, double gtol, int *iter, double *fret,
 #define ALF 1.0e-4
 #define TOLX 1.0e-7
 
-void lnsrch(int n, Vector &xold, double fold, Vector &g, Vector &p, Vector &x,
-	    double *f, double stpmax, int *check, double (*func)(Vector &p))
+void lnsrch(int n, vec &xold, double fold, vec &g, vec &p, vec &x,
+	    double *f, double stpmax, int *check, double (*func)(vec &p))
 {
   int i;
   double a,alam,alam2,alamin,b,disc,f2,fold2,rhs1,rhs2,slope,sum,temp,
@@ -198,7 +198,7 @@ int main()
      n = 1;
 //   reserve space in memory for vectors containing the variational
 //   parameters
-     Vector g(n), p(n);
+     vec g(n), p(n);
      cout << "Read in guess for alpha" << endl;
      cin >> alpha;
      gtol = 1.0e-5;

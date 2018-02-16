@@ -2,15 +2,15 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include "vectormatrixclass.h"
+#include <armadillo>
 
 using namespace  std;
+using namespace arma;
 
-  Vector ConjugateGradient(Matrix A, Vector b, Vector x0){
+vec ConjugateGradient(mat A, vec b, vec x0, int dim){
   int IterMax, i;
-  int dim = x0.Dimension();
   const double tolerance = 1.0e-14;
-  Vector x(dim),r(dim),v(dim),z(dim);
+  vec x(dim),r(dim),v(dim),z(dim);
   double c,t,d;
 
   IterMax = dim;
@@ -39,39 +39,12 @@ using namespace  std;
 } 
 
 
-Vector SteepestDescent(Matrix A, Vector b, Vector x0){
-  int IterMax, i;
-  int dim = x0.Dimension();
-  const double tolerance = 1.0e-14;
-  Vector x(dim),f(dim),z(dim);
-  double c,alpha,d;
-  IterMax = 20;
-  x = x0;
-  f = A*x-b;
-  i = 0;
-  while (i <= IterMax || sqrt(dot(f,f)) < tolerance ){
-    if(sqrt(dot(f,f))<tolerance){
-       cerr << "An error has occurred: execution of function terminated" << endl;
-       break;
-    }
-    z = A*f;
-    c = dot(f,f);
-    alpha = c/dot(f,z);
-    x = x - alpha*f;
-    f =  A*x-b;
-    if(sqrt(dot(f,f)) < tolerance) break;
-    i++;
-  }
-  return x;
-} 
-
-
 
 //   Main function begins here
 int main(int  argc, char * argv[]){
   int dim = 2;
-  Vector x(dim),xsd(dim), b(dim),x0(dim);
-  Matrix A(dim,dim);
+  vec x(dim),xsd(dim), b(dim),x0(dim);
+  mat A(dim,dim);
   
   // Set our initial guess
   x0(0) = x0(1) = 0;
@@ -79,38 +52,32 @@ int main(int  argc, char * argv[]){
   A(0,0) =  3;    A(1,0) =  2;   A(0,1) =  2;   A(1,1) =  6; 
   
   cout << "The Matrix A that we are using: " << endl;
-  A.Print();
+  A.print();
   cout << endl;
 
-  Vector y(dim);
+  vec y(dim);
   y(0) = 2.;
   y(1) = -2.;
 
   cout << "The exact solution is: " << endl;
-  y.Print();
+  y.print();
   cout << endl;
   b = A*y;
 
   cout << "The right hand side, b, of the expression Ax=b: " << endl;
-  b.Print();
+  b.print();
   cout << endl;
 
-  x = ConjugateGradient(A,b,x0);
-
-  xsd = SteepestDescent(A,b,x0);
+  xsd = ConjugateGradient(A,b,x0, dim);
   
-  cout << "The approximate solution using Conjugate Gradient is: " << endl;
-  x.Print();
-  cout << endl;
 
-  cout << "The approximate solution using Steepest Descent is: " << endl;
-  xsd.Print();
+  cout << "The approximate solution using Conjugate Gradient is: " << endl;
+  xsd.print();
   cout << endl;
 
 
  
 }
-
 
 
 
