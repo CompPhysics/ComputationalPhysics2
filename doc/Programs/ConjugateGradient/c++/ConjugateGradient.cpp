@@ -10,28 +10,28 @@ using namespace arma;
 vec ConjugateGradient(mat A, vec b, vec x0, int dim){
   int IterMax, i;
   const double tolerance = 1.0e-14;
-  vec x(dim),r(dim),v(dim),z(dim);
-  double c,t,d;
+  vec x(dim),r(dim),p(dim),t(dim);
+  double c,alpha,d;
 
   IterMax = dim;
   x = x0;
   r = b - A*x;
-  v = r;
+  p = r;
   c = dot(r,r);
   i = 0;
-  while (i <= IterMax || sqrt(dot(v,v)) < tolerance ){
-    if(sqrt(dot(v,v))<tolerance){
+  while (i <= IterMax || sqrt(dot(p,p)) < tolerance ){
+    if(sqrt(dot(p,p))<tolerance){
       cerr << "An error has occurred in ConjugateGradient: execution of function terminated" << endl;
       break;
     }
-    z = A*v;
-    t = c/dot(v,z);
-    x = x + t*v;
-    r = r - t*z;
+    t = A*p;
+    alpha = c/dot(p,t);
+    x = x + alpha*p;
+    r = r - alpha*t;
     d = dot(r,r);
     if(sqrt(d) < tolerance)
       break;
-    v = r + (d/c)*v;
+    p = r + (d/c)*p;
     c = d;
     i++;
   }
