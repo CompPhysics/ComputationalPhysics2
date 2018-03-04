@@ -600,6 +600,7 @@ which gives
 !eblock
 
 
+
 !split
 ===== Codes from numerical recipes =====
 !bblock
@@ -669,3 +670,32 @@ When I compute the local energy I also compute its derivative.
 After roughly 10-20 iterations I got a converged result in terms of $\alpha$.
 !eblock
 
+!split
+===== Broyden–Fletcher–Goldfarb–Shanno algorithm =====
+!bblock
+The optimization problem is to minimize $f(\mathbf {x} )$ where $\mathbf {x}$  is a vector in $R^{n}$, and $f$ is a differentiable scalar function. There are no constraints on the values that {\displaystyle \mathbf {x} } \mathbf {x}  can take.
+
+The algorithm begins at an initial estimate for the optimal value $\mathbf {x}_{0}$ and proceeds iteratively to get a better estimate at each stage.
+
+The search direction $p_k$ at stage $k$ is given by the solution of the analogue of the Newton equation
+
+{\displaystyle B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x} _{k}),} {\displaystyle B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x} _{k}),}
+where {\displaystyle B_{k}} B_{k} is an approximation to the Hessian matrix, which is updated iteratively at each stage, and {\displaystyle \nabla f(\mathbf {x} _{k})} \nabla f(\mathbf {x} _{k}) is the gradient of the function evaluated at xk. A line search in the direction pk is then used to find the next point xk+1 by minimising {\displaystyle f(\mathbf {x} _{k}+\alpha \mathbf {p} _{k})} {\displaystyle f(\mathbf {x} _{k}+\alpha \mathbf {p} _{k})} over the scalar {\displaystyle \alpha >0} \alpha >0.
+
+The quasi-Newton condition imposed on the update of {\displaystyle B_{k}} B_{k} is:
+
+{\displaystyle B_{k+1}(\mathbf {x} _{k+1}-\mathbf {x} _{k})=\nabla f(\mathbf {x} _{k+1})-\nabla f(\mathbf {x} _{k}).} {\displaystyle B_{k+1}(\mathbf {x} _{k+1}-\mathbf {x} _{k})=\nabla f(\mathbf {x} _{k+1})-\nabla f(\mathbf {x} _{k}).}
+Let {\displaystyle \mathbf {y} _{k}=\nabla f(\mathbf {x} _{k+1})-\nabla f(\mathbf {x} _{k})} {\displaystyle \mathbf {y} _{k}=\nabla f(\mathbf {x} _{k+1})-\nabla f(\mathbf {x} _{k})} and {\displaystyle \mathbf {s} _{k}=\mathbf {x} _{k+1}-\mathbf {x} _{k}} {\displaystyle \mathbf {s} _{k}=\mathbf {x} _{k+1}-\mathbf {x} _{k}}, then {\displaystyle B_{k+1}} B_{k+1} satisfies {\displaystyle B_{k+1}\mathbf {s} _{k}=\mathbf {y} _{k}} {\displaystyle B_{k+1}\mathbf {s} _{k}=\mathbf {y} _{k}} which is the secant equation. The curvature condition {\displaystyle \mathbf {s} _{k}^{\top }\mathbf {y} _{k}>0} {\displaystyle \mathbf {s} _{k}^{\top }\mathbf {y} _{k}>0} should be satisfied. If the function is not strongly convex, then the condition has to be enforced explicitly.
+
+Instead of requiring the full Hessian matrix at the point xk+1 to be computed as Bk+1, the approximate Hessian at stage k is updated by the addition of two matrices:
+
+{\displaystyle B_{k+1}=B_{k}+U_{k}+V_{k}.} {\displaystyle B_{k+1}=B_{k}+U_{k}+V_{k}.}
+Both Uk and Vk are symmetric rank-one matrices, but their sum is a rank-two update matrix. BFGS and DFP updating matrix both differ from its predecessor by a rank-two matrix. Another simpler rank-one method is known as Symmetric rank-one method which does not guarantee the positive definitiveness. In order to maintain the symmetry and positive definitiveness of {\displaystyle B_{k+1}} B_{k+1}, the update form can be chosen as: {\displaystyle B_{k+1}=B_{k}+\alpha \mathbf {u} \mathbf {u} ^{\top }+\beta \mathbf {v} \mathbf {v} ^{\top }} {\displaystyle B_{k+1}=B_{k}+\alpha \mathbf {u} \mathbf {u} ^{\top }+\beta \mathbf {v} \mathbf {v} ^{\top }}. Imposing the secant condition, {\displaystyle B_{k+1}\mathbf {s} _{k}=\mathbf {y} _{k}} {\displaystyle B_{k+1}\mathbf {s} _{k}=\mathbf {y} _{k}}. Choosing {\displaystyle \mathbf {u} =\mathbf {y} _{k}} {\displaystyle \mathbf {u} =\mathbf {y} _{k}} and {\displaystyle \mathbf {v} =B_{k}\mathbf {s} _{k}} {\displaystyle \mathbf {v} =B_{k}\mathbf {s} _{k}}, we can obtain:[5]
+
+{\displaystyle \alpha ={\frac {1}{\mathbf {y} _{k}^{T}\mathbf {s} _{k}}}} {\displaystyle \alpha ={\frac {1}{\mathbf {y} _{k}^{T}\mathbf {s} _{k}}}}.
+{\displaystyle \beta =-{\frac {1}{\mathbf {s} _{k}^{T}B_{k}\mathbf {s} _{k}}}} {\displaystyle \beta =-{\frac {1}{\mathbf {s} _{k}^{T}B_{k}\mathbf {s} _{k}}}}.
+Finally, we substitute {\displaystyle \alpha } \alpha  and {\displaystyle \beta } \beta  into {\displaystyle B_{k+1}=B_{k}+\alpha \mathbf {u} \mathbf {u} ^{\top }+\beta \mathbf {v} \mathbf {v} ^{\top }} {\displaystyle B_{k+1}=B_{k}+\alpha \mathbf {u} \mathbf {u} ^{\top }+\beta \mathbf {v} \mathbf {v} ^{\top }} and get the update equation of {\displaystyle B_{k+1}} B_{k+1}:
+
+{\displaystyle B_{k+1}=B_{k}+{\frac {\mathbf {y} _{k}\mathbf {y} _{k}^{\mathrm {T} }}{\mathbf {y} _{k}^{\mathrm {T} }\mathbf {s} _{k}}}-{\frac {B_{k}\mathbf {s} _{k}\mathbf {s} _{k}^{\mathrm {T} }B_{k}^{\mathrm {T} }}{\mathbf {s} _{k}^{\mathrm {T} }B_{k}\mathbf {s} _{k}}}} {\displaystyle B_{k+1}=B_{k}+{\frac {\mathbf {y} _{k}\mathbf {y} _{k}^{\mathrm {T} }}{\mathbf {y} _{k}^{\mathrm {T} }\mathbf {s} _{k}}}-{\frac {B_{k}\mathbf {s} _{k}\mathbf {s} _{k}^{\mathrm {T} }B_{k}^{\mathrm {T} }}{\mathbf {s} _{k}^{\mathrm {T} }B_{k}\mathbf {s} _{k}}}}.
+
+!eblock
