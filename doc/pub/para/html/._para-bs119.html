@@ -272,7 +272,7 @@ Automatically generated HTML file from DocOnce source
               ('More on $MPI\\_Reduce$', 2, None, '___sec115'),
               ('Dissection of trapezoidal rule', 2, None, '___sec116'),
               ('Dissection of trapezoidal rule', 2, None, '___sec117'),
-              ('"The quantum dot program for two electrons":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp"',
+              ('"The quantum dot program for two electrons":"https://github.com/CompPhysics/ComputationalPhysics2/blob/master/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp"',
                2,
                None,
                '___sec118')]}
@@ -431,7 +431,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._para-bs116.html#___sec115" style="font-size: 80%;">More on \( MPI\_Reduce \)</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs117.html#___sec116" style="font-size: 80%;">Dissection of trapezoidal rule</a></li>
      <!-- navigation toc: --> <li><a href="._para-bs118.html#___sec117" style="font-size: 80%;">Dissection of trapezoidal rule</a></li>
-     <!-- navigation toc: --> <li><a href="#___sec118" style="font-size: 80%;">"The quantum dot program for two electrons":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp"</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec118" style="font-size: 80%;">"The quantum dot program for two electrons":"https://github.com/CompPhysics/ComputationalPhysics2/blob/master/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp"</a></li>
 
         </ul>
       </li>
@@ -447,64 +447,469 @@ MathJax.Hub.Config({
 <a name="part0119"></a>
 <!-- !split -->
 
-<h2 id="___sec118" class="anchor"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp" target="_self">The quantum dot program for two electrons</a>  </h2>
+<h2 id="___sec118" class="anchor"><a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/master/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp" target="_self">The quantum dot program for two electrons</a>  </h2>
 <div class="panel panel-default">
 <div class="panel-body">
 <p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">// Begin of main program   </span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">// Variational Monte Carlo for atoms with importance sampling, slater det</span>
+<span style="color: #408080; font-style: italic">// Test case for 2-electron quantum dot, no classes using Mersenne-Twister RNG</span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&quot;mpi.h&quot;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;cmath&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;random&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;string&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iostream&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;fstream&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iomanip&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&quot;vectormatrixclass.h&quot;</span><span style="color: #BC7A00"></span>
+
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span>  std;
+<span style="color: #408080; font-style: italic">// output file as global variable</span>
+ofstream ofile;  
+<span style="color: #408080; font-style: italic">// the step length and its squared inverse for the second derivative </span>
+<span style="color: #408080; font-style: italic">//  Here we define global variables  used in various functions</span>
+<span style="color: #408080; font-style: italic">//  These can be changed by using classes</span>
+<span style="color: #B00040">int</span> Dimension <span style="color: #666666">=</span> <span style="color: #666666">2</span>; 
+<span style="color: #B00040">int</span> NumberParticles  <span style="color: #666666">=</span> <span style="color: #666666">2</span>;  <span style="color: #408080; font-style: italic">//  we fix also the number of electrons to be 2</span>
+
+<span style="color: #408080; font-style: italic">// declaration of functions </span>
+
+<span style="color: #408080; font-style: italic">// The Mc sampling for the variational Monte Carlo </span>
+<span style="color: #B00040">void</span>  <span style="color: #0000FF">MonteCarloSampling</span>(<span style="color: #B00040">int</span>, <span style="color: #B00040">double</span> <span style="color: #666666">&amp;</span>, <span style="color: #B00040">double</span> <span style="color: #666666">&amp;</span>, Vector <span style="color: #666666">&amp;</span>);
+
+<span style="color: #408080; font-style: italic">// The variational wave function</span>
+<span style="color: #B00040">double</span>  <span style="color: #0000FF">WaveFunction</span>(Matrix <span style="color: #666666">&amp;</span>, Vector <span style="color: #666666">&amp;</span>);
+
+<span style="color: #408080; font-style: italic">// The local energy </span>
+<span style="color: #B00040">double</span>  <span style="color: #0000FF">LocalEnergy</span>(Matrix <span style="color: #666666">&amp;</span>, Vector <span style="color: #666666">&amp;</span>);
+
+<span style="color: #408080; font-style: italic">// The quantum force</span>
+<span style="color: #B00040">void</span>  <span style="color: #0000FF">QuantumForce</span>(Matrix <span style="color: #666666">&amp;</span>, Matrix <span style="color: #666666">&amp;</span>, Vector <span style="color: #666666">&amp;</span>);
+
+
+<span style="color: #408080; font-style: italic">// inline function for single-particle wave function</span>
+<span style="color: #008000; font-weight: bold">inline</span> <span style="color: #B00040">double</span> <span style="color: #0000FF">SPwavefunction</span>(<span style="color: #B00040">double</span> r, <span style="color: #B00040">double</span> alpha) { 
+   <span style="color: #008000; font-weight: bold">return</span> exp(<span style="color: #666666">-</span>alpha<span style="color: #666666">*</span>r<span style="color: #666666">*0.5</span>);
+}
+
+<span style="color: #408080; font-style: italic">// inline function for derivative of single-particle wave function</span>
+<span style="color: #008000; font-weight: bold">inline</span> <span style="color: #B00040">double</span> <span style="color: #0000FF">DerivativeSPwavefunction</span>(<span style="color: #B00040">double</span> r, <span style="color: #B00040">double</span> alpha) { 
+  <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">-</span>r<span style="color: #666666">*</span>alpha;
+}
+
+<span style="color: #408080; font-style: italic">// function for absolute value of relative distance</span>
+<span style="color: #B00040">double</span> <span style="color: #0000FF">RelativeDistance</span>(Matrix <span style="color: #666666">&amp;</span>r, <span style="color: #B00040">int</span> i, <span style="color: #B00040">int</span> j) { 
+      <span style="color: #B00040">double</span> r_ij <span style="color: #666666">=</span> <span style="color: #666666">0</span>;  
+      <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> k <span style="color: #666666">=</span> <span style="color: #666666">0</span>; k <span style="color: #666666">&lt;</span> Dimension; k<span style="color: #666666">++</span>) { 
+	r_ij <span style="color: #666666">+=</span> (r(i,k)<span style="color: #666666">-</span>r(j,k))<span style="color: #666666">*</span>(r(i,k)<span style="color: #666666">-</span>r(j,k));
+      }
+      <span style="color: #008000; font-weight: bold">return</span> sqrt(r_ij); 
+}
+
+<span style="color: #408080; font-style: italic">// inline function for derivative of Jastrow factor</span>
+<span style="color: #008000; font-weight: bold">inline</span> <span style="color: #B00040">double</span> <span style="color: #0000FF">JastrowDerivative</span>(Matrix <span style="color: #666666">&amp;</span>r, <span style="color: #B00040">double</span> beta, <span style="color: #B00040">int</span> i, <span style="color: #B00040">int</span> j, <span style="color: #B00040">int</span> k){
+  <span style="color: #008000; font-weight: bold">return</span> (r(i,k)<span style="color: #666666">-</span>r(j,k))<span style="color: #666666">/</span>(RelativeDistance(r, i, j)<span style="color: #666666">*</span>pow(<span style="color: #666666">1.0+</span>beta<span style="color: #666666">*</span>RelativeDistance(r, i, j),<span style="color: #666666">2</span>));
+}
+
+<span style="color: #408080; font-style: italic">// function for square of position of single particle</span>
+<span style="color: #B00040">double</span> <span style="color: #0000FF">singleparticle_pos2</span>(Matrix <span style="color: #666666">&amp;</span>r, <span style="color: #B00040">int</span> i) { 
+    <span style="color: #B00040">double</span> r_single_particle <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> Dimension; j<span style="color: #666666">++</span>) { 
+      r_single_particle  <span style="color: #666666">+=</span> r(i,j)<span style="color: #666666">*</span>r(i,j);
+    }
+    <span style="color: #008000; font-weight: bold">return</span> r_single_particle;
+}
+
+<span style="color: #B00040">void</span> <span style="color: #0000FF">lnsrch</span>(<span style="color: #B00040">int</span> n, Vector <span style="color: #666666">&amp;</span>xold, <span style="color: #B00040">double</span> fold, Vector <span style="color: #666666">&amp;</span>g, Vector <span style="color: #666666">&amp;</span>p, Vector <span style="color: #666666">&amp;</span>x,
+		 <span style="color: #B00040">double</span> <span style="color: #666666">*</span>f, <span style="color: #B00040">double</span> stpmax, <span style="color: #B00040">int</span> <span style="color: #666666">*</span>check, <span style="color: #B00040">double</span> (<span style="color: #666666">*</span>func)(Vector <span style="color: #666666">&amp;</span>p));
+
+<span style="color: #B00040">void</span> <span style="color: #0000FF">dfpmin</span>(Vector <span style="color: #666666">&amp;</span>p, <span style="color: #B00040">int</span> n, <span style="color: #B00040">double</span> gtol, <span style="color: #B00040">int</span> <span style="color: #666666">*</span>iter, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>fret,
+	    <span style="color: #B00040">double</span>(<span style="color: #666666">*</span>func)(Vector <span style="color: #666666">&amp;</span>p), <span style="color: #B00040">void</span> (<span style="color: #666666">*</span>dfunc)(Vector <span style="color: #666666">&amp;</span>p, Vector <span style="color: #666666">&amp;</span>g));
+
+<span style="color: #008000; font-weight: bold">static</span> <span style="color: #B00040">double</span> sqrarg;
+<span style="color: #BC7A00">#define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg)</span>
+
+
+<span style="color: #008000; font-weight: bold">static</span> <span style="color: #B00040">double</span> maxarg1,maxarg2;
+<span style="color: #BC7A00">#define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1) &gt; (maxarg2) ?\</span>
+<span style="color: #BC7A00">        (maxarg1) : (maxarg2))</span>
+
+
+<span style="color: #408080; font-style: italic">// Begin of main program   </span>
+
 <span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(<span style="color: #B00040">int</span> argc, <span style="color: #B00040">char</span><span style="color: #666666">*</span> argv[])
 {
-  ...  Omitted declarations
+
   <span style="color: #408080; font-style: italic">//  MPI initializations</span>
+  <span style="color: #B00040">int</span> NumberProcesses, MyRank, NumberMCsamples;
   MPI_Init (<span style="color: #666666">&amp;</span>argc, <span style="color: #666666">&amp;</span>argv);
-  MPI_Comm_size (MPI_COMM_WORLD, <span style="color: #666666">&amp;</span>numprocs);
-  MPI_Comm_rank (MPI_COMM_WORLD, <span style="color: #666666">&amp;</span>my_rank);
-  time_start <span style="color: #666666">=</span> MPI_Wtime();
-
-  <span style="color: #008000; font-weight: bold">if</span> (my_rank <span style="color: #666666">==</span> <span style="color: #666666">0</span> <span style="color: #666666">&amp;&amp;</span> argc <span style="color: #666666">&lt;=</span> <span style="color: #666666">1</span>) {
+  MPI_Comm_size (MPI_COMM_WORLD, <span style="color: #666666">&amp;</span>NumberProcesses);
+  MPI_Comm_rank (MPI_COMM_WORLD, <span style="color: #666666">&amp;</span>MyRank);
+  <span style="color: #B00040">double</span> StartTime <span style="color: #666666">=</span> MPI_Wtime();
+  <span style="color: #008000; font-weight: bold">if</span> (MyRank <span style="color: #666666">==</span> <span style="color: #666666">0</span> <span style="color: #666666">&amp;&amp;</span> argc <span style="color: #666666">&lt;=</span> <span style="color: #666666">1</span>) {
     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Bad Usage: &quot;</span> <span style="color: #666666">&lt;&lt;</span> argv[<span style="color: #666666">0</span>] <span style="color: #666666">&lt;&lt;</span> 
-      <span style="color: #BA2121">&quot; read also output file on same line&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+      <span style="color: #BA2121">&quot; Read also output file on same line and number of Monte Carlo cycles&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
   }
-  <span style="color: #008000; font-weight: bold">if</span> (my_rank <span style="color: #666666">==</span> <span style="color: #666666">0</span> <span style="color: #666666">&amp;&amp;</span> argc <span style="color: #666666">&gt;</span> <span style="color: #666666">1</span>) {
-    outfilename<span style="color: #666666">=</span>argv[<span style="color: #666666">1</span>];
-    ofile.open(outfilename); 
+  <span style="color: #408080; font-style: italic">// Read filename and number of Monte Carlo cycles from the command line</span>
+  <span style="color: #008000; font-weight: bold">if</span> (MyRank <span style="color: #666666">==</span> <span style="color: #666666">0</span> <span style="color: #666666">&amp;&amp;</span> argc <span style="color: #666666">&gt;</span> <span style="color: #666666">2</span>) {
+    string filename <span style="color: #666666">=</span> argv[<span style="color: #666666">1</span>]; <span style="color: #408080; font-style: italic">// first command line argument after name of program</span>
+    NumberMCsamples  <span style="color: #666666">=</span> atoi(argv[<span style="color: #666666">2</span>]);
+    string fileout <span style="color: #666666">=</span> filename;
+    string argument <span style="color: #666666">=</span> to_string(NumberMCsamples);
+    <span style="color: #408080; font-style: italic">// Final filename as filename+NumberMCsamples</span>
+    fileout.append(argument);
+    ofile.open(fileout);
   }
-  Vector variate(<span style="color: #666666">2</span>);
-  variate(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> <span style="color: #666666">1.0</span>;  <span style="color: #408080; font-style: italic">// value of alpha</span>
-  variate(<span style="color: #666666">1</span>) <span style="color: #666666">=</span> <span style="color: #666666">0.4</span>;  <span style="color: #408080; font-style: italic">// value of beta</span>
-  <span style="color: #408080; font-style: italic">// broadcast the total number of  variations</span>
-  <span style="color: #408080; font-style: italic">//  MPI_Bcast (&amp;number_cycles, 1, MPI_INT, 0, MPI_COMM_WORLD);</span>
-  total_number_cycles <span style="color: #666666">=</span> number_cycles<span style="color: #666666">*</span>numprocs; 
-  <span style="color: #408080; font-style: italic">//  Do the mc sampling  and accumulate data with MPI_Reduce</span>
-  cumulative_e <span style="color: #666666">=</span> cumulative_e2 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
-  mc_sampling(number_cycles, cumulative_e, cumulative_e2, variate);
-  <span style="color: #408080; font-style: italic">//  Collect data in total averages</span>
-  MPI_Reduce(<span style="color: #666666">&amp;</span>cumulative_e, <span style="color: #666666">&amp;</span>total_cumulative_e, <span style="color: #666666">1</span>, MPI_DOUBLE, MPI_SUM, <span style="color: #666666">0</span>, MPI_COMM_WORLD);
-  MPI_Reduce(<span style="color: #666666">&amp;</span>cumulative_e2, <span style="color: #666666">&amp;</span>total_cumulative_e2, <span style="color: #666666">1</span>, MPI_DOUBLE, MPI_SUM, <span style="color: #666666">0</span>, MPI_COMM_WORLD);
-
-  time_end <span style="color: #666666">=</span> MPI_Wtime();
-  total_time <span style="color: #666666">=</span> time_end<span style="color: #666666">-</span>time_start;
-  <span style="color: #408080; font-style: italic">// Print out results  </span>
-  <span style="color: #008000; font-weight: bold">if</span> ( my_rank <span style="color: #666666">==</span> <span style="color: #666666">0</span>) {
-    cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Time = &quot;</span> <span style="color: #666666">&lt;&lt;</span>  total_time  <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; on number of processors: &quot;</span>  <span style="color: #666666">&lt;&lt;</span> numprocs  <span style="color: #666666">&lt;&lt;</span> endl;
-    energy <span style="color: #666666">=</span> total_cumulative_e<span style="color: #666666">/</span>numprocs;
-    variance <span style="color: #666666">=</span> total_cumulative_e2<span style="color: #666666">/</span>numprocs<span style="color: #666666">-</span>energy<span style="color: #666666">*</span>energy;
-    error<span style="color: #666666">=</span>sqrt(variance<span style="color: #666666">/</span>(total_number_cycles<span style="color: #666666">-1.0</span>));
-    ofile <span style="color: #666666">&lt;&lt;</span> setiosflags(ios<span style="color: #666666">::</span>showpoint <span style="color: #666666">|</span> ios<span style="color: #666666">::</span>uppercase);
-    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> variate(<span style="color: #666666">0</span>);
-    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> variate(<span style="color: #666666">1</span>);
-    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> energy;
-    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> variance;
-    ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> error <span style="color: #666666">&lt;&lt;</span> endl;
-    ofile.close();  <span style="color: #408080; font-style: italic">// close output file</span>
+  <span style="color: #408080; font-style: italic">// broadcast the number of  Monte Carlo samples</span>
+  MPI_Bcast (<span style="color: #666666">&amp;</span>NumberMCsamples, <span style="color: #666666">1</span>, MPI_INT, <span style="color: #666666">0</span>, MPI_COMM_WORLD);
+  <span style="color: #408080; font-style: italic">// Two variational parameters only</span>
+  Vector VariationalParameters(<span style="color: #666666">2</span>);
+  <span style="color: #B00040">int</span> TotalNumberMCsamples <span style="color: #666666">=</span> NumberMCsamples<span style="color: #666666">*</span>NumberProcesses; 
+  <span style="color: #408080; font-style: italic">// Loop over variational parameters</span>
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">double</span> alpha <span style="color: #666666">=</span> <span style="color: #666666">0.5</span>; alpha <span style="color: #666666">&lt;=</span> <span style="color: #666666">1.5</span>; alpha <span style="color: #666666">+=0.1</span>){
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">double</span> beta <span style="color: #666666">=</span> <span style="color: #666666">0.1</span>; beta <span style="color: #666666">&lt;=</span> <span style="color: #666666">0.5</span>; beta <span style="color: #666666">+=0.05</span>){
+      VariationalParameters(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> alpha;  <span style="color: #408080; font-style: italic">// value of alpha</span>
+      VariationalParameters(<span style="color: #666666">1</span>) <span style="color: #666666">=</span> beta;  <span style="color: #408080; font-style: italic">// value of beta</span>
+      <span style="color: #408080; font-style: italic">//  Do the mc sampling  and accumulate data with MPI_Reduce</span>
+      <span style="color: #B00040">double</span> TotalEnergy, TotalEnergySquared, LocalProcessEnergy, LocalProcessEnergy2;
+      LocalProcessEnergy <span style="color: #666666">=</span> LocalProcessEnergy2 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+      MonteCarloSampling(NumberMCsamples, LocalProcessEnergy, LocalProcessEnergy2, VariationalParameters);
+      <span style="color: #408080; font-style: italic">//  Collect data in total averages</span>
+      MPI_Reduce(<span style="color: #666666">&amp;</span>LocalProcessEnergy, <span style="color: #666666">&amp;</span>TotalEnergy, <span style="color: #666666">1</span>, MPI_DOUBLE, MPI_SUM, <span style="color: #666666">0</span>, MPI_COMM_WORLD);
+      MPI_Reduce(<span style="color: #666666">&amp;</span>LocalProcessEnergy2, <span style="color: #666666">&amp;</span>TotalEnergySquared, <span style="color: #666666">1</span>, MPI_DOUBLE, MPI_SUM, <span style="color: #666666">0</span>, MPI_COMM_WORLD);
+      <span style="color: #408080; font-style: italic">// Print out results  in case of Master node, set to MyRank = 0</span>
+      <span style="color: #008000; font-weight: bold">if</span> ( MyRank <span style="color: #666666">==</span> <span style="color: #666666">0</span>) {
+	<span style="color: #B00040">double</span> Energy <span style="color: #666666">=</span> TotalEnergy<span style="color: #666666">/</span>( (<span style="color: #B00040">double</span>)NumberProcesses);
+	<span style="color: #B00040">double</span> Variance <span style="color: #666666">=</span> TotalEnergySquared<span style="color: #666666">/</span>( (<span style="color: #B00040">double</span>)NumberProcesses)<span style="color: #666666">-</span>Energy<span style="color: #666666">*</span>Energy;
+	<span style="color: #B00040">double</span> StandardDeviation <span style="color: #666666">=</span> sqrt(Variance<span style="color: #666666">/</span>((<span style="color: #B00040">double</span>)TotalNumberMCsamples)); <span style="color: #408080; font-style: italic">// over optimistic error</span>
+	ofile <span style="color: #666666">&lt;&lt;</span> setiosflags(ios<span style="color: #666666">::</span>showpoint <span style="color: #666666">|</span> ios<span style="color: #666666">::</span>uppercase);
+	ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> VariationalParameters(<span style="color: #666666">0</span>);
+	ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> VariationalParameters(<span style="color: #666666">1</span>);
+	ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> Energy;
+	ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> Variance;
+	ofile <span style="color: #666666">&lt;&lt;</span> setw(<span style="color: #666666">15</span>) <span style="color: #666666">&lt;&lt;</span> setprecision(<span style="color: #666666">8</span>) <span style="color: #666666">&lt;&lt;</span> StandardDeviation <span style="color: #666666">&lt;&lt;</span> endl;
+      }
+    }
   }
+  <span style="color: #B00040">double</span> EndTime <span style="color: #666666">=</span> MPI_Wtime();
+  <span style="color: #B00040">double</span> TotalTime <span style="color: #666666">=</span> EndTime<span style="color: #666666">-</span>StartTime;
+  <span style="color: #008000; font-weight: bold">if</span> ( MyRank <span style="color: #666666">==</span> <span style="color: #666666">0</span> )  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Time = &quot;</span> <span style="color: #666666">&lt;&lt;</span>  TotalTime  <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot; on number of processors: &quot;</span>  <span style="color: #666666">&lt;&lt;</span> NumberProcesses  <span style="color: #666666">&lt;&lt;</span> endl;
+  <span style="color: #008000; font-weight: bold">if</span> (MyRank <span style="color: #666666">==</span> <span style="color: #666666">0</span>)  ofile.close();  <span style="color: #408080; font-style: italic">// close output file</span>
   <span style="color: #408080; font-style: italic">// End MPI</span>
   MPI_Finalize ();  
   <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
 }  <span style="color: #408080; font-style: italic">//  end of main function</span>
+
+
+<span style="color: #408080; font-style: italic">// Monte Carlo sampling with the Metropolis algorithm  </span>
+
+<span style="color: #B00040">void</span> <span style="color: #0000FF">MonteCarloSampling</span>(<span style="color: #B00040">int</span> NumberMCsamples, <span style="color: #B00040">double</span> <span style="color: #666666">&amp;</span>cumulative_e, <span style="color: #B00040">double</span> <span style="color: #666666">&amp;</span>cumulative_e2, Vector <span style="color: #666666">&amp;</span>VariationalParameters)
+{
+
+ <span style="color: #408080; font-style: italic">// Initialize the seed and call the Mersienne algo</span>
+  std<span style="color: #666666">::</span>random_device rd;
+  std<span style="color: #666666">::</span>mt19937_64 gen(rd());
+  <span style="color: #408080; font-style: italic">// Set up the uniform distribution for x \in [[0, 1]</span>
+  std<span style="color: #666666">::</span>uniform_real_distribution<span style="color: #666666">&lt;</span><span style="color: #B00040">double</span><span style="color: #666666">&gt;</span> UniformNumberGenerator(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>);
+  std<span style="color: #666666">::</span>normal_distribution<span style="color: #666666">&lt;</span><span style="color: #B00040">double</span><span style="color: #666666">&gt;</span> Normaldistribution(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>);
+  <span style="color: #408080; font-style: italic">// diffusion constant from Schroedinger equation</span>
+  <span style="color: #B00040">double</span> D <span style="color: #666666">=</span> <span style="color: #666666">0.5</span>; 
+  <span style="color: #B00040">double</span> timestep <span style="color: #666666">=</span> <span style="color: #666666">0.05</span>;  <span style="color: #408080; font-style: italic">//  we fix the time step  for the gaussian deviate</span>
+  <span style="color: #408080; font-style: italic">// allocate matrices which contain the position of the particles  </span>
+  Matrix OldPosition( NumberParticles, Dimension), NewPosition( NumberParticles, Dimension);
+  Matrix OldQuantumForce(NumberParticles, Dimension), NewQuantumForce(NumberParticles, Dimension);
+  <span style="color: #B00040">double</span> Energy <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>; <span style="color: #B00040">double</span> EnergySquared <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>; <span style="color: #B00040">double</span> DeltaE <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+  <span style="color: #408080; font-style: italic">//  initial trial positions</span>
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles; i<span style="color: #666666">++</span>) { 
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> Dimension; j<span style="color: #666666">++</span>) {
+      OldPosition(i,j) <span style="color: #666666">=</span> Normaldistribution(gen)<span style="color: #666666">*</span>sqrt(timestep);
+    }
+  }
+  <span style="color: #B00040">double</span> OldWaveFunction <span style="color: #666666">=</span> WaveFunction(OldPosition, VariationalParameters);
+  QuantumForce(OldPosition, OldQuantumForce, VariationalParameters);
+  <span style="color: #408080; font-style: italic">// loop over monte carlo cycles </span>
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> cycles <span style="color: #666666">=</span> <span style="color: #666666">1</span>; cycles <span style="color: #666666">&lt;=</span> NumberMCsamples; cycles<span style="color: #666666">++</span>){ 
+    <span style="color: #408080; font-style: italic">// new position </span>
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles; i<span style="color: #666666">++</span>) { 
+      <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> Dimension; j<span style="color: #666666">++</span>) {
+	<span style="color: #408080; font-style: italic">// gaussian deviate to compute new positions using a given timestep</span>
+	NewPosition(i,j) <span style="color: #666666">=</span> OldPosition(i,j) <span style="color: #666666">+</span> Normaldistribution(gen)<span style="color: #666666">*</span>sqrt(timestep)<span style="color: #666666">+</span>OldQuantumForce(i,j)<span style="color: #666666">*</span>timestep<span style="color: #666666">*</span>D;
+	<span style="color: #408080; font-style: italic">//	NewPosition(i,j) = OldPosition(i,j) + gaussian_deviate(&amp;idum)*sqrt(timestep)+OldQuantumForce(i,j)*timestep*D;</span>
+      }  
+      <span style="color: #408080; font-style: italic">//  for the other particles we need to set the position to the old position since</span>
+      <span style="color: #408080; font-style: italic">//  we move only one particle at the time</span>
+      <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> k <span style="color: #666666">=</span> <span style="color: #666666">0</span>; k <span style="color: #666666">&lt;</span> NumberParticles; k<span style="color: #666666">++</span>) {
+	<span style="color: #008000; font-weight: bold">if</span> ( k <span style="color: #666666">!=</span> i) {
+	  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> Dimension; j<span style="color: #666666">++</span>) {
+	    NewPosition(k,j) <span style="color: #666666">=</span> OldPosition(k,j);
+	  }
+	} 
+      }
+      <span style="color: #B00040">double</span> NewWaveFunction <span style="color: #666666">=</span> WaveFunction(NewPosition, VariationalParameters); 
+      QuantumForce(NewPosition, NewQuantumForce, VariationalParameters);
+      <span style="color: #408080; font-style: italic">//  we compute the log of the ratio of the greens functions to be used in the </span>
+      <span style="color: #408080; font-style: italic">//  Metropolis-Hastings algorithm</span>
+      <span style="color: #B00040">double</span> GreensFunction <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;            
+      <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> Dimension; j<span style="color: #666666">++</span>) {
+	GreensFunction <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>(OldQuantumForce(i,j)<span style="color: #666666">+</span>NewQuantumForce(i,j))<span style="color: #666666">*</span>
+	  (D<span style="color: #666666">*</span>timestep<span style="color: #666666">*0.5*</span>(OldQuantumForce(i,j)<span style="color: #666666">-</span>NewQuantumForce(i,j))<span style="color: #666666">-</span>NewPosition(i,j)<span style="color: #666666">+</span>OldPosition(i,j));
+      }
+      GreensFunction <span style="color: #666666">=</span> exp(GreensFunction);
+      <span style="color: #408080; font-style: italic">// The Metropolis test is performed by moving one particle at the time</span>
+      <span style="color: #008000; font-weight: bold">if</span>(UniformNumberGenerator(gen) <span style="color: #666666">&lt;=</span> GreensFunction<span style="color: #666666">*</span>NewWaveFunction<span style="color: #666666">*</span>NewWaveFunction<span style="color: #666666">/</span>OldWaveFunction<span style="color: #666666">/</span>OldWaveFunction ) { 
+	<span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span>  j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> Dimension; j<span style="color: #666666">++</span>) {
+	  OldPosition(i,j) <span style="color: #666666">=</span> NewPosition(i,j);
+	  OldQuantumForce(i,j) <span style="color: #666666">=</span> NewQuantumForce(i,j);
+	}
+	OldWaveFunction <span style="color: #666666">=</span> NewWaveFunction;
+      }
+    }  <span style="color: #408080; font-style: italic">//  end of loop over particles</span>
+    <span style="color: #408080; font-style: italic">// compute local energy  </span>
+    <span style="color: #B00040">double</span> DeltaE <span style="color: #666666">=</span> LocalEnergy(OldPosition, VariationalParameters);
+    <span style="color: #408080; font-style: italic">// update energies</span>
+    Energy <span style="color: #666666">+=</span> DeltaE;
+    EnergySquared <span style="color: #666666">+=</span> DeltaE<span style="color: #666666">*</span>DeltaE;
+  }   <span style="color: #408080; font-style: italic">// end of loop over MC trials   </span>
+  <span style="color: #408080; font-style: italic">// update the energy average and its squared </span>
+  cumulative_e <span style="color: #666666">=</span> Energy<span style="color: #666666">/</span>NumberMCsamples;
+  cumulative_e2 <span style="color: #666666">=</span> EnergySquared<span style="color: #666666">/</span>NumberMCsamples;
+}   <span style="color: #408080; font-style: italic">// end MonteCarloSampling function  </span>
+
+
+<span style="color: #408080; font-style: italic">// Function to compute the squared wave function and the quantum force</span>
+
+<span style="color: #B00040">double</span>  <span style="color: #0000FF">WaveFunction</span>(Matrix <span style="color: #666666">&amp;</span>r, Vector <span style="color: #666666">&amp;</span>VariationalParameters)
+{
+  <span style="color: #B00040">double</span> wf <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+  <span style="color: #408080; font-style: italic">// full Slater determinant for two particles, replace with Slater det for more particles </span>
+  wf  <span style="color: #666666">=</span> SPwavefunction(singleparticle_pos2(r, <span style="color: #666666">0</span>), VariationalParameters(<span style="color: #666666">0</span>))<span style="color: #666666">*</span>SPwavefunction(singleparticle_pos2(r, <span style="color: #666666">1</span>),VariationalParameters(<span style="color: #666666">0</span>));
+  <span style="color: #408080; font-style: italic">// contribution from Jastrow factor</span>
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles<span style="color: #666666">-1</span>; i<span style="color: #666666">++</span>) { 
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> i<span style="color: #666666">+1</span>; j <span style="color: #666666">&lt;</span> NumberParticles; j<span style="color: #666666">++</span>) {
+      wf <span style="color: #666666">*=</span> exp(RelativeDistance(r, i, j)<span style="color: #666666">/</span>((<span style="color: #666666">1.0+</span>VariationalParameters(<span style="color: #666666">1</span>)<span style="color: #666666">*</span>RelativeDistance(r, i, j))));
+    }
+  }
+  <span style="color: #008000; font-weight: bold">return</span> wf;
+}
+
+<span style="color: #408080; font-style: italic">// Function to calculate the local energy without numerical derivation of kinetic energy</span>
+
+<span style="color: #B00040">double</span>  <span style="color: #0000FF">LocalEnergy</span>(Matrix <span style="color: #666666">&amp;</span>r, Vector <span style="color: #666666">&amp;</span>VariationalParameters)
+{
+
+  <span style="color: #408080; font-style: italic">// compute the kinetic and potential energy from the single-particle part</span>
+  <span style="color: #408080; font-style: italic">// for a many-electron system this has to be replaced by a Slater determinant</span>
+  <span style="color: #408080; font-style: italic">// The absolute value of the interparticle length</span>
+  Matrix length( NumberParticles, NumberParticles);
+  <span style="color: #408080; font-style: italic">// Set up interparticle distance</span>
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles<span style="color: #666666">-1</span>; i<span style="color: #666666">++</span>) { 
+    <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> i<span style="color: #666666">+1</span>; j <span style="color: #666666">&lt;</span> NumberParticles; j<span style="color: #666666">++</span>){
+      length(i,j) <span style="color: #666666">=</span> RelativeDistance(r, i, j);
+      length(j,i) <span style="color: #666666">=</span>  length(i,j);
+    }
+  }
+  <span style="color: #B00040">double</span> KineticEnergy <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+  <span style="color: #408080; font-style: italic">// Set up kinetic energy from Slater and Jastrow terms</span>
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles; i<span style="color: #666666">++</span>) { 
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> k <span style="color: #666666">=</span> <span style="color: #666666">0</span>; k <span style="color: #666666">&lt;</span> Dimension; k<span style="color: #666666">++</span>) {
+      <span style="color: #B00040">double</span> sum1 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>; 
+      <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> NumberParticles; j<span style="color: #666666">++</span>){
+	<span style="color: #008000; font-weight: bold">if</span> ( j <span style="color: #666666">!=</span> i) {
+	  sum1 <span style="color: #666666">+=</span> JastrowDerivative(r, VariationalParameters(<span style="color: #666666">1</span>), i, j, k);
+	}
+      }
+      KineticEnergy <span style="color: #666666">+=</span> (sum1<span style="color: #666666">+</span>DerivativeSPwavefunction(r(i,k),VariationalParameters(<span style="color: #666666">0</span>)))<span style="color: #666666">*</span>(sum1<span style="color: #666666">+</span>DerivativeSPwavefunction(r(i,k),VariationalParameters(<span style="color: #666666">0</span>)));
+    }
+  }
+  KineticEnergy <span style="color: #666666">+=</span> <span style="color: #666666">-2*</span>VariationalParameters(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>NumberParticles;
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles<span style="color: #666666">-1</span>; i<span style="color: #666666">++</span>) {
+      <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> i<span style="color: #666666">+1</span>; j <span style="color: #666666">&lt;</span> NumberParticles; j<span style="color: #666666">++</span>) {
+        KineticEnergy <span style="color: #666666">+=</span> <span style="color: #666666">2.0/</span>(pow(<span style="color: #666666">1.0</span> <span style="color: #666666">+</span> VariationalParameters(<span style="color: #666666">1</span>)<span style="color: #666666">*</span>length(i,j),<span style="color: #666666">2</span>))<span style="color: #666666">*</span>(<span style="color: #666666">1.0/</span>length(i,j)<span style="color: #666666">-2*</span>VariationalParameters(<span style="color: #666666">1</span>)<span style="color: #666666">/</span>(<span style="color: #666666">1+</span>VariationalParameters(<span style="color: #666666">1</span>)<span style="color: #666666">*</span>length(i,j)) );
+      }
+  }
+  KineticEnergy <span style="color: #666666">*=</span> <span style="color: #666666">-0.5</span>;
+  <span style="color: #408080; font-style: italic">// Set up potential energy, external potential + eventual electron-electron repulsion</span>
+  <span style="color: #B00040">double</span> PotentialEnergy <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles; i<span style="color: #666666">++</span>) { 
+    <span style="color: #B00040">double</span> DistanceSquared <span style="color: #666666">=</span> singleparticle_pos2(r, i);
+    PotentialEnergy <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>DistanceSquared;  <span style="color: #408080; font-style: italic">// sp energy HO part, note it has the oscillator frequency set to 1!</span>
+  }
+  <span style="color: #408080; font-style: italic">// Add the electron-electron repulsion</span>
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles<span style="color: #666666">-1</span>; i<span style="color: #666666">++</span>) { 
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> i<span style="color: #666666">+1</span>; j <span style="color: #666666">&lt;</span> NumberParticles; j<span style="color: #666666">++</span>) {
+      PotentialEnergy <span style="color: #666666">+=</span> <span style="color: #666666">1.0/</span>length(i,j);          
+    }
+  }
+  <span style="color: #B00040">double</span> LocalE <span style="color: #666666">=</span> KineticEnergy<span style="color: #666666">+</span>PotentialEnergy;
+  <span style="color: #008000; font-weight: bold">return</span> LocalE;
+}
+
+<span style="color: #408080; font-style: italic">// Compute the analytical expression for the quantum force</span>
+<span style="color: #B00040">void</span>  <span style="color: #0000FF">QuantumForce</span>(Matrix <span style="color: #666666">&amp;</span>r, Matrix <span style="color: #666666">&amp;</span>qforce, Vector <span style="color: #666666">&amp;</span>VariationalParameters)
+{
+  <span style="color: #408080; font-style: italic">// compute the first derivative </span>
+  <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> NumberParticles; i<span style="color: #666666">++</span>) {
+    <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> k <span style="color: #666666">=</span> <span style="color: #666666">0</span>; k <span style="color: #666666">&lt;</span> Dimension; k<span style="color: #666666">++</span>) {
+      <span style="color: #408080; font-style: italic">// single-particle part, replace with Slater det for larger systems</span>
+      <span style="color: #B00040">double</span> sppart <span style="color: #666666">=</span> DerivativeSPwavefunction(r(i,k),VariationalParameters(<span style="color: #666666">0</span>));
+      <span style="color: #408080; font-style: italic">//  Jastrow factor contribution</span>
+      <span style="color: #B00040">double</span> Jsum <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;
+      <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> NumberParticles; j<span style="color: #666666">++</span>) {
+	<span style="color: #008000; font-weight: bold">if</span> ( j <span style="color: #666666">!=</span> i) {
+	  Jsum <span style="color: #666666">+=</span> JastrowDerivative(r, VariationalParameters(<span style="color: #666666">1</span>), i, j, k);
+	}
+      }
+      qforce(i,k) <span style="color: #666666">=</span> <span style="color: #666666">2.0*</span>(Jsum<span style="color: #666666">+</span>sppart);
+    }
+  }
+} <span style="color: #408080; font-style: italic">// end of QuantumForce function</span>
+
+
+<span style="color: #BC7A00">#define ITMAX 200</span>
+<span style="color: #BC7A00">#define EPS 3.0e-8</span>
+<span style="color: #BC7A00">#define TOLX (4*EPS)</span>
+<span style="color: #BC7A00">#define STPMX 100.0</span>
+
+<span style="color: #B00040">void</span> <span style="color: #0000FF">dfpmin</span>(Vector <span style="color: #666666">&amp;</span>p, <span style="color: #B00040">int</span> n, <span style="color: #B00040">double</span> gtol, <span style="color: #B00040">int</span> <span style="color: #666666">*</span>iter, <span style="color: #B00040">double</span> <span style="color: #666666">*</span>fret,
+	    <span style="color: #B00040">double</span>(<span style="color: #666666">*</span>func)(Vector <span style="color: #666666">&amp;</span>p), <span style="color: #B00040">void</span> (<span style="color: #666666">*</span>dfunc)(Vector <span style="color: #666666">&amp;</span>p, Vector <span style="color: #666666">&amp;</span>g))
+{
+
+  <span style="color: #B00040">int</span> check,i,its,j;
+  <span style="color: #B00040">double</span> den,fac,fad,fae,fp,stpmax,sum<span style="color: #666666">=0.0</span>,sumdg,sumxi,temp,test;
+  Vector dg(n), g(n), hdg(n), pnew(n), xi(n);
+  Matrix hessian(n,n);
+
+  fp<span style="color: #666666">=</span>(<span style="color: #666666">*</span>func)(p);
+  (<span style="color: #666666">*</span>dfunc)(p,g);
+  <span style="color: #008000; font-weight: bold">for</span> (i <span style="color: #666666">=</span> <span style="color: #666666">0</span>;i <span style="color: #666666">&lt;</span> n;i<span style="color: #666666">++</span>) {
+    <span style="color: #008000; font-weight: bold">for</span> (j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j<span style="color: #666666">&lt;</span> n;j<span style="color: #666666">++</span>) hessian(i,j)<span style="color: #666666">=0.0</span>;
+    hessian(i,i)<span style="color: #666666">=1.0</span>;
+    xi(i) <span style="color: #666666">=</span> <span style="color: #666666">-</span>g(i);
+    sum <span style="color: #666666">+=</span> p(i)<span style="color: #666666">*</span>p(i);
+  }
+  stpmax<span style="color: #666666">=</span>STPMX<span style="color: #666666">*</span>FMAX(sqrt(sum),(<span style="color: #B00040">double</span>)n);
+  <span style="color: #008000; font-weight: bold">for</span> (its<span style="color: #666666">=1</span>;its<span style="color: #666666">&lt;=</span>ITMAX;its<span style="color: #666666">++</span>) {
+    <span style="color: #666666">*</span>iter<span style="color: #666666">=</span>its;
+    lnsrch(n,p,fp,g,xi,pnew,fret,stpmax,<span style="color: #666666">&amp;</span>check,func);
+    fp <span style="color: #666666">=</span> <span style="color: #666666">*</span>fret;
+    <span style="color: #008000; font-weight: bold">for</span> (i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i<span style="color: #666666">&lt;</span> n;i<span style="color: #666666">++</span>) {
+      xi(i)<span style="color: #666666">=</span>pnew(i)<span style="color: #666666">-</span>p(i);
+      p(i)<span style="color: #666666">=</span>pnew(i);
+    }
+    test<span style="color: #666666">=0.0</span>;
+    <span style="color: #008000; font-weight: bold">for</span> (i <span style="color: #666666">=</span> <span style="color: #666666">0</span>;i<span style="color: #666666">&lt;</span> n;i<span style="color: #666666">++</span>) {
+      temp<span style="color: #666666">=</span>fabs(xi(i))<span style="color: #666666">/</span>FMAX(fabs(p(i)),<span style="color: #666666">1.0</span>);
+      <span style="color: #008000; font-weight: bold">if</span> (temp <span style="color: #666666">&gt;</span> test) test<span style="color: #666666">=</span>temp;
+    }
+    <span style="color: #008000; font-weight: bold">if</span> (test <span style="color: #666666">&lt;</span> TOLX) {
+      <span style="color: #008000; font-weight: bold">return</span>;
+    }
+    <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) dg(i)<span style="color: #666666">=</span>g(i);
+    (<span style="color: #666666">*</span>dfunc)(p,g);
+    test<span style="color: #666666">=0.0</span>;
+    den<span style="color: #666666">=</span>FMAX(<span style="color: #666666">*</span>fret,<span style="color: #666666">1.0</span>);
+    <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) {
+      temp<span style="color: #666666">=</span>fabs(g(i))<span style="color: #666666">*</span>FMAX(fabs(p(i)),<span style="color: #666666">1.0</span>)<span style="color: #666666">/</span>den;
+      <span style="color: #008000; font-weight: bold">if</span> (temp <span style="color: #666666">&gt;</span> test) test<span style="color: #666666">=</span>temp;
+    }
+    <span style="color: #008000; font-weight: bold">if</span> (test <span style="color: #666666">&lt;</span> gtol) {
+      <span style="color: #008000; font-weight: bold">return</span>;
+    }
+    <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) dg(i)<span style="color: #666666">=</span>g(i)<span style="color: #666666">-</span>dg(i);
+    <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) {
+      hdg(i)<span style="color: #666666">=0.0</span>;
+      <span style="color: #008000; font-weight: bold">for</span> (j<span style="color: #666666">=0</span>;j<span style="color: #666666">&lt;</span>n;j<span style="color: #666666">++</span>) hdg(i) <span style="color: #666666">+=</span> hessian(i,j)<span style="color: #666666">*</span>dg(j);
+    }
+    fac<span style="color: #666666">=</span>fae<span style="color: #666666">=</span>sumdg<span style="color: #666666">=</span>sumxi<span style="color: #666666">=0.0</span>;
+    <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) {
+      fac <span style="color: #666666">+=</span> dg(i)<span style="color: #666666">*</span>xi(i);
+      fae <span style="color: #666666">+=</span> dg(i)<span style="color: #666666">*</span>hdg(i);
+      sumdg <span style="color: #666666">+=</span> SQR(dg(i));
+      sumxi <span style="color: #666666">+=</span> SQR(xi(i));
+    }
+    <span style="color: #008000; font-weight: bold">if</span> (fac<span style="color: #666666">*</span>fac <span style="color: #666666">&gt;</span> EPS<span style="color: #666666">*</span>sumdg<span style="color: #666666">*</span>sumxi) {
+      fac<span style="color: #666666">=1.0/</span>fac;
+      fad<span style="color: #666666">=1.0/</span>fae;
+      <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) dg(i)<span style="color: #666666">=</span>fac<span style="color: #666666">*</span>xi(i)<span style="color: #666666">-</span>fad<span style="color: #666666">*</span>hdg(i);
+      <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) {
+	<span style="color: #008000; font-weight: bold">for</span> (j<span style="color: #666666">=0</span>;j<span style="color: #666666">&lt;</span>n;j<span style="color: #666666">++</span>) {
+	  hessian(i,j) <span style="color: #666666">+=</span> fac<span style="color: #666666">*</span>xi(i)<span style="color: #666666">*</span>xi(j)
+	    <span style="color: #666666">-</span>fad<span style="color: #666666">*</span>hdg(i)<span style="color: #666666">*</span>hdg(j)<span style="color: #666666">+</span>fae<span style="color: #666666">*</span>dg(i)<span style="color: #666666">*</span>dg(j);
+	}
+      }
+    }
+    <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) {
+      xi(i)<span style="color: #666666">=0.0</span>;
+      <span style="color: #008000; font-weight: bold">for</span> (j<span style="color: #666666">=0</span>;j<span style="color: #666666">&lt;</span>n;j<span style="color: #666666">++</span>) xi(i) <span style="color: #666666">-=</span> hessian(i,j)<span style="color: #666666">*</span>g(j);
+    }
+  }
+  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;too many iterations in dfpmin&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+}
+<span style="color: #BC7A00">#undef ITMAX</span>
+<span style="color: #BC7A00">#undef EPS</span>
+<span style="color: #BC7A00">#undef TOLX</span>
+<span style="color: #BC7A00">#undef STPMX</span>
+
+<span style="color: #BC7A00">#define ALF 1.0e-4</span>
+<span style="color: #BC7A00">#define TOLX 1.0e-7</span>
+
+<span style="color: #B00040">void</span> <span style="color: #0000FF">lnsrch</span>(<span style="color: #B00040">int</span> n, Vector <span style="color: #666666">&amp;</span>xold, <span style="color: #B00040">double</span> fold, Vector <span style="color: #666666">&amp;</span>g, Vector <span style="color: #666666">&amp;</span>p, Vector <span style="color: #666666">&amp;</span>x,
+	    <span style="color: #B00040">double</span> <span style="color: #666666">*</span>f, <span style="color: #B00040">double</span> stpmax, <span style="color: #B00040">int</span> <span style="color: #666666">*</span>check, <span style="color: #B00040">double</span> (<span style="color: #666666">*</span>func)(Vector <span style="color: #666666">&amp;</span>p))
+{
+  <span style="color: #B00040">int</span> i;
+  <span style="color: #B00040">double</span> a,alam,alam2,alamin,b,disc,f2,fold2,rhs1,rhs2,slope,sum,temp,
+    test,tmplam;
+
+  <span style="color: #666666">*</span>check<span style="color: #666666">=0</span>;
+  <span style="color: #008000; font-weight: bold">for</span> (sum<span style="color: #666666">=0.0</span>,i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) sum <span style="color: #666666">+=</span> p(i)<span style="color: #666666">*</span>p(i);
+  sum<span style="color: #666666">=</span>sqrt(sum);
+  <span style="color: #008000; font-weight: bold">if</span> (sum <span style="color: #666666">&gt;</span> stpmax)
+    <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) p(i) <span style="color: #666666">*=</span> stpmax<span style="color: #666666">/</span>sum;
+  <span style="color: #008000; font-weight: bold">for</span> (slope<span style="color: #666666">=0.0</span>,i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>)
+    slope <span style="color: #666666">+=</span> g(i)<span style="color: #666666">*</span>p(i);
+  test<span style="color: #666666">=0.0</span>;
+  <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) {
+    temp<span style="color: #666666">=</span>fabs(p(i))<span style="color: #666666">/</span>FMAX(fabs(xold(i)),<span style="color: #666666">1.0</span>);
+    <span style="color: #008000; font-weight: bold">if</span> (temp <span style="color: #666666">&gt;</span> test) test<span style="color: #666666">=</span>temp;
+  }
+  alamin<span style="color: #666666">=</span>TOLX<span style="color: #666666">/</span>test;
+  alam<span style="color: #666666">=1.0</span>;
+  <span style="color: #008000; font-weight: bold">for</span> (;;) {
+    <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) x(i)<span style="color: #666666">=</span>xold(i)<span style="color: #666666">+</span>alam<span style="color: #666666">*</span>p(i);
+    <span style="color: #666666">*</span>f<span style="color: #666666">=</span>(<span style="color: #666666">*</span>func)(x);
+    <span style="color: #008000; font-weight: bold">if</span> (alam <span style="color: #666666">&lt;</span> alamin) {
+      <span style="color: #008000; font-weight: bold">for</span> (i<span style="color: #666666">=0</span>;i<span style="color: #666666">&lt;</span>n;i<span style="color: #666666">++</span>) x(i)<span style="color: #666666">=</span>xold(i);
+      <span style="color: #666666">*</span>check<span style="color: #666666">=1</span>;
+      <span style="color: #008000; font-weight: bold">return</span>;
+    } <span style="color: #008000; font-weight: bold">else</span> <span style="color: #008000; font-weight: bold">if</span> (<span style="color: #666666">*</span>f <span style="color: #666666">&lt;=</span> fold<span style="color: #666666">+</span>ALF<span style="color: #666666">*</span>alam<span style="color: #666666">*</span>slope) <span style="color: #008000; font-weight: bold">return</span>;
+    <span style="color: #008000; font-weight: bold">else</span> {
+      <span style="color: #008000; font-weight: bold">if</span> (alam <span style="color: #666666">==</span> <span style="color: #666666">1.0</span>)
+	tmplam <span style="color: #666666">=</span> <span style="color: #666666">-</span>slope<span style="color: #666666">/</span>(<span style="color: #666666">2.0*</span>(<span style="color: #666666">*</span>f<span style="color: #666666">-</span>fold<span style="color: #666666">-</span>slope));
+      <span style="color: #008000; font-weight: bold">else</span> {
+	rhs1 <span style="color: #666666">=</span> <span style="color: #666666">*</span>f<span style="color: #666666">-</span>fold<span style="color: #666666">-</span>alam<span style="color: #666666">*</span>slope;
+	rhs2<span style="color: #666666">=</span>f2<span style="color: #666666">-</span>fold2<span style="color: #666666">-</span>alam2<span style="color: #666666">*</span>slope;
+	a<span style="color: #666666">=</span>(rhs1<span style="color: #666666">/</span>(alam<span style="color: #666666">*</span>alam)<span style="color: #666666">-</span>rhs2<span style="color: #666666">/</span>(alam2<span style="color: #666666">*</span>alam2))<span style="color: #666666">/</span>(alam<span style="color: #666666">-</span>alam2);
+	b<span style="color: #666666">=</span>(<span style="color: #666666">-</span>alam2<span style="color: #666666">*</span>rhs1<span style="color: #666666">/</span>(alam<span style="color: #666666">*</span>alam)<span style="color: #666666">+</span>alam<span style="color: #666666">*</span>rhs2<span style="color: #666666">/</span>(alam2<span style="color: #666666">*</span>alam2))<span style="color: #666666">/</span>(alam<span style="color: #666666">-</span>alam2);
+	<span style="color: #008000; font-weight: bold">if</span> (a <span style="color: #666666">==</span> <span style="color: #666666">0.0</span>) tmplam <span style="color: #666666">=</span> <span style="color: #666666">-</span>slope<span style="color: #666666">/</span>(<span style="color: #666666">2.0*</span>b);
+	<span style="color: #008000; font-weight: bold">else</span> {
+	  disc<span style="color: #666666">=</span>b<span style="color: #666666">*</span>b<span style="color: #666666">-3.0*</span>a<span style="color: #666666">*</span>slope;
+	  <span style="color: #008000; font-weight: bold">if</span> (disc<span style="color: #666666">&lt;0.0</span>) cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Roundoff problem in lnsrch.&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+	  <span style="color: #008000; font-weight: bold">else</span> tmplam<span style="color: #666666">=</span>(<span style="color: #666666">-</span>b<span style="color: #666666">+</span>sqrt(disc))<span style="color: #666666">/</span>(<span style="color: #666666">3.0*</span>a);
+	}
+	<span style="color: #008000; font-weight: bold">if</span> (tmplam<span style="color: #666666">&gt;0.5*</span>alam)
+	  tmplam<span style="color: #666666">=0.5*</span>alam;
+      }
+    }
+    alam2<span style="color: #666666">=</span>alam;
+    f2 <span style="color: #666666">=</span> <span style="color: #666666">*</span>f;
+    fold2<span style="color: #666666">=</span>fold;
+    alam<span style="color: #666666">=</span>FMAX(tmplam,<span style="color: #666666">0.1*</span>alam);
+  }
+}
+<span style="color: #BC7A00">#undef ALF</span>
+<span style="color: #BC7A00">#undef TOLX</span>
 </pre></div>
 <p>
 </div>
