@@ -1,0 +1,495 @@
+%%
+%% Automatically generated file from DocOnce source
+%% (https://github.com/hplgit/doconce/)
+%%
+%%
+% #ifdef PTEX2TEX_EXPLANATION
+%%
+%% The file follows the ptex2tex extended LaTeX format, see
+%% ptex2tex: http://code.google.com/p/ptex2tex/
+%%
+%% Run
+%%      ptex2tex myfile
+%% or
+%%      doconce ptex2tex myfile
+%%
+%% to turn myfile.p.tex into an ordinary LaTeX file myfile.tex.
+%% (The ptex2tex program: http://code.google.com/p/ptex2tex)
+%% Many preprocess options can be added to ptex2tex or doconce ptex2tex
+%%
+%%      ptex2tex -DMINTED myfile
+%%      doconce ptex2tex myfile envir=minted
+%%
+%% ptex2tex will typeset code environments according to a global or local
+%% .ptex2tex.cfg configure file. doconce ptex2tex will typeset code
+%% according to options on the command line (just type doconce ptex2tex to
+%% see examples). If doconce ptex2tex has envir=minted, it enables the
+%% minted style without needing -DMINTED.
+% #endif
+
+% #define PREAMBLE
+
+% #ifdef PREAMBLE
+%-------------------- begin preamble ----------------------
+
+\documentclass[%
+oneside,                 % oneside: electronic viewing, twoside: printing
+final,                   % draft: marks overfull hboxes, figures with paths
+10pt]{article}
+
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{relsize,makeidx,color,setspace,amsmath,amsfonts,amssymb}
+\usepackage[table]{xcolor}
+\usepackage{bm,ltablex,microtype}
+
+\usepackage[pdftex]{graphicx}
+
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{lmodern}         % Latin Modern fonts derived from Computer Modern
+
+% Hyperlinks in PDF:
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=black,
+    filecolor=black,
+    %filecolor=blue,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+    }
+%\hyperbaseurl{}   % hyperlinks are relative to this root
+
+\setcounter{tocdepth}{2}  % levels in table of contents
+
+% --- fancyhdr package for fancy headers ---
+\usepackage{fancyhdr}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[LE,RO]{\thepage}
+% Ensure copyright on titlepage (article style) and chapter pages (book style)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2018, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+%  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+% Ensure copyright on titlepages with \thispagestyle{empty}
+\fancypagestyle{empty}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2018, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+
+\pagestyle{fancy}
+
+
+% prevent orhpans and widows
+\clubpenalty = 10000
+\widowpenalty = 10000
+
+% --- end of standard preamble for documents ---
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+\usepackage[totoc]{idxlayout}   % for index in the toc
+\usepackage[nottoc]{tocbibind}  % for references/bibliography in the toc
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+% matching end for #ifdef PREAMBLE
+% #endif
+
+\newcommand{\exercisesection}[1]{\subsection*{#1}}
+
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\thispagestyle{empty}
+
+\begin{center}
+{\LARGE\bf
+\begin{spacing}{1.25}
+Project 2, The restricted Boltzmannn machine applied to the quantum many body problem. Deadline June 1  
+\end{spacing}
+}
+\end{center}
+
+% ----------------- author(s) -------------------------
+
+\begin{center}
+{\bf \href{{http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html}}{Computational Physics II FYS4411/FYS9411}}
+\end{center}
+
+    \begin{center}
+% List of all institutions:
+\centerline{{\small Department of Physics, University of Oslo, Norway}}
+\end{center}
+    
+% ----------------- end author(s) -------------------------
+
+% --- begin date ---
+\begin{center}
+Mar 17, 2018
+\end{center}
+% --- end date ---
+
+\vspace{1cm}
+
+
+\subsection{Introduction}
+The idea of representing the wave function with
+a restricted Boltzmann machine (RBM) was semented by G. Carleo and
+M. Troyer, Science Vol. 355, Issue 6325, pp. 602-606 (2017). They
+named such a wave function/network a \textit{neural network quantum
+state} (NQS). In their article they apply it to the quantum mechanical
+spin lattice systems of the Ising model and Heisenberg model, with
+encouraging results. To further test the applicability of RBM's to
+quanutm mechanics we will in this project apply it to systems of
+moving particles. Thus, while the mentioned article looks to model
+discrete spin values of "up" and "down", in this project we aim to
+model the continuous values of particle positions.
+
+
+
+
+\subsection{Theoretical background and description of the physical system}
+We consider a system of electrons confined in a pure two-dimensional 
+isotropic harmonic oscillator potential, with an idealized  total Hamiltonian given by
+\begin{equation}
+\label{eq:finalH}
+\hat{H}=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right)+\sum_{i<j}\frac{1}{r_{ij}},
+\end{equation}
+where natural units ($\hbar=c=e=m_e=1$) are used and all energies are in so-called atomic units a.u. We will study systems of many electrons $N$ as functions of the oscillator frequency  $\omega$ using the above Hamiltonian.  The Hamiltonian includes a standard harmonic oscillator part
+\begin{equation*}
+\hat{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),
+\end{equation*}
+and the repulsive interaction between two electrons given by
+\begin{equation*}
+\hat{H}_1=\sum_{i<j}\frac{1}{r_{ij}},
+\end{equation*}
+with the distance between electrons given by $r_{ij}=\vert \bm{r}_1-\bm{r}_2\vert$. We define the 
+modulus of the positions of the electrons (for a given electron $i$) as $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$.
+
+In these exercises we will deal only with a system of
+two electrons in a quantum dot with a frequency of $\hbar\omega = 1$. 
+The reason for this is that we have exact closed form expressions 
+for the ground state energy from Taut's work for selected values of $\omega$, 
+see M. Taut, Phys. Rev. A \textbf{48}, 3561 (1993).
+The energy is given by $3$ a.u.  (atomic units) when the interaction between the electrons is included.
+If only the harmonic oscillator part of the Hamiltonian is included,
+the so-called unperturbed part,
+\begin{equation*} 
+\hat{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),
+\end{equation*}
+the energy is $2$ a.u.
+The wave function for one electron in an oscillator potential in two dimensions is
+\begin{equation*}
+\phi_{n_x,n_y}(x,y) = A H_{n_x}(\sqrt{\omega}x)H_{n_y}(\sqrt{\omega}y)\exp{(-\omega(x^2+y^2)/2}.
+\end{equation*}
+The functions $H_{n_x}(\sqrt{\omega}x)$ are so-called Hermite polynomials  while $A$ is a normalization constant. 
+For the lowest-lying state we have $n_x=n_y=0$ and an energy $\epsilon_{n_x,n_y}=\omega(n_x+n_y+1) = \omega$.
+Convince yourself that the lowest-lying energy for the two-electron system  is simply $2\omega$.
+
+The unperturbed wave function for the ground state of the two-electron system is given by
+\begin{equation*}
+\Phi(\bm{r}_1,\bm{r}_2) = C\exp{\left(-\omega(r_1^2+r_2^2)/2\right)},
+\end{equation*}
+with $C$ being a normalization constant and $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$. Note that the vector $\bm{r}_i$ 
+refers to the $x$ and $y$ position for a given particle.
+What is the total spin of this wave function? Find arguments for why the ground state should have
+this specific total spin. 
+
+
+\paragraph{Representing the wave function with a neural network.}
+Our neural network of choice is the restricted Boltzmann machine. It
+is a two layer net where one is called the layer of visible nodes and
+the other the layer of hidden nodes. It is called restricted because
+there are no connections between nodes in the same layer. Meaning
+there's only a connection between two nodes if one is visible and the
+other hidden. These type of networks constitue the building blocks of
+the deep belief networks, which some might have heard of. The RBM is a
+generative network, meaning that the idea is for it to learn a
+\textit{probability distribution}. Thus the network does not produce
+an output directly, but a probability distribution from which we can
+generate an output. In our case this distribution corresponds to the
+wave function and the output we wish to generate are the positions
+taken by the particles in our system.
+
+Some might have heard that neural networks are referred to as falling
+under either supervised or unsupervised learning. Here we are not
+working with training data, thus it is not supervised. It's rather
+called reinforcement learning. From the variational principle we know
+that the NQS wave fucntion represents the ground state once the
+quantum mechanical energy is minimized. This information is used to
+optimize the weights and biases of the network.
+
+For more information and practical guides to the RBM, check out the links in the literature section.
+
+When working with the restricted Boltzmann machine we are given the joint probability distribution between the hidden and visible nodes.
+
+\paragraph{Restricted Boltzmann Machine (RBM).}
+The joint probability distribution is defined as 
+\begin{align}
+	F_{rbm}(\mathbf{X},\mathbf{H}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{X},\mathbf{H})}
+\end{align}
+where $Z$ is the partition function/normalization constant
+\begin{align}
+	Z = \int \int \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})} \diff \mathbf{x} \diff \mathbf{h}
+\end{align}
+
+It is common to ignore $T_0$ by setting it to one. Here $E$ is known
+as the energy of a configuration of the nodes. Do not confuse this
+with the energy of the quantum mechanical system. Here it is a
+function which gives the specifics of the relation between the hidden
+and visible nodes. Different versions of RBMs will implement the
+energy function differently.
+
+\paragraph{Gaussian-Binary RBM.}
+The original and most common version of an RBM is called "binary-binary", meaning both visible and hidden nodes only take on binary values. In our case we wish to model continuous values (positions), thus the visible nodes should be continuous. We therefore choose an RBM called "Gaussian-binary". 
+\begin{align}
+	E(\mathbf{X}, \mathbf{H}) = \sum_i^M \frac{(X_i - a_i)^2}{2\sigma_i^2} - \sum_j^N b_j H_j - \sum_{i,j}^{M,N} \frac{X_i w_{ij} H_j}{\sigma_i^2} 
+\end{align}
+If $\sigma_i = \sigma$ then
+\begin{align}
+	E(\mathbf{V}, \mathbf{H})= \frac{||\mathbf{X} - \mathbf{a}||^2}{2\sigma^2} - \mathbf{b}^T \mathbf{H} - \frac{\mathbf{X}^T \mathbf{W} \mathbf{H}}{\sigma^2}
+\end{align}
+Here $\mathbf{X}$ are the visible nodes (the position coordinates), $\mathbf{H}$ are the hidden nodes, $\mathbf{a}$ are the visible biases, $\mathbf{b}$ are the hidden biases and $\mathbf{W}$ is a matrix containing the weights characterizing the connection of each visible node to a hidden node.
+
+\paragraph{The Wave Function.}
+To find the marginal probability $F_{rbm}(X)$ we set:
+\begin{align}
+	F_{rbm}(\mathbf{X}) &= \sum_\mathbf{h} F_{rbm}(\mathbf{X}, \mathbf{h}) \\
+				&= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{X}, \mathbf{h})}
+\end{align}
+This is used to represent the wave function:
+\begin{align}
+\Psi (\mathbf{X}) &= F_{rbm}(\mathbf{X}) \\
+&= \frac{1}{Z}\sum_{\{h_j\}} e^{-E(\mathbf{X}, \mathbf{h})} \\
+&= \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{X_i w_{ij} h_j}{\sigma^2}} \\
+&= \frac{1}{Z} e^{-\sum_i^M \frac{(X_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}) \\
+\end{align}
+
+\paragraph{The Monte Carlo procedure.}
+In many aspects, the procedure of optimizing the NQS wave function
+will be very similar to the VMC method in project one. However, it
+requires a heavier emphasis on the minimization process. Whereas in
+project one you only had one or two parameters to optimize and could
+even determine them analytically, in this situation the biases and
+weights quickly add up to a high number of parameters to optimize, and
+it's hard, if possible, to determine them analytically. Thus
+minimizing the quantum mechanical energy and optimizing the parameters
+is important from the beginning. Still, the structure of the process
+is similar. You set up an initial guess of the NQS wave function by
+giving the weights and biases random, preferably small values. The
+process then follows the same structure as the VMC method.
+
+
+\paragraph{Project 2 a): Analytical expressions.}
+Once again you should start by analytically determining the local energy, given by
+\begin{align}
+	E_L = \frac{1}{\Psi} \hat{\mathbf{H}} \Psi
+\end{align}
+using the NQS $\Psi$ and the Hamiltonian as defined earlier.
+
+If your minimization method of choice is for example stochastic gradient descent (when using this method for neural network training, the step size is often referred to as the learning rate), you will also need the gradient of the local energy with respect to the RBM parameters $\mathbf{\alpha}$ ($\mathbf{a}$, $\mathbf{b}$ and $\mathbf{W}$). It is given by
+\begin{align}
+	G_i = \frac{\partial \langle E_L \rangle}{\partial \alpha_i}
+	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} \rangle )
+\end{align}
+where $\alpha_i = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{MN}$.
+
+In addition to $E_L$ then you will also need to find the expression for
+$\frac{\partial \Psi}{\partial \alpha_i}$.
+
+You see here that the visible nodes (the position coordinates) and the corresponding visible biases are vectors of length $M$. The hidden nodes and the corresponding hidden biases are vectors of length $N$. The weight matrix is of size $M\times N$. While the number of hidden nodes (that is, $N$) is your own choice and should be experimented with, the number of visible nodes ($M$) should correspond to the number of particles ($P$) and the number of dimensions ($D$) in the system, that is $M = P \cdot D$.
+
+
+\paragraph{Project 2 b): Initial code.}
+Now implement the code. The structure of the code (how you organize
+your classes) can (probably) imitate what you did in project 1.  Use
+standard Metropolis sampling and ignore interaction. This means
+excluding the repulsive interaction from your Hamiltonian and local
+energy calculations. In this case the analytically correct energy of
+the system is given by $E=\frac{1}{2}P\cdot D$.  Optimize the NQS and
+compute the energy of 1 particle in 1D with 2 hidden units as
+accurately as you can. Experiment with the learning rate. What
+precision do you achieve?  Eventually you may also experiment with
+changing the number of hidden units. Document your findings.
+
+\paragraph{Project 2 c): Importance sampling.}
+Add importance sampling to improve your method. Document the results and compare them to the brute force method.
+
+\paragraph{Project 2 d): Statistical analysis.}
+Include a proper statistical analysis by use of the blocking method for your results.
+
+\paragraph{Project 2 e): From Metropolis to Gibbs sampling.}
+For a system such as the one we currently study, where we know that
+the wave function is positive definite, we may use a sampling method
+called Gibbs sampling. In this case we represent the wave function as
+$\Psi(x) = \sqrt(F_{rbm})$ rather than $\Psi(x) = F_{rbm}(x)$.
+
+In this method we sample from the joint probability of $\mathbf{x}$ and
+$\mathbf{h}$, in the form of a two step sampling process. The samples $\mathbf{x}$
+by themselves then model the probability density $|\Psi(\mathbf{x})|^2$ as we
+wish.  The updated samples are generated according to the conditional
+probabilities $P(X_i|\mathbf{h})$ and $P(H_j|\mathbf{x})$ respectively and accepted
+with the probability of $1$.
+
+\begin{align}
+	P(X_i|\mathbf{h}) &= \mathcal{N}(X_i; a_i+\mathbf{w}_{i*} \mathbf{h}, \sigma^2) \\
+	P(\mathbf{X}|\mathbf{h}) &= \prod_i^M \mathcal{N}(X_i; a_i+\mathbf{w}_{i*} \mathbf{h}, \sigma^2) \\
+	&= \mathcal{N} (\mathbf{X}; \mathbf{a}+\mathbf{W}\mathbf{h},\sigma^2)
+\end{align}
+and 
+\begin{align}
+	P(H_j|\mathbf{x}) &= \frac{e^{(b_j+\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2})H_j}}{\sum_{h_j}e^{(b_j+\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2})h_j}} \\
+	&= \frac{e^{(b_j+\frac{\mathbf{v}^T\mathbf{w}_{*j}}{\sigma^2})H_j}}{1+e^{b_j+\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2}}} \\
+	P(\mathbf{H}|\mathbf{x}) &= \prod_j^N \frac{e^{(b_j+\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2})H_j}}{1+e^{b_j+\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2}}} \\
+\end{align}
+Meaning
+\begin{align}
+	P(H_j=1|\mathbf{x}) &= \frac{e^{b_j+\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2}}}{1+e^{b_j+\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2}}} \\
+	&= \frac{1}{1+e^{-b_j-\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2}}} \\
+	P(H_j=0|\mathbf{x}) &= \frac{1}{1+e^{b_j+\frac{\mathbf{x}^T\mathbf{w}_{*j}}{\sigma^2}}} 
+\end{align}
+Recalculate the values needed for the local energy and its gradient with the form of the wave function given by $\Psi(x) = \sqrt(F_{rbm})$.
+
+\paragraph{Project 2 f): Gibbs sampling}
+Implement a Gibbs sampling method as an alternative to the Metropolis sampling. Reproduce the energy of the same system as in b), document your results. Again experiment with the learning rate and the number of hidden values. Experiment with changing the $\sigma$ of the neural netwrok. Comment. Eventually you may increase the number of particles and dimensions. Do the produced energy compare well with the analytical values?
+
+\paragraph{Project 2 g): Interaction.}
+Include the interaction. Remember that for the interacting case we
+have an analytical answer when we look at two particles in two
+dimensions (the energy shoud be 3 a.u.). Also, in the interacting case
+it does not make sense to look at more than two particles since we are
+currently looking at fermions and have not accounted for the Pauli
+exclusion principle.  As before, experiment with the learning rate and
+number of hidden values and document how well the network reproduces
+the analytical value.
+
+\paragraph{Project 2 h): Analyze and interpret the results for the two-electron system.}
+Using the NQS that gave the best results in e), compute the mean
+distance $r_{12}=\vert \bm{r}_1-\bm{r}_2\vert$ (with $r_i =
+\sqrt{r_{i_x}^2+r_{i_y}^2}$) between the two electrons. Compute also
+the one body density. Compute also the expectation value of the
+kinetic energy and potential energy using $\omega=0.01$,
+$\omega=0.05$, $\omega=0.1$, $\omega=0.5$ and $\omega=1.0$. Comment
+your results. Hint, think of the virial theorem.
+
+
+
+\paragraph{Literature.}
+\begin{enumerate}
+ \item \href{{https://journals.aps.org/pra/abstract/10.1103/PhysRevA.48.3561}}{M. Taut, Phys. Rev. A \textbf{48}, 3561 - 3566 (1993)}
+
+ \item \href{{http://science.sciencemag.org/content/355/6325/602}}{G. Carleo and M. Troyer, Science \textbf{355}, Issue 6325, pp. 602-606 (2017)}
+
+ \item \href{{https://deeplearning4j.org/restrictedboltzmannmachine}}{See notes on Deep Learning}
+
+ \item \href{{https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf}}{More notes on Deep learning}
+\end{enumerate}
+
+\noindent
+\subsection{Introduction to numerical projects}
+
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+
+\begin{itemize}
+  \item Give a short description of the nature of the problem and the eventual  numerical methods you have used.
+
+  \item Describe the algorithm you have used and/or developed. Here you may find it convenient to use pseudocoding. In many cases you can describe the algorithm in the program itself.
+
+  \item Include the source code of your program. Comment your program properly.
+
+  \item If possible, try to find analytic solutions, or known limits in order to test your program when developing the code.
+
+  \item Include your results either in figure form or in a table. Remember to label your results. All tables and figures should have relevant captions and labels on the axes.
+
+  \item Try to evaluate the reliabilty and numerical stability/precision of your results. If possible, include a qualitative and/or quantitative discussion of the numerical stability, eventual loss of precision etc.
+
+  \item Try to give an interpretation of you results in your answers to  the problems.
+
+  \item Critique: if possible include your comments and reflections about the  exercise, whether you felt you learnt something, ideas for improvements and  other thoughts you've made when solving the exercise. We wish to keep this course at the interactive level and your comments can help us improve it.
+
+  \item Try to establish a practice where you log your work at the  computerlab. You may find such a logbook very handy at later stages in your work, especially when you don't properly remember  what a previous test version  of your program did. Here you could also record  the time spent on solving the exercise, various algorithms you may have tested or other topics which you feel worthy of mentioning.
+\end{itemize}
+
+\noindent
+\subsection{Format for electronic delivery of report and programs}
+
+The preferred format for the report is a PDF file. You can also use DOC or postscript formats or as an ipython notebook file.  As programming language we prefer that you choose between C/C++, Fortran2008 or Python. The following prescription should be followed when preparing the report:
+
+\begin{itemize}
+  \item Use Devilry to hand in your projects, log in  at  \href{{http://devilry.ifi.uio.no}}{\nolinkurl{http://devilry.ifi.uio.no}} with your normal UiO username and password.
+
+  \item Upload \textbf{only} the report file!  For the source code file(s) you have developed please provide us with your link to your github domain.  The report file should include all of your discussions and a list of the codes you have developed.  The full version of the codes should be in your github repository.
+
+  \item In your github repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.
+
+  \item Still in your github make a folder where you place your codes. 
+
+  \item In this and all later projects, you should include tests (for example unit tests) of your code(s).
+
+  \item Comments  from us on your projects, approval or not, corrections to be made  etc can be found under your Devilry domain and are only visible to you and the teachers of the course.
+\end{itemize}
+
+\noindent
+Finally, 
+we encourage you to work two and two together. Optimal working groups consist of 
+2-3 students. You can then hand in a common report. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% ------------------- end of main content ---------------
+
+% #ifdef PREAMBLE
+\end{document}
+% #endif
+
