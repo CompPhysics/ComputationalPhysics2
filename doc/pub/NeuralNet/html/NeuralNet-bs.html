@@ -1,0 +1,599 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/hplgit/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="description" content="Restricted Boltzmann Machine applied to Quantum Mechanical Problems">
+
+<title>Restricted Boltzmann Machine applied to Quantum Mechanical Problems</title>
+
+<!-- Bootstrap style: bootstrap -->
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<!-- not necessary
+<link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+-->
+
+<style type="text/css">
+
+/* Add scrollbar to dropdown menus in bootstrap navigation bar */
+.dropdown-menu {
+   height: auto;
+   max-height: 400px;
+   overflow-x: hidden;
+}
+
+/* Adds an invisible element before each target to offset for the navigation
+   bar */
+.anchor::before {
+  content:"";
+  display:block;
+  height:50px;      /* fixed header height for style bootstrap */
+  margin:-50px 0 0; /* negative fixed header height */
+}
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [('What is Machine Learning?', 2, None, '___sec0'),
+              ('Types of Machine Learning', 2, None, '___sec1'),
+              ('Artificial neurons', 2, None, '___sec2'),
+              ('Neural network types', 2, None, '___sec3'),
+              ('Feed-forward neural networks', 2, None, '___sec4'),
+              ('Recurrent neural networks', 2, None, '___sec5'),
+              ('Other types of networks', 2, None, '___sec6'),
+              ('Multilayer perceptrons', 2, None, '___sec7'),
+              ('Why multilayer perceptrons?', 2, None, '___sec8'),
+              ('Mathematical model', 2, None, '___sec9'),
+              ('Mathematical model', 2, None, '___sec10'),
+              ('Mathematical model', 2, None, '___sec11'),
+              ('Mathematical model', 2, None, '___sec12'),
+              ('Mathematical model', 2, None, '___sec13'),
+              ('Matrix-vector notation', 3, None, '___sec14'),
+              ('Matrix-vector notation  and activation', 3, None, '___sec15'),
+              ('Activation functions', 3, None, '___sec16'),
+              ('Activation functions, Logistic and Hyperbolic ones',
+               3,
+               None,
+               '___sec17'),
+              ('Relevance', 3, None, '___sec18')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- Bootstrap navigation bar -->
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="NeuralNet-bs.html">Restricted Boltzmann Machine applied to Quantum Mechanical Problems</a>
+  </div>
+
+  <div class="navbar-collapse collapse navbar-responsive-collapse">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+     <!-- navigation toc: --> <li><a href="#___sec0" style="font-size: 80%;"><b>What is Machine Learning?</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec1" style="font-size: 80%;"><b>Types of Machine Learning</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec2" style="font-size: 80%;"><b>Artificial neurons</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec3" style="font-size: 80%;"><b>Neural network types</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec4" style="font-size: 80%;"><b>Feed-forward neural networks</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec5" style="font-size: 80%;"><b>Recurrent neural networks</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec6" style="font-size: 80%;"><b>Other types of networks</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec7" style="font-size: 80%;"><b>Multilayer perceptrons</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec8" style="font-size: 80%;"><b>Why multilayer perceptrons?</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec9" style="font-size: 80%;"><b>Mathematical model</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec10" style="font-size: 80%;"><b>Mathematical model</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec11" style="font-size: 80%;"><b>Mathematical model</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec12" style="font-size: 80%;"><b>Mathematical model</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec13" style="font-size: 80%;"><b>Mathematical model</b></a></li>
+     <!-- navigation toc: --> <li><a href="#___sec14" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Matrix-vector notation</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec15" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Matrix-vector notation  and activation</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec16" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Activation functions</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec17" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Activation functions, Logistic and Hyperbolic ones</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec18" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Relevance</a></li>
+
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+</div> <!-- end of navigation bar -->
+
+<div class="container">
+
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
+
+<!-- ------------------- main content ---------------------- -->
+
+
+
+<div class="jumbotron">
+<center><h1>Restricted Boltzmann Machine applied to Quantum Mechanical Problems</h1></center>  <!-- document title -->
+
+<p>
+<!-- author(s): Morten Hjorth-Jensen -->
+
+<center>
+<b>Morten Hjorth-Jensen</b> [1, 2]
+</center>
+
+<p>
+<!-- institution(s) -->
+
+<center>[1] <b>Department of Physics, University of Oslo</b></center>
+<center>[2] <b>Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University</b></center>
+<br>
+<p>
+<center><h4>Mar 22, 2018</h4></center> <!-- date -->
+<br>
+<p>
+<!-- potential-jumbotron-button -->
+</div> <!-- end jumbotron -->
+
+<!-- !split -->
+
+<h2 id="___sec0" class="anchor">What is Machine Learning? </h2>
+
+<p>
+Machine learning is the science of giving computers the ability to learn without being explicitly programmed. 
+The idea is that there exist generic algorithms which can be used to find patterns in a broad class of data sets without 
+having to write code specifically for each problem. The algorithm will build its own logic based on the data.
+
+<p>
+Machine learning is a subfield of computer science, and is closely related to computational statistics. 
+It evolved from the study of pattern recognition in artificial intelligence (AI) research, and has made contributions to
+AI tasks like computer vision, natural language processing 
+and speech recognition. It has also, especially in later years, 
+found applications in a wide variety of other areas, including bioinformatics, economy, physics, finance and marketing.
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec1" class="anchor">Types of Machine Learning </h2>
+
+<p>
+The approaches to machine learning are many, but are often split into two main categories. 
+In <em>supervised learning</em> we know the answer to a problem,
+and let the computer deduce the logic behind it. On the other hand, <em>unsupervised learning</em>
+is a method for finding patterns and relationship in data sets without any prior knowledge of the system.
+Some authours also operate with a third category, namely <em>reinforcement learning</em>. This is a paradigm 
+of learning inspired by behavioural psychology, where learning is achieved by trial-and-error, 
+solely from rewards and punishment.
+
+<p>
+Another way to categorize machine learning tasks is to consider the desired output of a system.
+Some of the most common tasks are:
+
+<ul>
+  <li> Classification: Outputs are divided into two or more classes. The goal is to   produce a model that assigns inputs into one of these classes. An example is to identify  digits based on pictures of hand-written ones. Classification is typically supervised learning.</li>
+  <li> Regression: Finding a functional relationship between an input data set and a reference data set.   The goal is to construct a function that maps input data to continuous output values.</li>
+  <li> Clustering: Data are divided into groups with certain common traits, without knowing the different groups beforehand.  It is thus a form of unsupervised learning.</li>
+</ul>
+
+<!-- !split -->
+
+<h2 id="___sec2" class="anchor">Artificial neurons  </h2>
+The field of artificial neural networks has a long history of development, and is closely connected with 
+the advancement of computer science and computers in general. A model of artificial neurons 
+was first developed by McCulloch and Pitts in 1943  to study signal processing in the brain and 
+has later been refined by others. The general idea is to mimic neural networks in the human brain, which
+is composed of billions of neurons that communicate with each other by sending electrical signals. 
+Each neuron accumulates its incoming signals, 
+which must exceed an activation threshold to yield an output. If the threshold is not overcome, the neuron
+remains inactive, i.e. has zero output.
+
+<p>
+This behaviour has inspired a simple mathematical model for an artificial neuron.
+
+$$
+\begin{equation}
+ y = f\left(\sum_{i=1}^n w_ix_i\right) = f(u)
+\label{artificialNeuron}
+\end{equation}
+$$
+
+Here, the output \( y \) of the neuron is the value of its activation function, which have as input
+a weighted sum of signals \( x_i, \dots ,x_n \) received by \( n \) other neurons.
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec3" class="anchor">Neural network types </h2>
+
+<p>
+An artificial neural network (NN), is a computational model that consists of layers of connected neurons, or <em>nodes</em>. 
+It is supposed to mimic a biological nervous system by letting each neuron interact with other neurons
+by sending signals in the form of mathematical functions between layers. 
+A wide variety of different NNs have
+been developed, but most of them consist of an input layer, an output layer and eventual layers in-between, called
+<em>hidden layers</em>. All layers can contain an arbitrary number of nodes, and each connection between two nodes
+is associated with a weight variable.
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec4" class="anchor">Feed-forward neural networks </h2>
+The feed-forward neural network (FFNN) was the first and simplest type of NN devised. In this network, 
+the information moves in only one direction: forward through the layers.
+
+<p>
+Nodes are represented by circles, while the arrows display the connections between the nodes, including the 
+direction of information flow. Additionally, each arrow corresponds to a weight variable, not displayed here. 
+We observe that each node in a layer is connected to <em>all</em> nodes in the subsequent layer, 
+making this a so-called <em>fully-connected</em> FFNN.
+
+<p>
+A different variant of FFNNs are <em>convolutional neural networks</em> (CNNs), which have a connectivity pattern
+inspired by the animal visual cortex. Individual neurons in the visual cortex only respond to stimuli from
+small sub-regions of the visual field, called a receptive field. This makes the neurons well-suited to exploit the strong
+spatially local correlation present in natural images. The response of each neuron can be approximated mathematically 
+as a convolution operation.
+
+<p>
+CNNs emulate the behaviour of neurons in the visual cortex by enforcing a <em>local</em> connectivity pattern
+between nodes of adjacent layers: Each node
+in a convolutional layer is connected only to a subset of the nodes in the previous layer, 
+in contrast to the fully-connected FFNN.
+Often, CNNs 
+consist of several convolutional layers that learn local features of the input, with a fully-connected layer at the end, 
+which gathers all the local data and produces the outputs. They have wide applications in image and video recognition
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec5" class="anchor">Recurrent neural networks </h2>
+
+<p>
+So far we have only mentioned NNs where information flows in one direction: forward. <em>Recurrent neural networks</em> on
+the other hand, have connections between nodes that form directed <em>cycles</em>. This creates a form of 
+internal memory which are able to capture information on what has been calculated before; the output is dependent 
+on the previous computations. Recurrent NNs make use of sequential information by performing the same task for 
+every element in a sequence, where each element depends on previous elements. An example of such information is 
+sentences, making recurrent NNs especially well-suited for handwriting and speech recognition.
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec6" class="anchor">Other types of networks </h2>
+
+<p>
+There are many other kinds of NNs that have been developed. One type that is specifically designed for interpolation
+in multidimensional space is the radial basis function (RBF) network. RBFs are typically made up of three layers: 
+an input layer, a hidden layer with non-linear radial symmetric activation functions and a linear output layer (''linear'' here
+means that each node in the output layer has a linear activation function). The layers are normally fully-connected and 
+there are no cycles, thus RBFs can be viewed as a type of fully-connected FFNN. They are however usually treated as
+a separate type of NN due the unusual activation functions.
+
+<p>
+Other types of NNs could also be mentioned, but are outside the scope of this work. We will now move on to a detailed description
+of how a fully-connected FFNN works, and how it can be used to interpolate data sets.
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec7" class="anchor">Multilayer perceptrons  </h2>
+
+<p>
+One use often so-called  fully-connected feed-forward neural networks with three
+or more layers (an input layer, one or more hidden layers and an output layer)
+consisting of neurons that have non-linear activation functions.
+
+<p>
+Such networks are often called <em>multilayer perceptrons</em> (MLPs)
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec8" class="anchor">Why multilayer perceptrons?  </h2>
+
+<p>
+According to the <em>Universal approximation theorem</em>, a feed-forward neural network with just a single hidden layer containing 
+a finite number of neurons can approximate a continuous multidimensional function to arbitrary accuracy, 
+assuming the activation function for the hidden layer is a <b>non-constant, bounded and monotonically-increasing continuous function</b>.
+Note that the requirements on the activation function only applies to the hidden layer, the output nodes are always
+assumed to be linear, so as to not restrict the range of output values.
+
+<p>
+We note that this theorem is only applicable to a NN with <em>one</em> hidden layer. 
+Therefore, we can easily construct an NN 
+that employs activation functions which do not satisfy the above requirements, as long as we have at least one layer
+with activation functions that <em>do</em>. Furthermore, although the universal approximation theorem
+lays the theoretical foundation for regression with neural networks, it does not say anything about how things work in practice: 
+A neural network can still be able to approximate a given function reasonably well without having the flexibility to fit <em>all other</em>
+functions.
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec9" class="anchor">Mathematical model  </h2>
+
+$$
+\begin{equation}
+ y = f\left(\sum_{i=1}^n w_ix_i + b_i\right) = f(u)
+\label{artificialNeuron2}
+\end{equation}
+$$
+
+In an FFNN of such neurons, the <em>inputs</em> \( x_i \)
+are the <em>outputs</em> of the neurons in the preceding layer. Furthermore, an MLP is fully-connected, 
+which means that each neuron receives a weighted sum of the outputs of <em>all</em> neurons in the previous layer.
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec10" class="anchor">Mathematical model  </h2>
+
+<p>
+First, for each node \( i \) in the first hidden layer, we calculate a weighted sum \( u_i^1 \) of the input coordinates \( x_j \),
+
+$$
+\begin{equation}
+ u_i^1 = \sum_{j=1}^2 w_{ij}^1 x_j  + b_i^1 
+\label{_auto1}
+\end{equation}
+$$
+
+This value is the argument to the activation function \( f_1 \) of each neuron \( i \),
+producing the output \( y_i^1 \) of all neurons in layer 1,
+
+$$
+\begin{equation}
+ y_i^1 = f_1(u_i^1) = f_1\left(\sum_{j=1}^2 w_{ij}^1 x_j  + b_i^1\right)
+\label{outputLayer1}
+\end{equation}
+$$
+
+where we assume that all nodes in the same layer have identical activation functions, hence the notation \( f_l \)
+
+$$
+\begin{equation}
+ y_i^l = f_l(u_i^l) = f_l\left(\sum_{j=1}^{N_{l-1}} w_{ij}^l y_j^{l-1} + b_i^l\right)
+\label{generalLayer}
+\end{equation}
+$$
+
+where \( N_l \) is the number of nodes in layer \( l \). When the output of all the nodes in the first hidden layer are computed,
+the values of the subsequent layer can be calculated and so forth until the output is obtained.
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec11" class="anchor">Mathematical model  </h2>
+
+<p>
+The output of neuron \( i \) in layer 2 is thus,
+
+$$
+\begin{align}
+ y_i^2 &= f_2\left(\sum_{j=1}^3 w_{ij}^2 y_j^1 + b_i^2\right) 
+\label{_auto2}\\
+ &= f_2\left[\sum_{j=1}^3 w_{ij}^2f_1\left(\sum_{k=1}^2 w_{jk}^1 x_k + b_j^1\right) + b_i^2\right]
+\label{outputLayer2}
+\end{align}
+$$
+
+where we have substituted \( y_m^1 \) with. Finally, the NN output yields,
+
+$$
+\begin{align}
+ y_1^3 &= f_3\left(\sum_{j=1}^3 w_{1m}^3 y_j^2 + b_1^3\right) 
+\label{_auto3}\\
+ &= f_3\left[\sum_{j=1}^3 w_{1j}^3 f_2\left(\sum_{k=1}^3 w_{jk}^2 f_1\left(\sum_{m=1}^2 w_{km}^1 x_m + b_k^1\right) + b_j^2\right)
+  + b_1^3\right]
+\label{_auto4}
+\end{align}
+$$
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec12" class="anchor">Mathematical model  </h2>
+
+<p>
+We can generalize this expression to an MLP with \( l \) hidden layers. The complete functional form
+is,
+$$
+\begin{align}
+&y^{l+1}_1\! = \!f_{l+1}\!\left[\!\sum_{j=1}^{N_l}\! w_{1j}^3 f_l\!\left(\!\sum_{k=1}^{N_{l-1}}\! w_{jk}^2 f_{l-1}\!\left(\!
+ \dots \!f_1\!\left(\!\sum_{n=1}^{N_0} \!w_{mn}^1 x_n\! + \!b_m^1\!\right)
+ \!\dots \!\right) \!+ \!b_k^2\!\right)
+ \!+ \!b_1^3\!\right] &&
+\label{completeNN}
+\end{align}
+$$
+
+which illustrates a basic property of MLPs: The only independent variables are the input values \( x_n \).
+
+<p>
+<!-- !split -->
+
+<h2 id="___sec13" class="anchor">Mathematical model  </h2>
+
+<p>
+This confirms that an MLP,
+despite its quite convoluted mathematical form, is nothing more than an analytic function, specifically a 
+mapping of real-valued vectors \( \vec{x} \in \mathbb{R}^n \rightarrow \vec{y} \in \mathbb{R}^m \). 
+In our example, \( n=2 \) and \( m=1 \). Consequentially, 
+the number of input and output values of the function we want to fit must be equal to the number of inputs and outputs of our MLP.
+
+<p>
+Furthermore, the flexibility and universality of a MLP can be illustrated by realizing that 
+the expression  is essentially a nested sum of scaled activation functions of the form
+
+$$
+\begin{equation}
+ h(x) = c_1 f(c_2 x + c_3) + c_4
+\label{_auto5}
+\end{equation}
+$$
+
+where the parameters \( c_i \) are weights and biases. By adjusting these parameters, the activation functions
+can be shifted up and down or left and right, change slope or be rescaled 
+which is the key to the flexibility of a neural network.
+
+<p>
+<!-- !split -->
+
+<h3 id="___sec14" class="anchor">Matrix-vector notation </h3>
+
+We can introduce a more convenient notation for the activations in a NN.
+
+<p>
+Additionally, we can represent the biases and activations
+as layer-wise column vectors \( \vec{b}_l \) and \( \vec{y}_l \), so that the \( i \)-th element of each vector 
+is the bias \( b_i^l \) and activation \( y_i^l \) of node \( i \) in layer \( l \) respectively.
+
+<p>
+We have that \( \mathrm{W}_l \) is a \( N_{l-1} \times N_l \) matrix, while \( \vec{b}_l \) and \( \vec{y}_l \) are \( N_l \times 1 \) column vectors. 
+With this notation, the sum in  becomes a matrix-vector multiplication, and we can write
+the equation for the activations of hidden layer 2 in
+$$
+\begin{equation}
+ \vec{y}_2 = f_2(\mathrm{W}_2 \vec{y}_{1} + \vec{b}_{2}) = 
+ f_2\left(\left[\begin{array}{ccc}
+    w^2_{11} &w^2_{12} &w^2_{13} \\
+    w^2_{21} &w^2_{22} &w^2_{23} \\
+    w^2_{31} &w^2_{32} &w^2_{33} \\
+    \end{array} \right] \cdot
+    \left[\begin{array}{c}
+           y^1_1 \\
+           y^1_2 \\
+           y^1_3 \\
+          \end{array}\right] + 
+    \left[\begin{array}{c}
+           b^2_1 \\
+           b^2_2 \\
+           b^2_3 \\
+          \end{array}\right]\right).
+\label{_auto6}
+\end{equation}
+$$
+
+<p>
+<!-- !split -->
+
+<h3 id="___sec15" class="anchor">Matrix-vector notation  and activation </h3>
+
+The activation of node \( i \) in layer 2 is
+
+$$
+\begin{equation}
+ y^2_i = f_2\Bigr(w^2_{i1}y^1_1 + w^2_{i2}y^1_2 + w^2_{i3}y^1_3 + b^2_i\Bigr) = 
+ f_2\left(\sum_{j=1}^3 w^2_{ij} y_j^1 + b^2_i\right).
+\label{_auto7}
+\end{equation}
+$$
+
+This is not just a convenient and compact notation, but also 
+a useful and intuitive way to think about MLPs: The output is calculated by a series of matrix-vector multiplications
+and vector additions that are used as input to the activation functions. For each operation 
+\( \mathrm{W}_l \vec{y}_{l-1} \) we move forward one layer.
+
+<p>
+<!-- !split -->
+
+<h3 id="___sec16" class="anchor">Activation functions  </h3>
+
+<p>
+A property that characterizes a neural network, other than its connectivity, is the choice of activation function(s). 
+As described in, the following restrictions are imposed on an activation function for a FFNN
+to fulfill the universal approximation theorem
+
+<ul>
+  <li> Non-constant</li>
+  <li> Bounded</li>
+  <li> Monotonically-increasing</li>
+  <li> Continuous</li>
+</ul>
+
+<!-- !split -->
+
+<h3 id="___sec17" class="anchor">Activation functions, Logistic and Hyperbolic ones  </h3>
+
+<p>
+The second requirement excludes all linear functions. Furthermore, in a MLP with only linear activation functions, each 
+layer simply performs a linear transformation of its inputs.
+
+<p>
+Regardless of the number of layers, 
+the output of the NN will be nothing but a linear function of the inputs. Thus we need to introduce some kind of 
+non-linearity to the NN to be able to fit non-linear functions
+Typical examples are the logistic <em>Sigmoid</em>
+$$
+\begin{equation}
+ f(x) = \frac{1}{1 + e^{-x}},
+\label{sigmoidActivationFunction}
+\end{equation}
+$$
+
+and the <em>hyperbolic tangent</em> function
+$$
+\begin{equation}
+ f(x) = \tanh(x)
+\label{tanhActivationFunction}
+\end{equation}
+$$
+
+<p>
+<!-- !split -->
+
+<h3 id="___sec18" class="anchor">Relevance </h3>
+
+The <em>sigmoid</em> function are more biologically plausible because 
+the output of inactive neurons are zero. Such activation function are called <em>one-sided</em>. However,
+it has been shown  that the hyperbolic tangent 
+performs better than the sigmoid for training MLPs. 
+has become the most popular  for <em>deep neural networks</em>
+
+<p>
+
+<!-- ------------------- end of main content --------------- -->
+
+</div>  <!-- end container -->
+<!-- include javascript, jQuery *first* -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap footer
+<footer>
+<a href="http://..."><img width="250" align=right src="http://..."></a>
+</footer>
+-->
+
+
+<center style="font-size:80%">
+<!-- copyright --> &copy; 1999-2018, Morten Hjorth-Jensen. Released under CC Attribution-NonCommercial 4.0 license
+</center>
+
+
+</body>
+</html>
+    
+
