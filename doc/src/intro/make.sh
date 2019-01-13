@@ -59,8 +59,8 @@ doconce subst "% Add user's preamble" "\g<1>\n\\usepackage{simplewick}" $name.te
 doconce replace 'section{' 'section*{' $name.tex
 pdflatex -shell-escape $name
 pdflatex -shell-escape $name
-mv -f $name.pdf ${name}-minted.pdf
-cp $name.tex ${name}-plain-minted.tex
+mv -f $name.pdf ${name}-print.pdf
+cp $name.tex ${name}-plain-print.tex
 
 
 
