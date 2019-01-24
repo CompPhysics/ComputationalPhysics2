@@ -123,7 +123,7 @@ Project 1, deadline  March 22
 
 % --- begin date ---
 \begin{center}
-Jan 8, 2019
+Jan 24, 2019
 \end{center}
 % --- end date ---
 
@@ -216,7 +216,12 @@ trial wave function.
  of the trap.  The ratio of the frequencies is denoted
  $\lambda=\omega_z/\omega_{\perp}$ leading to a ratio of the trap
  lengths $(a_{\perp}/a_z)=(\omega_z/\omega_{\perp})^{\frac{1}{2}} =
- \sqrt{\lambda}$.
+ \sqrt{\lambda}$. Note that we use the shorthand notation
+\begin{align}
+    \sum_{i < j}^{N} V_{ij} \equiv \sum_{i = 1}^{N}\sum_{j = i + 1}^{N} V_{ij},
+\end{align}
+ that is, the notation $i < j$ under the summation sign signifies a double sum
+ running over all pairwise interactions once.
 
  We will represent the inter-boson interaction by a pairwise,
  repulsive potential
@@ -225,7 +230,7 @@ trial wave function.
  V_{int}(|\mathbf{r}_i-\mathbf{r}_j|) =  \Bigg\{
  \begin{array}{ll}
 	 \infty & {|\mathbf{r}_i-\mathbf{r}_j|} \leq {a}\\
-	 0 & {|\mathbf{r}_i-_r\mathbf{r}_j|} > {a}
+	 0 & {|\mathbf{r}_i-\mathbf{r}_j|} > {a}
  \end{array}
  \end{equation}
  where $a$ is the so-called hard-core diameter of the bosons.
@@ -236,7 +241,13 @@ trial wave function.
  Our trial wave function for the ground state with $N$ atoms is given by
 
 \begin{equation}
- \Psi_T(\mathbf{r})=\Psi_T(\mathbf{r}_1, \mathbf{r}_2, \dots \mathbf{r}_N,\alpha,\beta)=\prod_i g(\alpha,\beta,\mathbf{r}_i)\prod_{i<j}f(a,|\mathbf{r}_i-\mathbf{r}_j|),
+ \Psi_T(\mathbf{r})=\Psi_T(\mathbf{r}_1, \mathbf{r}_2, \dots \mathbf{r}_N,\alpha,\beta)
+ =\left[
+    \prod_i g(\alpha,\beta,\mathbf{r}_i)
+ \right]
+ \left[
+    \prod_{j<k}f(a,|\mathbf{r}_j-\mathbf{r}_k|)
+ \right],
  \label{eq:trialwf}
  \end{equation}
  where $\alpha$ and $\beta$ are variational parameters. The
@@ -290,12 +301,21 @@ trial wave function of Eq. (\ref{eq:trialwf}).
 We rewrite (and we can use the same general expressions for projects 2 and 3)
 
 \begin{equation*}
-\Psi_T(\mathbf{r})=\Psi_T(\mathbf{r}_1, \mathbf{r}_2, \dots \mathbf{r}_N,\alpha,\beta)=\prod_i g(\alpha,\beta,\mathbf{r}_i)\prod_{i<j}f(a,|\mathbf{r}_i-\mathbf{r}_j|),
+\Psi_T(\mathbf{r})=\Psi_T(\mathbf{r}_1, \mathbf{r}_2, \dots \mathbf{r}_N,\alpha,\beta)
+=\left[
+    \prod_i g(\alpha,\beta,\mathbf{r}_i)
+\right]
+\left[
+    \prod_{j<k}f(a,|\mathbf{r}_j-\mathbf{r}_k|)
+\right],
 \end{equation*}
 as
 
 \begin{equation*}
-\Psi_T(\mathbf{r})=\prod_i g(\alpha,\beta,\mathbf{r}_i)\exp{\left(\sum_{i<j}u(r_{ij})\right)}
+\Psi_T(\mathbf{r})=\left[
+    \prod_i g(\alpha,\beta,\mathbf{r}_i)
+\right]
+\exp{\left(\sum_{j<k}u(r_{jk})\right)}
 \end{equation*}
 where we have defined $r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|$
 and
@@ -307,28 +327,34 @@ with $u(r_{ij})=\ln{f(r_{ij})}$.
 We have also
 
 \begin{equation*}
-    g(\alpha,\beta,\mathbf{r}_i) = \exp{-\alpha(x_i^2+y_i^2+\beta z_i^2)}= \phi(\mathbf{r}_i).
+    g(\alpha,\beta,\mathbf{r}_i) = \exp{\left[-\alpha(x_i^2+y_i^2+\beta
+    z_i^2)\right]}= \phi(\mathbf{r}_i).
 \end{equation*}
 
 Show that the first  derivative for particle $k$ is
 
-\begin{equation*}
-  \nabla_k\Psi_T(\mathbf{r}) = \nabla_k\phi(\mathbf{r}_k)\left[\prod_{i\ne k}\phi(\mathbf{r}_i)\right]\exp{\left(\sum_{i<j}u(r_{ij})\right)}+ 
-\prod_i\phi(\mathbf{r}_i)\exp{\left(\sum_{i<j}u(r_{ij})\right)}\sum_{j\ne k}\nabla_k u(r_{ij}),
-\end{equation*}
+\begin{align*}
+  \nabla_k\Psi_T(\mathbf{r}) &= \nabla_k\phi(\mathbf{r}_k)\left[\prod_{i\ne k}\phi(\mathbf{r}_i)\right]\exp{\left(\sum_{j<m}u(r_{jm})\right)}
+  \\
+  &\qquad
+  +  \left[\prod_i\phi(\mathbf{r}_i)\right]
+  \exp{\left(\sum_{j<m}u(r_{jm})\right)}\sum_{l\ne k}\nabla_k u(r_{kl}),
+\end{align*}
 and find the final expression for our specific trial function.
 The expression for the second derivative is (show this)
 
-\begin{equation*}
-   \frac{1}{\Psi_T(\mathbf{r})}\nabla_k^2\Psi_T(\mathbf{r})=
-   \frac{\nabla_k^2\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}+
-\frac{\nabla_k\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}\left(\sum_{j\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_j)}{r_{kj}}u'(r_{ij})\right)+
-\end{equation*}
-
-\begin{equation*}
-\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}u'(r_{ki})u'(r_{kj})+
-\sum_{j\ne k}\left( u''(r_{kj})+\frac{2}{r_{kj}}u'(r_{kj})\right).
-\end{equation*}
+\begin{align*}
+   \frac{1}{\Psi_T(\mathbf{r})}\nabla_k^2\Psi_T(\mathbf{r})
+   &= \frac{\nabla_k^2\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}
+   + 2\frac{\nabla_k\phi(\mathbf{r}_k)}{\phi(\mathbf{r}_k)}
+   \left(\sum_{j\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_j)}{r_{kj}}u'(r_{ij})\right)
+   \\
+   &\qquad
+   + \sum_{i\ne k}\sum_{j \ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}u'(r_{ki})u'(r_{kj})
+   \\
+   &\qquad
+   + \sum_{j\ne k}\left( u''(r_{kj})+\frac{2}{r_{kj}}u'(r_{kj})\right).
+\end{align*}
 Use this expression to find the final second derivative entering the definition of the local energy. 
 You need to get the analytic expression for this expression using the harmonic oscillator wave functions
 and the correlation term defined in the project.
