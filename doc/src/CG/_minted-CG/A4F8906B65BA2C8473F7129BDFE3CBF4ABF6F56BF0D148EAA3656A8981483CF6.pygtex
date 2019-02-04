@@ -1,0 +1,36 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+\PYGdefault{k+kn}{import} \PYGdefault{n+nn}{autograd.numpy} \PYGdefault{k+kn}{as} \PYGdefault{n+nn}{np}
+
+\PYGdefault{c+c1}{\PYGdefaultZsh{} To do elementwise differentiation:}
+\PYGdefault{k+kn}{from} \PYGdefault{n+nn}{autograd} \PYGdefault{k+kn}{import} \PYGdefault{n}{elementwise\PYGdefaultZus{}grad} \PYGdefault{k}{as} \PYGdefault{n}{egrad}
+
+\PYGdefault{c+c1}{\PYGdefaultZsh{} To plot:}
+\PYGdefault{k+kn}{import} \PYGdefault{n+nn}{matplotlib.pyplot} \PYGdefault{k+kn}{as} \PYGdefault{n+nn}{plt}
+
+
+\PYGdefault{k}{def} \PYGdefault{n+nf}{f}\PYGdefault{p}{(}\PYGdefault{n}{x}\PYGdefault{p}{):}
+    \PYGdefault{k}{return} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{sin}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{2}\PYGdefault{o}{*}\PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{pi}\PYGdefault{o}{*}\PYGdefault{n}{x} \PYGdefault{o}{+} \PYGdefault{n}{x}\PYGdefault{o}{**}\PYGdefault{l+m+mi}{2}\PYGdefault{p}{)}
+
+\PYGdefault{k}{def} \PYGdefault{n+nf}{f\PYGdefaultZus{}grad\PYGdefaultZus{}analytic}\PYGdefault{p}{(}\PYGdefault{n}{x}\PYGdefault{p}{):}
+    \PYGdefault{k}{return} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{cos}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{2}\PYGdefault{o}{*}\PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{pi}\PYGdefault{o}{*}\PYGdefault{n}{x} \PYGdefault{o}{+} \PYGdefault{n}{x}\PYGdefault{o}{**}\PYGdefault{l+m+mi}{2}\PYGdefault{p}{)}\PYGdefault{o}{*}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{2}\PYGdefault{o}{*}\PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{pi} \PYGdefault{o}{+} \PYGdefault{l+m+mi}{2}\PYGdefault{o}{*}\PYGdefault{n}{x}\PYGdefault{p}{)}
+
+\PYGdefault{c+c1}{\PYGdefaultZsh{} Do the comparison:}
+\PYGdefault{n}{x} \PYGdefault{o}{=} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{linspace}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{,}\PYGdefault{l+m+mi}{1}\PYGdefault{p}{,}\PYGdefault{l+m+mi}{1000}\PYGdefault{p}{)}
+
+\PYGdefault{n}{f\PYGdefaultZus{}grad} \PYGdefault{o}{=} \PYGdefault{n}{egrad}\PYGdefault{p}{(}\PYGdefault{n}{f}\PYGdefault{p}{)}
+
+\PYGdefault{n}{computed} \PYGdefault{o}{=} \PYGdefault{n}{f\PYGdefaultZus{}grad}\PYGdefault{p}{(}\PYGdefault{n}{x}\PYGdefault{p}{)}
+\PYGdefault{n}{analytic} \PYGdefault{o}{=} \PYGdefault{n}{f\PYGdefaultZus{}grad\PYGdefaultZus{}analytic}\PYGdefault{p}{(}\PYGdefault{n}{x}\PYGdefault{p}{)}
+
+\PYGdefault{n}{plt}\PYGdefault{o}{.}\PYGdefault{n}{title}\PYGdefault{p}{(}\PYGdefault{l+s+s1}{\PYGdefaultZsq{}Derivative computed from Autograd compared with the analytical derivative\PYGdefaultZsq{}}\PYGdefault{p}{)}
+\PYGdefault{n}{plt}\PYGdefault{o}{.}\PYGdefault{n}{plot}\PYGdefault{p}{(}\PYGdefault{n}{x}\PYGdefault{p}{,}\PYGdefault{n}{computed}\PYGdefault{p}{,}\PYGdefault{n}{label}\PYGdefault{o}{=}\PYGdefault{l+s+s1}{\PYGdefaultZsq{}autograd\PYGdefaultZsq{}}\PYGdefault{p}{)}
+\PYGdefault{n}{plt}\PYGdefault{o}{.}\PYGdefault{n}{plot}\PYGdefault{p}{(}\PYGdefault{n}{x}\PYGdefault{p}{,}\PYGdefault{n}{analytic}\PYGdefault{p}{,}\PYGdefault{n}{label}\PYGdefault{o}{=}\PYGdefault{l+s+s1}{\PYGdefaultZsq{}analytic\PYGdefaultZsq{}}\PYGdefault{p}{)}
+
+\PYGdefault{n}{plt}\PYGdefault{o}{.}\PYGdefault{n}{xlabel}\PYGdefault{p}{(}\PYGdefault{l+s+s1}{\PYGdefaultZsq{}x\PYGdefaultZsq{}}\PYGdefault{p}{)}
+\PYGdefault{n}{plt}\PYGdefault{o}{.}\PYGdefault{n}{ylabel}\PYGdefault{p}{(}\PYGdefault{l+s+s1}{\PYGdefaultZsq{}y\PYGdefaultZsq{}}\PYGdefault{p}{)}
+\PYGdefault{n}{plt}\PYGdefault{o}{.}\PYGdefault{n}{legend}\PYGdefault{p}{()}
+
+\PYGdefault{n}{plt}\PYGdefault{o}{.}\PYGdefault{n}{show}\PYGdefault{p}{()}
+
+\PYGdefault{k}{print}\PYGdefault{p}{(}\PYGdefault{l+s+s2}{\PYGdefaultZdq{}The max absolute difference is: }\PYGdefault{l+s+si}{\PYGdefaultZpc{}g}\PYGdefault{l+s+s2}{\PYGdefaultZdq{}}\PYGdefault{o}{\PYGdefaultZpc{}}\PYGdefault{p}{(}\PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{max}\PYGdefault{p}{(}\PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{abs}\PYGdefault{p}{(}\PYGdefault{n}{computed} \PYGdefault{o}{\PYGdefaultZhy{}} \PYGdefault{n}{analytic}\PYGdefault{p}{))))}
+\end{Verbatim}
