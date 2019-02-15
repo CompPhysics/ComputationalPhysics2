@@ -171,7 +171,10 @@ div { text-align: justify; text-justify: inter-word; }
               ('Python program for 2-electrons in 2 dimensions',
                2,
                None,
-               '___sec64')]}
+               '___sec64'),
+              ("Using Broyden's algorithm in scipy", 2, None, '___sec65'),
+              ('How do we proceed?', 2, None, '___sec66'),
+              ('Modified code', 2, None, '___sec67')]}
 end of tocinfo -->
 
 <body>
@@ -213,7 +216,7 @@ MathJax.Hub.Config({
 <center>[2] <b>Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University</b></center>
 <br>
 <p>
-<center><h4>Feb 14, 2019</h4></center> <!-- date -->
+<center><h4>Feb 15, 2019</h4></center> <!-- date -->
 <br>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
@@ -2118,6 +2121,8 @@ Below we show only excerpts from the main program. For the full program, see the
 <b></b>
 <p>
 The functions <b>Efunction</b> and <b>dEfunction</b> compute the expectation value of the energy and its derivative.
+They use the the quasi-Newton method of <a href="https://www.springer.com/it/book/9780387303031" target="_blank">Broyden, Fletcher, Goldfarb, and Shanno (BFGS)</a>
+It uses the first derivatives only. The BFGS algorithm has proven good performance even for non-smooth optimizations. 
 These functions need to be changed when you want to your own derivatives.
 <p>
 
@@ -2281,8 +2286,8 @@ beta = <span style="color: #B452CD">0.2</span>
 <span style="color: #228B22"># Set up iteration using gradient descent method</span>
 Energy = <span style="color: #B452CD">0</span>
 EDerivative = np.zeros((<span style="color: #B452CD">2</span>), np.double)
-eta = <span style="color: #B452CD">0.1</span>
-Niterations = <span style="color: #B452CD">100</span>
+eta = <span style="color: #B452CD">0.01</span>
+Niterations = <span style="color: #B452CD">50</span>
 <span style="color: #228B22"># </span>
 <span style="color: #8B008B; font-weight: bold">for</span> <span style="color: #658b00">iter</span> <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Niterations):
     Energy, EDerivative = EnergyMinimization(alpha,beta)
@@ -2293,6 +2298,425 @@ Niterations = <span style="color: #B452CD">100</span>
 
 <span style="color: #8B008B; font-weight: bold">print</span>(alpha, beta)
 <span style="color: #8B008B; font-weight: bold">print</span>(Energy, EDerivative[<span style="color: #B452CD">0</span>], EDerivative[<span style="color: #B452CD">1</span>])
+</pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec65">Using Broyden's algorithm in scipy </h2>
+The following function uses the above described BFGS algorithm. Here we have defined a function which calculates the energy and a function which computes the first derivative.
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
+<span style="color: #228B22"># Added energy minimization using the BFGS algorithm, see p. 136 of https://www.springer.com/it/book/9780387303031</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed, normalvariate
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">mpl_toolkits.mplot3d</span> <span style="color: #8B008B; font-weight: bold">import</span> Axes3D
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib</span> <span style="color: #8B008B; font-weight: bold">import</span> cm
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.ticker</span> <span style="color: #8B008B; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.optimize</span> <span style="color: #8B008B; font-weight: bold">import</span> minimize
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">sys</span>
+
+
+<span style="color: #228B22"># Trial wave function for the 2-electron quantum dot in two dims</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">WaveFunction</span>(r,alpha,beta):
+    r1 = r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r2 = r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = r12/(<span style="color: #B452CD">1</span>+beta*r12)
+    <span style="color: #8B008B; font-weight: bold">return</span> exp(-<span style="color: #B452CD">0.5</span>*alpha*(r1+r2)+deno)
+
+<span style="color: #228B22"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">LocalEnergy</span>(r,alpha,beta):
+    
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0.5</span>*(<span style="color: #B452CD">1</span>-alpha*alpha)*(r1 + r2) +<span style="color: #B452CD">2.0</span>*alpha + <span style="color: #B452CD">1.0</span>/r12+deno2*(alpha*r12-deno2+<span style="color: #B452CD">2</span>*beta*deno-<span style="color: #B452CD">1.0</span>/r12)
+
+<span style="color: #228B22"># Derivate of wave function ansatz as function of variational parameters</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">DerivativeWFansatz</span>(r,alpha,beta):
+    
+    WfDer  = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    WfDer[<span style="color: #B452CD">0</span>] = -<span style="color: #B452CD">0.5</span>*(r1+r2)
+    WfDer[<span style="color: #B452CD">1</span>] = -r12*r12*deno2
+    <span style="color: #8B008B; font-weight: bold">return</span>  WfDer
+
+<span style="color: #228B22"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">QuantumForce</span>(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    qforce[<span style="color: #B452CD">0</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">0</span>,:]*alpha*(r[<span style="color: #B452CD">0</span>,:]-r[<span style="color: #B452CD">1</span>,:])*deno*deno/r12
+    qforce[<span style="color: #B452CD">1</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">1</span>,:]*alpha*(r[<span style="color: #B452CD">1</span>,:]-r[<span style="color: #B452CD">0</span>,:])*deno*deno/r12
+    <span style="color: #8B008B; font-weight: bold">return</span> qforce
+    
+
+<span style="color: #228B22"># Computing the derivative of the energy and the energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">EnergyDerivative</span>(x0):
+
+    
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    NumberMCcycles= <span style="color: #B452CD">10000</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    alpha = x0[<span style="color: #B452CD">0</span>]
+    beta = x0[<span style="color: #B452CD">1</span>]
+    EnergyDer = <span style="color: #B452CD">0.0</span>
+    DeltaPsi = <span style="color: #B452CD">0.0</span>
+    DerivativePsiE = <span style="color: #B452CD">0.0</span> 
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
+        DeltaPsi += DerPsi
+        energy += DeltaE
+        DerivativePsiE += DerPsi*DeltaE
+            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    DerivativePsiE /= NumberMCcycles
+    DeltaPsi /= NumberMCcycles
+    EnergyDer  = <span style="color: #B452CD">2</span>*(DerivativePsiE-DeltaPsi*energy)
+    <span style="color: #8B008B; font-weight: bold">return</span> EnergyDer
+
+
+<span style="color: #228B22"># Computing the expectation value of the local energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">Energy</span>(x0):
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    alpha = x0[<span style="color: #B452CD">0</span>]
+    beta = x0[<span style="color: #B452CD">1</span>]
+    NumberMCcycles= <span style="color: #B452CD">10000</span>
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        energy += DeltaE
+            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    <span style="color: #8B008B; font-weight: bold">return</span> energy
+
+
+
+
+<span style="color: #228B22">#Here starts the main program with variable declarations</span>
+NumberParticles = <span style="color: #B452CD">2</span>
+Dimension = <span style="color: #B452CD">2</span>
+<span style="color: #228B22"># seed for rng generator </span>
+seed()
+<span style="color: #228B22"># guess for variational parameters</span>
+x0 = np.array([<span style="color: #B452CD">0.9</span>,<span style="color: #B452CD">0.2</span>])
+<span style="color: #228B22"># Using Broydens method</span>
+res = minimize(Energy, x0, method=<span style="color: #CD5555">&#39;BFGS&#39;</span>, jac=EnergyDerivative, options={<span style="color: #CD5555">&#39;gtol&#39;</span>: <span style="color: #B452CD">1e-4</span>,<span style="color: #CD5555">&#39;disp&#39;</span>: <span style="color: #658b00">True</span>})
+<span style="color: #8B008B; font-weight: bold">print</span>(res.x)
+</pre></div>
+<p>
+Note that the <b>minimize</b> function returns the finale values for the variable \( \alpha=x0[0] \) and \( \beta=x0[1] \) in the array \( x \).
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec66">How do we proceed? </h2>
+There are several paths which can be chosen. One is to extend the brute force gradient descent method with an adapative stochastic gradient. There are several examples of this. A recent approach based on <a href="https://arxiv.org/pdf/1805.09416.pdf" target="_blank">the Langevin equations</a> seems like a promising approach for general and possibly non-convex optimization problems.
+
+<p>
+Here we would like to point out that our next step is now to use the optimal values for our variational parameters and use these as inputs to a production run. Here we would output values of the energy and perform for example a blocking analysis of the results in order to get a best possible estimate of the standard deviation.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec67">Modified code </h2>
+The modified code here uses the BFGS algorithm but performs now a production run and writes to file all average values of the energy. The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/Resampling" target="_blank">sampling functions</a> can be used to perform both a blocking analysis, or a standard bootstrap and jackknife analysis.
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
+<span style="color: #228B22"># Added energy minimization</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed, normalvariate
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">mpl_toolkits.mplot3d</span> <span style="color: #8B008B; font-weight: bold">import</span> Axes3D
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib</span> <span style="color: #8B008B; font-weight: bold">import</span> cm
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.ticker</span> <span style="color: #8B008B; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.optimize</span> <span style="color: #8B008B; font-weight: bold">import</span> minimize
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">sys</span>
+
+
+
+<span style="color: #228B22"># Trial wave function for the 2-electron quantum dot in two dims</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">WaveFunction</span>(r,alpha,beta):
+    r1 = r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r2 = r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = r12/(<span style="color: #B452CD">1</span>+beta*r12)
+    <span style="color: #8B008B; font-weight: bold">return</span> exp(-<span style="color: #B452CD">0.5</span>*alpha*(r1+r2)+deno)
+
+<span style="color: #228B22"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">LocalEnergy</span>(r,alpha,beta):
+    
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0.5</span>*(<span style="color: #B452CD">1</span>-alpha*alpha)*(r1 + r2) +<span style="color: #B452CD">2.0</span>*alpha + <span style="color: #B452CD">1.0</span>/r12+deno2*(alpha*r12-deno2+<span style="color: #B452CD">2</span>*beta*deno-<span style="color: #B452CD">1.0</span>/r12)
+
+<span style="color: #228B22"># Derivate of wave function ansatz as function of variational parameters</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">DerivativeWFansatz</span>(r,alpha,beta):
+    
+    WfDer  = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    WfDer[<span style="color: #B452CD">0</span>] = -<span style="color: #B452CD">0.5</span>*(r1+r2)
+    WfDer[<span style="color: #B452CD">1</span>] = -r12*r12*deno2
+    <span style="color: #8B008B; font-weight: bold">return</span>  WfDer
+
+<span style="color: #228B22"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">QuantumForce</span>(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    qforce[<span style="color: #B452CD">0</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">0</span>,:]*alpha*(r[<span style="color: #B452CD">0</span>,:]-r[<span style="color: #B452CD">1</span>,:])*deno*deno/r12
+    qforce[<span style="color: #B452CD">1</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">1</span>,:]*alpha*(r[<span style="color: #B452CD">1</span>,:]-r[<span style="color: #B452CD">0</span>,:])*deno*deno/r12
+    <span style="color: #8B008B; font-weight: bold">return</span> qforce
+    
+
+<span style="color: #228B22"># Computing the derivative of the energy and the energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">EnergyDerivative</span>(x0):
+
+    
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    alpha = x0[<span style="color: #B452CD">0</span>]
+    beta = x0[<span style="color: #B452CD">1</span>]
+    EnergyDer = <span style="color: #B452CD">0.0</span>
+    DeltaPsi = <span style="color: #B452CD">0.0</span>
+    DerivativePsiE = <span style="color: #B452CD">0.0</span> 
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
+        DeltaPsi += DerPsi
+        energy += DeltaE
+        DerivativePsiE += DerPsi*DeltaE
+            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    DerivativePsiE /= NumberMCcycles
+    DeltaPsi /= NumberMCcycles
+    EnergyDer  = <span style="color: #B452CD">2</span>*(DerivativePsiE-DeltaPsi*energy)
+    <span style="color: #8B008B; font-weight: bold">return</span> EnergyDer
+
+
+<span style="color: #228B22"># Computing the expectation value of the local energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">Energy</span>(x0):
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    alpha = x0[<span style="color: #B452CD">0</span>]
+    beta = x0[<span style="color: #B452CD">1</span>]
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        energy += DeltaE
+        <span style="color: #8B008B; font-weight: bold">if</span> Printout: 
+           outfile.write(<span style="color: #CD5555">&#39;%f\n&#39;</span> %(energy/(MCcycle+<span style="color: #B452CD">1.0</span>)))            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    <span style="color: #8B008B; font-weight: bold">return</span> energy
+
+
+
+
+<span style="color: #228B22">#Here starts the main program with variable declarations</span>
+NumberParticles = <span style="color: #B452CD">2</span>
+Dimension = <span style="color: #B452CD">2</span>
+<span style="color: #228B22"># seed for rng generator </span>
+seed()
+<span style="color: #228B22"># Monte Carlo cycles for parameter optimization</span>
+Printout = <span style="color: #658b00">False</span>
+NumberMCcycles= <span style="color: #B452CD">10000</span>
+<span style="color: #228B22"># guess for variational parameters</span>
+x0 = np.array([<span style="color: #B452CD">0.9</span>,<span style="color: #B452CD">0.2</span>])
+<span style="color: #228B22"># Using Broydens method to find optimal parameters</span>
+res = minimize(Energy, x0, method=<span style="color: #CD5555">&#39;BFGS&#39;</span>, jac=EnergyDerivative, options={<span style="color: #CD5555">&#39;gtol&#39;</span>: <span style="color: #B452CD">1e-4</span>,<span style="color: #CD5555">&#39;disp&#39;</span>: <span style="color: #658b00">True</span>})
+x0 = res.x
+<span style="color: #8B008B; font-weight: bold">print</span>(x0)
+<span style="color: #228B22"># Compute the energy again with the optimal parameters and increased number of Monte Cycles</span>
+NumberMCcycles= <span style="color: #B452CD">1000000</span>
+Printout = <span style="color: #658b00">True</span>
+outfile = <span style="color: #658b00">open</span>(<span style="color: #CD5555">&quot;Energies.dat&quot;</span>,<span style="color: #CD5555">&#39;w&#39;</span>)
+<span style="color: #8B008B; font-weight: bold">print</span>(Energy(x0))
+outfile.close()
 </pre></div>
 <p>
 
