@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from scipy.optimize import minimize
 import sys
 
 
@@ -55,9 +56,9 @@ def QuantumForce(r,alpha,beta):
     
 
 # Computing the derivative of the energy and the energy 
-def EnergyMinimization(alpha, beta):
+def EnergyDerivative(x0):
 
-    NumberMCcycles= 10000
+    
     # Parameters in the Fokker-Planck simulation of the quantum force
     D = 0.5
     TimeStep = 0.05
@@ -68,13 +69,13 @@ def EnergyMinimization(alpha, beta):
     QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
     QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
 
-    # seed for rng generator 
-    seed()
     energy = 0.0
     DeltaE = 0.0
-    EnergyDer = np.zeros((2), np.double)
-    DeltaPsi = np.zeros((2), np.double)
-    DerivativePsiE = np.zeros((2), np.double)
+    alpha = x0[0]
+    beta = x0[1]
+    EnergyDer = 0.0
+    DeltaPsi = 0.0
+    DerivativePsiE = 0.0 
     #Initial position
     for i in range(NumberParticles):
         for j in range(Dimension):
@@ -116,31 +117,90 @@ def EnergyMinimization(alpha, beta):
     DerivativePsiE /= NumberMCcycles
     DeltaPsi /= NumberMCcycles
     EnergyDer  = 2*(DerivativePsiE-DeltaPsi*energy)
-    return energy, EnergyDer
+    return EnergyDer
+
+
+# Computing the expectation value of the local energy 
+def Energy(x0):
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = 0.0
+    DeltaE = 0.0
+    alpha = x0[0]
+    beta = x0[1]
+    #Initial position
+    for i in range(NumberParticles):
+        for j in range(Dimension):
+            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    #Loop over MC MCcycles
+    for MCcycle in range(NumberMCcycles):
+        #Trial position moving one particle at the time
+        for i in range(NumberParticles):
+            for j in range(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = 0.0
+            for j in range(Dimension):
+                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+            #Metropolis-Hastings test to see whether we accept the move
+            if random() <= ProbabilityRatio:
+                for j in range(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        energy += DeltaE
+        if Printout: 
+           outfile.write('%f\n' %(energy/(MCcycle+1.0)))            
+    # We calculate mean values
+    energy /= NumberMCcycles
+    return energy
+
+
 
 
 #Here starts the main program with variable declarations
 NumberParticles = 2
 Dimension = 2
+# seed for rng generator 
+seed()
+# Monte Carlo cycles for parameter optimization
+Printout = False
+NumberMCcycles= 10000
 # guess for variational parameters
-alpha = 0.95
-beta = 0.3
-# Set up iteration using stochastic gradient method
-Energy = 0
-EDerivative = np.zeros((2), np.double)
-# Learning rate eta, max iterations, need to change to adaptive learning rate
-eta = 0.01
-MaxIterations = 50
-Niterations = 0
+x0 = np.array([0.9,0.2])
+# Using Broydens method to find optimal parameters
+res = minimize(Energy, x0, method='BFGS', jac=EnergyDerivative, options={'gtol': 1e-4,'disp': True})
+x0 = res.x
+print(x0)
+# Compute the energy again with the optimal parameters and increased number of Monte Cycles
+NumberMCcycles= 100000
+Printout = True
+outfile = open("Energies.dat",'w')
+print(Energy(x0))
+outfile.close()
 
-while Niterations <= MaxIterations:
-    Energy, EDerivative = EnergyMinimization(alpha,beta)
-    alphagradient = EDerivative[0]
-    betagradient = EDerivative[1]
-    alpha -= eta*alphagradient
-    beta -= eta*betagradient 
-    Niterations += 1
-print(alpha, beta)
-print(Energy, EDerivative[0], EDerivative[1])
+
+
+
+
 
 
