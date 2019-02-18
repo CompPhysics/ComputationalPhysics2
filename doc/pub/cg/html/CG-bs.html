@@ -154,7 +154,8 @@ Automatically generated HTML file from DocOnce source
                '___sec64'),
               ("Using Broyden's algorithm in scipy", 2, None, '___sec65'),
               ('How do we proceed?', 2, None, '___sec66'),
-              ('Modified code', 2, None, '___sec67')]}
+              ('Modified code', 2, None, '___sec67'),
+              ('Resampling analysis', 2, None, '___sec68')]}
 end of tocinfo -->
 
 <body>
@@ -260,6 +261,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="#___sec65" style="font-size: 80%;">Using Broyden's algorithm in scipy</a></li>
      <!-- navigation toc: --> <li><a href="#___sec66" style="font-size: 80%;">How do we proceed?</a></li>
      <!-- navigation toc: --> <li><a href="#___sec67" style="font-size: 80%;">Modified code</a></li>
+     <!-- navigation toc: --> <li><a href="#___sec68" style="font-size: 80%;">Resampling analysis</a></li>
 
         </ul>
       </li>
@@ -293,7 +295,7 @@ MathJax.Hub.Config({
 <center>[2] <b>Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University</b></center>
 <br>
 <p>
-<center><h4>Feb 15, 2019</h4></center> <!-- date -->
+<center><h4>Feb 18, 2019</h4></center> <!-- date -->
 <br>
 <p>
 <!-- potential-jumbotron-button -->
@@ -2819,11 +2821,104 @@ res <span style="color: #666666">=</span> minimize(Energy, x0, method<span style
 x0 <span style="color: #666666">=</span> res<span style="color: #666666">.</span>x
 <span style="color: #008000; font-weight: bold">print</span>(x0)
 <span style="color: #408080; font-style: italic"># Compute the energy again with the optimal parameters and increased number of Monte Cycles</span>
-NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">1000000</span>
+NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">2**19</span>
 Printout <span style="color: #666666">=</span> <span style="color: #008000">True</span>
 outfile <span style="color: #666666">=</span> <span style="color: #008000">open</span>(<span style="color: #BA2121">&quot;Energies.dat&quot;</span>,<span style="color: #BA2121">&#39;w&#39;</span>)
 <span style="color: #008000; font-weight: bold">print</span>(Energy(x0))
 outfile<span style="color: #666666">.</span>close()
+</pre></div>
+<p>
+<!-- !split -->
+
+<h2 id="___sec68" class="anchor">Resampling analysis </h2>
+The next step is then to use the above data sets and perform a resampling analysis, either using say the Bootstrap method or the Blocking method. Since the data will be correlated, we would recommend to use the non-iid Bootstrap code here
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">import</span> std, mean, concatenate, arange, loadtxt, zeros, ceil
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">numpy.random</span> <span style="color: #008000; font-weight: bold">import</span> randint
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">time</span> <span style="color: #008000; font-weight: bold">import</span> time
+
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">tsboot</span>(data,statistic,R,l):
+    t <span style="color: #666666">=</span> zeros(R); n <span style="color: #666666">=</span> <span style="color: #008000">len</span>(data); k <span style="color: #666666">=</span> <span style="color: #008000">int</span>(ceil(<span style="color: #008000">float</span>(n)<span style="color: #666666">/</span>l));
+    inds <span style="color: #666666">=</span> arange(n); t0 <span style="color: #666666">=</span> time()
+    
+    <span style="color: #408080; font-style: italic"># time series bootstrap</span>
+    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(R):
+        <span style="color: #408080; font-style: italic"># construct bootstrap sample from</span>
+        <span style="color: #408080; font-style: italic"># k chunks of data. The chunksize is l</span>
+        _data <span style="color: #666666">=</span> concatenate([data[j:j<span style="color: #666666">+</span>l] <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> randint(<span style="color: #666666">0</span>,n<span style="color: #666666">-</span>l,k)])[<span style="color: #666666">0</span>:n];
+        t[i] <span style="color: #666666">=</span> statistic(_data)
+
+    <span style="color: #408080; font-style: italic"># analysis</span>
+    <span style="color: #008000; font-weight: bold">print</span> (<span style="color: #BA2121">&quot;Runtime: </span><span style="color: #BB6688; font-weight: bold">%g</span><span style="color: #BA2121"> sec&quot;</span> <span style="color: #666666">%</span> (time()<span style="color: #666666">-</span>t0)); <span style="color: #008000; font-weight: bold">print</span> (<span style="color: #BA2121">&quot;Bootstrap Statistics :&quot;</span>)
+    <span style="color: #008000; font-weight: bold">print</span> (<span style="color: #BA2121">&quot;original           bias      std. error&quot;</span>)
+    <span style="color: #008000; font-weight: bold">print</span> (<span style="color: #BA2121">&quot;</span><span style="color: #BB6688; font-weight: bold">%8g</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%14g</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%15g</span><span style="color: #BA2121">&quot;</span> <span style="color: #666666">%</span> (statistic(data), \
+                             mean(t) <span style="color: #666666">-</span> statistic(data), \
+                             std(t) ))
+    <span style="color: #008000; font-weight: bold">return</span> t
+
+
+<span style="color: #408080; font-style: italic"># Demo</span>
+
+<span style="color: #408080; font-style: italic"># data</span>
+T0 <span style="color: #666666">=</span> time()
+X <span style="color: #666666">=</span> loadtxt(<span style="color: #BA2121">&quot;Energies.dat&quot;</span>)
+
+<span style="color: #408080; font-style: italic"># statistic to be estimated. Takes two args.</span>
+<span style="color: #408080; font-style: italic"># arg1: the data</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">stat</span>(data):
+    <span style="color: #008000; font-weight: bold">return</span> mean(data)
+
+<span style="color: #008000; font-weight: bold">print</span> (<span style="color: #BA2121">&quot;Data loaded in </span><span style="color: #BB6688; font-weight: bold">%g</span><span style="color: #BA2121"> sec&quot;</span> <span style="color: #666666">%</span> (time() <span style="color: #666666">-</span> T0))
+t <span style="color: #666666">=</span> tsboot(X, stat, <span style="color: #666666">2**12</span>, <span style="color: #666666">2**10</span>)
+</pre></div>
+<p>
+The blocking code, based on the article of <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" target="_self">Marius Jonsson</a> is given here
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">import</span> log2, zeros, mean, var, <span style="color: #008000">sum</span>, loadtxt, arange, array, cumsum, dot, transpose, diagonal
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">numpy.linalg</span> <span style="color: #008000; font-weight: bold">import</span> inv
+
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">block</span>(x):
+    <span style="color: #408080; font-style: italic"># preliminaries</span>
+    n <span style="color: #666666">=</span> <span style="color: #008000">len</span>(x)
+    d <span style="color: #666666">=</span> <span style="color: #008000">int</span>(log2(n))
+    s, gamma <span style="color: #666666">=</span> zeros(d), zeros(d)
+    mu <span style="color: #666666">=</span> mean(x)
+
+    <span style="color: #408080; font-style: italic"># estimate the auto-covariance and variances </span>
+    <span style="color: #408080; font-style: italic"># for each blocking transformation</span>
+    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> arange(<span style="color: #666666">0</span>,d):
+        n <span style="color: #666666">=</span> <span style="color: #008000">len</span>(x)
+        <span style="color: #408080; font-style: italic"># estimate autocovariance of x</span>
+        gamma[i] <span style="color: #666666">=</span> (n)<span style="color: #666666">**</span>(<span style="color: #666666">-1</span>)<span style="color: #666666">*</span><span style="color: #008000">sum</span>( (x[<span style="color: #666666">0</span>:(n<span style="color: #666666">-1</span>)]<span style="color: #666666">-</span>mu)<span style="color: #666666">*</span>(x[<span style="color: #666666">1</span>:n]<span style="color: #666666">-</span>mu) )
+        <span style="color: #408080; font-style: italic"># estimate variance of x</span>
+        s[i] <span style="color: #666666">=</span> var(x)
+        <span style="color: #408080; font-style: italic"># perform blocking transformation</span>
+        x <span style="color: #666666">=</span> <span style="color: #666666">0.5*</span>(x[<span style="color: #666666">0</span>::<span style="color: #666666">2</span>] <span style="color: #666666">+</span> x[<span style="color: #666666">1</span>::<span style="color: #666666">2</span>])
+   
+    <span style="color: #408080; font-style: italic"># generate the test observator M_k from the theorem</span>
+    M <span style="color: #666666">=</span> (cumsum( ((gamma<span style="color: #666666">/</span>s)<span style="color: #666666">**2*2**</span>arange(<span style="color: #666666">1</span>,d<span style="color: #666666">+1</span>)[::<span style="color: #666666">-1</span>])[::<span style="color: #666666">-1</span>] )  )[::<span style="color: #666666">-1</span>]
+
+    <span style="color: #408080; font-style: italic"># we need a list of magic numbers</span>
+    q <span style="color: #666666">=</span>array([<span style="color: #666666">6.634897</span>,<span style="color: #666666">9.210340</span>, <span style="color: #666666">11.344867</span>, <span style="color: #666666">13.276704</span>, <span style="color: #666666">15.086272</span>, <span style="color: #666666">16.811894</span>, <span style="color: #666666">18.475307</span>, <span style="color: #666666">20.090235</span>, <span style="color: #666666">21.665994</span>, <span style="color: #666666">23.209251</span>, <span style="color: #666666">24.724970</span>, <span style="color: #666666">26.216967</span>, <span style="color: #666666">27.688250</span>, <span style="color: #666666">29.141238</span>, <span style="color: #666666">30.577914</span>, <span style="color: #666666">31.999927</span>, <span style="color: #666666">33.408664</span>, <span style="color: #666666">34.805306</span>, <span style="color: #666666">36.190869</span>, <span style="color: #666666">37.566235</span>, <span style="color: #666666">38.932173</span>, <span style="color: #666666">40.289360</span>, <span style="color: #666666">41.638398</span>, <span style="color: #666666">42.979820</span>, <span style="color: #666666">44.314105</span>, <span style="color: #666666">45.641683</span>, <span style="color: #666666">46.962942</span>, <span style="color: #666666">48.278236</span>, <span style="color: #666666">49.587884</span>, <span style="color: #666666">50.892181</span>])
+
+    <span style="color: #408080; font-style: italic"># use the above table to determine when we should have stopped blocking</span>
+    <span style="color: #008000; font-weight: bold">for</span> k <span style="color: #AA22FF; font-weight: bold">in</span> arange(<span style="color: #666666">0</span>,d):
+        <span style="color: #008000; font-weight: bold">if</span>(M[k] <span style="color: #666666">&lt;</span> q[k]):
+            <span style="color: #008000; font-weight: bold">break</span>
+    <span style="color: #008000; font-weight: bold">if</span> (k <span style="color: #666666">&gt;=</span> d<span style="color: #666666">-1</span>):
+        <span style="color: #008000; font-weight: bold">print</span>(<span style="color: #BA2121">&quot;Warning: Use more data&quot;</span>)
+    <span style="color: #008000; font-weight: bold">return</span> s[k]<span style="color: #666666">/2**</span>(d<span style="color: #666666">-</span>k)
+
+
+x <span style="color: #666666">=</span> loadtxt(<span style="color: #BA2121">&quot;Energies.dat&quot;</span>)
+<span style="color: #008000; font-weight: bold">print</span>(block(x))
 </pre></div>
 <p>
 
