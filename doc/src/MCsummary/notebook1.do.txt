@@ -1,0 +1,708 @@
+TITLE: From Variational Monte Carlo to Boltzmann Machines and Machine Learning
+AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email hjensen@msu.edu  Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University, East Lansing, 48824 MI, USA
+DATE: Notebook 1:  Variational Monte Carlo
+
+
+===== Introduction =====
+
+=== Structure and Aims ===
+
+These notebooks serve the aim of linking traditional variational Monte
+Carlo VMC calculations methods with recent progress on solving
+many-particle problems using Machine Learning algorithms.
+
+Furthermore, when linking with Machine Learning algorithms, in particular
+so-called Boltzmann Machines, there are interesting connections between
+these algorithms and so-called "Shadow Wave functions (SWFs)":"https://journals.aps.org/pre/abstract/10.1103/PhysRevE.90.053304" (and references therein). The implications of the latter have been explored in various Monte Carlo calculations. 
+
+In total there are three notebooks:
+o the one you are reading now on Variational Monte Carlo methods, 
+o notebook 2 on Machine Learning and quantum mechanical problems and in particular on Boltzmann Machines, 
+o and finally notebook 3 on the link between Boltzmann machines and SWFs. 
+
+
+=== This notebook ===
+
+In this notebook the aim is to give you an introduction as well as an
+understanding of the basic elements that are needed in order to
+develop a professional variational Monte Carlo code. We will focus on
+a simple system of two particles in an oscillator trap (or
+alternatively two fermions moving in a Coulombic potential) which can
+interact via repulsive or attrative force.
+
+The advantage of these systems is that for two particles (boson or
+fermions) we have analytical solutions for the eigenpairs for the
+non-interacting case. Furthermore, for a two- or three-dimensional
+system of two electrons moving in a harmonic oscillator trap, we have
+"analytical solutions for the interacting case as well":"https://iopscience.iop.org/article/10.1088/0305-4470/27/3/040/meta".  
+
+Having analytical eigenpairs is an invaluable feature that allow us 
+to assess the physical relevance of the trial wave functions, be
+these either from a standard VMC procedure, from Boltzmann Machines or
+from Shadow Wave functions.
+
+In this notebook we start with the basics of a VMC calculation and
+introduce concepts like Markow Chain Monte Carlo methods and the
+Metropolis algorithm, importance sampling and Metropolis-Hastings
+algorithm, resampling methods to obtain better estimates of the
+statistical errors and minimization of the expectation values of the
+energy and the variance. The latter is done in order to obtain the
+best possible variational parameters. Furthermore it will define the
+so-called _cost_ function, a commonly encountered quantity in Machine
+Learning algorithms. Minimizing the latter is the one which leads to
+the determination of the optimal parameters in basically all Machine Learning algorithms.
+For our purposes, it will serve as the first link between VMC methods and Machine Learning methods.
+
+Topics like Markov Chain Monte Carlo and various resampling techniques
+are also central to Machine Learning methods. Presenting them in the
+context of VMC approaches leads hopefully to an easier starting point
+for the understanding of these methods.
+
+Finally, the reader may ask what do we actually want to achieve with
+complicating life with Machine Learning methods when we can easily
+study interacting systems with standard Monte Carlo approaches.  Our
+hope is that by adding additional degrees of freedom via Machine
+Learning algorithms, we can let the algorithms we employ learn the
+parameters of the model via a given optimization algorithm. In
+standard Monte Carlo calculations the practitioners end fine tuning
+the trial wave function using all possible insights about the system
+understudy. This may not always lead to the best possible ansatz and
+can in the long run be rather time-consuming. In fields like nuclear
+many-body physics with complicated interaction terms, guessing an
+analytical form for the trial wave fuction can be difficult. Letting
+the machine learn the form of the trial function or find the optimal
+parameters may lead to insights about the problem which cannot be
+obtained by selecting various trial wave functions.
+
+The emerging and rapidly expanding fields of Machine Learning and Quantum Computing hold also great promise in tackling the 
+dimensionality problems (the so-called dimensionality curse in many-body problems) we encounter when studying 
+complicated many-body problems. 
+The approach to Machine Learning we will focus on 
+ is inspired by the idea of representing the wave function with
+a restricted Boltzmann machine (RBM), presented recently by "G. Carleo and M. Troyer, Science _355_, Issue 6325, pp. 602-606 (2017)":"http://science.sciencemag.org/content/355/6325/602". They
+named such a wave function/network a *neural network quantum state* (NQS). In their article they apply it to the quantum mechanical
+spin lattice systems of the Ising model and Heisenberg model, with
+encouraging results.
+
+Machine learning (ML) is an extremely rich field, in spite of its young age. The
+increases we have seen during the last three decades in computational
+capabilities have been followed by developments of methods and
+techniques for analyzing and handling large date sets, relying heavily
+on statistics, computer science and mathematics.  The field is rather
+new and developing rapidly. 
+Machine learning is the science of giving computers the ability to
+learn without being explicitly programmed.  The idea is that there
+exist generic algorithms which can be used to find patterns in a broad
+class of data sets without having to write code specifically for each
+problem. The algorithm will build its own logic based on the data.
+
+Machine learning is a subfield of computer science, and is closely
+related to computational statistics.  It evolved from the study of
+pattern recognition in artificial intelligence (AI) research, and has
+made contributions to AI tasks like computer vision, natural language
+processing and speech recognition. It has also, especially in later
+years, found applications in a wide variety of other areas, including
+bioinformatics, economy, physics, finance and marketing.
+An excellent reference we will come to back to is "Mehta *et al.*, arXiv:1803.08823":"https://arxiv.org/abs/1803.08823".
+
+Our focus will first be on the basics of VMC calculations. 
+
+
+
+===== Basic Quantum Monte Carlo  =====
+
+We start with the variational principle.
+Given a hamiltonian $H$ and a trial wave function $\Psi_T(\bm{R};\bm{\alpha})$, the variational principle states that the expectation value of $\langle H \rangle$, defined through 
+!bt
+\[
+   E[H]= \langle H \rangle =
+   \frac{\int d\bm{R}\Psi^{\ast}_T(\bm{R};\bm{\alpha})H(\bm{R})\Psi_T(\bm{R};\bm{\alpha})}
+        {\int d\bm{R}\Psi^{\ast}_T(\bm{R};\bm{\alpha})\Psi_T(\bm{R};\bm{\alpha})},
+\]
+!et
+is an upper bound to the ground state energy $E_0$ of the hamiltonian $H$, that is 
+!bt
+\[
+    E_0 \le \langle H \rangle .
+\]
+!et
+In general, the integrals involved in the calculation of various  expectation values  are multi-dimensional ones. Traditional integration methods such as the Gauss-Legendre will not be adequate for say the  computation of the energy of a many-body system.
+
+Here we have defined the vector $\bm{R} =[\bm{r}_1,\bm{r}_2,\dots,\bm{r}_n}]$  as an array that contains the positions of all particles $n$ while the vector $\bm{\alpha} = [\alpha_1,\alpha_2,\dots,\alpha_m]$ contains the variational parameters of the model, $m$ in total. 
+
+The trial wave function can be expanded in the eigenstates of the hamiltonian since they form a complete set, viz.,
+!bt
+\[
+   \Psi_T(\bm{R};\bm{\alpha})=\sum_i a_i\Psi_i(\bm{R}),
+\]
+!et
+and assuming the set of eigenfunctions to be normalized one obtains 
+!bt
+\[
+     \frac{\sum_{nm}a^*_ma_n \int d\bm{R}\Psi^{\ast}_m(\bm{R})H(\bm{R})\Psi_n(\bm{R})}
+        {\sum_{nm}a^*_ma_n \int d\bm{R}\Psi^{\ast}_m(\bm{R})\Psi_n(\bm{R})} =\frac{\sum_{n}a^2_n E_n}
+        {\sum_{n}a^2_n} \ge E_0,
+\]
+!et
+where we used that $H(\bm{R})\Psi_n(\bm{R})=E_n\Psi_n(\bm{R})$.
+In general, the integrals involved in the calculation of various  expectation
+values  are multi-dimensional ones. 
+The variational principle yields the lowest state of a given symmetry.
+
+In most cases, a wave function has only small values in large parts of 
+configuration space, and a straightforward procedure which uses
+homogenously distributed random points in configuration space 
+will most likely lead to poor results. This may suggest that some kind
+of importance sampling combined with e.g., the Metropolis algorithm 
+may be  a more efficient way of obtaining the ground state energy.
+The hope is then that those regions of configurations space where
+the wave function assumes appreciable values are sampled more 
+efficiently. 
+
+The tedious part in a VMC calculation is the search for the variational
+minimum. A good knowledge of the system is required in order to carry out
+reasonable VMC calculations. This is not always the case, 
+and often VMC calculations 
+serve rather as the starting
+point for so-called diffusion Monte Carlo calculations (DMC). DMC is a way of
+solving exactly the many-body Schroedinger equation by means of 
+a stochastic procedure. A good guess on the binding energy
+and its wave function is however necessary. 
+A carefully performed VMC calculation can aid in this context. 
+
+
+The basic procedure of a Variational Monte Carlo calculations consists thus of 
+
+o Construct first a trial wave function $\psi_T(\bm{R};\bm{\alpha})$,  for a many-body system consisting of $n$ particles located at positions  $\bm{R}=(\bm{R}_1,\dots ,\bm{R}_n)$. The trial wave function depends on $\alpha$ variational parameters $\bm{\alpha}=(\alpha_1,\dots ,\alpha_M)$.
+o Then we evaluate the expectation value of the hamiltonian $H$ 
+!bt
+\[
+   \overline{E}[\bm{alpha}]=\frac{\int d\bm{R}\Psi^{\ast}_{T}(\bm{R},\bm{\alpha})H(\bm{R})\Psi_{T}(\bm{R},\bm{\alpha})}
+        {\int d\bm{R}\Psi^{\ast}_{T}(\bm{R},\bm{\alpha})\Psi_{T}(\bm{R},\bm{\alpha})}.
+\]
+!et
+o Thereafter we vary $\bm{\alpha}$ according to some minimization algorithm and return eventually to the first step if we are not satisfied with the results.
+
+Here we have used the notation $\overline{E}$ to label the expectation value of the energy. 
+
+=== Linking with standard statistical expressions for expectation values ===
+
+In order to bring in the Monte Carlo machinery, we define first a likelihood distribution, or probability density distribution (PDF). Using our ansatz for the trial wave function $\psi_T(\bm{R};\bm{\alpha})$.
+!bt
+\[
+   P(\bm{R})= \frac{\left|\psi_T(\bm{R};\bm{\alpha})\right|^2}{\int \left|\psi_T(\bm{R};\bm{\alpha})\right|^2d\bm{R}}.
+\]
+!et
+This is our new probability distribution function  (PDF).
+The approximation to the expectation value of the Hamiltonian is now 
+!bt
+\[
+   \overline{E}[\bm{\alpha}] = 
+   \frac{\int d\bm{R}\Psi^{\ast}_T(\bm{R};\bm{\alpha})H(\bm{R})\Psi_T(\bm{R};\bm{\alpha})}
+        {\int d\bm{R}\Psi^{\ast}_T(\bm{R};\bm{\alpha})\Psi_T(\bm{R};\bm{\alpha})}.
+\]
+!et
+
+Define a new quantity
+!bt
+\[
+   E_L(\bm{R};\bm{\alpha})=\frac{1}{\psi_T(\bm{R};\bm{\alpha})}H\psi_T(\bm{R};\bm{\alpha}),
+   label{eq:locale1}
+\]
+!et
+called the local energy, which, together with our trial PDF yields
+!bt
+\[
+  \overline{E}[\bm{\alpha}]=\int P(\bm{R})E_L(\bm{R};\bm{\alpha}) d\bm{R}\approx \frac{1}{N}\sum_{i=1}^NE_L(\bm{R_i};\bm{\alpha})
+  label{eq:vmc1}
+\]
+!et
+with $N$ being the number of Monte Carlo samples.
+
+The Algorithm for performing a variational Monte Carlo calculations runs thus as this
+       
+  *  Initialisation: Fix the number of Monte Carlo steps. Choose an initial $\bm{R}$ and variational parameters $\alpha$ and calculate $\left|\psi_T^{\alpha}(\bm{R})\right|^2$. 
+  *  Initialise the energy and the variance and start the Monte Carlo calculation.
+     *  Calculate  a trial position  $\bm{R}_p=\bm{R}+r*step$ where $r$ is a random variable $r \in [0,1]$.
+     *  Metropolis algorithm to accept or reject this move  $w = P(\bm{R}_p)/P(\bm{R})$.
+     *  If the step is accepted, then we set $\bm{R}=\bm{R}_p$. 
+     *  Update averages
+  *  Finish and compute final averages.
+      
+Observe that the jumping in space is governed by the variable *step*. This is called brute-force sampling.
+Need importance sampling to get more relevant sampling, see lectures below.
+
+
+=== Simple example, the hydrogen atom ===
+The radial Schroedinger equation for the hydrogen atom can be
+written as (when we have gotten rid of the first derivative term in the kinetic energy and used $rR(r)=u(r)$)
+!bt
+\[
+-\frac{\hbar^2}{2m}\frac{\partial^2 u(r)}{\partial r^2}-
+\left(\frac{ke^2}{r}-\frac{\hbar^2l(l+1)}{2mr^2}\right)u(r)=Eu(r).
+\]
+!et
+or with dimensionless variables
+!bt
+\[
+-\frac{1}{2}\frac{\partial^2 u(\rho)}{\partial \rho^2}-
+\frac{u(\rho)}{\rho}+\frac{l(l+1)}{2\rho^2}u(\rho)-\lambda u(\rho)=0,
+label{eq:hydrodimless1}
+\]
+!et
+with the hamiltonian
+!bt
+\[
+H=-\frac{1}{2}\frac{\partial^2 }{\partial \rho^2}-
+\frac{1}{\rho}+\frac{l(l+1)}{2\rho^2}.
+\]
+!et
+Use variational parameter $\alpha$ in the trial
+wave function 
+!bt
+\[
+   u_T^{\alpha}(\rho)=\alpha\rho e^{-\alpha\rho}. 
+   label{eq:trialhydrogen}
+\]
+!et
+
+Inserting this wave function into the expression for the
+local energy $E_L$ gives
+!bt
+\[
+   E_L(\rho)=-\frac{1}{\rho}-
+              \frac{\alpha}{2}\left(\alpha-\frac{2}{\rho}\right).
+\]
+!et
+
+We note that at $\alpha=1$ we obtain the exact
+result, and the variance is zero, as it should. The reason is that 
+we then have the exact wave function, and the action of the hamiltionan
+on the wave function
+!bt
+\[
+   H\psi = \mathrm{constant}\times \psi,
+\]
+!et
+yields just a constant. The integral which defines various 
+expectation values involving moments of the hamiltonian becomes then
+!bt
+\[
+   \langle H^n \rangle =
+   \frac{\int d\bm{R}\Psi^{\ast}_T(\bm{R})H^n(\bm{R})\Psi_T(\bm{R})}
+        {\int d\bm{R}\Psi^{\ast}_T(\bm{R})\Psi_T(\bm{R})}=
+\mathrm{constant}\times\frac{\int d\bm{R}\Psi^{\ast}_T(\bm{R})\Psi_T(\bm{R})}
+        {\int d\bm{R}\Psi^{\ast}_T(\bm{R})\Psi_T(\bm{R})}=\mathrm{constant}.
+\]
+!et
+_This gives an important information: the exact wave function leads to zero variance!_
+Variation is then performed by minimizing both the energy and the variance.
+
+
+===== The Metropolis algorithm =====
+
+The Metropolis algorithm , see "the original article": "http://scitation.aip.org/content/aip/journal/jcp/21/6/10.1063/1.1699114" was invented by Metropolis et. al
+and is often simply called the Metropolis algorithm.
+It is a method to sample a normalized probability
+distribution by a stochastic process. We define $\mathbf{P}_i^{(n)}$ to
+be the probability for finding the system in the state $i$ at step $n$.
+The algorithm is then
+
+* Sample a possible new state $j$ with some probability $T_{i\rightarrow j}$.
+* Accept the new state $j$ with probability $A_{i \rightarrow j}$ and use it as the next sample. With probability $1-A_{i\rightarrow j}$ the move is rejected and the original state $i$ is used again as a sample.
+
+We wish to derive the required properties of $T$ and $A$ such that
+$\mathbf{P}_i^{(n\rightarrow \infty)} \rightarrow p_i$ so that starting
+from any distribution, the method converges to the correct distribution.
+Note that the description here is for a discrete probability distribution.
+Replacing probabilities $p_i$ with expressions like $p(x_i)dx_i$ will
+take all of these over to the corresponding continuum expressions.
+
+The dynamical equation for $\mathbf{P}_i^{(n)}$ can be written directly from
+the description above. The probability of being in the state $i$ at step $n$
+is given by the probability of being in any state $j$ at the previous step,
+and making an accepted transition to $i$ added to the probability of
+being in the state $i$, making a transition to any state $j$ and
+rejecting the move:
+!bt
+\[
+\mathbf{P}^{(n)}_i = \sum_j \left [
+\mathbf{P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
++\mathbf{P}^{(n-1)}_iT_{i\rightarrow j}\left ( 1- A_{i\rightarrow j} \right)
+\right ] \,.
+\]
+!et
+Since the probability of making some transition must be 1,
+$\sum_j T_{i\rightarrow j} = 1$, and the above equation becomes
+!bt
+\[
+\mathbf{P}^{(n)}_i = \mathbf{P}^{(n-1)}_i +
+ \sum_j \left [
+\mathbf{P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
+-\mathbf{P}^{(n-1)}_iT_{i\rightarrow j}A_{i\rightarrow j}
+\right ] \,.
+\]
+!et
+
+For large $n$ we require that $\mathbf{P}^{(n\rightarrow \infty)}_i = p_i$,
+the desired probability distribution. Taking this limit, gives the
+balance requirement
+!bt
+\[
+ \sum_j \left [
+p_jT_{j\rightarrow i} A_{j\rightarrow i}
+-p_iT_{i\rightarrow j}A_{i\rightarrow j}
+\right ] = 0 \,.
+\]
+!et
+The balance requirement is very weak. Typically the much stronger detailed
+balance requirement is enforced, that is rather than the sum being
+set to zero, we set each term separately to zero and use this
+to determine the acceptance probabilities. Rearranging, the result is
+!bt
+\[
+\frac{ A_{j\rightarrow i}}{A_{i\rightarrow j}}
+= \frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}} \,.
+\]
+!et
+
+The Metropolis choice is to maximize the $A$ values, that is
+!bt
+\[
+A_{j \rightarrow i} = \min \left ( 1,
+\frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}}\right ).
+\]
+!et
+Other choices are possible, but they all correspond to multilplying
+$A_{i\rightarrow j}$ and $A_{j\rightarrow i}$ by the same constant
+smaller than unity.\footnote{The penalty function method uses just such
+a factor to compensate for $p_i$ that are evaluated stochastically
+and are therefore noisy.}
+
+Having chosen the acceptance probabilities, we have guaranteed that
+if the  $\mathbf{P}_i^{(n)}$ has equilibrated, that is if it is equal to $p_i$,
+it will remain equilibrated. Next we need to find the circumstances for
+convergence to equilibrium.
+
+The dynamical equation can be written as
+!bt
+\[
+\mathbf{P}^{(n)}_i = \sum_j M_{ij}\mathbf{P}^{(n-1)}_j
+\]
+!et
+with the matrix $M$ given by
+!bt
+\[
+M_{ij} = \delta_{ij}\left [ 1 -\sum_k T_{i\rightarrow k} A_{i \rightarrow k}
+\right ] + T_{j\rightarrow i} A_{j\rightarrow i} \,.
+\]
+!et
+Summing over $i$ shows that $\sum_i M_{ij} = 1$, and since
+$\sum_k T_{i\rightarrow k} = 1$, and $A_{i \rightarrow k} \leq 1$, the
+elements of the matrix satisfy $M_{ij} \geq 0$. The matrix $M$ is therefore
+a stochastic matrix.
+
+
+The Metropolis method is simply the power method for computing the
+right eigenvector of $M$ with the largest magnitude eigenvalue.
+By construction, the correct probability distribution is a right eigenvector
+with eigenvalue 1. Therefore, for the Metropolis method to converge
+to this result, we must show that $M$ has only one eigenvalue with this
+magnitude, and all other eigenvalues are smaller.
+
+
+=== The system: two electrons in a harmonic oscillator trap in two dimensions ===
+
+The Hamiltonian of the quantum dot is given by
+!bt
+\[ \hat{H} = \hat{H}_0 + \hat{V}, 
+\]
+!et
+where $\hat{H}_0$ is the many-body HO Hamiltonian, and $\hat{V}$ is the
+inter-electron Coulomb interactions. In dimensionless units,
+!bt
+\[ \hat{V}= \sum_{i < j}^N \frac{1}{r_{ij}},
+\]
+!et
+with $r_{ij}=\sqrt{\mathbf{r}_i^2 - \mathbf{r}_j^2}$.
+
+This leads to the  separable Hamiltonian, with the relative motion part given by ($r_{ij}=r$)
+!bt
+\[ 
+\hat{H}_r=-\nabla^2_r + \frac{1}{4}\omega^2r^2+ \frac{1}{r},
+\]
+!et
+plus a standard Harmonic Oscillator problem  for the center-of-mass motion.
+This system has analytical solutions in two and three dimensions ("M. Taut 1993 and 1994":"https://journals.aps.org/pra/abstract/10.1103/PhysRevA.48.3561"). 
+
+We want to perform  a Variational Monte Carlo calculation of the ground state of two electrons in a quantum dot well with different oscillator energies, assuming total spin $S=0$.
+Our trial wave function has the following form
+!bt
+\begin{equation}
+   \psi_{T}(\bm{r}_1,\bm{r}_2) = 
+   C\exp{\left(-\alpha_1\omega(r_1^2+r_2^2)/2\right)}
+   \exp{\left(\frac{r_{12}}{(1+\alpha_2 r_{12})}\right)}, 
+label{eq:trial}
+\end{equation}
+!et
+where the $\alpha$s represent our variational parameters, two in this case.
+
+Why does the trial function look like this? How did we get there? _This will be our main motivation_ for switching to
+Machine Learning.
+
+
+To find an ansatz for the correlated part of the wave function, it is useful to rewrite the two-particle
+local energy in terms of the relative and center-of-mass motion.
+Let us denote the distance between the two electrons as
+$r_{12}$. We omit the center-of-mass motion since we are only interested in the case when
+$r_{12} \rightarrow 0$. The contribution from the center-of-mass (CoM) variable $\bm{R}_{\mathrm{CoM}}$
+gives only a finite contribution.
+We focus only on the terms that are relevant for $r_{12}$ and for three dimensions. The relevant local energy becomes then
+!bt
+\[
+\lim_{r_{12} \rightarrow 0}E_L(R)=
+    \frac{1}{{\cal R}_T(r_{12})}\left(2\frac{d^2}{dr_{ij}^2}+\frac{4}{r_{ij}}\frac{d}{dr_{ij}}+
+\frac{2}{r_{ij}}-\frac{l(l+1)}{r_{ij}^2}+2E
+\right){\cal R}_T(r_{12}) = 0.
+\]
+!et
+Set $l=0$ and we have the so-called _cusp_ condition
+!bt
+\[
+\frac{d {\cal R}_T(r_{12})}{dr_{12}} = -\frac{1}{2(l+1)}
+{\cal R}_T(r_{12})\qquad r_{12}\to 0
+\]
+!et
+
+
+The above  results in
+!bt
+\[
+{\cal R}_T  \propto \exp{(r_{ij}/2)}, 
+\]
+!et 
+for anti-parallel spins and 
+!bt
+\[
+{\cal R}_T  \propto \exp{(r_{ij}/4)}, 
+\]
+!et
+for anti-parallel spins. 
+This is the so-called cusp condition for the relative motion, resulting in a minimal requirement
+for the correlation part of the wave fuction.
+For general systems containing more than say two electrons, we have this
+condition for each electron pair $ij$.
+
+
+
+
+
+!bc pycod 
+python code here 
+!ec
+
+
+
+===== Importance sampling =====
+
+We need to replace the brute force
+Metropolis algorithm with a walk in coordinate space biased by the trial wave function.
+This approach is based on the Fokker-Planck equation and the Langevin equation for generating a trajectory in coordinate space.  The link between the Fokker-Planck equation and the Langevin equations are explained, only partly, in the slides below.
+An excellent reference on topics like Brownian motion, Markov chains, the Fokker-Planck equation and the Langevin equation is the text by  "Van Kampen": "http://www.elsevier.com/books/stochastic-processes-in-physics-and-chemistry/van-kampen/978-0-444-52965-7"
+Here we will focus first on the implementation part first.
+
+For a diffusion process characterized by a time-dependent probability density $P(x,t)$ in one dimension the Fokker-Planck
+equation reads (for one particle /walker) 
+!bt
+\[
+   \frac{\partial P}{\partial t} = D\frac{\partial }{\partial x}\left(\frac{\partial }{\partial x} -F\right)P(x,t),
+\]
+!et
+where $F$ is a drift term and $D$ is the diffusion coefficient. 
+
+
+The new positions in coordinate space are given as the solutions of the Langevin equation using Euler's method, namely,
+we go from the Langevin equation
+!bt
+\[ 
+   \frac{\partial x(t)}{\partial t} = DF(x(t)) +\eta,
+\]
+!et
+with $\eta$ a random variable,
+yielding a new position 
+!bt
+\[
+   y = x+DF(x)\Delta t +\xi\sqrt{\Delta t},
+\]
+!et
+where $\xi$ is gaussian random variable and $\Delta t$ is a chosen time step. 
+The quantity $D$ is, in atomic units, equal to $1/2$ and comes from the factor $1/2$ in the kinetic energy operator. Note that $\Delta t$ is to be viewed as a parameter. Values of $\Delta t \in [0.001,0.01]$ yield in general rather stable values of the ground state energy.  
+
+The process of isotropic diffusion characterized by a time-dependent probability density $P(\mathbf{x},t)$ obeys (as an approximation) the so-called Fokker-Planck equation 
+!bt
+\[
+   \frac{\partial P}{\partial t} = \sum_i D\frac{\partial }{\partial \mathbf{x_i}}\left(\frac{\partial }{\partial \mathbf{x_i}} -\mathbf{F_i}\right)P(\mathbf{x},t),
+\]
+!et
+where $\mathbf{F_i}$ is the $i^{th}$ component of the drift term (drift velocity) caused by an external potential, and $D$ is the diffusion coefficient. The convergence to a stationary probability density can be obtained by setting the left hand side to zero. The resulting equation will be satisfied if and only if all the terms of the sum are equal zero,
+!bt
+\[
+\frac{\partial^2 P}{\partial {\mathbf{x_i}^2}} = P\frac{\partial}{\partial {\mathbf{x_i}}}\mathbf{F_i} + \mathbf{F_i}\frac{\partial}{\partial {\mathbf{x_i}}}P.
+\]
+!et
+
+The drift vector should be of the form $\mathbf{F} = g(\mathbf{x}) \frac{\partial P}{\partial \mathbf{x}}$. Then,
+!bt
+\[
+\frac{\partial^2 P}{\partial {\mathbf{x_i}^2}} = P\frac{\partial g}{\partial P}\left( \frac{\partial P}{\partial {\mathbf{x}_i}}  \right)^2 + P g \frac{\partial ^2 P}{\partial {\mathbf{x}_i^2}}  + g \left( \frac{\partial P}{\partial {\mathbf{x}_i}}  \right)^2.
+\]
+!et
+The condition of stationary density means that the left hand side equals zero. In other words, the terms containing first and second derivatives have to cancel each other. It is possible only if $g = \frac{1}{P}$, which yields
+!bt
+\[
+\mathbf{F} = 2\frac{1}{\Psi_T}\nabla\Psi_T,
+\]
+!et
+which is known as the so-called *quantum force*. This term is responsible for pushing the walker towards regions of configuration space where the trial wave function is large, increasing the efficiency of the simulation in contrast to the Metropolis algorithm where the walker has the same probability of moving in every direction.
+
+The Fokker-Planck equation yields a (the solution to the equation) transition probability given by the Green's function
+!bt
+\[
+  G(y,x,\Delta t) = \frac{1}{(4\pi D\Delta t)^{3N/2}} \exp{\left(-(y-x-D\Delta t F(x))^2/4D\Delta t\right)}
+\]
+!et
+which in turn means that our brute force Metropolis algorithm
+!bt
+\[ 
+    A(y,x) = \mathrm{min}(1,q(y,x))),
+\]
+!et
+with $q(y,x) = |\Psi_T(y)|^2/|\Psi_T(x)|^2$ is now replaced by the "Metropolis-Hastings algorithm":"http://scitation.aip.org/content/aip/journal/jcp/21/6/10.1063/1.1699114" as well as "Hasting's article":"http://biomet.oxfordjournals.org/content/57/1/97.abstract", 
+!bt
+\[
+q(y,x) = \frac{G(x,y,\Delta t)|\Psi_T(y)|^2}{G(y,x,\Delta t)|\Psi_T(x)|^2}
+\]
+!et
+
+
+
+!bc pycod
+add python code here
+!ec 
+
+
+===== Technical aspect, improvements and how to define the cost function ===== 
+
+
+_The above procedure is not the smartest one_. Looping over all variational parameters becomes expensive.
+Also, we don't use importance sampling and optimizations of the standard deviation (blocking, bootstrap, jackknife). 
+Such codes are included in the above Github address.
+
+
+We can also be smarter and use minimization methods to find the _optimal_ variational parameters with fewer Monte Carlo cycles and then 
+fire up our heavy artillery. 
+
+One way to achieve this is to minimize the energy as function of the variational parameters.
+
+
+To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.  
+
+Let us define 
+!bt
+\[
+\bar{E}_{\alpha_i}=\frac{d\langle  E_L\rangle}{d\alpha_i}.
+\]
+!et
+as the derivative of the energy with respect to the variational parameter $\alpha_i$
+We define also the derivative of the trial function (skipping the subindex $T$) as 
+!bt
+\[
+\bar{\Psi}_{i}=\frac{d\Psi}{d\alpha_i}.
+\]
+!et  
+
+The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)
+!bt
+\[
+\bar{E}_{i}= 2\left( \langle \frac{\bar{\Psi}_{i}}{\Psi}E_L\rangle -\langle \frac{\bar{\Psi}_{i}}{\Psi}\rangle\langle E_L \rangle\right).
+\]
+!et
+From a computational point of view it means that you need to compute the expectation values of 
+!bt
+\[
+\langle \frac{\bar{\Psi}_{i}}{\Psi}E_L\rangle,
+\]
+!et
+and
+!bt
+\[
+\langle \frac{\bar{\Psi}_{i}}{\Psi}\rangle\langle E_L\rangle
+\]
+!et
+These integrals are evaluted using MC intergration (with all its possible error sources). 
+We can then use methods like stochastic gradient or other minimization methods to find the optimal variational parameters (I don't discuss this topic here, but these methods are very important in ML). 
+
+We have a model, our likelihood function. 
+
+How should we define the cost function?
+
+
+Suppose the trial function (our model) is the exact wave function. The action of the hamiltionan
+on the wave function
+!bt
+\[
+   H\Psi = \mathrm{constant}\times \Psi,
+\]
+!et
+The integral which defines various 
+expectation values involving moments of the hamiltonian becomes then
+!bt
+\[
+   \langle E^n \rangle =   \langle H^n \rangle =
+   \frac{\int d\bm{R}\Psi^{\ast}(\bm{R})H^n(\bm{R})\Psi(\bm{R})}
+        {\int d\bm{R}\Psi^{\ast}(\bm{R})\Psi(\bm{R})}=
+\mathrm{constant}\times\frac{\int d\bm{R}\Psi^{\ast}(\bm{R})\Psi(\bm{R})}
+        {\int d\bm{R}\Psi^{\ast}(\bm{R})\Psi(\bm{R})}=\mathrm{constant}.
+\]
+!et
+_This gives an important information: If I want the variance, the exact wave function leads to zero variance!_
+The variance is defined as 
+!bt
+\[
+\sigma_E = \langle E^2\rangle - \langle E\rangle^2.
+\]
+!et
+Variation is then performed by minimizing both the energy and the variance.
+
+
+We can then take the derivatives of 
+!bt
+\[
+\sigma_E = \langle E^2\rangle - \langle E\rangle^2,
+\]
+!et
+with respect to the variational parameters. The derivatives of the variance can then be used to defined the
+so-called Hessian matrix, which in turn allows us to use minimization methods like Newton's method or 
+standard gradient methods. 
+
+This leads to however a more complicated expression, with obvious errors when evaluating integrals by Monte Carlo integration. Less used, see however "Filippi and Umrigar":"https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.94.150201". The expression becomes complicated
+!bt
+\[
+\bar{E}_{ij} = 2\left[ \langle (\frac{\bar{\Psi}_{ij}}{\Psi}+\frac{\bar{\Psi}_{j}}{\Psi}\frac{\bar{\Psi}_{i}}{\Psi})(E_L-\langle E\rangle)\rangle -\langle \frac{\bar{\Psi}_{i}}{\Psi}\rangle\bar{E}_j-\langle \frac{\bar{\Psi}_{j}}{\Psi}\rangle\bar{E}_i\right] +\langle \frac{\bar{\Psi}_{i}}{\Psi}E_L{_j}\rangle +\langle \frac{\bar{\Psi}_{j}}{\Psi}E_L{_i}\rangle -\langle \frac{\bar{\Psi}_{i}}{\Psi}\rangle\langle E_L{_j}\rangle \langle \frac{\bar{\Psi}_{j}}{\Psi}\rangle\langle E_L{_i}\rangle.  
+\]
+!et
+
+Evaluating the cost function means having to evaluate the above second derivative of the energy. 
+
+
+
+
+
+
+
+
+
+
+
+
+
