@@ -493,29 +493,61 @@ for the correlation part of the wave fuction.
 For general systems containing more than say two electrons, we have this
 condition for each electron pair $ij$.
 
+=== First code attempt for the two-electron case ===
+We start we a  more general setup which allows to store files and figures in user defined folders.
+!bc pycod
+# To support both python 2 and python 3
+from __future__ import division, print_function, unicode_literals
+
+# Common imports
+import numpy as np
+import os
+import sys
+
+# preparing for making figures
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+mpl.rc('axes', labelsize=14)
+mpl.rc('xtick', labelsize=12)
+mpl.rc('ytick', labelsize=12)
+
+# Where to save the figures and data files
+PROJECT_ROOT_DIR = "Results"
+FIGURE_ID = "images"
+DATA_ID = "data"
+
+def image_path(fig_id):
+    return os.path.join(PROJECT_ROOT_DIR, "images", FIGURE_ID, fig_id)
+
+def data_path(dat_id):
+    return os.path.join(PROJECT_ROOT_DIR, "data", DATA_ID, dat_id)
+
+def save_fig(fig_id, tight_layout=True):
+    print("Saving figure", fig_id)
+    if tight_layout:
+        plt.tight_layout()
+    plt.savefig(image_path(fig_id) + ".png", format='png', dpi=300)
 
 
+#save_fig("decision_tree_decision_boundaries_plot")
+#plt.show()
 
+!ec
 
-!bc pycod 
+We show then the first attempt using a _brute force_ sampling of positions with a fixed step size.
+!bc pycod
 # 2-electron VMC for quantum dot system in two dimensions
 # Brute force Metropolis, no importance sampling and no energy minimization
 from math import exp, sqrt
 from random import random, seed
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-import sys
 from numba import jit
 
-#Read name of output file from command line
-if len(sys.argv) == 2:
-    outfilename = sys.argv[1]
-else:
-    print('\nError: Name of output file must be given as command line argument.\n')
-outfile = open(outfilename,'w')
+#outfile = open(outfilename,'w')
 
 # Trial wave function for the 2-electron quantum dot in two dims
 def WaveFunction(r,alpha,beta):
@@ -588,7 +620,7 @@ def MonteCarloSampling():
             variance = energy2 - energy**2
             error = sqrt(variance/NumberMCcycles)
             Energies[ia,jb] = energy    
-            outfile.write('%f %f %f %f %f\n' %(alpha,beta,energy,variance,error))
+#            outfile.write('%f %f %f %f %f\n' %(alpha,beta,energy,variance,error))
     return Energies, AlphaValues, BetaValues
 
 
@@ -619,6 +651,7 @@ ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 # Add a color bar which maps values to colors.
 fig.colorbar(surf, shrink=0.5, aspect=5)
+save_fig("MetropolisSampling")
 plt.show()
 
 
