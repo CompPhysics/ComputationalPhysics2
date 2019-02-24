@@ -1,3 +1,22 @@
+# Common imports
+import os
+
+# Where to save the figures and data files
+PROJECT_ROOT_DIR = "Results"
+FIGURE_ID = "FigureFiles"
+
+def image_path(fig_id):
+    return os.path.join(PROJECT_ROOT_DIR, FIGURE_ID, fig_id)
+
+def save_fig(fig_id):
+    plt.savefig(image_path(fig_id) + ".png", format='png')
+
+
+# 2-electron VMC for quantum dot system in two dimensions
+# Brute force Metropolis, no importance sampling and no energy minimization
+
+outfile = open("Results/DataFiles/qdotmetro.dat",'w')
+
 # 2-electron VMC for quantum dot system in two dimensions
 # Brute force Metropolis, no importance sampling and no energy minimization
 from math import exp, sqrt
@@ -10,12 +29,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import sys
 from numba import jit
 
-#Read name of output file from command line
-if len(sys.argv) == 2:
-    outfilename = sys.argv[1]
-else:
-    print('\nError: Name of output file must be given as command line argument.\n')
-outfile = open(outfilename,'w')
+#outfile = open(outfilename,'w')
 
 # Trial wave function for the 2-electron quantum dot in two dims
 def WaveFunction(r,alpha,beta):
@@ -41,7 +55,7 @@ def LocalEnergy(r,alpha,beta):
 @jit
 def MonteCarloSampling():
 
-    NumberMCcycles= 100000
+    NumberMCcycles= 10000
     StepSize = 1.0
     # positions
     PositionOld = np.zeros((NumberParticles,Dimension), np.double)
@@ -119,5 +133,6 @@ ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 # Add a color bar which maps values to colors.
 fig.colorbar(surf, shrink=0.5, aspect=5)
+save_fig("QdotMetropolis")
 plt.show()
 
