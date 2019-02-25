@@ -1,3 +1,31 @@
+# Common imports
+import os
+
+# Where to save the figures and data files
+PROJECT_ROOT_DIR = "Results"
+FIGURE_ID = "Results/FigureFiles"
+DATA_ID = "Results/VMCQdotImportance"
+
+if not os.path.exists(PROJECT_ROOT_DIR):
+    os.mkdir(PROJECT_ROOT_DIR)
+
+if not os.path.exists(FIGURE_ID):
+    os.makedirs(FIGURE_ID)
+
+if not os.path.exists(DATA_ID):
+    os.makedirs(DATA_ID)
+
+def image_path(fig_id):
+    return os.path.join(FIGURE_ID, fig_id)
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+def save_fig(fig_id):
+    plt.savefig(image_path(fig_id) + ".png", format='png')
+
+outfile = open(data_path("VMCQdotImportance.dat"),'w')
+
 # 2-electron VMC code for 2dim quantum dot with importance sampling
 # Using gaussian rng for new positions and Metropolis- Hastings 
 # No energy minimization
@@ -12,12 +40,6 @@ import sys
 from numba import jit,njit
 
 
-#Read name of output file from command line
-if len(sys.argv) == 2:
-    outfilename = sys.argv[1]
-else:
-    print('\nError: Name of output file must be given as command line argument.\n')
-outfile = open(outfilename,'w')
 
 # Trial wave function for the 2-electron quantum dot in two dims
 def WaveFunction(r,alpha,beta):
@@ -146,5 +168,11 @@ ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 # Add a color bar which maps values to colors.
 fig.colorbar(surf, shrink=0.5, aspect=5)
+save_fig("QdotImportance")
 plt.show()
+
+
+
+
+
 
