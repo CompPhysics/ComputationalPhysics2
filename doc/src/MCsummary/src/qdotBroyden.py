@@ -174,9 +174,6 @@ def Energy(x0):
     energy /= NumberMCcycles
     return energy
 
-
-
-
 #Here starts the main program with variable declarations
 NumberParticles = 2
 Dimension = 2

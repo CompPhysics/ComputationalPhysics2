@@ -1,6 +1,29 @@
 # 2-electron VMC code for 2dim quantum dot with importance sampling
+# No Coulomb interaction
 # Using gaussian rng for new positions and Metropolis- Hastings 
-# No energy minimization
+# Energy minimization using standard gradient descent 
+
+# Common imports
+import os
+
+# Where to save the figures and data files
+PROJECT_ROOT_DIR = "Results"
+FIGURE_ID = "Results/FigureFiles"
+
+if not os.path.exists(PROJECT_ROOT_DIR):
+    os.mkdir(PROJECT_ROOT_DIR)
+
+if not os.path.exists(FIGURE_ID):
+    os.makedirs(FIGURE_ID)
+
+def image_path(fig_id):
+    return os.path.join(FIGURE_ID, fig_id)
+
+
+def save_fig(fig_id):
+    plt.savefig(image_path(fig_id) + ".png", format='png')
+
+
 from math import exp, sqrt
 from random import random, seed, normalvariate
 import numpy as np
@@ -102,12 +125,11 @@ def EnergyMinimization(alpha):
         energy += DeltaE
         DerivativePsiE += DerPsi*DeltaE
             
-    # We calculate mean, variance and error (no blocking applied)
+    # We calculate mean values
     energy /= NumberMCcycles
     DerivativePsiE /= NumberMCcycles
     DeltaPsi /= NumberMCcycles
     EnergyDer  = 2*(DerivativePsiE-DeltaPsi*energy)
-    print(energy, DerivativePsiE, DeltaPsi*energy)
     return energy, EnergyDer
 
 
@@ -115,18 +137,43 @@ def EnergyMinimization(alpha):
 NumberParticles = 2
 Dimension = 2
 # guess for variational parameters
-x0 = 0.9
+x0 = 0.5
 # Set up iteration using stochastic gradient method
 Energy =0 ; EnergyDer = 0
 Energy, EnergyDer = EnergyMinimization(x0)
 
+# No adaptive search for a minimum
 eta = 0.5
-Niterations = 100
+Niterations = 50
+
+Energies = np.zeros(Niterations)
+EnergyDerivatives = np.zeros(Niterations)
+AlphaValues = np.zeros(Niterations)
+Totiterations = np.zeros(Niterations)
 
 for iter in range(Niterations):
     gradients = EnergyDer
     x0 -= eta*gradients
     Energy, EnergyDer = EnergyMinimization(x0)
-    print(Energy, EnergyDer)
-    print(x0)
+    Energies[iter] = Energy
+    EnergyDerivatives[iter] = EnergyDer
+    AlphaValues[iter] = x0
+    Totiterations[iter] = iter
 
+plt.subplot(2, 1, 1)
+plt.plot(Totiterations, Energies, 'o-')
+plt.title('Energy and energy derivatives')
+plt.ylabel('Dimensionless energy')
+plt.subplot(2, 1, 2)
+plt.plot(Totiterations, EnergyDerivatives, '.-')
+plt.xlabel(r'$\mathrm{Iterations}$', fontsize=15)
+plt.ylabel('Energy derivative')
+save_fig("QdotNonint")
+plt.show()
+#nice printout with Pandas
+import pandas as pd
+from pandas import DataFrame
+data ={'Alpha':AlphaValues, 'Energy':Energies,'Derivative':EnergyDerivatives}
+
+frame = pd.DataFrame(data)
+print(frame)
