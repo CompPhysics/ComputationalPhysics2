@@ -298,6 +298,7 @@ To have analytical local energies saves us from computing numerically
 the second derivative, a feature which often increases our numerical
 expenditure with a factor of three or more. Integratng up the local energy (recall to bring back the PDF in the integration) gives  $\overline{E}[\bm{\alpha}]=\alpha(\alpha/2-1)$. 
 
+
 We are now ready to write our first VMC code. We start by including
 some generic operations on where to save our outputs (data files and figures).
 
@@ -1891,15 +1892,226 @@ f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
 over the scalar $\alpha > 0$.
 
 
-
-
-
-
 The modified code here uses the BFGS algorithm but performs now a
 production run and writes to file all average values of the
 energy. 
 !bc pycod
+# 2-electron VMC code for 2dim quantum dot with importance sampling
+# Using gaussian rng for new positions and Metropolis- Hastings 
+# Added energy minimization
+from math import exp, sqrt
+from random import random, seed, normalvariate
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from scipy.optimize import minimize
+import sys
+import os
 
+# Where to save data files
+PROJECT_ROOT_DIR = "Results"
+DATA_ID = "Results/EnergyMin"
+
+if not os.path.exists(PROJECT_ROOT_DIR):
+    os.mkdir(PROJECT_ROOT_DIR)
+
+if not os.path.exists(DATA_ID):
+    os.makedirs(DATA_ID)
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+outfile = open(data_path("Energies.dat"),'w')
+
+
+# Trial wave function for the 2-electron quantum dot in two dims
+def WaveFunction(r,alpha,beta):
+    r1 = r[0,0]**2 + r[0,1]**2
+    r2 = r[1,0]**2 + r[1,1]**2
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = r12/(1+beta*r12)
+    return exp(-0.5*alpha*(r1+r2)+deno)
+
+# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
+def LocalEnergy(r,alpha,beta):
+    
+    r1 = (r[0,0]**2 + r[0,1]**2)
+    r2 = (r[1,0]**2 + r[1,1]**2)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    deno2 = deno*deno
+    return 0.5*(1-alpha*alpha)*(r1 + r2) +2.0*alpha + 1.0/r12+deno2*(alpha*r12-deno2+2*beta*deno-1.0/r12)
+
+# Derivate of wave function ansatz as function of variational parameters
+def DerivativeWFansatz(r,alpha,beta):
+    
+    WfDer  = np.zeros((2), np.double)
+    r1 = (r[0,0]**2 + r[0,1]**2)
+    r2 = (r[1,0]**2 + r[1,1]**2)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    deno2 = deno*deno
+    WfDer[0] = -0.5*(r1+r2)
+    WfDer[1] = -r12*r12*deno2
+    return  WfDer
+
+# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
+def QuantumForce(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    qforce[0,:] = -2*r[0,:]*alpha*(r[0,:]-r[1,:])*deno*deno/r12
+    qforce[1,:] = -2*r[1,:]*alpha*(r[1,:]-r[0,:])*deno*deno/r12
+    return qforce
+    
+
+# Computing the derivative of the energy and the energy 
+def EnergyDerivative(x0):
+
+    
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = 0.0
+    DeltaE = 0.0
+    alpha = x0[0]
+    beta = x0[1]
+    EnergyDer = 0.0
+    DeltaPsi = 0.0
+    DerivativePsiE = 0.0 
+    #Initial position
+    for i in range(NumberParticles):
+        for j in range(Dimension):
+            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    #Loop over MC MCcycles
+    for MCcycle in range(NumberMCcycles):
+        #Trial position moving one particle at the time
+        for i in range(NumberParticles):
+            for j in range(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = 0.0
+            for j in range(Dimension):
+                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+            #Metropolis-Hastings test to see whether we accept the move
+            if random() <= ProbabilityRatio:
+                for j in range(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
+        DeltaPsi += DerPsi
+        energy += DeltaE
+        DerivativePsiE += DerPsi*DeltaE
+            
+    # We calculate mean values
+    energy /= NumberMCcycles
+    DerivativePsiE /= NumberMCcycles
+    DeltaPsi /= NumberMCcycles
+    EnergyDer  = 2*(DerivativePsiE-DeltaPsi*energy)
+    return EnergyDer
+
+
+# Computing the expectation value of the local energy 
+def Energy(x0):
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = 0.0
+    DeltaE = 0.0
+    alpha = x0[0]
+    beta = x0[1]
+    #Initial position
+    for i in range(NumberParticles):
+        for j in range(Dimension):
+            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    #Loop over MC MCcycles
+    for MCcycle in range(NumberMCcycles):
+        #Trial position moving one particle at the time
+        for i in range(NumberParticles):
+            for j in range(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = 0.0
+            for j in range(Dimension):
+                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+            #Metropolis-Hastings test to see whether we accept the move
+            if random() <= ProbabilityRatio:
+                for j in range(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        energy += DeltaE
+        if Printout: 
+           outfile.write('%f\n' %(energy/(MCcycle+1.0)))            
+    # We calculate mean values
+    energy /= NumberMCcycles
+    return energy
+
+#Here starts the main program with variable declarations
+NumberParticles = 2
+Dimension = 2
+# seed for rng generator 
+seed()
+# Monte Carlo cycles for parameter optimization
+Printout = False
+NumberMCcycles= 10000
+# guess for variational parameters
+x0 = np.array([0.9,0.2])
+# Using Broydens method to find optimal parameters
+res = minimize(Energy, x0, method='BFGS', jac=EnergyDerivative, options={'gtol': 1e-4,'disp': True})
+x0 = res.x
+# Compute the energy again with the optimal parameters and increased number of Monte Cycles
+NumberMCcycles= 2**19
+Printout = True
+FinalEnergy = Energy(x0)
+EResult = np.array([FinalEnergy,FinalEnergy])
+outfile.close()
+#nice printout with Pandas
+import pandas as pd
+from pandas import DataFrame
+data ={'Optimal Parameters':x0, 'Final Energy':EResult}
+frame = pd.DataFrame(data)
+print(frame)
 !ec
 
 
@@ -1908,7 +2120,7 @@ variable $\alpha=x0[0]$ and $\beta=x0[1]$ in the array $x$.
 
 When we have found the minimum, we use these optimal parameters to perform a production run of energies.
 The output is in turn written to file and is used, together with resampling methods like the _blocking method_,
-to obtain the best possible estimate for the standard deviation. 
+to obtain the best possible estimate for the standard deviation.   The optimal minimum is, even with our guess, rather close to the exact value of $3.0$ a.u.
 
 The "sampling
 functions":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/Resampling"
@@ -1937,9 +2149,21 @@ a best possible estimate of the standard deviation.
 The next step is then to use the above data sets and perform a
 resampling analysis, either using say the Bootstrap method or the
 Blocking method. Since the data will be correlated, we would recommend
-to use the non-iid Bootstrap code here
+to use the non-iid Bootstrap code here. The theoretical background for these resampling methods is found in the "lecture notes on the statistical analysis":"http://compphysics.github.io/ComputationalPhysics2/doc/pub/statanalysis/html/statanalysis.html"
+
+Here we have tailored the codes to the output file from the previous example. We present first the bootstrap resampling with non-iid stochastic event.
 
 !bc pycod 
+# Common imports
+import os
+
+# Where to save the figures and data files
+DATA_ID = "Results/EnergyMin"
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+infile = open(data_path("Energies.dat"),'r')
 
 from numpy import std, mean, concatenate, arange, loadtxt, zeros, ceil
 from numpy.random import randint
@@ -1964,26 +2188,31 @@ def tsboot(data,statistic,R,l):
                              mean(t) - statistic(data), \
                              std(t) ))
     return t
-
-
-
-# data
-T0 = time()
-X = loadtxt("Energies.dat")
-
+# Read in data
+X = loadtxt(infile)
 # statistic to be estimated. Takes two args.
 # arg1: the data
 def stat(data):
     return mean(data)
-
-print ("Data loaded in %g sec" % (time() - T0))
 t = tsboot(X, stat, 2**12, 2**10)
+
 !ec
 
 The blocking code, based on the article of "Marius Jonsson":"https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" is given here
 
 !bc pycod
-from numpy import log2, zeros, mean, var, sum, loadtxt, arange, array, cumsum, dot, transpose, diagonal
+# Common imports
+import os
+
+# Where to save the figures and data files
+DATA_ID = "Results/EnergyMin"
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+infile = open(data_path("Energies.dat"),'r')
+
+from numpy import log2, zeros, mean, var, sum, loadtxt, arange, array, cumsum, dot, transpose, diagonal, sqrt
 from numpy.linalg import inv
 
 def block(x):
@@ -2010,17 +2239,31 @@ def block(x):
     # we need a list of magic numbers
     q =array([6.634897,9.210340, 11.344867, 13.276704, 15.086272, 16.811894, 18.475307, 20.090235, 21.665994, 23.209251, 24.724970, 26.216967, 27.688250, 29.141238, 30.577914, 31.999927, 33.408664, 34.805306, 36.190869, 37.566235, 38.932173, 40.289360, 41.638398, 42.979820, 44.314105, 45.641683, 46.962942, 48.278236, 49.587884, 50.892181])
 
-    # use the above table to determine when we should have stopped blocking
+    # use magic to determine when we should have stopped blocking
     for k in arange(0,d):
         if(M[k] < q[k]):
             break
     if (k >= d-1):
         print("Warning: Use more data")
-    return s[k]/2**(d-k)
+    return mu, s[k]/2**(d-k)
 
 
-x = loadtxt("Energies.dat")
-print(block(x))
+x = loadtxt(infile)
+(mean, var) = block(x) 
+std = sqrt(var)
+import pandas as pd
+from pandas import DataFrame
+data ={'Mean':[mean], 'STDev':[std]}
+frame = pd.DataFrame(data,index=['Values'])
+print(frame)
+
+
+
+
+
+
+
+
 
 !ec
 

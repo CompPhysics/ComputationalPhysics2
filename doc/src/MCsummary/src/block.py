@@ -1,4 +1,15 @@
-from numpy import log2, zeros, mean, var, sum, loadtxt, arange, array, cumsum, dot, transpose, diagonal
+# Common imports
+import os
+
+# Where to save the figures and data files
+DATA_ID = "Results/EnergyMin"
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+infile = open(data_path("Energies.dat"),'r')
+
+from numpy import log2, zeros, mean, var, sum, loadtxt, arange, array, cumsum, dot, transpose, diagonal, sqrt
 from numpy.linalg import inv
 
 def block(x):
@@ -31,8 +42,22 @@ def block(x):
             break
     if (k >= d-1):
         print("Warning: Use more data")
-    return s[k]/2**(d-k)
+    return mu, s[k]/2**(d-k)
 
 
-x = loadtxt("Energies.dat")
-print(block(x))
+x = loadtxt(infile)
+(mean, var) = block(x) 
+std = sqrt(var)
+import pandas as pd
+from pandas import DataFrame
+data ={'Mean':[mean], 'STDev':[std]}
+frame = pd.DataFrame(data,index=['Values'])
+print(frame)
+
+
+
+
+
+
+
+

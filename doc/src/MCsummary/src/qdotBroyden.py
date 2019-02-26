@@ -10,7 +10,22 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from scipy.optimize import minimize
 import sys
+import os
 
+# Where to save data files
+PROJECT_ROOT_DIR = "Results"
+DATA_ID = "Results/EnergyMin"
+
+if not os.path.exists(PROJECT_ROOT_DIR):
+    os.mkdir(PROJECT_ROOT_DIR)
+
+if not os.path.exists(DATA_ID):
+    os.makedirs(DATA_ID)
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+outfile = open(data_path("Energies.dat"),'w')
 
 
 # Trial wave function for the 2-electron quantum dot in two dims
@@ -187,13 +202,21 @@ x0 = np.array([0.9,0.2])
 # Using Broydens method to find optimal parameters
 res = minimize(Energy, x0, method='BFGS', jac=EnergyDerivative, options={'gtol': 1e-4,'disp': True})
 x0 = res.x
-print(x0)
 # Compute the energy again with the optimal parameters and increased number of Monte Cycles
 NumberMCcycles= 2**19
 Printout = True
-outfile = open("Energies.dat",'w')
-print(Energy(x0))
+FinalEnergy = Energy(x0)
+EResult = np.array([FinalEnergy,FinalEnergy])
 outfile.close()
+#nice printout with Pandas
+import pandas as pd
+from pandas import DataFrame
+data ={'Optimal Parameters':x0, 'Final Energy':EResult}
+frame = pd.DataFrame(data)
+print(frame)
+
+
+
 
 
 
