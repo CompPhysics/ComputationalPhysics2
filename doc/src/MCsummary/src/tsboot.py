@@ -1,3 +1,14 @@
+# Common imports
+import os
+
+# Where to save the figures and data files
+DATA_ID = "Results/EnergyMin"
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+infile = open(data_path("Energies.dat"),'r')
+
 from numpy import std, mean, concatenate, arange, loadtxt, zeros, ceil
 from numpy.random import randint
 from time import time
@@ -27,7 +38,7 @@ def tsboot(data,statistic,R,l):
 
 # data
 T0 = time()
-X = loadtxt("Energies.dat")
+X = loadtxt(infile)
 
 # statistic to be estimated. Takes two args.
 # arg1: the data
@@ -36,3 +47,9 @@ def stat(data):
 
 print ("Data loaded in %g sec" % (time() - T0))
 t = tsboot(X, stat, 2**12, 2**10)
+
+
+
+
+
+

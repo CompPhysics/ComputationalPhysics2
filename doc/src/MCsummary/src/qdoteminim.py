@@ -1,6 +1,7 @@
 # 2-electron VMC code for 2dim quantum dot with importance sampling
 # Using gaussian rng for new positions and Metropolis- Hastings 
 # Added energy minimization
+# Common imports
 from math import exp, sqrt
 from random import random, seed, normalvariate
 import numpy as np
@@ -131,16 +132,32 @@ EDerivative = np.zeros((2), np.double)
 # Learning rate eta, max iterations, need to change to adaptive learning rate
 eta = 0.01
 MaxIterations = 50
-Niterations = 0
+iter = 0
 
-while Niterations <= MaxIterations:
+Energies = np.zeros(MaxIterations)
+EnergyDerivatives1 = np.zeros(MaxIterations)
+EnergyDerivatives2 = np.zeros(MaxIterations)
+AlphaValues = np.zeros(MaxIterations)
+BetaValues = np.zeros(MaxIterations)
+
+while iter < MaxIterations:
     Energy, EDerivative = EnergyMinimization(alpha,beta)
     alphagradient = EDerivative[0]
     betagradient = EDerivative[1]
     alpha -= eta*alphagradient
     beta -= eta*betagradient 
-    Niterations += 1
-print(alpha, beta)
-print(Energy, EDerivative[0], EDerivative[1])
+    Energies[iter] = Energy
+    EnergyDerivatives1[iter] = EDerivative[0] 
+    EnergyDerivatives2[iter] = EDerivative[1] 
+    AlphaValues[iter] = alpha
+    BetaValues[iter] = beta
+    iter += 1
 
+#nice printout with Pandas
+import pandas as pd
+from pandas import DataFrame
+pd.set_option('max_columns', 6)
+data ={'Alpha':AlphaValues,'Beta':BetaValues,'Energy':Energies,'Alpha Derivative':EnergyDerivatives1,'Beta Derivative':EnergyDerivatives2}
 
+frame = pd.DataFrame(data)
+print(frame)

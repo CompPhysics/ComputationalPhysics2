@@ -151,3 +151,6 @@ save_fig("QdotMetropolis")
 plt.show()
 
 
+
+
+
