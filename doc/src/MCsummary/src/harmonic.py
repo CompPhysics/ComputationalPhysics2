@@ -34,16 +34,14 @@ from random import random, seed
 import numpy as np
 import matplotlib.pyplot as plt
 from numba import jit
-
-# Trial wave function for the hydrogen atom
+from decimal import *
+# Trial wave function for the Harmonic oscillator in one dimension
 def WaveFunction(r,alpha):
-    r1 = np.linalg.norm(r) 
-    return exp(-0.5*alpha*r1*r1)
+    return exp(-0.5*alpha*alpha*r*r)
 
-# Local energy  for the hydrogen atom
+# Local energy  for the Harmonic oscillator in one dimension
 def LocalEnergy(r,alpha):
-    r1 = np.linalg.norm(r) 
-    return 0.5*r1*r1*(1-alpha*alpha) + alpha
+    return 0.5*r*r*(1-alpha**4) + 0.5*alpha*alpha
 
 # The Monte Carlo sampling with the Metropolis algo
 # The jit decorator tells Numba to compile this function.
@@ -51,29 +49,27 @@ def LocalEnergy(r,alpha):
 @jit
 def MonteCarloSampling():
 
-    NumberMCcycles= 1000
+    NumberMCcycles= 100000
     StepSize = 1.0
     # positions
-    PositionOld = np.zeros((Dimension), np.double)
-    PositionNew = np.zeros((Dimension), np.double)
+    PositionOld = 0.0
+    PositionNew = 0.0
 
     # seed for rng generator
     seed()
     # start variational parameter
-    alpha = 0.5
+    alpha = 0.4
     for ia in range(MaxVariations):
-        alpha += .025
+        alpha += .05
         AlphaValues[ia] = alpha
         energy = energy2 = 0.0
         #Initial position
-        for j in range(Dimension):
-            PositionOld[j] = StepSize * (random() - .5)
+        PositionOld = StepSize * (random() - .5)
         wfold = WaveFunction(PositionOld,alpha)
         #Loop over MC MCcycles
         for MCcycle in range(NumberMCcycles):
             #Trial position 
-            for j in range(Dimension):
-                PositionNew[j] = PositionOld[j] + StepSize*(random() - .5)
+            PositionNew = PositionOld + StepSize*(random() - .5)
             wfnew = WaveFunction(PositionNew,alpha)
             #Metropolis test to see whether we accept the move
             if random() <= wfnew**2 / wfold**2:
@@ -94,19 +90,15 @@ def MonteCarloSampling():
 
 
 #Here starts the main program with variable declarations
-NumberParticles = 1
-Dimension = 1
-MaxVariations = 10
+MaxVariations = 20
 Energies = np.zeros((MaxVariations))
 Variances = np.zeros((MaxVariations))
 AlphaValues = np.zeros(MaxVariations)
-ExactEnergy = np.zeros((MaxVariations))
 (Energies, AlphaValues, Variances) = MonteCarloSampling()
-ExactEnergy = AlphaValues*AlphaValues*0.5+1.0/(AlphaValues*AlphaValues*8.0)
 outfile.close()
 #simple subplot
 plt.subplot(2, 1, 1)
-plt.plot(AlphaValues, Energies, 'o-',AlphaValues, ExactEnergy, 'r-')
+plt.plot(AlphaValues, Energies, 'o-')
 plt.title('Energy and variance')
 plt.ylabel('Dimensionless energy')
 plt.subplot(2, 1, 2)
@@ -118,8 +110,7 @@ plt.show()
 #nice printout with Pandas
 import pandas as pd
 from pandas import DataFrame
-data ={'Alpha':AlphaValues, 'Energy':Energies,'ExactEnergy':ExactEnergy,'Variance':Variances}
-
+data ={'Alpha':AlphaValues, 'Energy':Energies,'Variance':Variances}
 frame = pd.DataFrame(data)
 print(frame)
 
