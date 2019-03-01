@@ -481,13 +481,25 @@ oscillator frequency. We use the following trial wave function
 
 !bt
 \[
-\psi_T(x;\alpha) = \exp{-(\alpha^2x^2)},
+\psi_T(x;\alpha) = \exp{-(\frac{1}{2}\alpha^2x^2)},
 \]
 !et 
 which results in a local energy 
 !bt
 \[
 \frac{1}{2}\left(\alpha^2+x^2(1-\alpha^4)\right).
+\]
+!et
+We can compare our numerically calculated energies with the exact energy as function of $\alpha$
+!bt
+\[
+\overline{E}[\alpha] = \frac{1}{4}\left(\alpha^2+\frac{1}{\alpha^2}\right).
+\]
+!et
+Similarly, with the above ansatz, we can also compute the exact variance which reads
+!bt
+\[
+\sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}.
 \]
 !et
 The code is similar to the one we discussed above for the hydrogen atom. After the initializations
@@ -583,24 +595,27 @@ def MonteCarloSampling():
         outfile.write('%f %f %f %f \n' %(alpha,energy,variance,error))
     return Energies, AlphaValues, Variances
 !ec
-
-
-Finally, the initializations and runs are performed here.
+Finally, the results are presented here with the exact energies and variances as well.
 !bc pycod
 #Here starts the main program with variable declarations
 MaxVariations = 20
 Energies = np.zeros((MaxVariations))
+ExactEnergies = np.zeros((MaxVariations))
+ExactVariance = np.zeros((MaxVariations))
 Variances = np.zeros((MaxVariations))
 AlphaValues = np.zeros(MaxVariations)
 (Energies, AlphaValues, Variances) = MonteCarloSampling()
 outfile.close()
+ExactEnergies = 0.25*(AlphaValues*AlphaValues+1.0/(AlphaValues*AlphaValues))
+ExactVariance = 0.25*(1.0+((1.0-AlphaValues**4)**2)*3.0/(4*(AlphaValues**4)))-ExactEnergies*ExactEnergies
+
 #simple subplot
 plt.subplot(2, 1, 1)
-plt.plot(AlphaValues, Energies, 'o-')
+plt.plot(AlphaValues, Energies, 'o-',AlphaValues, ExactEnergies,'r-')
 plt.title('Energy and variance')
 plt.ylabel('Dimensionless energy')
 plt.subplot(2, 1, 2)
-plt.plot(AlphaValues, Variances, '.-')
+plt.plot(AlphaValues, Variances, '.-',AlphaValues, ExactVariance,'r-')
 plt.xlabel(r'$\alpha$', fontsize=15)
 plt.ylabel('Variance')
 save_fig("VMCHarmonic")
@@ -608,12 +623,15 @@ plt.show()
 #nice printout with Pandas
 import pandas as pd
 from pandas import DataFrame
-data ={'Alpha':AlphaValues, 'Energy':Energies,'Variance':Variances}
+data ={'Alpha':AlphaValues, 'Energy':Energies,'Exact Energy':ExactEnergies,'Variance':Variances,'Exact Variance':ExactVariance,}
 frame = pd.DataFrame(data)
 print(frame)
+
 !ec
 
-For $\alpha=1$ we have the exact eigenpairs, as ca be deduced from the table here. With $\omega=1$, the exact energy is $1/2$ a.u. with zer variance, as it should.
+For $\alpha=1$ we have the exact eigenpairs, as ca be deduced from the
+table here. With $\omega=1$, the exact energy is $1/2$ a.u. with zero
+variance, as it should. We see also that our computed variance follows rather well the exact variance.
 
 
 

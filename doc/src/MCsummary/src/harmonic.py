@@ -92,17 +92,22 @@ def MonteCarloSampling():
 #Here starts the main program with variable declarations
 MaxVariations = 20
 Energies = np.zeros((MaxVariations))
+ExactEnergies = np.zeros((MaxVariations))
+ExactVariance = np.zeros((MaxVariations))
 Variances = np.zeros((MaxVariations))
 AlphaValues = np.zeros(MaxVariations)
 (Energies, AlphaValues, Variances) = MonteCarloSampling()
 outfile.close()
+ExactEnergies = 0.25*(AlphaValues*AlphaValues+1.0/(AlphaValues*AlphaValues))
+ExactVariance = 0.25*(1.0+((1.0-AlphaValues**4)**2)*3.0/(4*(AlphaValues**4)))-ExactEnergies*ExactEnergies
+
 #simple subplot
 plt.subplot(2, 1, 1)
-plt.plot(AlphaValues, Energies, 'o-')
+plt.plot(AlphaValues, Energies, 'o-',AlphaValues, ExactEnergies,'r-')
 plt.title('Energy and variance')
 plt.ylabel('Dimensionless energy')
 plt.subplot(2, 1, 2)
-plt.plot(AlphaValues, Variances, '.-')
+plt.plot(AlphaValues, Variances, '.-',AlphaValues, ExactVariance,'r-')
 plt.xlabel(r'$\alpha$', fontsize=15)
 plt.ylabel('Variance')
 save_fig("VMCHarmonic")
@@ -110,7 +115,7 @@ plt.show()
 #nice printout with Pandas
 import pandas as pd
 from pandas import DataFrame
-data ={'Alpha':AlphaValues, 'Energy':Energies,'Variance':Variances}
+data ={'Alpha':AlphaValues, 'Energy':Energies,'Exact Energy':ExactEnergies,'Variance':Variances,'Exact Variance':ExactVariance,}
 frame = pd.DataFrame(data)
 print(frame)
 
