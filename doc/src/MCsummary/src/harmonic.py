@@ -49,7 +49,7 @@ def LocalEnergy(r,alpha):
 @jit
 def MonteCarloSampling():
 
-    NumberMCcycles= 100000
+    NumberMCcycles= 1000000
     StepSize = 1.0
     # positions
     PositionOld = 0.0
@@ -65,16 +65,15 @@ def MonteCarloSampling():
         energy = energy2 = 0.0
         #Initial position
         PositionOld = StepSize * (random() - .5)
-        wfold = WaveFunction(PositionOld,alpha)
         #Loop over MC MCcycles
         for MCcycle in range(NumberMCcycles):
             #Trial position 
             PositionNew = PositionOld + StepSize*(random() - .5)
-            wfnew = WaveFunction(PositionNew,alpha)
+            #argument in exponential for Metropolis test
+            argument = -alpha*alpha*(PositionNew*PositionNew-PositionOld*PositionOld)    
             #Metropolis test to see whether we accept the move
-            if random() <= wfnew**2 / wfold**2:
+            if random() <= exp(argument):
                 PositionOld = PositionNew
-                wfold = wfnew
             DeltaE = LocalEnergy(PositionOld,alpha)
             energy += DeltaE
             energy2 += DeltaE**2
@@ -92,17 +91,22 @@ def MonteCarloSampling():
 #Here starts the main program with variable declarations
 MaxVariations = 20
 Energies = np.zeros((MaxVariations))
+ExactEnergies = np.zeros((MaxVariations))
+ExactVariance = np.zeros((MaxVariations))
 Variances = np.zeros((MaxVariations))
 AlphaValues = np.zeros(MaxVariations)
 (Energies, AlphaValues, Variances) = MonteCarloSampling()
 outfile.close()
+ExactEnergies = 0.25*(AlphaValues*AlphaValues+1.0/(AlphaValues*AlphaValues))
+ExactVariance = 0.25*(1.0+((1.0-AlphaValues**4)**2)*3.0/(4*(AlphaValues**4)))-ExactEnergies*ExactEnergies
+
 #simple subplot
 plt.subplot(2, 1, 1)
-plt.plot(AlphaValues, Energies, 'o-')
+plt.plot(AlphaValues, Energies, 'o-',AlphaValues, ExactEnergies,'r-')
 plt.title('Energy and variance')
 plt.ylabel('Dimensionless energy')
 plt.subplot(2, 1, 2)
-plt.plot(AlphaValues, Variances, '.-')
+plt.plot(AlphaValues, Variances, '.-',AlphaValues, ExactVariance,'r-')
 plt.xlabel(r'$\alpha$', fontsize=15)
 plt.ylabel('Variance')
 save_fig("VMCHarmonic")
@@ -110,7 +114,7 @@ plt.show()
 #nice printout with Pandas
 import pandas as pd
 from pandas import DataFrame
-data ={'Alpha':AlphaValues, 'Energy':Energies,'Variance':Variances}
+data ={'Alpha':AlphaValues, 'Energy':Energies,'Exact Energy':ExactEnergies,'Variance':Variances,'Exact Variance':ExactVariance,}
 frame = pd.DataFrame(data)
 print(frame)
 

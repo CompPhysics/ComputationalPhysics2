@@ -35,14 +35,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numba import jit
 
-# Trial wave function for the hydrogen atom
+# Trial wave function for the hydrogen atom, note spherical coordinates
 def WaveFunction(r,alpha):
-    argument = np.linalg.norm(r)
-    return alpha*argument*exp(-alpha*argument)
+    return alpha*r*exp(-alpha*r)
 
-# Local energy  for the hydrogen atom
+# Local energy  for the hydrogen atom, note spherical coordinates
 def LocalEnergy(r,alpha):
-    return (1.0/np.linalg.norm(r))*(alpha-1)-alpha*alpha*0.5
+    return (alpha-1.0)/r-alpha*alpha*0.5
 
 # The Monte Carlo sampling with the Metropolis algo
 # The jit decorator tells Numba to compile this function.
@@ -53,8 +52,8 @@ def MonteCarloSampling():
     NumberMCcycles= 10000
     StepSize = 1.0
     # positions
-    PositionOld = np.zeros((Dimension), np.double)
-    PositionNew = np.zeros((Dimension), np.double)
+    PositionOld = 0.0
+    PositionNew = 0.0
 
     # seed for rng generator
     seed()
@@ -65,14 +64,12 @@ def MonteCarloSampling():
         AlphaValues[ia] = alpha
         energy = energy2 = 0.0
         #Initial position
-        for j in range(Dimension):
-            PositionOld[j] = StepSize * (random() - .5)
+        PositionOld = StepSize * random()
         wfold = WaveFunction(PositionOld,alpha)
         #Loop over MC MCcycles
         for MCcycle in range(NumberMCcycles):
             #Trial position 
-            for j in range(Dimension):
-                PositionNew[j] = PositionOld[j] + StepSize*(random() - .5)
+            PositionNew = PositionOld + StepSize*random()
             wfnew = WaveFunction(PositionNew,alpha)
             #Metropolis test to see whether we accept the move
             if random() <= wfnew**2 / wfold**2:
@@ -93,8 +90,6 @@ def MonteCarloSampling():
 
 
 #Here starts the main program with variable declarations
-NumberParticles = 1
-Dimension = 3
 MaxVariations = 10
 Energies = np.zeros((MaxVariations))
 Variances = np.zeros((MaxVariations))
