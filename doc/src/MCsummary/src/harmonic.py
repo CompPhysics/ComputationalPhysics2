@@ -49,7 +49,7 @@ def LocalEnergy(r,alpha):
 @jit
 def MonteCarloSampling():
 
-    NumberMCcycles= 100000
+    NumberMCcycles= 1000000
     StepSize = 1.0
     # positions
     PositionOld = 0.0
@@ -65,16 +65,15 @@ def MonteCarloSampling():
         energy = energy2 = 0.0
         #Initial position
         PositionOld = StepSize * (random() - .5)
-        wfold = WaveFunction(PositionOld,alpha)
         #Loop over MC MCcycles
         for MCcycle in range(NumberMCcycles):
             #Trial position 
             PositionNew = PositionOld + StepSize*(random() - .5)
-            wfnew = WaveFunction(PositionNew,alpha)
+            #argument in exponential for Metropolis test
+            argument = -alpha*alpha*(PositionNew*PositionNew-PositionOld*PositionOld)    
             #Metropolis test to see whether we accept the move
-            if random() <= wfnew**2 / wfold**2:
+            if random() <= exp(argument):
                 PositionOld = PositionNew
-                wfold = wfnew
             DeltaE = LocalEnergy(PositionOld,alpha)
             energy += DeltaE
             energy2 += DeltaE**2
