@@ -2403,15 +2403,9 @@ Some of these remarks are particular to DNNs, others are shared by all supervise
 
 
 
-===== Why Boltzmann machines? =====
 
-What is known as restricted Boltzmann Machines (RMB) have received a lot of attention lately. 
-One of the major reasons is that they can be stacked layer-wise to build deep neural networks that capture complicated statistics.
 
-The original RBMs had just one visible layer and a hidden layer, but recently so-called Gaussian-binary RBMs have gained quite some popularity in imaging since they are capable of modeling continuous data that are common to natural images. 
-
-Furthermore, they have been used to solve complicated quantum mechanical many-particle problems or classical statistical physics problems like the Ising and Potts classes of models. 
-
+===== Boltzmann Machines =====
 
 Why use a generative model rather than the more well known discriminative deep neural networks (DNN)? 
 
@@ -2423,7 +2417,6 @@ Why use a generative model rather than the more well known discriminative deep n
   o Generate a sample of an ordered or disordered Ising model phase, having been given samples of such phases.
   o Model the trial function for Monte Carlo calculations
 
-
  o Both use gradient-descent based learning procedures for minimizing cost functions
  o Energy based models don't use backpropagation and automatic differentiation for computing gradients, instead turning to Markov Chain Monte Carlo methods.
  o DNNs often have several hidden layers. A restricted Boltzmann machine has only one hidden layer, however several RBMs can be stacked to make up Deep Belief Networks, of which they constitute the building blocks.
@@ -2431,37 +2424,49 @@ Why use a generative model rather than the more well known discriminative deep n
 History: The RBM was developed by amongst others Geoffrey Hinton, called by some the "Godfather of Deep Learning", working with the University of Toronto and Google.
 
 
+
+!bblock
 A BM is what we would call an undirected probabilistic graphical model
 with stochastic continuous or discrete units.
+!eblock
+!bblock
 It is interpreted as a stochastic recurrent neural network where the
 state of each unit(neurons/nodes) depends on the units it is connected
 to. The weights in the network represent thus the strength of the
 interaction between various units/nodes.
-
+!eblock
+!bblock
 It turns into a Hopfield network if we choose deterministic rather
 than stochastic units. In contrast to a Hopfield network, a BM is a
 so-called generative model. It allows us to generate new samples from
 the learned distribution.
+!eblock
 
+!bblock
 A standard BM network is divided into a set of observable and visible units $\hat{x}$ and a set of unknown hidden units/nodes $\hat{h}$.
+!eblock
 
-
-
+!bblock
 Additionally there can be bias nodes for the hidden and visible layers. These biases are normally set to $1$.
+!eblock
 
-
-
+!bblock
 BMs are stackable, meaning they cwe can train a BM which serves as input to another BM. We can construct deep networks for learning complex PDFs. The layers can be trained one after another, a feature which makes them popular in deep learning
+!eblock
 
 However, they are often hard to train. This leads to the introduction of so-called restricted BMs, or RBMS.
 Here we take away all lateral connections between nodes in the visible layer as well as connections between nodes in the hidden layer. The network is illustrated in the figure below.
 
+FIGURE: [figures/RBM.pdf, width=800 frac=1.0]
 
+
+
+!split
+===== The network =====
 
 _The network layers_:
   o A function $\mathbf{x}$ that represents the visible layer, a vector of $M$ elements (nodes). This layer represents both what the RBM might be given as training input, and what we want it to be able to reconstruct. This might for example be the pixels of an image, the spin values of the Ising model, or coefficients representing speech.
   o The function $\mathbf{h}$ represents the hidden, or latent, layer. A vector of $N$ elements (nodes). Also called "feature detectors".
-
 
 The goal of the hidden layer is to increase the model's expressive power. We encode complex interactions between visible variables by introducing additional, hidden variables that interact with visible degrees of freedom in a simple manner, yet still reproduce the complex correlations between visible degrees in the data once marginalized over (integrated out).
 
@@ -2475,7 +2480,9 @@ _The network parameters, to be optimized/learned_:
   o $W$ represents the interaction weights, a matrix of size $M\times N$.
 
 
-The restricted Boltzmann machine is described by a Boltzmann distribution
+
+=== Joint distribution ===
+The restricted Boltzmann machine is described by a Bolztmann distribution
 !bt
 \begin{align}
 	P_{rbm}(\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})},
@@ -2490,6 +2497,7 @@ where $Z$ is the normalization constant or partition function, defined as
 It is common to ignore $T_0$ by setting it to one. 
 
 
+=== Network Elements, the energy function  ===
 
 The function $E(\mathbf{x},\mathbf{h})$ gives the _energy_ of a
 configuration (pair of vectors) $(\mathbf{x}, \mathbf{h})$. The lower
@@ -2511,7 +2519,7 @@ The quantities $b$ and $c$ can be interpreted as the visible and hidden biases, 
 
 The connection between the nodes in the two layers is given by the weights $w_{ij}$. 
 
-
+=== Defining different types of RBMs ===
 There are different variants of RBMs, and the differences lie in the types of visible and hidden units we choose as well as in the implementation of the energy function $E(\mathbf{x},\mathbf{h})$. 
 
 !bblock Binary-Binary RBM:
@@ -2534,7 +2542,8 @@ Another varient is the RBM where the visible units are Gaussian while the hidden
 !et
 !eblock
 
-o Useful when we model continuous data (i.e., we wish $\mathbf{x}$ to be continuous)
+
+o RBMs are Useful when we model continuous data (i.e., we wish $\mathbf{x}$ to be continuous)
 o Requires a smaller learning rate, since there's no upper bound to the value a component might take in the reconstruction
 
 Other types of units include:
@@ -2543,54 +2552,6 @@ Other types of units include:
  o Binomial units
  o Rectified linear units
 
-
-
-In order to sample from the RBM probability distribution it is common to use Markov Chain Monte Carlo (MCMC) algorithms such as Metropolis-Hastings or Gibbs sampling.
-
-
-
-Metropolis sampling starts by suggesting a new configuration $\bm{x}^{k+1}$. In the brute force method this is done by some random change of the visible units. The new configuration is then accepted with the acceptance probability
-!bt
-\begin{align}
-	A(\bm{x}^k \rightarrow \bm{x}^{k+1}) = \text{min} (1, \frac{P(\bm{x}^{k+1})}{P(\bm{x}^k)}),
-\end{align} 
-!et
-where we need the marginalized probability
-!bt
-\begin{align}
-	P(\bm{x})  &= \sum_\mathbf{h} P_{rbm}(\mathbf{x}, \mathbf{h}) \\
-				&= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}.
-\end{align}
-!et
-
-
-=== Grinding through the details ===
-
-Show to compute the marginal probabilities
-
-=== Sampling: Gibbs sampling ===
-
-In this method we sample from the joint probability $P_{rbm} (\mathbf{x}, \mathbf{h})$ by way of a two step sampling process. We alternately update the visible and hidden units.
-New samples are generated according to the conditional probabilities $P(x_i|\mathbf{h})$ and $P(h_j|\mathbf{x})$ respectively and accepted with the probability of $1$. While the the visible nodes are dependent on the hidden nodes and vice versa, the nodes are independent of other nodes within the same layer. This is due to there being no intra layer interactions in the restricted Boltzmann machine.
-
-The conditional probabilities are often referred to as the activitation functions in the neural networks context due to their role in determining the node outputs. For the binary-binary RBM they are
-!bt
-\begin{align}
-	P(h_j = 1 | \bm{x}) &= \frac{1}{1 + e^{-b_j - \sum_i x_i w_{ij}}} \\
-	P(x_i = 1 | \bm{h}) &= \frac{1}{1 + e^{-a_j - \sum_j h_j w_{ij}}},
-\end{align}
-!et
-where we recognize the logistic sigmoid function $\sigma (x) = 1/(1+exp(-x))$.
-
-=== Gaussian RBM ===
-For the Gaussian-Binary RBM the conditional probabilities are
-!bt
-\begin{align}
-	P(x_i|\mathbf{h}) &= \mathcal{N}(x_i; a_i+ \sum_j h_j w_{ij}, \sigma^2) \\
-	P(h_j=1|\mathbf{x}) &=  \frac{1}{1+e^{-b_j-\frac{1}{\sigma^2} \sum_i x_i w_{ij}}},
-\end{align}
-!et
-while the visible units now follow a normal distribution, we see the hidden units again follow the logistic sigmoid function.
 
 === Cost function ===
 
@@ -2637,7 +2598,13 @@ and used the statistical mechanics relationship between expectation values and t
 \end{align}
 !et
 
-The data-dependent term in the gradient is known as the positive phase of the gradient, while the model-dependent term is known as the negative phase of the gradient. The aim of the training is to lower the energy of configurations that are near observed data points (increasing their probability), and raising the energy of configurations that are far from observed data points (decreasing their probability).
+The data-dependent term in the gradient is known as the positive phase
+of the gradient, while the model-dependent term is known as the
+negative phase of the gradient. The aim of the training is to lower
+the energy of configurations that are near observed data points
+(increasing their probability), and raising the energy of
+configurations that are far from observed data points (decreasing
+their probability).
 
 The gradient of the negative log-likelihood cost function of a Binary-Binary RBM is then
 !bt
@@ -2650,8 +2617,20 @@ The gradient of the negative log-likelihood cost function of a Binary-Binary RBM
 To get the expecation values with respect to the *data*, we set the visible units to each of the observed samples in the training data, then update the hidden units according to the conditional probability found before. We then average over all samples in the training data to calculate expectation values with respect to the data. 
 
 
-To get the expectation values with respect to the *model*, we use Gibbs sampling. We can either initialize the $\bm{x}$ randomly or with a training sample. While we ideally want a large number of Gibbs iterations $n\rightarrow n$, one might decide to truncate it earlier for efficiency. Doing this while having intialized $\bm{x}$ with a training data vector is referred to as contrastive divergence (CD), because one is then closer to approximating the gradient of this function than the negative log-likelihood. The contrastive divergence function is the difference between two Kullback-Leibler divergences (also called relative entropy), which measure how one probability distribution diverges from a second, expected probability distribution (in this case the estimated one from the ground truth one).
+=== Which sampling to use ===
 
+To get the expectation values with respect to the *model*, we use
+Gibbs sampling. We can either initialize the $\bm{x}$ randomly or with
+a training sample. While we ideally want a large number of Gibbs
+iterations $n\rightarrow n$, one might decide to truncate it earlier
+for efficiency. Doing this while having intialized $\bm{x}$ with a
+training data vector is referred to as contrastive divergence (CD),
+because one is then closer to approximating the gradient of this
+function than the negative log-likelihood. The contrastive divergence
+function is the difference between two Kullback-Leibler divergences
+(also called relative entropy), which measure how one probability
+distribution diverges from a second, expected probability distribution
+(in this case the estimated one from the ground truth one).
 
 
 === Kullback-Leibler relative entropy ===
@@ -2679,6 +2658,7 @@ training data $f(\bm{x})$ and the model distribution $p(\bm{x}|
 	f (\bm{x}) \log \frac{f(\bm{x})}{p(\bm{x}| \bm{\theta})} d\bm{x} \\
 	=& \int_{-\infty}^{\infty} f(\bm{x}) \log f(\bm{x}) d\bm{x} - \int_{-\infty}^{\infty} f(\bm{x}) \log
 	p(\bm{x}| \bm{\theta}) d\bm{x} \\
+	%=& \mathbb{E}_{f(\bm{x})} (\log f(\bm{x})) - \mathbb{E}_{f(\bm{x})} (\log p(\bm{x}| \bm{\theta}))
 	=& \langle \log f(\bm{x}) \rangle_{f(\bm{x})} - \langle \log p(\bm{x}| \bm{\theta}) \rangle_{f(\bm{x})} \\
 	=& \langle \log f(\bm{x}) \rangle_{data} + \langle E(\bm{x}) \rangle_{data} + \log Z \\
 	=& \langle \log f(\bm{x}) \rangle_{data} + \mathcal{C}_{LL} .
@@ -2687,7 +2667,6 @@ training data $f(\bm{x})$ and the model distribution $p(\bm{x}|
 
 The first term is constant with respect to $\bm{\theta}$ since $f(\bm{x})$ is independent of $\bm{\theta}$. Thus the Kullback-Leibler Divergence is minimal when the second term is minimal. The second term is the log-likelihood cost function, hence minimizing the Kullback-Leibler divergence is equivalent to maximizing the log-likelihood.
 
-=== Optimizing the cost function ===
 
 To further understand generative models it is useful to study the
 gradient of the cost function which is needed in order to minimize it
@@ -2707,15 +2686,16 @@ case we have
 
 Here $\langle \cdot \rangle_{model}$ is the expectation value over the model probability distribution $p(\bm{x}| \bm{\theta})$.
 
-=== Setting up for gradient descent calculations ===
+===== Setting up for gradient descent calculations =====
 
 Using the previous relationship we can express the gradient of the cost function as
 
 !bt
 \begin{align}
-	\frac{\partial \mathcal{C}_{LL}}{\partial \theta_i}=& \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{data} + \frac{\partial \log Z(\theta_i)}{ \partial  \theta_i} \\
+	\frac{\partial \mathcal{C}_{LL}}{\partial \theta_i}
+	=& \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{data} + \frac{\partial \log Z(\theta_i)}{ \partial  \theta_i} \\
 	=& \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{data} - \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{model} \\
-	=& \langle O_i(\bm{x}) \rangle_{data} - \langle O_i(\bm{x}) \rangle_{model}
+	%=& \langle O_i(\bm{x}) \rangle_{data} - \langle O_i(\bm{x}) \rangle_{model}
 \end{align}
 !et
 
@@ -2765,12 +2745,12 @@ Some of their motivation included
 * Want to understand whether an artifical neural network may adapt to describe a quantum system.
 
 
-
 Carleo and Troyer applied the RBM to the quantum mechanical spin lattice systems of the Ising model and Heisenberg model, with encouraging results. Our goal is to test the method on systems of moving particles. For the spin lattice systems it was natural to use a binary-binary RBM, with the nodes taking values of 1 and -1. For moving particles, on the other hand, we want the visible nodes to be continuous, representing position coordinates. Thus, we start by choosing a Gaussian-binary RBM, where the visible nodes are continuous and hidden nodes take on values of 0 or 1. If eventually we would like the hidden nodes to be continuous as well the rectified linear units seem like the most relevant choice.
 
 
 
-=== Representing the wave function ===
+
+===== Representing the wave function =====
 The wavefunction should be a probability amplitude depending on $\bm{x}$. The RBM model is given by the joint\
  distribution of $\bm{x}$ and $\bm{h}$
 !bt
@@ -2798,9 +2778,7 @@ _i w_{ij}}{\sigma^2}}). \\
 \end{align}
 !et
 
-
-
-=== Choose the cost function ===
+===== Choose the cost function =====
 Now we don't necessarily have training data (unless we generate it by using some other method). However, what we do have is the variational principle which allows us to obtain the ground state wave function by minimizing the expectation value of the energy of a trial wavefunction (corresponding to the untrained NQS). Similarly to the traditional variational Monte Carlo method then, it is the local energy we wish to minimize. The gradient to use for the stochastic gradient descent procedure is
 !bt
 \begin{align}
@@ -2814,6 +2792,7 @@ where the local energy is given by
 	E_L = \frac{1}{\Psi} \hat{\mathbf{H}} \Psi.
 \end{align}
 !et
+
 
 
 === Mathematical details ===
