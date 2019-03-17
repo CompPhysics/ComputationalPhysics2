@@ -2717,6 +2717,119 @@ it is common to add regularizers to the cost function in the same
 manner as we discussed for say linear regression.
 
 
+
+===== Basic Elements of the Bayesian Recipe =====
+
+In the derivation of our equations for the Boltzmann machines, we need some basic elements of Bayesian statistics.
+Baye's theorem is based on the so-called product rule. We repeat some of these elements here.
+
+Probability Theory Axioms:
+- Product (AND) rule : $p(A, B | I) = p(A|I) p(B|A, I) = p(B|I)p(A|B,I)$<linebreak>
+  Should read $p(A,B|I)$ as the probability for propositions $A$ AND $B$ being true given that $I$ is true.
+- Sum (OR) rule: $p(A + B | I) = p(A | I) + p(B | I) - p(A, B | I)$<linebreak>
+  $p(A+B|I)$ is the probability that proposition $A$ OR $B$ is true given that $I$ is true.
+- Normalization: $p(A|I) + p(\bar{A}|I) = 1$<linebreak>
+  $\bar{A}$ denotes the proposition that $A$ is false.
+ 
+
+
+Bayes' theorem follows directly from the product rule
+!bt
+$$
+p(A|B,I) = \frac{p(B|A,I) p(A|I)}{p(B|I)}.
+$$
+!et
+The importance of this property to data analysis becomes apparent if we replace $A$ and $B$ by hypothesis($H$) and data($D$):
+!bt
+\begin{align}
+p(H|D,I) &= \frac{p(D|H,I) p(H|I)}{p(D|I)}.
+label{eq:bayes}
+\end{align}
+!et
+The power of Bayes’ theorem lies in the fact that it relates the quantity of interest, the probability that the hypothesis is true given the data, to the term we have a better chance of being able to assign, the probability that we would have observed the measured data if the hypothesis was true.
+
+The various terms in Bayes’ theorem have formal names. 
+* The quantity on the far right, $p(H|I)$, is called the *prior* probability; it represents our state of knowledge (or ignorance) about the truth of the hypothesis before we have analysed the current data. 
+* This is modified by the experimental measurements through $p(D|H,I)$, the *likelihood* function, 
+* The denominator $p(D|I)$ is called the *evidence*. It does not depend on the hypothesis and can be regarded as a normalization constant.
+* Together, these yield the *posterior* probability, $p(H|D, I )$, representing our state of knowledge about the truth of the hypothesis in the light of the data. 
+
+In a sense, Bayes’ theorem encapsulates the process of learning.
+
+- Normalization: $\sum_i p(H_i|\ldots) = 1$.
+- Marginalization: $\sum_i p(A,H_i|I) = \sum_i p(H_i|A,I) p(A|I) = p(A|I)$.
+- Marginalization (continuum limit): $\int dx p(A,H(x)|I) = p(A|I)$.
+
+In the above, $H_i$ is an exclusive and exhaustive list of hypotheses. For example,let’s imagine that there are five candidates in a presidential election; then $H_1$ could be the proposition that the first candidate will win, and so on. The probability that $A$ is true, for example that unemployment will be lower in a year’s time (given all relevant information $I$, but irrespective of whoever becomes president) is then given by $\sum_i p(A,H_i|I)$.
+
+In the continuum limit of propositions we must understand $p(\ldots)$ as a pdf (probability density function).
+
+Marginalization is a very powerful device in data analysis because it enables us to deal with nuisance parameters; that is, quantities which necessarily enter the analysis but are of no intrinsic interest. The unwanted background signal present in many experimental measurements are examples of nuisance parameters.
+
+
+
+=== Inference With Parametric Models  ===
+
+Inductive inference with parametric models is a very important tool in the natural sciences.
+* Consider $N$ different models $M_i$ ($i = 1, \ldots, N$), each with parameters $\boldsymbol{\alpha}_i$. Each of them implies a sampling distribution (conditional predictive distribution for possible data)
+!bt
+$$
+p(D|\boldsymbol{\alpha}_i, M_i)
+$$
+!et
+* The $\boldsymbol{\alpha}_i$ dependence when we fix attention on the actual, observed data ($D_\mathrm{obs}$) is the likelihood function:
+!bt
+$$
+\mathcal{L}_i (\boldsymbol{\alpha}_i) \equiv p(D_\mathrm{obs}|\boldsymbol{\alpha}_i, M_i)
+$$
+!et
+* We may be uncertain about $i$ (model uncertainty),
+* or uncertain about $\boldsymbol{\alpha}_i$ (parameter uncertainty).
+
+- Parameter Estimation: Premise = choice of model (pick specific $i$)<linebreak>
+  $\Rightarrow$ What can we say about $\boldsymbol{\alpha}_i$?
+- Model comparison: Premise = $\{M_i\}$<linebreak> 
+  $\Rightarrow$ What can we say about $i$?
+- Model adequacy: Premise = $M_1$<linebreak> 
+  $\Rightarrow$ Is $M_1$ adequate?
+- Hybrid Uncertainty: Models share some common params: $\boldsymbol{\alpha}_1 = \{ \boldsymbol{\varphi}, \boldsymbol{\eta}_i\}$<linebreak>
+  $\Rightarrow$ What can we say about $\boldsymbol{\varphi}$? (Systematic error is an example)
+
+
+
+In the light of this data, our inference about the fairness of this coin is summarized by the conditional pdf: $p(H|D,I)$. This is, of course, shorthand for the limiting case of a continuum of propositions for the value of $H$; that is to say, the probability that $H$ lies in an infinitesimally narrow range is given by $p(H|D,I) dH$. 
+
+To estimate this posterior pdf, we need to use Bayes’ theorem (ref{eq:bayes}). We will ignore the denominator $p(D|I)$ as it does not involve bias-weighting explicitly, and it will therefore not affect the shape of the desired pdf. At the end we can evaluate the missing constant subsequently from the normalization condition 
+!bt
+\begin{equation}
+\int_0^1 p(H|D,I) dH = 1.
+label{eq:coin_posterior_norm}
+\end{equation}
+!et
+
+The prior pdf, $p(H|I)$, represents what we know about the coin given only the information $I$ that we are dealing with a ‘strange coin’. We could keep a very open mind about the nature of the coin; a simple probability assignment which reflects this is a uniform, or flat, prior
+!bt
+\begin{equation}
+p(H|I) = \left\{ \begin{array}{ll}
+1 & 0 \le H \le 1, \\
+0 & \mathrm{otherwise}.
+\end{array} \right.
+label{eq:coin_prior_uniform}
+\end{equation}
+!et
+
+
+This prior state of knowledge, or ignorance, is modified by the data through the likelihood function $p(D|H,I)$. It is a measure of the chance that we would have obtained the data that we actually observed, if the value of the bias-weighting was given (as known). If, in the conditioning information $I$, we assume that the flips of the coin were independent events, so that the outcome of one did not influence that of another, then the probability of obtaining the data `R heads in N tosses' is given by the binomial distribution (we leave a formal definition of this to a statistics textbook)
+!bt
+\begin{equation}
+p(D|H,I) \propto H^R (1-H)^{N-R}.
+\end{equation}
+!et
+It seems reasonable because $H$ is the chance of obtaining a head on any flip, and there were $R$ of them, and $1-H$ is the corresponding probability for a tail, of which there were $N-R$. We note that this binomial distribution also contains a normalization factor, but we will ignore it since it does not depend explicitly on $H$, the quantity of interest. It will be absorbed by the normalization condition (ref{eq:coin_posterior_norm}).
+
+
+
+
 ===== Recent examples: RBMs for the quantum many body problem =====
 
 The idea of applying RBMs to quantum many body problems was presented by G. Carleo and M. Troyer, working with ETH Zurich and Microsoft Research.
@@ -3199,185 +3312,7 @@ $\sigma_i^2$.
 
 
 
-===== Inference  =====
-!bblock
-- Inference: ``the act of passing from one proposition, statement or judgment considered as true to another whose truth is believed to follow from that of the former'' (Webster) <linebreak>
-  Do premises $A, B, \ldots \to$ hypothesis, $H$? 
-
-- Deductive inference: Premises allow definite determination of truth/falsity of H (syllogisms, symbolic logic, Boolean algebra) <linebreak>
-  $B(H|A,B,...) = 0$ or $1$
-
-- Inductive inference: Premises bear on truth/falsity of H, but don’t allow its definite determination (weak syllogisms, analogies)<linebreak>
-  $A, B, C, D$ share properties $x, y, z$; $E$ has properties $x, y$<linebreak>
-  $\to$ $E$ probably has property $z$.
-!eblock
 
 
-===== Statistical Inference  =====
-!bblock
-* Quantify the strength of inductive inferences from facts, in the form of data ($D$), and other premises, e.g. models, to hypotheses about the phenomena producing the data.
-* Quantify via probabilities, or averages calculated using probabilities. Frequentists ($\mathcal{F}$) and Bayesians ($\mathcal{B}$) use probabilities very differently for this.
-* To the pioneers such as Bernoulli, Bayes and Laplace, a probability represented a *degree-of-belief* or plausability: how much they thought that something as true based on the evidence at hand. This is the Bayesian approach.
-* To the 19th century scholars, this seemed too vague and subjective. They redefined probability as the *long run relative frequency* with which an event occurred, given (infinitely) many repeated (experimental) trials.
-!eblock
-
-
-===== Some history =====
-Adapted from D.S. Sivia[^Sivia]:
-
-[^Sivia]: Sivia, Devinderjit, and John Skilling. Data Analysis : A Bayesian Tutorial, OUP Oxford, 2006
-
-!bquote
-Although the frequency definition appears to be more objective, its range of validity is also far more limited. For example, Laplace used (his) probability theory to estimate the mass of Saturn, given orbital data that were available to him from various astronomical observatories. In essence, he computed the posterior pdf for the mass M , given the data and all the relevant background information I (such as a knowledge of the laws of classical mechanics): prob(M|{data},I); this is shown schematically in the figure [Fig. 1.2]. 
-!equote
-
-!bquote
-To Laplace, the (shaded) area under the posterior pdf curve between $m_1$ and $m_2$ was a measure of how much he believed that the mass of Saturn lay in the range $m_1 \le M \le m_2$. As such, the position of the maximum of the posterior pdf represents a best estimate of the mass; its width, or spread, about this optimal value gives an indication of the uncertainty in the estimate. Laplace stated that: ‘ . . . it is a bet of 11,000 to 1 that the error of this result is not 1/100th of its value.’ He would have won the bet, as another 150 years’ accumulation of data has changed the estimate by only 0.63%! 
-!equote
-
-
-!bquote
-According to the frequency definition, however, we are not permitted to use probability theory to tackle this problem. This is because the mass of Saturn is a constant and not a random variable; therefore, it has no frequency distribution and so probability theory cannot be used.
-
-If the pdf [of Fig. 1.2] had to be interpreted in terms of the frequency definition, we would have to imagine a large ensemble of universes in which everything remains constant apart from the mass of Saturn. 
-!equote
-
-!bquote
-As this scenario appears quite far-fetched, we might be inclined to think of [Fig. 1.2] in terms of the distribution of the measurements of the mass in many repetitions of the experiment. Although we are at liberty to think about a problem in any way that facilitates its solution, or our understanding of it, having to seek a frequency interpretation for every data analysis problem seems rather perverse.
-For example, what do we mean by the ‘measurement of the mass’ when the data consist of orbital periods? Besides, why should we have to think about many repetitions of an experiment that never happened? What we really want to do is to make the best inference of the mass given the (few) data that we actually have; this is precisely the Bayes and Laplace view of probability.
-!equote
-
-
-!bquote
-Faced with the realization that the frequency definition of probability theory did not permit most real-life scientific problems to be addressed, a new subject was invented — statistics! To estimate the mass of Saturn, for example, one has to relate the mass to the data through some function called the statistic; since the data are subject to ‘random’ noise, the statistic becomes the random variable to which the rules of probability the- ory can be applied. But now the question arises: How should we choose the statistic? The frequentist approach does not yield a natural way of doing this and has, therefore, led to the development of several alternative schools of orthodox or conventional statis- tics. The masters, such as Fisher, Neyman and Pearson, provided a variety of different principles, which has merely resulted in a plethora of tests and procedures without any clear underlying rationale. This lack of unifying principles is, perhaps, at the heart of the shortcomings of the cook-book approach to statistics that students are often taught even today.
-!equote
-
-
-===== The Bayesian recipe =====
-!bblock
-Assess hypotheses by calculating their probabilities $p(H_i | \ldots)$ conditional on known and/or presumed information using the rules of probability theory.
-!eblock
-!bblock
-Probability Theory Axioms:
-- Product (AND) rule : $p(A, B | I) = p(A|I) p(B|A, I) = p(B|I)p(A|B,I)$<linebreak>
-  Should read $p(A,B|I)$ as the probability for propositions $A$ AND $B$ being true given that $I$ is true.
-- Sum (OR) rule: $p(A + B | I) = p(A | I) + p(B | I) - p(A, B | I)$<linebreak>
-  $p(A+B|I)$ is the probability that proposition $A$ OR $B$ is true given that $I$ is true.
-- Normalization: $p(A|I) + p(\bar{A}|I) = 1$<linebreak>
-  $\bar{A}$ denotes the proposition that $A$ is false.
- 
-!eblock
-
-
-===== Bayes' theorem =====
-!bblock
-Bayes' theorem follows directly from the product rule
-!bt
-$$
-p(A|B,I) = \frac{p(B|A,I) p(A|I)}{p(B|I)}.
-$$
-!et
-The importance of this property to data analysis becomes apparent if we replace $A$ and $B$ by hypothesis($H$) and data($D$):
-!bt
-\begin{align}
-p(H|D,I) &= \frac{p(D|H,I) p(H|I)}{p(D|I)}.
-label{eq:bayes}
-\end{align}
-!et
-The power of Bayes’ theorem lies in the fact that it relates the quantity of interest, the probability that the hypothesis is true given the data, to the term we have a better chance of being able to assign, the probability that we would have observed the measured data if the hypothesis was true.
-!eblock
-
-
-!bblock
-The various terms in Bayes’ theorem have formal names. 
-* The quantity on the far right, $p(H|I)$, is called the *prior* probability; it represents our state of knowledge (or ignorance) about the truth of the hypothesis before we have analysed the current data. 
-* This is modified by the experimental measurements through $p(D|H,I)$, the *likelihood* function, 
-* The denominator $p(D|I)$ is called the *evidence*. It does not depend on the hypothesis and can be regarded as a normalization constant.
-* Together, these yield the *posterior* probability, $p(H|D, I )$, representing our state of knowledge about the truth of the hypothesis in the light of the data. 
-
-In a sense, Bayes’ theorem encapsulates the process of learning.
-!eblock
-
-
-===== The friends of Bayes' theorem =====
-!bblock
-- Normalization: $\sum_i p(H_i|\ldots) = 1$.
-- Marginalization: $\sum_i p(A,H_i|I) = \sum_i p(H_i|A,I) p(A|I) = p(A|I)$.
-- Marginalization (continuum limit): $\int dx p(A,H(x)|I) = p(A|I)$.
-
-In the above, $H_i$ is an exclusive and exhaustive list of hypotheses. For example,let’s imagine that there are five candidates in a presidential election; then $H_1$ could be the proposition that the first candidate will win, and so on. The probability that $A$ is true, for example that unemployment will be lower in a year’s time (given all relevant information $I$, but irrespective of whoever becomes president) is then given by $\sum_i p(A,H_i|I)$.
-
-In the continuum limit of propositions we must understand $p(\ldots)$ as a pdf (probability density function).
-
-Marginalization is a very powerful device in data analysis because it enables us to deal with nuisance parameters; that is, quantities which necessarily enter the analysis but are of no intrinsic interest. The unwanted background signal present in many experimental measurements are examples of nuisance parameters.
-!eblock
-
-
-===== Inference With Parametric Models  =====
-!bblock
-Inductive inference with parametric models is a very important tool in the natural sciences.
-* Consider $N$ different models $M_i$ ($i = 1, \ldots, N$), each with parameters $\boldsymbol{\alpha}_i$. Each of them implies a sampling distribution (conditional predictive distribution for possible data)
-!bt
-$$
-p(D|\boldsymbol{\alpha}_i, M_i)
-$$
-!et
-* The $\boldsymbol{\alpha}_i$ dependence when we fix attention on the actual, observed data ($D_\mathrm{obs}$) is the likelihood function:
-!bt
-$$
-\mathcal{L}_i (\boldsymbol{\alpha}_i) \equiv p(D_\mathrm{obs}|\boldsymbol{\alpha}_i, M_i)
-$$
-!et
-* We may be uncertain about $i$ (model uncertainty),
-* or uncertain about $\boldsymbol{\alpha}_i$ (parameter uncertainty).
-!eblock
-
-
-!bblock
-- Parameter Estimation: Premise = choice of model (pick specific $i$)<linebreak>
-  $\Rightarrow$ What can we say about $\boldsymbol{\alpha}_i$?
-- Model comparison: Premise = $\{M_i\}$<linebreak> 
-  $\Rightarrow$ What can we say about $i$?
-- Model adequacy: Premise = $M_1$<linebreak> 
-  $\Rightarrow$ Is $M_1$ adequate?
-- Hybrid Uncertainty: Models share some common params: $\boldsymbol{\alpha}_1 = \{ \boldsymbol{\varphi}, \boldsymbol{\eta}_i\}$<linebreak>
-  $\Rightarrow$ What can we say about $\boldsymbol{\varphi}$? (Systematic error is an example)
-!eblock
-
-
-
-
-
-In the light of this data, our inference about the fairness of this coin is summarized by the conditional pdf: $p(H|D,I)$. This is, of course, shorthand for the limiting case of a continuum of propositions for the value of $H$; that is to say, the probability that $H$ lies in an infinitesimally narrow range is given by $p(H|D,I) dH$. 
-
-To estimate this posterior pdf, we need to use Bayes’ theorem (ref{eq:bayes}). We will ignore the denominator $p(D|I)$ as it does not involve bias-weighting explicitly, and it will therefore not affect the shape of the desired pdf. At the end we can evaluate the missing constant subsequently from the normalization condition 
-!bt
-\begin{equation}
-\int_0^1 p(H|D,I) dH = 1.
-label{eq:coin_posterior_norm}
-\end{equation}
-!et
-
-The prior pdf, $p(H|I)$, represents what we know about the coin given only the information $I$ that we are dealing with a ‘strange coin’. We could keep a very open mind about the nature of the coin; a simple probability assignment which reflects this is a uniform, or flat, prior
-!bt
-\begin{equation}
-p(H|I) = \left\{ \begin{array}{ll}
-1 & 0 \le H \le 1, \\
-0 & \mathrm{otherwise}.
-\end{array} \right.
-label{eq:coin_prior_uniform}
-\end{equation}
-!et
-We will get back later to the choice of prior and its effect on the analysis.
-
-This prior state of knowledge, or ignorance, is modified by the data through the likelihood function $p(D|H,I)$. It is a measure of the chance that we would have obtained the data that we actually observed, if the value of the bias-weighting was given (as known). If, in the conditioning information $I$, we assume that the flips of the coin were independent events, so that the outcome of one did not influence that of another, then the probability of obtaining the data `R heads in N tosses' is given by the binomial distribution (we leave a formal definition of this to a statistics textbook)
-!bt
-\begin{equation}
-p(D|H,I) \propto H^R (1-H)^{N-R}.
-\end{equation}
-!et
-It seems reasonable because $H$ is the chance of obtaining a head on any flip, and there were $R$ of them, and $1-H$ is the corresponding probability for a tail, of which there were $N-R$. We note that this binomial distribution also contains a normalization factor, but we will ignore it since it does not depend explicitly on $H$, the quantity of interest. It will be absorbed by the normalization condition (ref{eq:coin_posterior_norm}).
-
-We perform the setup of this Bayesian framework on the computer.
  
 
