@@ -2615,7 +2615,7 @@ The gradient of the negative log-likelihood cost function of a Binary-Binary RBM
 	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial b_{ij}} =& \langle h_i \rangle_{data} - \langle h_i \rangle_{model}. \\
 \end{align}
 !et
-To get the expecation values with respect to the *data*, we set the visible units to each of the observed samples in the training data, then update the hidden units according to the conditional probability found before. We then average over all samples in the training data to calculate expectation values with respect to the data. 
+To get the expectation values with respect to the *data*, we set the visible units to each of the observed samples in the training data, then update the hidden units according to the conditional probability found before. We then average over all samples in the training data to calculate expectation values with respect to the data. 
 
 
 
@@ -2718,129 +2718,17 @@ manner as we discussed for say linear regression.
 
 
 
-===== Basic Elements of the Bayesian Recipe =====
-
-In the derivation of our equations for the Boltzmann machines, we need some basic elements of Bayesian statistics.
-Baye's theorem is based on the so-called product rule. We repeat some of these elements here.
-
-Probability Theory Axioms:
-- Product (AND) rule : $p(A, B | I) = p(A|I) p(B|A, I) = p(B|I)p(A|B,I)$<linebreak>
-  Should read $p(A,B|I)$ as the probability for propositions $A$ AND $B$ being true given that $I$ is true.
-- Sum (OR) rule: $p(A + B | I) = p(A | I) + p(B | I) - p(A, B | I)$<linebreak>
-  $p(A+B|I)$ is the probability that proposition $A$ OR $B$ is true given that $I$ is true.
-- Normalization: $p(A|I) + p(\bar{A}|I) = 1$<linebreak>
-  $\bar{A}$ denotes the proposition that $A$ is false.
- 
-
-
-Bayes' theorem follows directly from the product rule
-!bt
-$$
-p(A|B,I) = \frac{p(B|A,I) p(A|I)}{p(B|I)}.
-$$
-!et
-The importance of this property to data analysis becomes apparent if we replace $A$ and $B$ by hypothesis($H$) and data($D$):
-!bt
-\begin{align}
-p(H|D,I) &= \frac{p(D|H,I) p(H|I)}{p(D|I)}.
-label{eq:bayes}
-\end{align}
-!et
-The power of Bayes’ theorem lies in the fact that it relates the quantity of interest, the probability that the hypothesis is true given the data, to the term we have a better chance of being able to assign, the probability that we would have observed the measured data if the hypothesis was true.
-
-The various terms in Bayes’ theorem have formal names. 
-* The quantity on the far right, $p(H|I)$, is called the *prior* probability; it represents our state of knowledge (or ignorance) about the truth of the hypothesis before we have analysed the current data. 
-* This is modified by the experimental measurements through $p(D|H,I)$, the *likelihood* function, 
-* The denominator $p(D|I)$ is called the *evidence*. It does not depend on the hypothesis and can be regarded as a normalization constant.
-* Together, these yield the *posterior* probability, $p(H|D, I )$, representing our state of knowledge about the truth of the hypothesis in the light of the data. 
-
-In a sense, Bayes’ theorem encapsulates the process of learning.
-
-- Normalization: $\sum_i p(H_i|\ldots) = 1$.
-- Marginalization: $\sum_i p(A,H_i|I) = \sum_i p(H_i|A,I) p(A|I) = p(A|I)$.
-- Marginalization (continuum limit): $\int dx p(A,H(x)|I) = p(A|I)$.
-
-In the above, $H_i$ is an exclusive and exhaustive list of hypotheses. For example,let’s imagine that there are five candidates in a presidential election; then $H_1$ could be the proposition that the first candidate will win, and so on. The probability that $A$ is true, for example that unemployment will be lower in a year’s time (given all relevant information $I$, but irrespective of whoever becomes president) is then given by $\sum_i p(A,H_i|I)$.
-
-In the continuum limit of propositions we must understand $p(\ldots)$ as a pdf (probability density function).
-
-Marginalization is a very powerful device in data analysis because it enables us to deal with nuisance parameters; that is, quantities which necessarily enter the analysis but are of no intrinsic interest. The unwanted background signal present in many experimental measurements are examples of nuisance parameters.
-
-
-
-=== Inference With Parametric Models  ===
-
-Inductive inference with parametric models is a very important tool in the natural sciences.
-* Consider $N$ different models $M_i$ ($i = 1, \ldots, N$), each with parameters $\boldsymbol{\alpha}_i$. Each of them implies a sampling distribution (conditional predictive distribution for possible data)
-!bt
-$$
-p(D|\boldsymbol{\alpha}_i, M_i)
-$$
-!et
-* The $\boldsymbol{\alpha}_i$ dependence when we fix attention on the actual, observed data ($D_\mathrm{obs}$) is the likelihood function:
-!bt
-$$
-\mathcal{L}_i (\boldsymbol{\alpha}_i) \equiv p(D_\mathrm{obs}|\boldsymbol{\alpha}_i, M_i)
-$$
-!et
-* We may be uncertain about $i$ (model uncertainty),
-* or uncertain about $\boldsymbol{\alpha}_i$ (parameter uncertainty).
-
-- Parameter Estimation: Premise = choice of model (pick specific $i$)<linebreak>
-  $\Rightarrow$ What can we say about $\boldsymbol{\alpha}_i$?
-- Model comparison: Premise = $\{M_i\}$<linebreak> 
-  $\Rightarrow$ What can we say about $i$?
-- Model adequacy: Premise = $M_1$<linebreak> 
-  $\Rightarrow$ Is $M_1$ adequate?
-- Hybrid Uncertainty: Models share some common params: $\boldsymbol{\alpha}_1 = \{ \boldsymbol{\varphi}, \boldsymbol{\eta}_i\}$<linebreak>
-  $\Rightarrow$ What can we say about $\boldsymbol{\varphi}$? (Systematic error is an example)
-
-
-
-In the light of this data, our inference about the fairness of this coin is summarized by the conditional pdf: $p(H|D,I)$. This is, of course, shorthand for the limiting case of a continuum of propositions for the value of $H$; that is to say, the probability that $H$ lies in an infinitesimally narrow range is given by $p(H|D,I) dH$. 
-
-To estimate this posterior pdf, we need to use Bayes’ theorem (ref{eq:bayes}). We will ignore the denominator $p(D|I)$ as it does not involve bias-weighting explicitly, and it will therefore not affect the shape of the desired pdf. At the end we can evaluate the missing constant subsequently from the normalization condition 
-!bt
-\begin{equation}
-\int_0^1 p(H|D,I) dH = 1.
-label{eq:coin_posterior_norm}
-\end{equation}
-!et
-
-The prior pdf, $p(H|I)$, represents what we know about the coin given only the information $I$ that we are dealing with a ‘strange coin’. We could keep a very open mind about the nature of the coin; a simple probability assignment which reflects this is a uniform, or flat, prior
-!bt
-\begin{equation}
-p(H|I) = \left\{ \begin{array}{ll}
-1 & 0 \le H \le 1, \\
-0 & \mathrm{otherwise}.
-\end{array} \right.
-label{eq:coin_prior_uniform}
-\end{equation}
-!et
-
-
-This prior state of knowledge, or ignorance, is modified by the data through the likelihood function $p(D|H,I)$. It is a measure of the chance that we would have obtained the data that we actually observed, if the value of the bias-weighting was given (as known). If, in the conditioning information $I$, we assume that the flips of the coin were independent events, so that the outcome of one did not influence that of another, then the probability of obtaining the data `R heads in N tosses' is given by the binomial distribution (we leave a formal definition of this to a statistics textbook)
-!bt
-\begin{equation}
-p(D|H,I) \propto H^R (1-H)^{N-R}.
-\end{equation}
-!et
-It seems reasonable because $H$ is the chance of obtaining a head on any flip, and there were $R$ of them, and $1-H$ is the corresponding probability for a tail, of which there were $N-R$. We note that this binomial distribution also contains a normalization factor, but we will ignore it since it does not depend explicitly on $H$, the quantity of interest. It will be absorbed by the normalization condition (ref{eq:coin_posterior_norm}).
-
-
-
-
-===== Recent examples: RBMs for the quantum many body problem =====
+===== RBMs for the quantum many body problem =====
 
 The idea of applying RBMs to quantum many body problems was presented by G. Carleo and M. Troyer, working with ETH Zurich and Microsoft Research.
 
 Some of their motivation included
 
-* "The wave function $\Psi$ is a monolithic mathematical quantity that contains all the information on a quantum state, be it a single particle or a complex molecule. In principle, an exponential amount of information is needed to fully encode a generic many-body quantum state."
+* The wave function $\Psi$ is a monolithic mathematical quantity that contains all the information on a quantum state, be it a single particle or a complex molecule. In principle, an exponential amount of information is needed to fully encode a generic many-body quantum state.
 * There are still interesting open problems, including fundamental questions ranging from the dynamical properties of high-dimensional systems to the exact ground-state properties of strongly interacting fermions.
 * The difficulty lies in finding a general strategy to reduce the exponential complexity of the full many-body wave function down to its most essential features. That is
- o $\rightarrow$ Dimensional reduction
- o $\rightarrow$ Feature extraction
+ o Dimensional reduction
+ o Feature extraction
 * Among the most successful techniques to attack these challenges, artifical neural networks play a prominent role.
 * Want to understand whether an artifical neural network may adapt to describe a quantum system.
 
@@ -2851,14 +2739,19 @@ Carleo and Troyer applied the RBM to the quantum mechanical spin lattice systems
 
 
 ===== Representing the wave function =====
-The wavefunction should be a probability amplitude depending on $\bm{x}$. The RBM model is given by the joint\
- distribution of $\bm{x}$ and $\bm{h}$
+
+The wavefunction should be a probability amplitude depending on
+ $\bm{x}$. The RBM model is given by the joint distribution of
+ $\bm{x}$ and $\bm{h}$
+
 !bt
 \begin{align}
         F_{rbm}(\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})}.
 \end{align}
 !et
+
 To find the marginal distribution of $\bm{x}$ we set:
+
 !bt
 \begin{align}
         F_{rbm}(\mathbf{x}) &= \sum_\mathbf{h} F_{rbm}(\mathbf{x}, \mathbf{h}) \\
@@ -2879,10 +2772,12 @@ _i w_{ij}}{\sigma^2}}). \\
 !et
 
 ===== Choose the cost function =====
+
 Now we don't necessarily have training data (unless we generate it by using some other method). However, what we do have is the variational principle which allows us to obtain the ground state wave function by minimizing the expectation value of the energy of a trial wavefunction (corresponding to the untrained NQS). Similarly to the traditional variational Monte Carlo method then, it is the local energy we wish to minimize. The gradient to use for the stochastic gradient descent procedure is
+
 !bt
 \begin{align}
-	G_i = \frac{\partial \langle E_L \rangle}{\partial \theta_i}
+	C_i = \frac{\partial \langle E_L \rangle}{\partial \theta_i}
 	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle ),
 \end{align}
 !et
@@ -2906,7 +2801,9 @@ is convenient to express them as exponentials, so that
 \end{align}
 !et
 
-where $E(\bm{x}_C)$ is called an \textbf{energy function}, and the exponential representation is the \textbf{Boltzmann distribution}. The joint distribution is defined as the product of potentials, and so the total energy is obtained by adding the energies of each of the maximal cliques.
+where $E(\bm{x}_C)$ is called an *energy function*, and the
+exponential representation is the *Boltzmann distribution*. The
+joint distribution is defined as the product of potentials.
 
 The joint distribution of the random variables is then
 
@@ -2918,17 +2815,14 @@ The joint distribution of the random variables is then
 	=& \frac{1}{Z} e^{-E(\bm{x})}.
 \end{align} 
 !et
-
-
-
-
-
-
 !bt
 \begin{align}
 	p_{BM}(\bm{x}, \bm{h}) = \frac{1}{Z_{BM}} e^{-\frac{1}{T}E_{BM}(\bm{x}, \bm{h})} ,
 \end{align}
+!et
+
 with the partition function 
+!bt
 \begin{align}
 	Z_{BM} = \int \int e^{-\frac{1}{T} E_{BM}(\tilde{\bm{x}}, \tilde{\bm{h}})} \dif \tilde{\bm{x}} \dif \tilde{\bm{h}} .
 \end{align}
@@ -2971,25 +2865,25 @@ to zero. The expression for the energy of the RBM is then
 	- \sum_{i,j,k,l}^{M,N,K,L} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j). 
 \end{align}
 !et
-
+resulting in 
 !bt
 \begin{align}
-	P_{RBM} (\bm{x}) =& \int P_{RBM} (\bm{x}, \tilde{\bm{h}}) \dif \tilde{\bm{h}} \nonumber \\
-	=& \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\bm{x}, \tilde{\bm{h}}) } \dif \tilde{\bm{h}} \nonumber \\
+	P_{RBM} (\bm{x}) =& \int P_{RBM} (\bm{x}, \tilde{\bm{h}})  d \tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\bm{x}, \tilde{\bm{h}}) } d\tilde{\bm{h}} \nonumber \\
 	=& \frac{1}{Z_{RBM}} \int e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)
 	+ \sum_{j, l} b_j^l \beta_j^l (\tilde{h}_j) 
 	+ \sum_{i,j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} 
-	\dif \tilde{\bm{h}} \nonumber \\
+	d\tilde{\bm{h}} \nonumber \\
 	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
 	\int \prod_j^N e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) 
-	+ \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} \dif \tilde{\bm{h}} \nonumber \\
+	+ \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} d\tilde{\bm{h}} \nonumber \\
 	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
-	\biggl( \int e^{\sum_l b_1^l \beta_1^l (\tilde{h}_1) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i1}^{kl} \beta_1^l (\tilde{h}_1)} \dif  \tilde{h}_1 \nonumber \\
-	& \times \int e^{\sum_l b_2^l \beta_2^l (\tilde{h}_2) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i2}^{kl} \beta_2^l (\tilde{h}_2)} \dif  \tilde{h}_2 \nonumber \\
+	\biggl( \int e^{\sum_l b_1^l \beta_1^l (\tilde{h}_1) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i1}^{kl} \beta_1^l (\tilde{h}_1)} d \tilde{h}_1 \nonumber \\
+	& \times \int e^{\sum_l b_2^l \beta_2^l (\tilde{h}_2) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i2}^{kl} \beta_2^l (\tilde{h}_2)} d \tilde{h}_2 \nonumber \\
 	& \times ... \nonumber \\
-	& \times \int e^{\sum_l b_N^l \beta_N^l (\tilde{h}_N) + \sum_{i,k,l} \alpha_i^k (x_i) w_{iN}^{kl} \beta_N^l (\tilde{h}_N)} \dif  \tilde{h}_N \biggr) \nonumber \\
+	& \times \int e^{\sum_l b_N^l \beta_N^l (\tilde{h}_N) + \sum_{i,k,l} \alpha_i^k (x_i) w_{iN}^{kl} \beta_N^l (\tilde{h}_N)} d \tilde{h}_N \biggr) \nonumber \\
 	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
-	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  \dif \tilde{h}_j
+	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j
 \end{align}
 !et
 
@@ -2997,10 +2891,10 @@ Similarly
 
 !bt
 \begin{align}
-	P_{RBM} (\bm{h}) =& \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\tilde{\bm{x}}, \bm{h})} \dif \tilde{\bm{x}} \nonumber \\
+	P_{RBM} (\bm{h}) =& \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\tilde{\bm{x}}, \bm{h})} d\tilde{\bm{x}} \nonumber \\
 	=& \frac{1}{Z_{RBM}} e^{\sum_{j, l} b_j^l \beta_j^l (h_j)}
 	\prod_i^M \int e^{\sum_k a_i^k \alpha_i^k (\tilde{x}_i)
-	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} \dif \tilde{x}_i
+	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} d\tilde{x}_i
 \end{align}
 !et
 
@@ -3014,9 +2908,9 @@ Using Bayes theorem
 	+ \sum_{j, l} b_j^l \beta_j^l (h_j) 
 	+ \sum_{i,j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)}}
 	{\frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
-	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  \dif \tilde{h}_j} \nonumber \\
+	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j} \nonumber \\
 	=& \prod_j^N \frac{e^{\sum_l b_j^l \beta_j^l (h_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)} }
-	{\int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  \dif \tilde{h}_j}
+	{\int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j}
 \end{align}
 !et
 
@@ -3028,7 +2922,7 @@ Similarly
 	=& \prod_i^M \frac{e^{\sum_k a_i^k \alpha_i^k (x_i)
 	+ \sum_{j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)}}
 	{\int e^{\sum_k a_i^k \alpha_i^k (\tilde{x}_i)
-	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} \dif \tilde{x}_i}
+	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} d\tilde{x}_i}
 \end{align}
 !et
 
@@ -3185,7 +3079,7 @@ with the partition function given by
 !bt
 \begin{align}
 	Z_{GB} =& \int \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} e^{-\norm*{\frac{\tilde{\bm{x}} -\bm{a}}{2\bm{\sigma}}}^2 + \bm{b}^T \tilde{\bm{h}} 
-	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\tilde{\bm{h}}} \dif \tilde{\bm{x}} .
+	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\tilde{\bm{h}}} d\tilde{\bm{x}} .
 \end{align}
 !et
 
@@ -3213,28 +3107,28 @@ the last step.
 
 !bt
 \begin{align}
-	p_{GB} (\bm{h}) =& \int p_{GB} (\tilde{\bm{x}}, \bm{h}) \dif \tilde{\bm{x}} \nonumber \\
+	p_{GB} (\bm{h}) =& \int p_{GB} (\tilde{\bm{x}}, \bm{h}) d\tilde{\bm{x}} \nonumber \\
 	=& \frac{1}{Z_{GB}} \int e^{-\norm*{\frac{\tilde{\bm{x}} -\bm{a}}{2\bm{\sigma}}}^2 + \bm{b}^T \bm{h} 
-	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\bm{h}} \dif \tilde{\bm{x}} \nonumber \\
+	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\bm{h}} d\tilde{\bm{x}} \nonumber \\
 	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h} } \int \prod_i^M
-	e^{- \frac{(\tilde{x}_i - a_i)^2}{2\sigma_i^2} + \frac{\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{\sigma_i^2} } \dif \tilde{\bm{x}} \nonumber \\
+	e^{- \frac{(\tilde{x}_i - a_i)^2}{2\sigma_i^2} + \frac{\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{\sigma_i^2} } d\tilde{\bm{x}} \nonumber \\
 	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h} }
-	\biggl( \int e^{- \frac{(\tilde{x}_1 - a_1)^2}{2\sigma_1^2} + \frac{\tilde{x}_1 \bm{w}_{1\ast}^T \bm{h}}{\sigma_1^2} } \dif \tilde{x}_1 \nonumber \\
-	& \times \int e^{- \frac{(\tilde{x}_2 - a_2)^2}{2\sigma_2^2} + \frac{\tilde{x}_2 \bm{w}_{2\ast}^T \bm{h}}{\sigma_2^2} } \dif \tilde{x}_2 \nonumber \\
+	\biggl( \int e^{- \frac{(\tilde{x}_1 - a_1)^2}{2\sigma_1^2} + \frac{\tilde{x}_1 \bm{w}_{1\ast}^T \bm{h}}{\sigma_1^2} } d\tilde{x}_1 \nonumber \\
+	& \times \int e^{- \frac{(\tilde{x}_2 - a_2)^2}{2\sigma_2^2} + \frac{\tilde{x}_2 \bm{w}_{2\ast}^T \bm{h}}{\sigma_2^2} } d\tilde{x}_2 \nonumber \\
 	& \times ... \nonumber \\
-	&\times \int e^{- \frac{(\tilde{x}_M - a_M)^2}{2\sigma_M^2} + \frac{\tilde{x}_M \bm{w}_{M\ast}^T \bm{h}}{\sigma_M^2} } \dif \tilde{x}_M \biggr) \nonumber \\
+	&\times \int e^{- \frac{(\tilde{x}_M - a_M)^2}{2\sigma_M^2} + \frac{\tilde{x}_M \bm{w}_{M\ast}^T \bm{h}}{\sigma_M^2} } d\tilde{x}_M \biggr) \nonumber \\
 	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
-	\int e^{- \frac{(\tilde{x}_i - a_i)^2 - 2\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{2\sigma_i^2} } \dif \tilde{x}_i \nonumber \\
+	\int e^{- \frac{(\tilde{x}_i - a_i)^2 - 2\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
 	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
-	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \tilde{x}_i \bm{w}_{i\ast}^T \bm{h}) + a_i^2}{2\sigma_i^2} } \dif \tilde{x}_i \nonumber \\
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \tilde{x}_i \bm{w}_{i\ast}^T \bm{h}) + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
 	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
-	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \bm{w}_{i\ast}^T \bm{h}) + (a_i + \bm{w}_{i\ast}^T \bm{h})^2 - (a_i + \bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } \dif \tilde{x}_i \nonumber \\
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \bm{w}_{i\ast}^T \bm{h}) + (a_i + \bm{w}_{i\ast}^T \bm{h})^2 - (a_i + \bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
 	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
-	\int e^{- \frac{(\tilde{x}_i - (a_i + \bm{w}_{i\ast}^T \bm{h}))^2 - a_i^2 -2a_i \bm{w}_{i\ast}^T \bm{h} - (\bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } \dif \tilde{x}_i \nonumber \\
+	\int e^{- \frac{(\tilde{x}_i - (a_i + \bm{w}_{i\ast}^T \bm{h}))^2 - a_i^2 -2a_i \bm{w}_{i\ast}^T \bm{h} - (\bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
 	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
 	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}
 	\int e^{- \frac{(\tilde{x}_i - a_i - \bm{w}_{i\ast}^T \bm{h})^2}{2\sigma_i^2}}
-	\dif \tilde{x}_i \nonumber \\
+	d\tilde{x}_i \nonumber \\
 	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
 	\sqrt{2\pi \sigma_i^2}
 	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}} .
