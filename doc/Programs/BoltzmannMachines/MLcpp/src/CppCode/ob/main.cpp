@@ -25,7 +25,7 @@ int main() {
 
     // Hamiltonian parameters
     double omega = 1.0;
-    bool includeInteraction = true;      // Include interaction or not
+    bool includeInteraction = false;      // Include interaction or not
 
     // Optimizer parameters (choose either stochastic gradient descent (SGD) or adaptive SGD (ASGD))
     int nPar = nx + nh + nx*nh;
