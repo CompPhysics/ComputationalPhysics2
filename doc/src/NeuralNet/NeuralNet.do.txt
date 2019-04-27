@@ -1,22 +1,9 @@
-TITLE: Restricted Boltzmann Machine applied to Quantum Mechanical Problems
-AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} at Department of Physics, University of Oslo & Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University
+TITLE: From Variational Monte Carlo to Boltzmann Machines and Machine Learning. Boltzmann Machines 
+AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email hjensen@msu.edu  Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University, East Lansing, 48824 MI, USA
 DATE: today
 
-!split
-===== What is Machine Learning? =====
 
-Machine learning is the science of giving computers the ability to learn without being explicitly programmed. 
-The idea is that there exist generic algorithms which can be used to find patterns in a broad class of data sets without 
-having to write code specifically for each problem. The algorithm will build its own logic based on the data.  
-
-Machine learning is a subfield of computer science, and is closely related to computational statistics. 
-It evolved from the study of pattern recognition in artificial intelligence (AI) research, and has made contributions to
-AI tasks like computer vision, natural language processing 
-and speech recognition. It has also, especially in later years, 
-found applications in a wide variety of other areas, including bioinformatics, economy, physics, finance and marketing. 
-
-!split
-===== Types of Machine Learning =====
+===== Introduction =====
 
 
 The approaches to machine learning are many, but are often split into two main categories. 
@@ -36,240 +23,257 @@ Some of the most common tasks are:
 
   * Clustering: Data are divided into groups with certain common traits, without knowing the different groups beforehand.  It is thus a form of unsupervised learning.
 
+  * Other unsupervised learning algortihms, here Boltzmann machines
 
-!split
-===== Artificial neurons  =====
-The field of artificial neural networks has a long history of development, and is closely connected with 
-the advancement of computer science and computers in general. A model of artificial neurons 
-was first developed by McCulloch and Pitts in 1943  to study signal processing in the brain and 
-has later been refined by others. The general idea is to mimic neural networks in the human brain, which
-is composed of billions of neurons that communicate with each other by sending electrical signals. 
-Each neuron accumulates its incoming signals, 
-which must exceed an activation threshold to yield an output. If the threshold is not overcome, the neuron
-remains inactive, i.e. has zero output.  
+In order to develop our understanding of Boltzmann Machines, it may, from a pedagogical point view be worth to take a closer look at Neural Networks and their basic workings. 
+
+
+
+=== Artificial neurons  ===
+
+The field of artificial neural networks has a long history of
+development, and is closely connected with the advancement of computer
+science and computers in general. A model of artificial neurons was
+first developed by McCulloch and Pitts in 1943 to study signal
+processing in the brain and has later been refined by others. The
+general idea is to mimic neural networks in the human brain, which is
+composed of billions of neurons that communicate with each other by
+sending electrical signals.  Each neuron accumulates its incoming
+signals, which must exceed an activation threshold to yield an
+output. If the threshold is not overcome, the neuron remains inactive,
+i.e. has zero output.
 
 This behaviour has inspired a simple mathematical model for an artificial neuron.
 
 !bt
-\begin{equation}
+\[
  y = f\left(\sum_{i=1}^n w_ix_i\right) = f(u)
- label{artificialNeuron}
-\end{equation}
+\]
 !et
 Here, the output $y$ of the neuron is the value of its activation function, which have as input
-a weighted sum of signals $x_i, \dots ,x_n$ received by $n$ other neurons.
+a weighted sum of signals $x_i, \dots ,x_n$ received by $n$ other neurons. The figure here shows the simple perceptron model.
 
-!split
-===== Neural network types =====
+FIGURE: [figures/perceptron.png, width=700 frac=0.9]
 
-An artificial neural network (NN), is a computational model that consists of layers of connected neurons, or *nodes*. 
-It is supposed to mimic a biological nervous system by letting each neuron interact with other neurons
-by sending signals in the form of mathematical functions between layers. 
-A wide variety of different NNs have
-been developed, but most of them consist of an input layer, an output layer and eventual layers in-between, called
-*hidden layers*. All layers can contain an arbitrary number of nodes, and each connection between two nodes
-is associated with a weight variable. 
+=== Feed-forward neural networks ===
+
+An artificial neural network (NN), is a computational model that
+consists of layers of connected neurons, or *nodes*.  It is supposed
+to mimic a biological nervous system by letting each neuron interact
+with other neurons by sending signals in the form of mathematical
+functions between layers.  A wide variety of different NNs have been
+developed, but most of them consist of an input layer, an output layer
+and eventual layers in-between, called *hidden layers*. All layers can
+contain an arbitrary number of nodes, and each connection between two
+nodes is associated with a weight variable.
+
+The feed-forward neural network (FFNN) was the first and simplest type
+of ANNs that were devised. In this network, the information moves in
+only one direction: forward through the layers.
+
+Nodes are represented by circles, while the arrows display the
+connections between the nodes, including the direction of information
+flow. Additionally, each arrow corresponds to a weight variable
+(figure to come).  We observe that each node in a layer is connected
+to *all* nodes in the subsequent layer, making this a so-called
+*fully-connected* FFNN.  The figure shows an example of an FFNN.
+
+FIGURE: [figures/dnn.png, width=500 frac=0.6]
+
+=== Convolutional Neural Network ===
+
+A different variant of FFNNs are *convolutional neural networks*
+(CNNs), which have a connectivity pattern inspired by the animal
+visual cortex. Individual neurons in the visual cortex only respond to
+stimuli from small sub-regions of the visual field, called a receptive
+field. This makes the neurons well-suited to exploit the strong
+spatially local correlation present in natural images. The response of
+each neuron can be approximated mathematically as a convolution
+operation.  (figure to come)
+
+Convolutional neural networks emulate the behaviour of neurons in the
+visual cortex by enforcing a *local* connectivity pattern between
+nodes of adjacent layers: Each node in a convolutional layer is
+connected only to a subset of the nodes in the previous layer, in
+contrast to the fully-connected FFNN.  Often, CNNs consist of several
+convolutional layers that learn local features of the input, with a
+fully-connected layer at the end, which gathers all the local data and
+produces the outputs. They have wide applications in image and video
+recognition.
+
+=== Recurrent neural networks ===
+
+So far we have only mentioned ANNs where information flows in one
+direction: forward. *Recurrent neural networks* on the other hand,
+have connections between nodes that form directed *cycles*. This
+creates a form of internal memory which are able to capture
+information on what has been calculated before; the output is
+dependent on the previous computations. Recurrent NNs make use of
+sequential information by performing the same task for every element
+in a sequence, where each element depends on previous elements. An
+example of such information is sentences, making recurrent NNs
+especially well-suited for handwriting and speech recognition.
 
 
+=== Other types of networks ===
+
+There are many other kinds of ANNs that have been developed. One type
+that is specifically designed for interpolation in multidimensional
+space is the radial basis function (RBF) network. RBFs are typically
+made up of three layers: an input layer, a hidden layer with
+non-linear radial symmetric activation functions and a linear output
+layer (''linear'' here means that each node in the output layer has a
+linear activation function). The layers are normally fully-connected
+and there are no cycles, thus RBFs can be viewed as a type of
+fully-connected FFNN. They are however usually treated as a separate
+type of NN due the unusual activation functions.
 
 
-
-!split
-===== Feed-forward neural networks =====
-The feed-forward neural network (FFNN) was the first and simplest type of NN devised. In this network, 
-the information moves in only one direction: forward through the layers.
-
-Nodes are represented by circles, while the arrows display the connections between the nodes, including the 
-direction of information flow. Additionally, each arrow corresponds to a weight variable, not displayed here. 
-We observe that each node in a layer is connected to *all* nodes in the subsequent layer, 
-making this a so-called *fully-connected* FFNN. 
-
-
-
-A different variant of FFNNs are *convolutional neural networks* (CNNs), which have a connectivity pattern
-inspired by the animal visual cortex. Individual neurons in the visual cortex only respond to stimuli from
-small sub-regions of the visual field, called a receptive field. This makes the neurons well-suited to exploit the strong
-spatially local correlation present in natural images. The response of each neuron can be approximated mathematically 
-as a convolution operation. 
-
-CNNs emulate the behaviour of neurons in the visual cortex by enforcing a *local* connectivity pattern
-between nodes of adjacent layers: Each node
-in a convolutional layer is connected only to a subset of the nodes in the previous layer, 
-in contrast to the fully-connected FFNN.
-Often, CNNs 
-consist of several convolutional layers that learn local features of the input, with a fully-connected layer at the end, 
-which gathers all the local data and produces the outputs. They have wide applications in image and video recognition
-
-!split
-===== Recurrent neural networks =====
-
-So far we have only mentioned NNs where information flows in one direction: forward. *Recurrent neural networks* on
-the other hand, have connections between nodes that form directed *cycles*. This creates a form of 
-internal memory which are able to capture information on what has been calculated before; the output is dependent 
-on the previous computations. Recurrent NNs make use of sequential information by performing the same task for 
-every element in a sequence, where each element depends on previous elements. An example of such information is 
-sentences, making recurrent NNs especially well-suited for handwriting and speech recognition.
-
-!split
-===== Other types of networks =====
-
-There are many other kinds of NNs that have been developed. One type that is specifically designed for interpolation
-in multidimensional space is the radial basis function (RBF) network. RBFs are typically made up of three layers: 
-an input layer, a hidden layer with non-linear radial symmetric activation functions and a linear output layer (''linear'' here
-means that each node in the output layer has a linear activation function). The layers are normally fully-connected and 
-there are no cycles, thus RBFs can be viewed as a type of fully-connected FFNN. They are however usually treated as
-a separate type of NN due the unusual activation functions.
-
-
-Other types of NNs could also be mentioned, but are outside the scope of this work. We will now move on to a detailed description
-of how a fully-connected FFNN works, and how it can be used to interpolate data sets. 
-
-!split
 ===== Multilayer perceptrons  =====
 
-One use often so-called  fully-connected feed-forward neural networks with three
-or more layers (an input layer, one or more hidden layers and an output layer)
-consisting of neurons that have non-linear activation functions.
+One uses often so-called fully-connected feed-forward neural networks
+with three or more layers (an input layer, one or more hidden layers
+and an output layer) consisting of neurons that have non-linear
+activation functions.
 
-Such networks are often called *multilayer perceptrons* (MLPs)
-
-!split
-===== Why multilayer perceptrons?  =====
-
-According to the *Universal approximation theorem*, a feed-forward neural network with just a single hidden layer containing 
-a finite number of neurons can approximate a continuous multidimensional function to arbitrary accuracy, 
-assuming the activation function for the hidden layer is a _non-constant, bounded and monotonically-increasing continuous function_.
-Note that the requirements on the activation function only applies to the hidden layer, the output nodes are always
-assumed to be linear, so as to not restrict the range of output values. 
-
-We note that this theorem is only applicable to a NN with *one* hidden layer. 
-Therefore, we can easily construct an NN 
-that employs activation functions which do not satisfy the above requirements, as long as we have at least one layer
-with activation functions that *do*. Furthermore, although the universal approximation theorem
-lays the theoretical foundation for regression with neural networks, it does not say anything about how things work in practice: 
-A neural network can still be able to approximate a given function reasonably well without having the flexibility to fit *all other*
-functions. 
+Such networks are often called *multilayer perceptrons* (MLPs).
 
 
+According to the *Universal approximation theorem*, a feed-forward
+neural network with just a single hidden layer containing a finite
+number of neurons/nodes can approximate a continuous multidimensional
+function to arbitrary accuracy, assuming the activation function for
+the hidden layer is a _non-constant, bounded and
+monotonically-increasing continuous function_.
 
-!split
-===== Mathematical model  =====
+Note that the requirements on the activation function only applies to
+the hidden layer, the output nodes are always assumed to be linear, so
+as to not restrict the range of output values.
+
+
+=== Mathematical model  ===
+
+The output $y$ is produced via the activation function $f$
+!bt
+\[
+ y = f\left(\sum_{i=1}^n w_ix_i + b_i\right) = f(z),
+\]
+!et
+This function receives $x_i$ as inputs.
+Here the activation $z=(\sum_{i=1}^n w_ix_i+b_i)$. 
+In an FFNN of such neurons, the *inputs* $x_i$ are the *outputs* of
+the neurons in the preceding layer. Furthermore, an MLP is
+fully-connected, which means that each neuron receives a weighted sum
+of the outputs of *all* neurons in the previous layer.
+
+
+First, for each node $i$ in the first hidden layer, we calculate a weighted sum $z_i^1$ of the input coordinates $x_j$,
 
 !bt
-\begin{equation}
- y = f\left(\sum_{i=1}^n w_ix_i + b_i\right) = f(u)
- label{artificialNeuron2}
+\begin{equation} z_i^1 = \sum_{j=1}^{M} w_{ij}^1 x_j + b_i^1
 \end{equation}
 !et
-In an FFNN of such neurons, the *inputs* $x_i$
-are the *outputs* of the neurons in the preceding layer. Furthermore, an MLP is fully-connected, 
-which means that each neuron receives a weighted sum of the outputs of *all* neurons in the previous layer. 
 
-!split
-===== Mathematical model  =====
-
-First, for each node $i$ in the first hidden layer, we calculate a weighted sum $u_i^1$ of the input coordinates $x_j$,
-
-!bt
-\begin{equation}
- u_i^1 = \sum_{j=1}^2 w_{ij}^1 x_j  + b_i^1 
-\end{equation}
-!et
-This value is the argument to the activation function $f_1$ of each neuron $i$,
-producing the output $y_i^1$ of all neurons in layer 1,
+Here $b_i$ is the so-called bias which is normally needed in
+case of zero activation weights or inputs. How to fix the biases and
+the weights will be discussed below.  The value of $z_i^1$ is the
+argument to the activation function $f_i$ of each node $i$, The
+variable $M$ stands for all possible inputs to a given node $i$ in the
+first layer.  We define  the output $y_i^1$ of all neurons in layer 1 as
 
 !bt
 \begin{equation}
- y_i^1 = f_1(u_i^1) = f_1\left(\sum_{j=1}^2 w_{ij}^1 x_j  + b_i^1\right)
+ y_i^1 = f(z_i^1) = f\left(\sum_{j=1}^M w_{ij}^1 x_j  + b_i^1\right)
  label{outputLayer1}
 \end{equation}
 !et
-where we assume that all nodes in the same layer have identical activation functions, hence the notation $f_l$
+
+where we assume that all nodes in the same layer have identical
+activation functions, hence the notation $f$. In general, we could assume in the more general case that different layers have different activation functions.
+In this case we would identify these functions with a superscript $l$ for the $l$-th layer,
 
 !bt
 \begin{equation}
- y_i^l = f_l(u_i^l) = f_l\left(\sum_{j=1}^{N_{l-1}} w_{ij}^l y_j^{l-1} + b_i^l\right)
+ y_i^l = f^l(u_i^l) = f^l\left(\sum_{j=1}^{N_{l-1}} w_{ij}^l y_j^{l-1} + b_i^l\right)
  label{generalLayer}
 \end{equation}
 !et
-where $N_l$ is the number of nodes in layer $l$. When the output of all the nodes in the first hidden layer are computed,
-the values of the subsequent layer can be calculated and so forth until the output is obtained. 
 
+where $N_l$ is the number of nodes in layer $l$. When the output of
+all the nodes in the first hidden layer are computed, the values of
+the subsequent layer can be calculated and so forth until the output
+is obtained.
 
-
-!split
-===== Mathematical model  =====
 
 The output of neuron $i$ in layer 2 is thus,
 
 !bt
 \begin{align}
- y_i^2 &= f_2\left(\sum_{j=1}^3 w_{ij}^2 y_j^1 + b_i^2\right) \\
- &= f_2\left[\sum_{j=1}^3 w_{ij}^2f_1\left(\sum_{k=1}^2 w_{jk}^1 x_k + b_j^1\right) + b_i^2\right]
+ y_i^2 &= f^2\left(\sum_{j=1}^N w_{ij}^2 y_j^1 + b_i^2\right) \\
+ &= f^2\left[\sum_{j=1}^N w_{ij}^2f^1\left(\sum_{k=1}^M w_{jk}^1 x_k + b_j^1\right) + b_i^2\right]
  label{outputLayer2}
 \end{align}
 !et
-where we have substituted $y_m^1$ with. Finally, the NN output yields,
+where we have substituted $y_k^1$ with the inputs $x_k$. Finally, the ANN output reads
 
 !bt
 \begin{align}
- y_1^3 &= f_3\left(\sum_{j=1}^3 w_{1m}^3 y_j^2 + b_1^3\right) \\
- &= f_3\left[\sum_{j=1}^3 w_{1j}^3 f_2\left(\sum_{k=1}^3 w_{jk}^2 f_1\left(\sum_{m=1}^2 w_{km}^1 x_m + b_k^1\right) + b_j^2\right)
+ y_i^3 &= f^3\left(\sum_{j=1}^N w_{ij}^3 y_j^2 + b_i^3\right) \\
+ &= f_3\left[\sum_{j} w_{ij}^3 f^2\left(\sum_{k} w_{jk}^2 f^1\left(\sum_{m} w_{km}^1 x_m + b_k^1\right) + b_j^2\right)
   + b_1^3\right]
 \end{align}
 !et
 
-!split
-===== Mathematical model  =====
 
-We can generalize this expression to an MLP with $l$ hidden layers. The complete functional form
-is,
+We can generalize this expression to an MLP with $l$ hidden
+layers. The complete functional form is,
+
 !bt
 \begin{align}
-&y^{l+1}_1\! = \!f_{l+1}\!\left[\!\sum_{j=1}^{N_l}\! w_{1j}^3 f_l\!\left(\!\sum_{k=1}^{N_{l-1}}\! w_{jk}^2 f_{l-1}\!\left(\!
- \dots \!f_1\!\left(\!\sum_{n=1}^{N_0} \!w_{mn}^1 x_n\! + \!b_m^1\!\right)
- \!\dots \!\right) \!+ \!b_k^2\!\right)
- \!+ \!b_1^3\!\right] &&
+&y^{l+1}_i = f^{l+1}\left[\!\sum_{j=1}^{N_l} w_{ij}^3 f^l\left(\sum_{k=1}^{N_{l-1}}w_{jk}^{l-1}\left(\dots f^1\left(\sum_{n=1}^{N_0} w_{mn}^1 x_n+ b_m^1\right)\dots\right)+b_k^2\right)+b_1^3\right] &&
  label{completeNN}
 \end{align}
 !et
-which illustrates a basic property of MLPs: The only independent variables are the input values $x_n$. 
 
-!split
-===== Mathematical model  =====
+which illustrates a basic property of MLPs: The only independent
+variables are the input values $x_n$.
 
-This confirms that an MLP,
-despite its quite convoluted mathematical form, is nothing more than an analytic function, specifically a 
-mapping of real-valued vectors $\vec{x} \in \mathbb{R}^n \rightarrow \vec{y} \in \mathbb{R}^m$. 
-In our example, $n=2$ and $m=1$. Consequentially, 
-the number of input and output values of the function we want to fit must be equal to the number of inputs and outputs of our MLP.  
 
-Furthermore, the flexibility and universality of a MLP can be illustrated by realizing that 
-the expression  is essentially a nested sum of scaled activation functions of the form
+This confirms that an MLP, despite its quite convoluted mathematical
+form, is nothing more than an analytic function, specifically a
+mapping of real-valued vectors $\hat{x} \in \mathbb{R}^n \rightarrow
+\hat{y} \in \mathbb{R}^m$.
+
+Furthermore, the flexibility and universality of an MLP can be
+illustrated by realizing that the expression is essentially a nested
+sum of scaled activation functions of the form
 
 !bt
 \begin{equation}
- h(x) = c_1 f(c_2 x + c_3) + c_4
+ f(x) = c_1 f(c_2 x + c_3) + c_4
 \end{equation}
 !et
-where the parameters $c_i$ are weights and biases. By adjusting these parameters, the activation functions
-can be shifted up and down or left and right, change slope or be rescaled 
-which is the key to the flexibility of a neural network. 
 
-!split
+where the parameters $c_i$ are weights and biases. By adjusting these
+parameters, the activation functions can be shifted up and down or
+left and right, change slope or be rescaled which is the key to the
+flexibility of a neural network.
+
+
 === Matrix-vector notation ===
-We can introduce a more convenient notation for the activations in a NN. 
+
+We can introduce a more convenient notation for the activations in an A NN. 
 
 Additionally, we can represent the biases and activations
-as layer-wise column vectors $\vec{b}_l$ and $\vec{y}_l$, so that the $i$-th element of each vector 
+as layer-wise column vectors $\hat{b}_l$ and $\hat{y}_l$, so that the $i$-th element of each vector 
 is the bias $b_i^l$ and activation $y_i^l$ of node $i$ in layer $l$ respectively. 
 
-We have that $\mathrm{W}_l$ is a $N_{l-1} \times N_l$ matrix, while $\vec{b}_l$ and $\vec{y}_l$ are $N_l \times 1$ column vectors. 
-With this notation, the sum in  becomes a matrix-vector multiplication, and we can write
-the equation for the activations of hidden layer 2 in
+We have that $\mathrm{W}_l$ is an $N_{l-1} \times N_l$ matrix, while $\hat{b}_l$ and $\hat{y}_l$ are $N_l \times 1$ column vectors. 
+With this notation, the sum becomes a matrix-vector multiplication, and we can write
+the equation for the activations of hidden layer 2 (assuming three nodes for simplicity) as
 !bt
 \begin{equation}
- \vec{y}_2 = f_2(\mathrm{W}_2 \vec{y}_{1} + \vec{b}_{2}) = 
+ \hat{y}_2 = f_2(\mathrm{W}_2 \hat{y}_{1} + \hat{b}_{2}) = 
  f_2\left(\left[\begin{array}{ccc}
     w^2_{11} &w^2_{12} &w^2_{13} \\
     w^2_{21} &w^2_{22} &w^2_{23} \\
@@ -288,8 +292,7 @@ the equation for the activations of hidden layer 2 in
 \end{equation}
 !et
 
-!split
-=== Matrix-vector notation  and activation ===
+
 The activation of node $i$ in layer 2 is
 
 !bt
@@ -298,19 +301,21 @@ The activation of node $i$ in layer 2 is
  f_2\left(\sum_{j=1}^3 w^2_{ij} y_j^1 + b^2_i\right).
 \end{equation}
 !et 
-This is not just a convenient and compact notation, but also 
-a useful and intuitive way to think about MLPs: The output is calculated by a series of matrix-vector multiplications
-and vector additions that are used as input to the activation functions. For each operation 
-$\mathrm{W}_l \vec{y}_{l-1}$ we move forward one layer. 
+
+This is not just a convenient and compact notation, but also a useful
+and intuitive way to think about MLPs: The output is calculated by a
+series of matrix-vector multiplications and vector additions that are
+used as input to the activation functions. For each operation
+$\mathrm{W}_l \hat{y}_{l-1}$ we move forward one layer.
 
 
-!split
 === Activation functions  ===
 
 
-A property that characterizes a neural network, other than its connectivity, is the choice of activation function(s). 
-As described in, the following restrictions are imposed on an activation function for a FFNN
-to fulfill the universal approximation theorem
+A property that characterizes a neural network, other than its
+connectivity, is the choice of activation function(s).  As described
+in, the following restrictions are imposed on an activation function
+for a FFNN to fulfill the universal approximation theorem
 
   * Non-constant
 
@@ -320,48 +325,2055 @@ to fulfill the universal approximation theorem
 
   * Continuous
 
-!split
 === Activation functions, Logistic and Hyperbolic ones  ===
 
-The second requirement excludes all linear functions. Furthermore, in a MLP with only linear activation functions, each 
-layer simply performs a linear transformation of its inputs.
+The second requirement excludes all linear functions. Furthermore, in
+a MLP with only linear activation functions, each layer simply
+performs a linear transformation of its inputs.
 
-Regardless of the number of layers, 
-the output of the NN will be nothing but a linear function of the inputs. Thus we need to introduce some kind of 
-non-linearity to the NN to be able to fit non-linear functions
-Typical examples are the logistic *Sigmoid*
+Regardless of the number of layers, the output of the NN will be
+nothing but a linear function of the inputs. Thus we need to introduce
+some kind of non-linearity to the NN to be able to fit non-linear
+functions Typical examples are the logistic *Sigmoid*
+
 !bt
-\begin{equation}
+\[
  f(x) = \frac{1}{1 + e^{-x}},
- label{sigmoidActivationFunction}
-\end{equation}
+\]
 !et
 and the *hyperbolic tangent* function
 !bt
-\begin{equation}
+\[
  f(x) = \tanh(x)
- label{tanhActivationFunction}
-\end{equation}
+\]
+!et
+
+=== Relevance === 
+
+The *sigmoid* function are more biologically plausible because the
+output of inactive neurons are zero. Such activation function are
+called *one-sided*. However, it has been shown that the hyperbolic
+tangent performs better than the sigmoid for training MLPs.  has
+become the most popular for *deep neural networks*
+
+!bc pycod
+"""The sigmoid function (or the logistic curve) is a 
+function that takes any real number, z, and outputs a number (0,1).
+It is useful in neural networks for assigning weights on a relative scale.
+The value z is the weighted sum of parameters involved in the learning algorithm."""
+
+import numpy
+import matplotlib.pyplot as plt
+import math as mt
+
+z = numpy.arange(-5, 5, .1)
+sigma_fn = numpy.vectorize(lambda z: 1/(1+numpy.exp(-z)))
+sigma = sigma_fn(z)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(z, sigma)
+ax.set_ylim([-0.1, 1.1])
+ax.set_xlim([-5,5])
+ax.grid(True)
+ax.set_xlabel('z')
+ax.set_title('sigmoid function')
+
+plt.show()
+
+"""Step Function"""
+z = numpy.arange(-5, 5, .02)
+step_fn = numpy.vectorize(lambda z: 1.0 if z >= 0.0 else 0.0)
+step = step_fn(z)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(z, step)
+ax.set_ylim([-0.5, 1.5])
+ax.set_xlim([-5,5])
+ax.grid(True)
+ax.set_xlabel('z')
+ax.set_title('step function')
+
+plt.show()
+
+"""Sine Function"""
+z = numpy.arange(-2*mt.pi, 2*mt.pi, 0.1)
+t = numpy.sin(z)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(z, t)
+ax.set_ylim([-1.0, 1.0])
+ax.set_xlim([-2*mt.pi,2*mt.pi])
+ax.grid(True)
+ax.set_xlabel('z')
+ax.set_title('sine function')
+
+plt.show()
+
+"""Plots a graph of the squashing function used by a rectified linear
+unit"""
+z = numpy.arange(-2, 2, .1)
+zero = numpy.zeros(len(z))
+y = numpy.max([zero, z], axis=0)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(z, y)
+ax.set_ylim([-2.0, 2.0])
+ax.set_xlim([-2.0, 2.0])
+ax.grid(True)
+ax.set_xlabel('z')
+ax.set_title('Rectified linear unit')
+
+plt.show()
+!ec
+
+
+
+===== The multilayer  perceptron (MLP) =====
+
+The multilayer perceptron is a very popular, and easy to implement approach, to deep learning. It consists of
+o A neural network with one or more layers of nodes between the input and the output nodes.
+o The multilayer network structure, or architecture, or topology, consists of an input layer, one or more hidden layers, and one output layer.
+o The input nodes pass values to the first hidden layer, its nodes pass the information on to the second and so on till we reach the output layer.
+
+As a convention it is normal to call  a  network with one layer of input units, one layer of hidden
+units and one layer of output units as  a two-layer network. A network with two layers of hidden units is called a three-layer network etc etc.
+
+For an MLP network there is no direct connection between the output nodes/neurons/units and  the input nodes/neurons/units.
+Hereafter we will call the various entities of a layer for nodes.
+There are also no connections within a single layer.
+
+The number of input nodes does not need to equal the number of output
+nodes. This applies also to the hidden layers. Each layer may have its
+own number of nodes and activation functions.
+
+The hidden layers have their name from the fact that they are not
+linked to observables and as we will see below when we define the
+so-called activation $\hat{z}$, we can think of this as a basis
+expansion of the original inputs $\hat{x}$. The difference however
+between neural networks and say linear regression is that now these
+basis functions (which will correspond to the weights in the network)
+are learned from data. This results in  an important difference between
+neural networks and deep learning approaches on one side and methods
+like logistic regression or linear regression and their modifications on the other side.
+
+
+
+A neural network with only one layer, what we called the simple
+perceptron, is best suited if we have a standard binary model with
+clear (linear) boundaries between the outcomes. As such it could
+equally well be replaced by standard linear regression or logistic
+regression. Networks with one or more hidden layers approximate
+systems with more complex boundaries.
+
+As stated earlier, 
+an important theorem in studies of neural networks, restated without
+proof here, is the "universal approximation
+theorem":"http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.441.7873&rep=rep1&type=pdf".
+
+It states that a feed-forward network with a single hidden layer
+containing a finite number of neurons can approximate continuous
+functions on compact subsets of real functions. The theorem thus
+states that simple neural networks can represent a wide variety of
+interesting functions when given appropriate parameters. It is the
+multilayer feedforward architecture itself which gives neural networks
+the potential of being universal approximators.
+
+
+=====  Deriving the back propagation code for a multilayer perceptron model =====
+
+As we have seen now in a feed forward network, we can express the final output of our network in terms of basic matrix-vector multiplications.
+The unknowwn quantities are our weights $w_{ij}$ and we need to find an algorithm for changing them so that our errors are as small as possible.
+This leads us to the famous "back propagation algorithm":"https://www.nature.com/articles/323533a0".
+
+The questions we want to ask are how do changes in the biases and the
+weights in our network change the cost function and how can we use the
+final output to modify the weights?
+
+To derive these equations let us start with a plain regression problem
+and define our cost function as
+
+!bt
+\[
+{\cal C}(\hat{W})  =  \frac{1}{2}\sum_{i=1}^n\left(y_i - t_i\right)^2, 
+\]
+!et
+
+where the $t_i$s are our $n$ targets (the values we want to
+reproduce), while the outputs of the network after having propagated
+all inputs $\hat{x}$ are given by $y_i$.  Below we will demonstrate
+how the basic equations arising from the back propagation algorithm
+can be modified in order to study classification problems with $K$
+classes.
+
+With our definition of the targets $\hat{t}$, the outputs of the
+network $\hat{y}$ and the inputs $\hat{x}$ we
+define now the activation $z_j^l$ of node/neuron/unit $j$ of the
+$l$-th layer as a function of the bias, the weights which add up from
+the previous layer $l-1$ and the forward passes/outputs
+$\hat{a}^{l-1}$ from the previous layer as
+
+
+!bt
+\[
+z_j^l = \sum_{i=1}^{M_{l-1}}w_{ij}^la_i^{l-1}+b_j^l,
+\]
+!et
+
+where $b_k^l$ are the biases from layer $l$.  Here $M_{l-1}$
+represents the total number of nodes/neurons/units of layer $l-1$. The
+figure here illustrates this equation.  We can rewrite this in a more
+compact form as the matrix-vector products we discussed earlier,
+
+!bt
+\[
+\hat{z}^l = \left(\hat{W}^l\right)^T\hat{a}^{l-1}+\hat{b}^l.
+\]
+!et
+
+With the activation values $\hat{z}^l$ we can in turn define the
+output of layer $l$ as $\hat{a}^l = f(\hat{z}^l)$ where $f$ is our
+activation function. In the examples here we will use the sigmoid
+function discussed in our logistic regression lectures. We will also use the same activation function $f$ for all layers
+and their nodes.  It means we have
+
+!bt
+\[
+a_j^l = f(z_j^l) = \frac{1}{1+\exp{-(z_j^l)}}.
+\]
+!et
+
+
+From the definition of the activation $z_j^l$ we have
+!bt
+\[
+\frac{\partial z_j^l}{\partial w_{ij}^l} = a_i^{l-1},
+\]
+!et
+and
+!bt
+\[
+\frac{\partial z_j^l}{\partial a_i^{l-1}} = w_{ji}^l. 
+\]
+!et
+
+With our definition of the activation function we have that (note that this function depends only on $z_j^l$)
+!bt
+\[
+\frac{\partial a_j^l}{\partial z_j^{l}} = a_j^l(1-a_j^l)=f(z_j^l)(1-f(z_j^l)). 
+\]
 !et
 
 
 
-!split
+=== Derivative of the cost function ===
+
+With these definitions we can now compute the derivative of the cost function in terms of the weights.
+
+Let us specialize to the output layer $l=L$. Our cost function is
+!bt
+\[
+{\cal C}(\hat{W^L})  =  \frac{1}{2}\sum_{i=1}^n\left(y_i - t_i\right)^2=\frac{1}{2}\sum_{i=1}^n\left(a_i^L - t_i\right)^2, 
+\]
+!et
+The derivative of this function with respect to the weights is
+
+!bt
+\[
+\frac{\partial{\cal C}(\hat{W^L})}{\partial w_{jk}^L}  =  \left(a_j^L - t_j\right)\frac{\partial a_j^L}{\partial w_{jk}^{L}}, 
+\]
+!et
+The last partial derivative can easily be computed and reads (by applying the chain rule)
+!bt
+\[
+\frac{\partial a_j^L}{\partial w_{jk}^{L}} = \frac{\partial a_j^L}{\partial z_{j}^{L}}\frac{\partial z_j^L}{\partial w_{jk}^{L}}=a_j^L(1-a_j^L)a_k^{L-1},  
+\]
+!et
+
+
+
+=== Bringing it together, first back propagation equation ===
+
+We have thus
+!bt
+\[
+\frac{\partial{\cal C}(\hat{W^L})}{\partial w_{jk}^L}  =  \left(a_j^L - t_j\right)a_j^L(1-a_j^L)a_k^{L-1}, 
+\]
+!et
+
+Defining
+!bt
+\[
+\delta_j^L = a_j^L(1-a_j^L)\left(a_j^L - t_j\right) = f'(z_j^L)\frac{\partial {\cal C}}{\partial (a_j^L)},
+\]
+!et
+and using the Hadamard product of two vectors we can write this as
+!bt
+\[
+\hat{\delta}^L = f'(\hat{z}^L)\circ\frac{\partial {\cal C}}{\partial (\hat{a}^L)}.
+\]
+!et
+
+This is an important expression. The second term on the right handside
+measures how fast the cost function is changing as a function of the $j$th
+output activation.  If, for example, the cost function doesn't depend
+much on a particular output node $j$, then $\delta_j^L$ will be small,
+which is what we would expect. The first term on the right, measures
+how fast the activation function $f$ is changing at a given activation
+value $z_j^L$.
+
+Notice that everything in the above equations is easily computed.  In
+particular, we compute $z_j^L$ while computing the behaviour of the
+network, and it is only a small additional overhead to compute
+$f'(z^L_j)$.  The exact form of the derivative with respect to the
+output depends on the form of the cost function.
+However, provided the cost function is known there should be little
+trouble in calculating
+
+!bt
+\[
+\frac{\partial {\cal C}}{\partial (a_j^L)}
+\]
+!et
+
+With the definition of $\delta_j^L$ we have a more compact definition of the derivative of the cost function in terms of the weights, namely
+!bt
+\[
+\frac{\partial{\cal C}(\hat{W^L})}{\partial w_{jk}^L}  =  \delta_j^La_k^{L-1}.
+\]
+!et
+
+
+=== Derivatives in terms of $z_j^L$ ===
+
+It is also easy to see that our previous equation can be written as
+
+!bt
+\[
+\delta_j^L =\frac{\partial {\cal C}}{\partial z_j^L}= \frac{\partial {\cal C}}{\partial a_j^L}\frac{\partial a_j^L}{\partial z_j^L},
+\]
+!et
+which can also be interpreted as the partial derivative of the cost function with respect to the biases $b_j^L$, namely
+!bt
+\[
+\delta_j^L = \frac{\partial {\cal C}}{\partial b_j^L}\frac{\partial b_j^L}{\partial z_j^L}=\frac{\partial {\cal C}}{\partial b_j^L},
+\]
+!et
+That is, the error $\delta_j^L$ is exactly equal to the rate of change of the cost function as a function of the bias. 
+
+
+We have now three equations that are essential for the computations of the derivatives of the cost function at the output layer. These equations are needed to start the algorithm and they are
+
+!bblock The starting equations
+
+!bt
+\begin{equation}
+\frac{\partial{\cal C}(\hat{W^L})}{\partial w_{jk}^L}  =  \delta_j^La_k^{L-1},
+\end{equation}
+!et
+and
+!bt
+\begin{equation}
+\delta_j^L = f'(z_j^L)\frac{\partial {\cal C}}{\partial (a_j^L)},
+\end{equation}
+!et
+and
+
+!bt
+\begin{equation}
+\delta_j^L = \frac{\partial {\cal C}}{\partial b_j^L},
+\end{equation}
+!et
+!eblock
+
+
+An interesting consequence of the above equations is that when the
+activation $a_k^{L-1}$ is small, the gradient term, that is the
+derivative of the cost function with respect to the weights, will also
+tend to be small. We say then that the weight learns slowly, meaning
+that it changes slowly when we minimize the weights via say gradient
+descent. In this case we say the system learns slowly.
+
+Another interesting feature is that is when the activation function,
+represented by the sigmoid function here, is rather flat when we move towards
+its end values $0$ and $1$ (see the above Python codes). In these
+cases, the derivatives of the activation function will also be close
+to zero, meaning again that the gradients will be small and the
+network learns slowly again.
+
+
+
+We need a fourth equation and we are set. We are going to propagate
+backwards in order to the determine the weights and biases. In order
+to do so we need to represent the error in the layer before the final
+one $L-1$ in terms of the errors in the final output layer.
+
+
+=== Final back propagating equation ===
+
+We have that (replacing $L$ with a general layer $l$)
+!bt
+\[
+\delta_j^l =\frac{\partial {\cal C}}{\partial z_j^l}.
+\]
+!et
+We want to express this in terms of the equations for layer $l+1$. Using the chain rule and summing over all $k$ entries we have
+
+!bt
+\[
+\delta_j^l =\sum_k \frac{\partial {\cal C}}{\partial z_k^{l+1}}\frac{\partial z_k^{l+1}}{\partial z_j^{l}}=\sum_k \delta_k^{l+1}\frac{\partial z_k^{l+1}}{\partial z_j^{l}},
+\]
+!et
+and recalling that
+!bt
+\[
+z_j^{l+1} = \sum_{i=1}^{M_{l}}w_{ij}^{l+1}a_j^{l}+b_j^{l+1},
+\]
+!et
+with $M_l$ being the number of nodes in layer $l$, we obtain
+!bt
+\[
+\delta_j^l =\sum_k \delta_k^{l+1}w_{kj}^{l+1}f'(z_j^l),
+\]
+!et
+This is our final equation.
+
+We are now ready to set up the algorithm for back propagation and learning the weights and biases.
+
+===== Setting up the Back propagation algorithm =====
+
+
+
+The four equations  provide us with a way of computing the gradient of the cost function. Let us write this out in the form of an algorithm.
+
+!bblock
+First, we set up the input data $\hat{x}$ and the activations
+$\hat{z}_1$ of the input layer and compute the activation function and
+the pertinent outputs $\hat{a}^1$.
+!eblock
+
+!bblock
+Secondly, we perform then the feed forward till we reach the output
+layer and compute all $\hat{z}_l$ of the input layer and compute the
+activation function and the pertinent outputs $\hat{a}^l$ for
+$l=2,3,\dots,L$.
+!eblock
+
+!bblock
+Thereafter we compute the ouput error $\hat{\delta}^L$ by computing all
+!bt
+\[
+\delta_j^L = f'(z_j^L)\frac{\partial {\cal C}}{\partial (a_j^L)}.
+\]
+!et
+!eblock
+
+!bblock
+Then we compute the back propagate error for each $l=L-1,L-2,\dots,2$ as
+!bt
+\[
+\delta_j^l = \sum_k \delta_k^{l+1}w_{kj}^{l+1}f'(z_j^l).
+\]
+!et
+!eblock
+
+!bblock
+Finally, we update the weights and the biases using gradient descent for each $l=L-1,L-2,\dots,2$ and update the weights and biases according to the rules
+!bt
+\[
+w_{jk}^l\leftarrow  = w_{jk}^l- \eta \delta_j^la_k^{l-1},
+\]
+!et
+
+!bt
+\[
+b_j^l \leftarrow b_j^l-\eta \frac{\partial {\cal C}}{\partial b_j^l}=b_j^l-\eta \delta_j^l,
+\]
+!et
+!eblock
+
+The parameter $\eta$ is the learning parameter discussed in connection with the gradient descent methods.
+Here it is convenient to use stochastic gradient descent (see the examples below) with mini-batches with an outer loop that steps through multiple epochs of training.
+
+
+
+===== Setting up a Multi-layer perceptron model for classification  =====
+
+We are now gong to develop an example based on the MNIST data
+base. This is a classification problem and we need to use our
+cross-entropy function we discussed in connection with logistic
+regression. The cross-entropy defines our cost function for the
+classificaton problems with neural networks.
+  
+In binary classification with two classes $(0, 1)$ we define the
+logistic/sigmoid function as the probability that a particular input
+is in class $0$ or $1$.  This is possible because the logistic
+function takes any input from the real numbers and inputs a number
+between 0 and 1, and can therefore be interpreted as a probability. It
+also has other nice properties, such as a derivative that is simple to
+calculate.
+  
+For an input $\boldsymbol{a}$ from the hidden layer, the probability that the input $\boldsymbol{x}$
+is in class 0 or 1 is just. We let $\theta$ represent the unknown weights and biases to be adjusted by our equations). The variable $x$
+represents our activation values $z$. We have
+!bt
+\[
+P(y = 0 \mid \hat{x}, \hat{\theta}) = \frac{1}{1 + \exp{(- \hat{x}})} ,
+\]
+!et
+and
+!bt
+\[
+P(y = 1 \mid \hat{x}, \hat{\theta}) = 1 - P(y = 0 \mid \hat{x}, \hat{\theta}) ,
+\]
+!et
+  
+where $y \in \{0, 1\}$  and $\hat{\theta}$ represents the weights and biases
+of our network.
+  
+
+=== Defining the cost function ===
+
+Our cost function is given as (see the Logistic regression lectures)
+!bt
+\[
+\mathcal{C}(\hat{\theta}) = - \ln P(\mathcal{D} \mid \hat{\theta}) = - \sum_{i=1}^n
+y_i \ln[P(y_i = 0)] + (1 - y_i) \ln [1 - P(y_i = 0)] = \sum_{i=1}^n \mathcal{L}_i(\hat{\theta}) .
+\]
+!et
+  
+This last equality means that we can interpret our *cost* function as a sum over the *loss* function
+for each point in the dataset $\mathcal{L}_i(\hat{\theta})$.  
+The negative sign is just so that we can think about our algorithm as minimizing a positive number, rather
+than maximizing a negative number.  
+  
+In *multiclass* classification it is common to treat each integer label as a so called *one-hot* vector:  
+  
+$y = 5 \quad \rightarrow \quad \hat{y} = (0, 0, 0, 0, 0, 1, 0, 0, 0, 0) ,$ and
+
+  
+$y = 1 \quad \rightarrow \quad \hat{y} = (0, 1, 0, 0, 0, 0, 0, 0, 0, 0) ,$ 
+  
+  
+i.e. a binary bit string of length $C$, where $C = 10$ is the number of classes in the MNIST dataset (numbers from $0$ to $9$)..  
+  
+If $\hat{x}_i$ is the $i$-th input (image), $y_{ic}$ refers to the $c$-th component of the $i$-th
+output vector $\hat{y}_i$.  
+The probability of $\hat{x}_i$ being in class $c$ will be given by the softmax function:  
+  
+!bt
+\[
+P(y_{ic} = 1 \mid \hat{x}_i, \hat{\theta}) = \frac{\exp{((\hat{a}_i^{hidden})^T \hat{w}_c)}}
+{\sum_{c'=0}^{C-1} \exp{((\hat{a}_i^{hidden})^T \hat{w}_{c'})}} ,
+\]
+!et
+  
+which reduces to the logistic function in the binary case.  
+The likelihood of this $C$-class classifier
+is now given as:  
+  
+!bt
+\[
+P(\mathcal{D} \mid \hat{\theta}) = \prod_{i=1}^n \prod_{c=0}^{C-1} [P(y_{ic} = 1)]^{y_{ic}} .
+\]
+!et
+Again we take the negative log-likelihood to define our cost function:  
+  
+!bt
+\[
+\mathcal{C}(\hat{\theta}) = - \log{P(\mathcal{D} \mid \hat{\theta})}.
+\]
+!et
+See the logistic regression lectures for a full definition of the cost function.
+
+The back propagation equations need now only a small change, namely the definition of a new cost function. We are thus ready to use the same equations as before!
+
+=== Example: binary classification problem ===
+
+As an example of the above let us consider a binary class. As discussed in our logistic regression lectures, we defined a cost function in terms of the parameters $\beta$ as
+!bt
+\[
+\mathcal{C}(\hat{\beta}) = - \sum_{i=1}^n \left(y_i\log{p(y_i \vert x_i,\hat{\beta})}+(i-y_i)\log{1-p(y_i \vert x_i,\hat{\beta})}\right),
+\]
+!et
+where we had defined the logistic (sigmoid) function
+!bt
+\[
+p(y_i =1\vert x_i,\hat{\beta})=\frac{\exp{(\beta_0+\beta_1 x_i)}}{1+\exp{(\beta_0+\beta_1 x_i)}},
+\]
+!et
+and
+!bt
+\[
+p(y_i =0\vert x_i,\hat{\beta})=1-p(y_i =1\vert x_i,\hat{\beta}).
+\]
+!et
+The parameters $\hat{\beta}$ were defined using a minimization method like gradient descent or Newton-Raphson's method. 
+
+Now we replace $x_i$ with the activation $z_i^l$ for a given layer $l$ and the outputs as $y_i=a_i^l=f(z_i^l)$, with $z_i^l$ now being a function of the weights $w_{ij}^l$ and biases $b_i^l$. 
+We have then
+!bt
+\[
+a_i^l = y_i = \frac{\exp{(z_i^l)}}{1+\exp{(z_i^l)}},
+\]
+!et
+with 
+!bt
+\[
+z_i^l = \sum_{j}w_{ij}^l a_j^{l-1}+b_i^l,
+\]
+!et
+where the superscript $l-1$ indicates that these are the outputs from layer $l-1$.
+Our cost function at the final layer $l=L$ is now
+!bt
+\[
+\mathcal{C}(\hat{W}) = - \sum_{i=1}^n \left(t_i\log{a_i^L}+(1-t_i)\log{(1-a_i^L)}\right),
+\]
+!et
+where we have defined the targets $t_i$. The derivatives of the cost function with respect to the output $a_i^L$ are then easily calculated and we get
+!bt
+\[
+\frac{\partial \mathcal{C}(\hat{W})}{\partial a_i^L} = \frac{a_i^L-t_i}{a_i^L(1-a_i^L)}. 
+\]
+!et
+In case we use another activation function than the logistic one, we need to evaluate other derivatives. 
+
+
+=== The Softmax function ===
+
+In case we employ the more general case given by the Softmax equation, we need to evaluate the derivative of the activation function with respect to the activation $z_i^l$, that is we need
+!bt
+\[
+\frac{\partial f(z_i^l)}{\partial w_{jk}^l} =
+\frac{\partial f(z_i^l)}{\partial z_j^l} \frac{\partial z_j^l}{\partial w_{jk}^l}= \frac{\partial f(z_i^l)}{\partial z_j^l}a_k^{l-1}.
+\]
+!et
+For the Softmax function we have
+!bt
+\[
+f(z_i^l) = \frac{\exp{(z_i^l)}}{\sum_{m=1}^K\exp{(z_m^l)}}.
+\]
+!et
+Its derivative with respect to $z_j^l$ gives 
+!bt
+\[
+\frac{\partial f(z_i^l)}{\partial z_j^l}= f(z_i^l)\left(\delta_{ij}-f(z_j^l)\right), 
+\]
+!et
+which in case of the simply binary model reduces to  having $i=j$. 
+
+===== Developing a code for doing neural networks with back propagation =====
+
+  
+One can identify a set of key steps when using neural networks to solve supervised learning problems:  
+  
+o Collect and pre-process data  
+o Define model and architecture  
+o Choose cost function and optimizer  
+o Train the model  
+o Evaluate model performance on test data  
+o Adjust hyperparameters (if necessary, network architecture)
+
+
+  
+Here we will be using the MNIST dataset, which is readily available through the _scikit-learn_
+package. You may also find it for example "here":"http://yann.lecun.com/exdb/mnist/".  
+The *MNIST* (Modified National Institute of Standards and Technology) database is a large database
+of handwritten digits that is commonly used for training various image processing systems.  
+The MNIST dataset consists of 70 000 images of size $28\times 28$ pixels, each labeled from 0 to 9.  
+The scikit-learn dataset we will use consists of a selection of 1797 images of size $8\times 8$ collected and processed from this database.  
+  
+To feed data into a feed-forward neural network we need to represent
+the inputs as a feature matrix $X = (n_{inputs}, n_{features})$.  Each
+row represents an *input*, in this case a handwritten digit, and
+each column represents a *feature*, in this case a pixel.  The
+correct answers, also known as *labels* or *targets* are
+represented as a 1D array of integers 
+$Y = (n_{inputs}) = (5, 3, 1, 8,...)$.
+  
+As an example, say we want to build a neural network using supervised learning to predict Body-Mass Index (BMI) from
+measurements of height (in m)  
+and weight (in kg). If we have measurements of 5 people the feature matrix could be for example:  
+  
+$$ X = \begin{bmatrix}
+1.85 & 81\\
+1.71 & 65\\
+1.95 & 103\\
+1.55 & 42\\
+1.63 & 56
+\end{bmatrix} ,$$  
+  
+and the targets would be:  
+  
+$$ Y = (23.7, 22.2, 27.1, 17.5, 21.1) $$  
+  
+Since each input image is a 2D matrix, we need to flatten the image
+(i.e. "unravel" the 2D matrix into a 1D array) to turn the data into a
+feature matrix. This means we lose all spatial information in the
+image, such as locality and translational invariance. More complicated
+architectures such as Convolutional Neural Networks can take advantage
+of such information, and are most commonly applied when analyzing
+images.
+
+
+!bc pycod
+# import necessary packages
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import datasets
+
+
+# ensure the same random numbers appear every time
+np.random.seed(0)
+
+# display images in notebook
+%matplotlib inline
+plt.rcParams['figure.figsize'] = (12,12)
+
+
+# download MNIST dataset
+digits = datasets.load_digits()
+
+# define inputs and labels
+inputs = digits.images
+labels = digits.target
+
+print("inputs = (n_inputs, pixel_width, pixel_height) = " + str(inputs.shape))
+print("labels = (n_inputs) = " + str(labels.shape))
+
+
+# flatten the image
+# the value -1 means dimension is inferred from the remaining dimensions: 8x8 = 64
+n_inputs = len(inputs)
+inputs = inputs.reshape(n_inputs, -1)
+print("X = (n_inputs, n_features) = " + str(inputs.shape))
+
+
+# choose some random images to display
+indices = np.arange(n_inputs)
+random_indices = np.random.choice(indices, size=5)
+
+for i, image in enumerate(digits.images[random_indices]):
+    plt.subplot(1, 5, i+1)
+    plt.axis('off')
+    plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+    plt.title("Label: %d" % digits.target[random_indices[i]])
+plt.show()
+!ec
+
+=== Train and test datasets ===
+
+Performing analysis before partitioning the dataset is a major error, that can lead to incorrect conclusions.  
+  
+We will reserve $80 \%$ of our dataset for training and $20 \%$ for testing.  
+  
+It is important that the train and test datasets are drawn randomly from our dataset, to ensure
+no bias in the sampling.  
+Say you are taking measurements of weather data to predict the weather in the coming 5 days.
+You don't want to train your model on measurements taken from the hours 00.00 to 12.00, and then test it on data
+collected from 12.00 to 24.00.
+
+
+!bc pycod
+from sklearn.model_selection import train_test_split
+
+# one-liner from scikit-learn library
+train_size = 0.8
+test_size = 1 - train_size
+X_train, X_test, Y_train, Y_test = train_test_split(inputs, labels, train_size=train_size,
+                                                    test_size=test_size)
+
+# equivalently in numpy
+def train_test_split_numpy(inputs, labels, train_size, test_size):
+    n_inputs = len(inputs)
+    inputs_shuffled = inputs.copy()
+    labels_shuffled = labels.copy()
+    
+    np.random.shuffle(inputs_shuffled)
+    np.random.shuffle(labels_shuffled)
+    
+    train_end = int(n_inputs*train_size)
+    X_train, X_test = inputs_shuffled[:train_end], inputs_shuffled[train_end:]
+    Y_train, Y_test = labels_shuffled[:train_end], labels_shuffled[train_end:]
+    
+    return X_train, X_test, Y_train, Y_test
+
+#X_train, X_test, Y_train, Y_test = train_test_split_numpy(inputs, labels, train_size, test_size)
+
+print("Number of training images: " + str(len(X_train)))
+print("Number of test images: " + str(len(X_test)))
+!ec
+
+=== Define model and architecture ===
+ 
+Our simple feed-forward neural network will consist of an *input* layer, a single *hidden* layer and an *output* layer. The activation $y$ of each neuron is a weighted sum of inputs, passed through an activation function. In case of the simple perceptron model we have 
+  
+$$ z = \sum_{i=1}^n w_i a_i ,$$
+  
+$$ y = f(z) ,$$
+  
+where $f$ is the activation function, $a_i$ represents input from neuron $i$ in the preceding layer
+and $w_i$ is the weight to input $i$.  
+The activation of the neurons in the input layer is just the features (e.g. a pixel value).  
+  
+The simplest activation function for a neuron is the *Heaviside* function:
+  
+$$ f(z) = 
+\begin{cases}
+1,  &  z > 0\\
+0,  & \text{otherwise}
+\end{cases}
+$$
+  
+A feed-forward neural network with this activation is known as a *perceptron*.  
+For a binary classifier (i.e. two classes, 0 or 1, dog or not-dog) we can also use this in our output layer.  
+This activation can be generalized to $k$ classes (using e.g. the *one-against-all* strategy), 
+and we call these architectures *multiclass perceptrons*.  
+  
+However, it is now common to use the terms Single Layer Perceptron (SLP) (1 hidden layer) and  
+Multilayer Perceptron (MLP) (2 or more hidden layers) to refer to feed-forward neural networks with any activation function.  
+  
+Typical choices for activation functions include the sigmoid function, hyperbolic tangent, and Rectified Linear Unit (ReLU).  
+We will be using the sigmoid function $\sigma(x)$:  
+  
+$$ f(x) = \sigma(x) = \frac{1}{1 + e^{-x}} ,$$
+  
+which is inspired by probability theory (see logistic regression) and was most commonly used until about 2011. See the discussion below concerning other activation functions.
+
+=== Layers ===
+  
+* Input 
+Since each input image has 8x8 = 64 pixels or features, we have an input layer of 64 neurons.  
+  
+* Hidden layer
+We will use 50 neurons in the hidden layer receiving input from the neurons in the input layer.  
+Since each neuron in the hidden layer is connected to the 64 inputs we have 64x50 = 3200 weights to the hidden layer.  
+  
+* Output
+If we were building a binary classifier, it would be sufficient with a single neuron in the output layer,
+which could output 0 or 1 according to the Heaviside function. This would be an example of a *hard* classifier, meaning it outputs the class of the input directly. However, if we are dealing with noisy data it is often beneficial to use a *soft* classifier, which outputs the probability of being in class 0 or 1.  
+  
+For a soft binary classifier, we could use a single neuron and interpret the output as either being the probability of being in class 0 or the probability of being in class 1. Alternatively we could use 2 neurons, and interpret each neuron as the probability of being in each class.  
+  
+Since we are doing multiclass classification, with 10 categories, it is natural to use 10 neurons in the output layer. We number the neurons $j = 0,1,...,9$. The activation of each output neuron $j$ will be according to the *softmax* function:  
+  
+$$ P(\text{class $j$} \mid \text{input $\hat{a}$}) = \frac{\exp{(\hat{a}^T \hat{w}_j)}}
+{\sum_{c=0}^{9} \exp{(\hat{a}^T \hat{w}_c)}} ,$$  
+  
+i.e. each neuron $j$ outputs the probability of being in class $j$ given an input from the hidden layer $\hat{a}$, with $\hat{w}_j$ the weights of neuron $j$ to the inputs.  
+The denominator is a normalization factor to ensure the outputs (probabilities) sum up to 1.  
+The exponent is just the weighted sum of inputs as before:  
+  
+$$ z_j = \sum_{i=1}^n w_ {ij} a_i+b_j.$$  
+  
+Since each neuron in the output layer is connected to the 50 inputs from the hidden layer we have 50x10 = 500
+weights to the output layer.
+
+=== Weights and biases ===
+  
+Typically weights are initialized with small values distributed around zero, drawn from a uniform
+or normal distribution. Setting all weights to zero means all neurons give the same output, making the network useless.  
+  
+Adding a bias value to the weighted sum of inputs allows the neural network to represent a greater range
+of values. Without it, any input with the value 0 will be mapped to zero (before being passed through the activation). The bias unit has an output of 1, and a weight to each neuron $j$, $b_j$:  
+  
+$$ z_j = \sum_{i=1}^n w_ {ij} a_i + b_j.$$  
+  
+The bias weights $\hat{b}$ are often initialized to zero, but a small value like $0.01$ ensures all neurons have some output which can be backpropagated in the first training cycle.
+!bc pycod
+# building our neural network
+
+n_inputs, n_features = X_train.shape
+n_hidden_neurons = 50
+n_categories = 10
+
+# we make the weights normally distributed using numpy.random.randn
+
+# weights and bias in the hidden layer
+hidden_weights = np.random.randn(n_features, n_hidden_neurons)
+hidden_bias = np.zeros(n_hidden_neurons) + 0.01
+
+# weights and bias in the output layer
+output_weights = np.random.randn(n_hidden_neurons, n_categories)
+output_bias = np.zeros(n_categories) + 0.01
+!ec
+
+=== Feed-forward pass ===
+
+Denote $F$ the number of features, $H$ the number of hidden neurons and $C$ the number of categories.  
+For each input image we calculate a weighted sum of input features (pixel values) to each neuron $j$ in the hidden layer $l$:  
+  
+$$ z_{j}^{l} = \sum_{i=1}^{F} w_{ij}^{l} x_i + b_{j}^{l},$$
+  
+this is then passed through our activation function  
+  
+$$ a_{j}^{l} = f(z_{j}^{l}) .$$  
+  
+We calculate a weighted sum of inputs (activations in the hidden layer) to each neuron $j$ in the output layer:  
+  
+$$ z_{j}^{L} = \sum_{i=1}^{H} w_{ij}^{L} a_{i}^{l} + b_{j}^{L}.$$  
+  
+Finally we calculate the output of neuron $j$ in the output layer using the softmax function:  
+  
+$$ a_{j}^{L} = \frac{\exp{(z_j^{L})}}
+{\sum_{c=0}^{C-1} \exp{(z_c^{L})}} .$$  
+
+=== Matrix multiplications ===
+  
+Since our data has the dimensions $X = (n_{inputs}, n_{features})$ and our weights to the hidden
+layer have the dimensions  
+$W_{hidden} = (n_{features}, n_{hidden})$,
+we can easily feed the network all our training data in one go by taking the matrix product  
+  
+$$ X W^{h} = (n_{inputs}, n_{hidden}),$$ 
+  
+and obtain a matrix that holds the weighted sum of inputs to the hidden layer
+for each input image and each hidden neuron.    
+We also add the bias to obtain a matrix of weighted sums to the hidden layer $Z^{h}$:  
+  
+$$ \hat{z}^{l} = \hat{X} \hat{W}^{l} + \hat{b}^{l} ,$$
+  
+meaning the same bias (1D array with size equal number of hidden neurons) is added to each input image.  
+This is then passed through the activation:  
+  
+$$ \hat{a}^{l} = f(\hat{z}^l) .$$  
+  
+This is fed to the output layer:  
+  
+$$ \hat{z}^{L} = \hat{a}^{L} \hat{W}^{L} + \hat{b}^{L} .$$
+  
+Finally we receive our output values for each image and each category by passing it through the softmax function:  
+  
+$$ output = softmax (\hat{z}^{L}) = (n_{inputs}, n_{categories}) .$$
+
+
+!bc pycod
+# setup the feed-forward pass, subscript h = hidden layer
+
+def sigmoid(x):
+    return 1/(1 + np.exp(-x))
+
+def feed_forward(X):
+    # weighted sum of inputs to the hidden layer
+    z_h = np.matmul(X, hidden_weights) + hidden_bias
+    # activation in the hidden layer
+    a_h = sigmoid(z_h)
+    
+    # weighted sum of inputs to the output layer
+    z_o = np.matmul(a_h, output_weights) + output_bias
+    # softmax output
+    # axis 0 holds each input and axis 1 the probabilities of each category
+    exp_term = np.exp(z_o)
+    probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
+    
+    return probabilities
+
+probabilities = feed_forward(X_train)
+print("probabilities = (n_inputs, n_categories) = " + str(probabilities.shape))
+print("probability that image 0 is in category 0,1,2,...,9 = \n" + str(probabilities[0]))
+print("probabilities sum up to: " + str(probabilities[0].sum()))
+print()
+
+# we obtain a prediction by taking the class with the highest likelihood
+def predict(X):
+    probabilities = feed_forward(X)
+    return np.argmax(probabilities, axis=1)
+
+predictions = predict(X_train)
+print("predictions = (n_inputs) = " + str(predictions.shape))
+print("prediction for image 0: " + str(predictions[0]))
+print("correct label for image 0: " + str(Y_train[0]))
+!ec
+
+=== Choose cost function and optimizer ===
+  
+To measure how well our neural network is doing we need to introduce a cost function.  
+We will call the function that gives the error of a single sample output the *loss* function, and the function
+that gives the total error of our network across all samples the *cost* function.
+A typical choice for multiclass classification is the *cross-entropy* loss, also known as the negative log likelihood.  
+  
+In *multiclass* classification it is common to treat each integer label as a so called *one-hot* vector:  
+  
+$$ y = 5 \quad \rightarrow \quad \hat{y} = (0, 0, 0, 0, 0, 1, 0, 0, 0, 0) ,$$  
+
+  
+$$ y = 1 \quad \rightarrow \quad \hat{y} = (0, 1, 0, 0, 0, 0, 0, 0, 0, 0) ,$$  
+  
+  
+i.e. a binary bit string of length $C$, where $C = 10$ is the number of classes in the MNIST dataset.  
+  
+Let $y_{ic}$ denote the $c$-th component of the $i$-th one-hot vector.  
+We define the cost function $\mathcal{C}$ as a sum over the cross-entropy loss for each point $\hat{x}_i$ in the dataset.
+  
+In the one-hot representation only one of the terms in the loss function is non-zero, namely the
+probability of the correct category $c'$  
+(i.e. the category $c'$ such that $y_{ic'} = 1$). This means that the cross entropy loss only punishes you for how wrong
+you got the correct label. The probability of category $c$ is given by the softmax function. The vector $\hat{\theta}$ represents the parameters of our network, i.e. all the weights and biases.  
+  
+  
+=== Optimizing the cost function ===
+  
+The network is trained by finding the weights and biases that minimize the cost function. One of the most widely used classes of methods is *gradient descent* and its generalizations. The idea behind gradient descent
+is simply to adjust the weights in the direction where the gradient of the cost function is large and negative. This ensures we flow toward a *local* minimum of the cost function.  
+Each parameter $\theta$ is iteratively adjusted according to the rule  
+  
+$$ \theta_{i+1} = \theta_i - \eta \nabla \mathcal{C}(\theta_i) ,$$
+
+where $\eta$ is known as the *learning rate*, which controls how big a step we take towards the minimum.  
+This update can be repeated for any number of iterations, or until we are satisfied with the result.  
+  
+A simple and effective improvement is a variant called *Batch Gradient Descent*.  
+Instead of calculating the gradient on the whole dataset, we calculate an approximation of the gradient
+on a subset of the data called a *minibatch*.  
+If there are $N$ data points and we have a minibatch size of $M$, the total number of batches
+is $N/M$.  
+We denote each minibatch $B_k$, with $k = 1, 2,...,N/M$. The gradient then becomes:  
+  
+$$ \nabla \mathcal{C}(\theta) = \frac{1}{N} \sum_{i=1}^N \nabla \mathcal{L}_i(\theta) \quad \rightarrow \quad
+\frac{1}{M} \sum_{i \in B_k} \nabla \mathcal{L}_i(\theta) ,$$
+  
+i.e. instead of averaging the loss over the entire dataset, we average over a minibatch.  
+  
+This has two important benefits:  
+o Introducing stochasticity decreases the chance that the algorithm becomes stuck in a local minima.  
+o It significantly speeds up the calculation, since we do not have to use the entire dataset to calculate the gradient.  
+
+The various optmization  methods, with codes and algorithms,  are discussed in our lectures on "Gradient descent approaches":"https://compphysics.github.io/MachineLearning/doc/pub/Splines/html/Splines-bs.html".
+
+===  Regularization ===
+  
+It is common to add an extra term to the cost function, proportional
+to the size of the weights.  This is equivalent to constraining the
+size of the weights, so that they do not grow out of control.
+Constraining the size of the weights means that the weights cannot
+grow arbitrarily large to fit the training data, and in this way
+reduces *overfitting*.
+  
+We will measure the size of the weights using the so called *L2-norm*, meaning our cost function becomes:  
+  
+$$ \nabla \mathcal{C}(\theta) = \frac{1}{N} \sum_{i=1}^N \nabla \mathcal{L}_i(\theta) \quad \rightarrow \quad
+\frac{1}{N} \sum_{i=1}^N \nabla \mathcal{L}_i(\theta) + \lambda \lvert \lvert \hat{w} \rvert \rvert_2^2 
+= \frac{1}{N} \sum_{i=1}^N \nabla \mathcal{L}(\theta) + \lambda \sum_{ij} w_{ij}^2,$$  
+  
+i.e. we sum up all the weights squared. The factor $\lambda$ is known as a regularization parameter.
+
+  
+In order to train the model, we need to calculate the derivative of
+the cost function with respect to every bias and weight in the
+network.  In total our network has $(64 + 1)\times 50=3250$ weights in
+the hidden layer and $(50 + 1)\times 10=510$ weights to the output
+layer ($+1$ for the bias), and the gradient must be calculated for
+every parameter.  We use the *backpropagation* algorithm discussed
+above. This is a clever use of the chain rule that allows us to
+calculate the gradient efficently. 
+
+  
+
+  
+To more efficently train our network these equations are implemented using matrix operations.  
+The error in the output layer is calculated simply as, with $\hat{t}$ being our targets,  
+  
+$$ \delta_L = \hat{t} - \hat{y} = (n_{inputs}, n_{categories}) .$$  
+  
+The gradient for the output weights is calculated as  
+  
+$$ \nabla W_{L} = \hat{a}^T \delta_L   = (n_{hidden}, n_{categories}) ,$$
+  
+where $\hat{a} = (n_{inputs}, n_{hidden})$. This simply means that we are summing up the gradients for each input.  
+Since we are going backwards we have to transpose the activation matrix.  
+  
+The gradient with respect to the output bias is then  
+  
+$$ \nabla \hat{b}_{L} = \sum_{i=1}^{n_{inputs}} \delta_L = (n_{categories}) .$$  
+  
+The error in the hidden layer is  
+  
+$$ \Delta_h = \delta_L W_{L}^T \circ f'(z_{h}) = \delta_L W_{L}^T \circ a_{h} \circ (1 - a_{h}) = (n_{inputs}, n_{hidden}) ,$$  
+  
+where $f'(a_{h})$ is the derivative of the activation in the hidden layer. The matrix products mean
+that we are summing up the products for each neuron in the output layer. The symbol $\circ$ denotes
+the *Hadamard product*, meaning element-wise multiplication.  
+  
+This again gives us the gradients in the hidden layer:  
+  
+$$ \nabla W_{h} = X^T \delta_h = (n_{features}, n_{hidden}) ,$$  
+  
+$$ \nabla b_{h} = \sum_{i=1}^{n_{inputs}} \delta_h = (n_{hidden}) .$$
+
+
+!bc pycod
+# to categorical turns our integer vector into a onehot representation
+from sklearn.metrics import accuracy_score
+
+# one-hot in numpy
+def to_categorical_numpy(integer_vector):
+    n_inputs = len(integer_vector)
+    n_categories = np.max(integer_vector) + 1
+    onehot_vector = np.zeros((n_inputs, n_categories))
+    onehot_vector[range(n_inputs), integer_vector] = 1
+    
+    return onehot_vector
+
+#Y_train_onehot, Y_test_onehot = to_categorical(Y_train), to_categorical(Y_test)
+Y_train_onehot, Y_test_onehot = to_categorical_numpy(Y_train), to_categorical_numpy(Y_test)
+
+def feed_forward_train(X):
+    # weighted sum of inputs to the hidden layer
+    z_h = np.matmul(X, hidden_weights) + hidden_bias
+    # activation in the hidden layer
+    a_h = sigmoid(z_h)
+    
+    # weighted sum of inputs to the output layer
+    z_o = np.matmul(a_h, output_weights) + output_bias
+    # softmax output
+    # axis 0 holds each input and axis 1 the probabilities of each category
+    exp_term = np.exp(z_o)
+    probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
+    
+    # for backpropagation need activations in hidden and output layers
+    return a_h, probabilities
+
+def backpropagation(X, Y):
+    a_h, probabilities = feed_forward_train(X)
+    
+    # error in the output layer
+    error_output = probabilities - Y
+    # error in the hidden layer
+    error_hidden = np.matmul(error_output, output_weights.T) * a_h * (1 - a_h)
+    
+    # gradients for the output layer
+    output_weights_gradient = np.matmul(a_h.T, error_output)
+    output_bias_gradient = np.sum(error_output, axis=0)
+    
+    # gradient for the hidden layer
+    hidden_weights_gradient = np.matmul(X.T, error_hidden)
+    hidden_bias_gradient = np.sum(error_hidden, axis=0)
+
+    return output_weights_gradient, output_bias_gradient, hidden_weights_gradient, hidden_bias_gradient
+
+print("Old accuracy on training data: " + str(accuracy_score(predict(X_train), Y_train)))
+
+eta = 0.01
+lmbd = 0.01
+for i in range(1000):
+    # calculate gradients
+    dWo, dBo, dWh, dBh = backpropagation(X_train, Y_train_onehot)
+    
+    # regularization term gradients
+    dWo += lmbd * output_weights
+    dWh += lmbd * hidden_weights
+    
+    # update weights and biases
+    output_weights -= eta * dWo
+    output_bias -= eta * dBo
+    hidden_weights -= eta * dWh
+    hidden_bias -= eta * dBh
+
+print("New accuracy on training data: " + str(accuracy_score(predict(X_train), Y_train)))
+!ec
+
+  
+As we can see the network does not seem to be learning at all. It seems to be just guessing the label for each image.  
+In order to obtain a network that does something useful, we will have to do a bit more work.  
+  
+The choice of *hyperparameters* such as learning rate and regularization parameter is hugely influential for the performance of the network. Typically a *grid-search* is performed, wherein we test different hyperparameters separated by orders of magnitude. For example we could test the learning rates $\eta = 10^{-6}, 10^{-5},...,10^{-1}$ with different regularization parameters $\lambda = 10^{-6},...,10^{-0}$.  
+  
+Next, we haven't implemented minibatching yet, which introduces stochasticity and is though to act as an important regularizer on the weights. We call a feed-forward + backward pass with a minibatch an *iteration*, and a full training period
+going through the entire dataset ($n/M$ batches) an *epoch*.
+  
+If this does not improve network performance, you may want to consider altering the network architecture, adding more neurons or hidden layers.  
+Andrew Ng goes through some of these considerations in this "video":"https://youtu.be/F1ka6a13S9I". You can find a summary of the video "here":"https://kevinzakka.github.io/2016/09/26/applying-deep-learning/".  
+  
+=== Full object-oriented implementation ===
+  
+It is very natural to think of the network as an object, with specific instances of the network
+being realizations of this object with different hyperparameters. An implementation using Python classes provides a clean structure and interface, and the full implementation of our neural network is given below.
+
+
+!bc pycod
+class NeuralNetwork:
+    def __init__(
+            self,
+            X_data,
+            Y_data,
+            n_hidden_neurons=50,
+            n_categories=10,
+            epochs=10,
+            batch_size=100,
+            eta=0.1,
+            lmbd=0.0):
+
+        self.X_data_full = X_data
+        self.Y_data_full = Y_data
+
+        self.n_inputs = X_data.shape[0]
+        self.n_features = X_data.shape[1]
+        self.n_hidden_neurons = n_hidden_neurons
+        self.n_categories = n_categories
+
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.iterations = self.n_inputs // self.batch_size
+        self.eta = eta
+        self.lmbd = lmbd
+
+        self.create_biases_and_weights()
+
+    def create_biases_and_weights(self):
+        self.hidden_weights = np.random.randn(self.n_features, self.n_hidden_neurons)
+        self.hidden_bias = np.zeros(self.n_hidden_neurons) + 0.01
+
+        self.output_weights = np.random.randn(self.n_hidden_neurons, self.n_categories)
+        self.output_bias = np.zeros(self.n_categories) + 0.01
+
+    def feed_forward(self):
+        # feed-forward for training
+        self.z_h = np.matmul(self.X_data, self.hidden_weights) + self.hidden_bias
+        self.a_h = sigmoid(self.z_h)
+
+        self.z_o = np.matmul(self.a_h, self.output_weights) + self.output_bias
+
+        exp_term = np.exp(self.z_o)
+        self.probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
+
+    def feed_forward_out(self, X):
+        # feed-forward for output
+        z_h = np.matmul(X, self.hidden_weights) + self.hidden_bias
+        a_h = sigmoid(z_h)
+
+        z_o = np.matmul(a_h, self.output_weights) + self.output_bias
+        
+        exp_term = np.exp(z_o)
+        probabilities = exp_term / np.sum(exp_term, axis=1, keepdims=True)
+        return probabilities
+
+    def backpropagation(self):
+        error_output = self.probabilities - self.Y_data
+        error_hidden = np.matmul(error_output, self.output_weights.T) * self.a_h * (1 - self.a_h)
+
+        self.output_weights_gradient = np.matmul(self.a_h.T, error_output)
+        self.output_bias_gradient = np.sum(error_output, axis=0)
+
+        self.hidden_weights_gradient = np.matmul(self.X_data.T, error_hidden)
+        self.hidden_bias_gradient = np.sum(error_hidden, axis=0)
+
+        if self.lmbd > 0.0:
+            self.output_weights_gradient += self.lmbd * self.output_weights
+            self.hidden_weights_gradient += self.lmbd * self.hidden_weights
+
+        self.output_weights -= self.eta * self.output_weights_gradient
+        self.output_bias -= self.eta * self.output_bias_gradient
+        self.hidden_weights -= self.eta * self.hidden_weights_gradient
+        self.hidden_bias -= self.eta * self.hidden_bias_gradient
+
+    def predict(self, X):
+        probabilities = self.feed_forward_out(X)
+        return np.argmax(probabilities, axis=1)
+
+    def predict_probabilities(self, X):
+        probabilities = self.feed_forward_out(X)
+        return probabilities
+
+    def train(self):
+        data_indices = np.arange(self.n_inputs)
+
+        for i in range(self.epochs):
+            for j in range(self.iterations):
+                # pick datapoints with replacement
+                chosen_datapoints = np.random.choice(
+                    data_indices, size=self.batch_size, replace=False
+                )
+
+                # minibatch training data
+                self.X_data = self.X_data_full[chosen_datapoints]
+                self.Y_data = self.Y_data_full[chosen_datapoints]
+
+                self.feed_forward()
+                self.backpropagation()
+!ec
+
+===== Evaluate model performance on test data =====
+  
+To measure the performance of our network we evaluate how well it does it data it has never seen before, i.e. the test data.  
+We measure the performance of the network using the *accuracy* score.  
+The accuracy is as you would expect just the number of images correctly labeled divided by the total number of images. A perfect classifier will have an accuracy score of $1$.  
+  
+$$ \text{Accuracy} = \frac{\sum_{i=1}^n I(\hat{y}_i = y_i)}{n} ,$$  
+  
+where $I$ is the indicator function, $1$ if $\hat{y}_i = y_i$ and $0$ otherwise.
+
+
+!bc pycod
+epochs = 100
+batch_size = 100
+
+dnn = NeuralNetwork(X_train, Y_train_onehot, eta=eta, lmbd=lmbd, epochs=epochs, batch_size=batch_size,
+                    n_hidden_neurons=n_hidden_neurons, n_categories=n_categories)
+dnn.train()
+test_predict = dnn.predict(X_test)
+
+# accuracy score from scikit library
+print("Accuracy score on test set: ", accuracy_score(Y_test, test_predict))
+
+# equivalent in numpy
+def accuracy_score_numpy(Y_test, Y_pred):
+    return np.sum(Y_test == Y_pred) / len(Y_test)
+
+#print("Accuracy score on test set: ", accuracy_score_numpy(Y_test, test_predict))
+!ec
+
+
+=== Adjust hyperparameters ===
+  
+We now perform a grid search to find the optimal hyperparameters for the network.  
+Note that we are only using 1 layer with 50 neurons, and human performance is estimated to be around $98\%$ ($2\%$ error rate).
+
+!bc pycod
+eta_vals = np.logspace(-5, 1, 7)
+lmbd_vals = np.logspace(-5, 1, 7)
+# store the models for later use
+DNN_numpy = np.zeros((len(eta_vals), len(lmbd_vals)), dtype=object)
+
+# grid search
+for i, eta in enumerate(eta_vals):
+    for j, lmbd in enumerate(lmbd_vals):
+        dnn = NeuralNetwork(X_train, Y_train_onehot, eta=eta, lmbd=lmbd, epochs=epochs, batch_size=batch_size,
+                            n_hidden_neurons=n_hidden_neurons, n_categories=n_categories)
+        dnn.train()
+        
+        DNN_numpy[i][j] = dnn
+        
+        test_predict = dnn.predict(X_test)
+        
+        print("Learning rate  = ", eta)
+        print("Lambda = ", lmbd)
+        print("Accuracy score on test set: ", accuracy_score(Y_test, test_predict))
+        print()
+!ec
+
+=== Visualization ===
+
+!bc pycod
+# visual representation of grid search
+# uses seaborn heatmap, you can also do this with matplotlib imshow
+import seaborn as sns
+
+sns.set()
+
+train_accuracy = np.zeros((len(eta_vals), len(lmbd_vals)))
+test_accuracy = np.zeros((len(eta_vals), len(lmbd_vals)))
+
+for i in range(len(eta_vals)):
+    for j in range(len(lmbd_vals)):
+        dnn = DNN_numpy[i][j]
+        
+        train_pred = dnn.predict(X_train) 
+        test_pred = dnn.predict(X_test)
+
+        train_accuracy[i][j] = accuracy_score(Y_train, train_pred)
+        test_accuracy[i][j] = accuracy_score(Y_test, test_pred)
+
+        
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(train_accuracy, annot=True, ax=ax, cmap="viridis")
+ax.set_title("Training Accuracy")
+ax.set_ylabel("$\eta$")
+ax.set_xlabel("$\lambda$")
+plt.show()
+
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(test_accuracy, annot=True, ax=ax, cmap="viridis")
+ax.set_title("Test Accuracy")
+ax.set_ylabel("$\eta$")
+ax.set_xlabel("$\lambda$")
+plt.show()
+!ec
+
+=== scikit-learn implementation ===
+  
+_scikit-learn_ focuses more
+on traditional machine learning methods, such as regression,
+clustering, decision trees, etc. As such, it has only two types of
+neural networks: Multi Layer Perceptron outputting continuous values,
+*MPLRegressor*, and Multi Layer Perceptron outputting labels,
+*MLPClassifier*. We will see how simple it is to use these classes.
+  
+_scikit-learn_ implements a few improvements from our neural network,
+such as early stopping, a varying learning rate, different
+optimization methods, etc. We would therefore expect a better
+performance overall.
+
+!bc pycod
+from sklearn.neural_network import MLPClassifier
+# store models for later use
+DNN_scikit = np.zeros((len(eta_vals), len(lmbd_vals)), dtype=object)
+
+for i, eta in enumerate(eta_vals):
+    for j, lmbd in enumerate(lmbd_vals):
+        dnn = MLPClassifier(hidden_layer_sizes=(n_hidden_neurons), activation='logistic',
+                            alpha=lmbd, learning_rate_init=eta, max_iter=epochs)
+        dnn.fit(X_train, Y_train)
+        
+        DNN_scikit[i][j] = dnn
+        
+        print("Learning rate  = ", eta)
+        print("Lambda = ", lmbd)
+        print("Accuracy score on test set: ", dnn.score(X_test, Y_test))
+        print()
+!ec
+
+
+!bc pycod
+# optional
+# visual representation of grid search
+# uses seaborn heatmap, could probably do this in matplotlib
+import seaborn as sns
+
+sns.set()
+
+train_accuracy = np.zeros((len(eta_vals), len(lmbd_vals)))
+test_accuracy = np.zeros((len(eta_vals), len(lmbd_vals)))
+
+for i in range(len(eta_vals)):
+    for j in range(len(lmbd_vals)):
+        dnn = DNN_scikit[i][j]
+        
+        train_pred = dnn.predict(X_train) 
+        test_pred = dnn.predict(X_test)
+
+        train_accuracy[i][j] = accuracy_score(Y_train, train_pred)
+        test_accuracy[i][j] = accuracy_score(Y_test, test_pred)
+
+        
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(train_accuracy, annot=True, ax=ax, cmap="viridis")
+ax.set_title("Training Accuracy")
+ax.set_ylabel("$\eta$")
+ax.set_xlabel("$\lambda$")
+plt.show()
+
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(test_accuracy, annot=True, ax=ax, cmap="viridis")
+ax.set_title("Test Accuracy")
+ax.set_ylabel("$\eta$")
+ax.set_xlabel("$\lambda$")
+plt.show()
+!ec
+
+
+
+===== Building neural networks in Tensorflow and Keras =====
+
+Now we want  to build on the experience gained from our neural network implementation in NumPy and scikit-learn
+and use it to construct a neural network in Tensorflow. Once we have constructed a neural network in NumPy
+and Tensorflow, building one in Keras is really quite trivial, though the performance may suffer.  
+  
+In our previous example we used only one hidden layer, and in this we will use two. From this it should be quite
+clear how to build one using an arbitrary number of hidden layers, using data structures such as Python lists or
+NumPy arrays.
+
+  
+Tensorflow is an open source library machine learning library
+developed by the Google Brain team for internal use. It was released
+under the Apache 2.0 open source license in November 9, 2015.
+  
+Tensorflow is a computational framework that allows you to construct
+machine learning models at different levels of abstraction, from
+high-level, object-oriented APIs like Keras, down to the C++ kernels
+that Tensorflow is built upon. The higher levels of abstraction are
+simpler to use, but less flexible, and our choice of implementation
+should reflect the problems we are trying to solve.
+  
+"Tensorflow uses":"https://www.tensorflow.org/guide/graphs" so-called graphs to represent your computation
+in terms of the dependencies between individual operations, such that you first build a Tensorflow *graph*
+to represent your model, and then create a Tensorflow *session* to run the graph.
+  
+In this guide we will analyze the same data as we did in our NumPy and
+scikit-learn tutorial, gathered from the MNIST database of images. We
+will give an introduction to the lower level Python Application
+Program Interfaces (APIs), and see how we use them to build our graph.
+Then we will build (effectively) the same graph in Keras, to see just
+how simple solving a machine learning problem can be.
+  
+To install tensorflow on Unix/Linux systems, use pip as
+!bc pycod
+pip3 install tensorflow
+!ec
+and/or if you use _anaconda_, just write (or install from the graphical user interface)
+!bc pycod
+conda install tensorflow
+!ec
+
+
+!bc pycod
+# import necessary packages
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import datasets
+
+
+# ensure the same random numbers appear every time
+np.random.seed(0)
+
+# display images in notebook
+%matplotlib inline
+plt.rcParams['figure.figsize'] = (12,12)
+
+
+# download MNIST dataset
+digits = datasets.load_digits()
+
+# define inputs and labels
+inputs = digits.images
+labels = digits.target
+
+print("inputs = (n_inputs, pixel_width, pixel_height) = " + str(inputs.shape))
+print("labels = (n_inputs) = " + str(labels.shape))
+
+
+# flatten the image
+# the value -1 means dimension is inferred from the remaining dimensions: 8x8 = 64
+n_inputs = len(inputs)
+inputs = inputs.reshape(n_inputs, -1)
+print("X = (n_inputs, n_features) = " + str(inputs.shape))
+
+
+# choose some random images to display
+indices = np.arange(n_inputs)
+random_indices = np.random.choice(indices, size=5)
+
+for i, image in enumerate(digits.images[random_indices]):
+    plt.subplot(1, 5, i+1)
+    plt.axis('off')
+    plt.imshow(image, cmap=plt.cm.gray_r, interpolation='nearest')
+    plt.title("Label: %d" % digits.target[random_indices[i]])
+plt.show()
+!ec
+
+!bc pycod
+from keras.utils import to_categorical
+from sklearn.model_selection import train_test_split
+
+# one-hot representation of labels
+labels = to_categorical(labels)
+
+# split into train and test data
+train_size = 0.8
+test_size = 1 - train_size
+X_train, X_test, Y_train, Y_test = train_test_split(inputs, labels, train_size=train_size,
+                                                    test_size=test_size)
+!ec
+
+=== Using TensorFlow backend ===
+
+o Define model and architecture
+o Choose cost function and optimizer
+
+!bc pycod
+import tensorflow as tf
+
+class NeuralNetworkTensorflow:
+    def __init__(
+            self,
+            X_train,
+            Y_train,
+            X_test,
+            Y_test,
+            n_neurons_layer1=100,
+            n_neurons_layer2=50,
+            n_categories=2,
+            epochs=10,
+            batch_size=100,
+            eta=0.1,
+            lmbd=0.0):
+        
+        # keep track of number of steps
+        self.global_step = tf.Variable(0, dtype=tf.int32, trainable=False, name='global_step')
+        
+        self.X_train = X_train
+        self.Y_train = Y_train
+        self.X_test = X_test
+        self.Y_test = Y_test
+        
+        self.n_inputs = X_train.shape[0]
+        self.n_features = X_train.shape[1]
+        self.n_neurons_layer1 = n_neurons_layer1
+        self.n_neurons_layer2 = n_neurons_layer2
+        self.n_categories = n_categories
+        
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.iterations = self.n_inputs // self.batch_size
+        self.eta = eta
+        self.lmbd = lmbd
+        
+        # build network piece by piece
+        # name scopes (with) are used to enforce creation of new variables
+        # https://www.tensorflow.org/guide/variables
+        self.create_placeholders()
+        self.create_DNN()
+        self.create_loss()
+        self.create_optimiser()
+        self.create_accuracy()
+    
+    def create_placeholders(self):
+        # placeholders are fine here, but "Datasets" are the preferred method
+        # of streaming data into a model
+        with tf.name_scope('data'):
+            self.X = tf.placeholder(tf.float32, shape=(None, self.n_features), name='X_data')
+            self.Y = tf.placeholder(tf.float32, shape=(None, self.n_categories), name='Y_data')
+    
+    def create_DNN(self):
+        with tf.name_scope('DNN'):
+            # the weights are stored to calculate regularization loss later
+            
+            # Fully connected layer 1
+            self.W_fc1 = self.weight_variable([self.n_features, self.n_neurons_layer1], name='fc1', dtype=tf.float32)
+            b_fc1 = self.bias_variable([self.n_neurons_layer1], name='fc1', dtype=tf.float32)
+            a_fc1 = tf.nn.sigmoid(tf.matmul(self.X, self.W_fc1) + b_fc1)
+            
+            # Fully connected layer 2
+            self.W_fc2 = self.weight_variable([self.n_neurons_layer1, self.n_neurons_layer2], name='fc2', dtype=tf.float32)
+            b_fc2 = self.bias_variable([self.n_neurons_layer2], name='fc2', dtype=tf.float32)
+            a_fc2 = tf.nn.sigmoid(tf.matmul(a_fc1, self.W_fc2) + b_fc2)
+            
+            # Output layer
+            self.W_out = self.weight_variable([self.n_neurons_layer2, self.n_categories], name='out', dtype=tf.float32)
+            b_out = self.bias_variable([self.n_categories], name='out', dtype=tf.float32)
+            self.z_out = tf.matmul(a_fc2, self.W_out) + b_out
+    
+    def create_loss(self):
+        with tf.name_scope('loss'):
+            softmax_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=self.Y, logits=self.z_out))
+            
+            regularizer_loss_fc1 = tf.nn.l2_loss(self.W_fc1)
+            regularizer_loss_fc2 = tf.nn.l2_loss(self.W_fc2)
+            regularizer_loss_out = tf.nn.l2_loss(self.W_out)
+            regularizer_loss = self.lmbd*(regularizer_loss_fc1 + regularizer_loss_fc2 + regularizer_loss_out)
+            
+            self.loss = softmax_loss + regularizer_loss
+
+    def create_accuracy(self):
+        with tf.name_scope('accuracy'):
+            probabilities = tf.nn.softmax(self.z_out)
+            predictions = tf.argmax(probabilities, axis=1)
+            labels = tf.argmax(self.Y, axis=1)
+            
+            correct_predictions = tf.equal(predictions, labels)
+            correct_predictions = tf.cast(correct_predictions, tf.float32)
+            self.accuracy = tf.reduce_mean(correct_predictions)
+    
+    def create_optimiser(self):
+        with tf.name_scope('optimizer'):
+            self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=self.eta).minimize(self.loss, global_step=self.global_step)
+            
+    def weight_variable(self, shape, name='', dtype=tf.float32):
+        initial = tf.truncated_normal(shape, stddev=0.1)
+        return tf.Variable(initial, name=name, dtype=dtype)
+    
+    def bias_variable(self, shape, name='', dtype=tf.float32):
+        initial = tf.constant(0.1, shape=shape)
+        return tf.Variable(initial, name=name, dtype=dtype)
+    
+    def fit(self):
+        data_indices = np.arange(self.n_inputs)
+
+        with tf.Session() as sess:
+            sess.run(tf.global_variables_initializer())
+            for i in range(self.epochs):
+                for j in range(self.iterations):
+                    chosen_datapoints = np.random.choice(data_indices, size=self.batch_size, replace=False)
+                    batch_X, batch_Y = self.X_train[chosen_datapoints], self.Y_train[chosen_datapoints]
+            
+                    sess.run([DNN.loss, DNN.optimizer],
+                        feed_dict={DNN.X: batch_X,
+                                   DNN.Y: batch_Y})
+                    accuracy = sess.run(DNN.accuracy,
+                        feed_dict={DNN.X: batch_X,
+                                   DNN.Y: batch_Y})
+                    step = sess.run(DNN.global_step)
+    
+            self.train_loss, self.train_accuracy = sess.run([DNN.loss, DNN.accuracy],
+                feed_dict={DNN.X: self.X_train,
+                           DNN.Y: self.Y_train})
+        
+            self.test_loss, self.test_accuracy = sess.run([DNN.loss, DNN.accuracy],
+                feed_dict={DNN.X: self.X_test,
+                           DNN.Y: self.Y_test})
+!ec
+
+
+=== Optimizing and using gradient descent ===
+
+!bc pycod
+epochs = 100
+batch_size = 100
+n_neurons_layer1 = 100
+n_neurons_layer2 = 50
+n_categories = 10
+eta_vals = np.logspace(-5, 1, 7)
+lmbd_vals = np.logspace(-5, 1, 7)
+!ec
+
+
+!bc pycod
+DNN_tf = np.zeros((len(eta_vals), len(lmbd_vals)), dtype=object)
+        
+for i, eta in enumerate(eta_vals):
+    for j, lmbd in enumerate(lmbd_vals):
+        DNN = NeuralNetworkTensorflow(X_train, Y_train, X_test, Y_test,
+                                      n_neurons_layer1, n_neurons_layer2, n_categories,
+                                      epochs=epochs, batch_size=batch_size, eta=eta, lmbd=lmbd)
+        DNN.fit()
+        
+        DNN_tf[i][j] = DNN
+        
+        print("Learning rate = ", eta)
+        print("Lambda = ", lmbd)
+        print("Test accuracy: %.3f" % DNN.test_accuracy)
+        print()
+!ec
+
+!bc pycod
+# optional
+# visual representation of grid search
+# uses seaborn heatmap, could probably do this in matplotlib
+import seaborn as sns
+
+sns.set()
+
+train_accuracy = np.zeros((len(eta_vals), len(lmbd_vals)))
+test_accuracy = np.zeros((len(eta_vals), len(lmbd_vals)))
+
+for i in range(len(eta_vals)):
+    for j in range(len(lmbd_vals)):
+        DNN = DNN_tf[i][j]
+
+        train_accuracy[i][j] = DNN.train_accuracy
+        test_accuracy[i][j] = DNN.test_accuracy
+
+        
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(train_accuracy, annot=True, ax=ax, cmap="viridis")
+ax.set_title("Training Accuracy")
+ax.set_ylabel("$\eta$")
+ax.set_xlabel("$\lambda$")
+plt.show()
+
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(test_accuracy, annot=True, ax=ax, cmap="viridis")
+ax.set_title("Test Accuracy")
+ax.set_ylabel("$\eta$")
+ax.set_xlabel("$\lambda$")
+plt.show()
+!ec
+
+!bc pycod
+# optional
+# we can use log files to visualize our graph in Tensorboard
+writer = tf.summary.FileWriter('logs/')
+writer.add_graph(tf.get_default_graph())
+!ec
+
+
+
+=== Using Keras ===
+  
+Keras is a high level "neural network":"https://en.wikipedia.org/wiki/Application_programming_interface"
+that supports Tensorflow, CTNK and Theano as backends.  
+If you have Tensorflow installed Keras is available through the *tf.keras* module.  
+If you have Anaconda installed you may run the following command
+!bc pycod
+conda install keras
+!ec
+  
+Alternatively, if you have Tensorflow or one of the other supported backends install you may use the pip package manager: 
+
+!bc pycod
+pip3 install keras
+!ec
+or look up the "instructions here":"https://keras.io/".
+
+!bc pycod
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.regularizers import l2
+from keras.optimizers import SGD
+
+def create_neural_network_keras(n_neurons_layer1, n_neurons_layer2, n_categories, eta, lmbd):
+    model = Sequential()
+    model.add(Dense(n_neurons_layer1, activation='sigmoid', kernel_regularizer=l2(lmbd)))
+    model.add(Dense(n_neurons_layer2, activation='sigmoid', kernel_regularizer=l2(lmbd)))
+    model.add(Dense(n_categories, activation='softmax'))
+    
+    sgd = SGD(lr=eta)
+    model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+    
+    return model
+!ec
+
+!bc pycod
+DNN_keras = np.zeros((len(eta_vals), len(lmbd_vals)), dtype=object)
+        
+for i, eta in enumerate(eta_vals):
+    for j, lmbd in enumerate(lmbd_vals):
+        DNN = create_neural_network_keras(n_neurons_layer1, n_neurons_layer2, n_categories,
+                                         eta=eta, lmbd=lmbd)
+        DNN.fit(X_train, Y_train, epochs=epochs, batch_size=batch_size, verbose=0)
+        scores = DNN.evaluate(X_test, Y_test)
+        
+        DNN_keras[i][j] = DNN
+        
+        print("Learning rate = ", eta)
+        print("Lambda = ", lmbd)
+        print("Test accuracy: %.3f" % scores[1])
+        print()
+!ec
+
+!bc pycod
+# optional
+# visual representation of grid search
+# uses seaborn heatmap, could probably do this in matplotlib
+import seaborn as sns
+
+sns.set()
+
+train_accuracy = np.zeros((len(eta_vals), len(lmbd_vals)))
+test_accuracy = np.zeros((len(eta_vals), len(lmbd_vals)))
+
+for i in range(len(eta_vals)):
+    for j in range(len(lmbd_vals)):
+        DNN = DNN_keras[i][j]
+
+        train_accuracy[i][j] = DNN.evaluate(X_train, Y_train)[1]
+        test_accuracy[i][j] = DNN.evaluate(X_test, Y_test)[1]
+
+        
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(train_accuracy, annot=True, ax=ax, cmap="viridis")
+ax.set_title("Training Accuracy")
+ax.set_ylabel("$\eta$")
+ax.set_xlabel("$\lambda$")
+plt.show()
+
+fig, ax = plt.subplots(figsize = (10, 10))
+sns.heatmap(test_accuracy, annot=True, ax=ax, cmap="viridis")
+ax.set_title("Test Accuracy")
+ax.set_ylabel("$\eta$")
+ax.set_xlabel("$\lambda$")
+plt.show()
+!ec
+
+
+
+
+===== Which activation function should I use? =====
+
+The Back propagation algorithm we derived above works by going from
+the output layer to the input layer, propagating the error gradient on
+the way. Once the algorithm has computed the gradient of the cost
+function with regards to each parameter in the network, it uses these
+gradients to update each parameter with a Gradient Descent (GD) step.
+
+
+Unfortunately for us, the gradients often get smaller and smaller as the
+algorithm progresses down to the first hidden layers. As a result, the
+GD update leaves the lower layer connection weights
+virtually unchanged, and training never converges to a good
+solution. This is known in the literature as 
+_the vanishing gradients problem_. 
+
+In other cases, the opposite can happen, namely the the gradients can grow bigger and
+bigger. The result is that many of the layers get large updates of the 
+weights the
+algorithm diverges. This is the _exploding gradients problem_, which is
+mostly encountered in recurrent neural networks. More generally, deep
+neural networks suffer from unstable gradients, different layers may
+learn at widely different speeds
+
+
+===== Is the Logistic activation function (Sigmoid)  our choice? =====
+
+Although this unfortunate behavior has been empirically observed for
+quite a while (it was one of the reasons why deep neural networks were
+mostly abandoned for a long time), it is only around 2010 that
+significant progress was made in understanding it.
+
+A paper titled "Understanding the Difficulty of Training Deep
+Feedforward Neural Networks by Xavier Glorot and Yoshua Bengio":"http://proceedings.mlr.press/v9/glorot10a.html" found that
+the problems with the popular logistic
+sigmoid activation function and the weight initialization technique
+that was most popular at the time, namely random initialization using
+a normal distribution with a mean of 0 and a standard deviation of
+1. 
+
+They showed that with this activation function and this
+initialization scheme, the variance of the outputs of each layer is
+much greater than the variance of its inputs. Going forward in the
+network, the variance keeps increasing after each layer until the
+activation function saturates at the top layers. This is actually made
+worse by the fact that the logistic function has a mean of 0.5, not 0
+(the hyperbolic tangent function has a mean of 0 and behaves slightly
+better than the logistic function in deep networks).
+
+
+
+===== The derivative of the Logistic funtion =====
+
+Looking at the logistic activation function, when inputs become large
+(negative or positive), the function saturates at 0 or 1, with a
+derivative extremely close to 0. Thus when backpropagation kicks in,
+it has virtually no gradient to propagate back through the network,
+and what little gradient exists keeps getting diluted as
+backpropagation progresses down through the top layers, so there is
+really nothing left for the lower layers.
+
+In their paper, Glorot and Bengio propose a way to significantly
+alleviate this problem. We need the signal to flow properly in both
+directions: in the forward direction when making predictions, and in
+the reverse direction when backpropagating gradients. We don’t want
+the signal to die out, nor do we want it to explode and saturate. For
+the signal to flow properly, the authors argue that we need the
+variance of the outputs of each layer to be equal to the variance of
+its inputs, and we also need the gradients to have equal variance
+before and after flowing through a layer in the reverse direction.
+
+
+
+One of the insights in the 2010 paper by Glorot and Bengio was that
+the vanishing/exploding gradients problems were in part due to a poor
+choice of activation function. Until then most people had assumed that
+if Nature had chosen to use roughly sigmoid activation functions in
+biological neurons, they must be an excellent choice. But it turns out
+that other activation functions behave much better in deep neural
+networks, in particular the ReLU activation function, mostly because
+it does not saturate for positive values (and also because it is quite
+fast to compute).
+
+
+
+===== The RELU function family =====
+
+The ReLU activation function suffers from a problem known as the dying
+ReLUs: during training, some neurons effectively die, meaning they
+stop outputting anything other than 0.
+
+In some cases, you may find that half of your network’s neurons are
+dead, especially if you used a large learning rate. During training,
+if a neuron’s weights get updated such that the weighted sum of the
+neuron’s inputs is negative, it will start outputting 0. When this
+happen, the neuron is unlikely to come back to life since the gradient
+of the ReLU function is 0 when its input is negative.
+
+To solve this problem, nowadays practitioners use a  variant of the ReLU
+function, such as the leaky ReLU discussed above or the so-called
+exponential linear unit (ELU) function
+
+
+!bt
+\[
+ELU(z) = \left\{\begin{array}{cc} \alpha\left( \exp{(z)}-1\right) & z < 0,\\  z & z \ge 0.\end{array}\right. 
+\]
+!et
+
+
+===== Which activation function should we use? =====
+
+In general it seems that the ELU activation function is better than
+the leaky ReLU function (and its variants), which is better than
+ReLU. ReLU performs better than $\tanh$ which in turn performs better
+than the logistic function. 
+
+If runtime
+performance is an issue, then you may opt for the  leaky ReLU function  over the 
+ELU function If you don’t
+want to tweak yet another hyperparameter, you may just use the default
+$\alpha$ of $0.01$ for the leaky ReLU, and $1$ for ELU. If you have
+spare time and computing power, you can use cross-validation or
+bootstrap to evaluate other activation functions.
+
+
+
+===== A top-down perspective on Neural networks =====
+
+
+The first thing we would like to do is divide the data into two or three
+parts. A training set, a validation or dev (development) set, and a
+test set. The test set is the data on which we want to make
+predictions. The dev set is a subset of the training data we use to
+check how well we are doing out-of-sample, after training the model on
+the training dataset. We use the validation error as a proxy for the
+test error in order to make tweaks to our model. It is crucial that we
+do not use any of the test data to train the algorithm. This is a
+cardinal sin in ML. Then:
+
+ 
+* Estimate optimal error rate
+
+* Minimize underfitting (bias) on training data set.
+
+* Make sure you are not overfitting.
+
+If the validation and test sets are drawn from the same distributions,
+then a good performance on the validation set should lead to similarly
+good performance on the test set. 
+
+However, sometimes
+the training data and test data differ in subtle ways because, for
+example, they are collected using slightly different methods, or
+because it is cheaper to collect data in one way versus another. In
+this case, there can be a mismatch between the training and test
+data. This can lead to the neural network overfitting these small
+differences between the test and training sets, and a poor performance
+on the test set despite having a good performance on the validation
+set. To rectify this, Andrew Ng suggests making two validation or dev
+sets, one constructed from the training data and one constructed from
+the test data. The difference between the performance of the algorithm
+on these two validation sets quantifies the train-test mismatch. This
+can serve as another important diagnostic when using DNNs for
+supervised learning.
+
+
+===== Limitations of supervised learning with deep networks =====
+
+Like all statistical methods, supervised learning using neural
+networks has important limitations. This is especially important when
+one seeks to apply these methods, especially to physics problems. Like
+all tools, DNNs are not a universal solution. Often, the same or
+better performance on a task can be achieved by using a few
+hand-engineered features (or even a collection of random
+features). 
+
+Here we list some of the important limitations of supervised neural network based models. 
+
+
+
+* _Need labeled data_. All supervised learning methods, DNNs for supervised learning require labeled data. Often, labeled data is harder to acquire than unlabeled data (e.g. one must pay for human experts to label images).
+* _Supervised neural networks are extremely data intensive._ DNNs are data hungry. They perform best when data is plentiful. This is doubly so for supervised methods where the data must also be labeled. The utility of DNNs is extremely limited if data is hard to acquire or the datasets are small (hundreds to a few thousand samples). In this case, the performance of other methods that utilize hand-engineered features can exceed that of DNNs.
+* _Homogeneous data._ Almost all DNNs deal with homogeneous data of one type. It is very hard to design architectures that mix and match data types (i.e.~some continuous variables, some discrete variables, some time series). In applications beyond images, video, and language, this is often what is required. In contrast, ensemble models like random forests or gradient-boosted trees have no difficulty handling mixed data types.
+* _Many problems are not about prediction._ In natural science we are often interested in learning something about the underlying distribution that generates the data. In this case, it is often difficult to cast these ideas in a supervised learning setting. While the problems are related, it is possible to make good predictions with a *wrong* model. The model might or might not be useful for understanding the underlying science.
+
+Some of these remarks are particular to DNNs, others are shared by all supervised learning methods. This motivates the use of unsupervised methods which in part circumvent these problems.
+
+
+
+
+
+
 ===== Boltzmann Machines =====
 
-Why use a generative ("dreaming") model rather than the more well known discirminative deep neural networks (DNN)? 
+Why use a generative model rather than the more well known discriminative deep neural networks (DNN)? 
 
-* Discriminitave methods have several limitations: They are supervised learning methods, thus requiring labeled data. And there are tasks they cannot accomplish, like drawing new examples from an unknown probability distribution.
+* Discriminitave methods have several limitations: They are mainly supervised learning methods, thus requiring labeled data. And there are tasks they cannot accomplish, like drawing new examples from an unknown probability distribution.
 
 * A generative model can learn to represent and sample from a probability distribution. The core idea is to learn a parametric model of the probability distribution from which the training data was drawn. As an example
 
   o A model for images could learn to draw new examples of cats and dogs, given a training dataset of images of cats and dogs.
   o Generate a sample of an ordered or disordered Ising model phase, having been given samples of such phases.
-  o Model the trial wave function for Monte Carlo calculations
-
-
-!split
-===== Some similarities and differences from DNNs =====
+  o Model the trial function for Monte Carlo calculations
 
  o Both use gradient-descent based learning procedures for minimizing cost functions
  o Energy based models don't use backpropagation and automatic differentiation for computing gradients, instead turning to Markov Chain Monte Carlo methods.
@@ -370,8 +2382,38 @@ Why use a generative ("dreaming") model rather than the more well known discirmi
 History: The RBM was developed by amongst others Geoffrey Hinton, called by some the "Godfather of Deep Learning", working with the University of Toronto and Google.
 
 
-!split
-===== The structure of the RBM network =====
+
+!bblock
+A BM is what we would call an undirected probabilistic graphical model
+with stochastic continuous or discrete units.
+!eblock
+!bblock
+It is interpreted as a stochastic recurrent neural network where the
+state of each unit(neurons/nodes) depends on the units it is connected
+to. The weights in the network represent thus the strength of the
+interaction between various units/nodes.
+!eblock
+!bblock
+It turns into a Hopfield network if we choose deterministic rather
+than stochastic units. In contrast to a Hopfield network, a BM is a
+so-called generative model. It allows us to generate new samples from
+the learned distribution.
+!eblock
+
+!bblock
+A standard BM network is divided into a set of observable and visible units $\hat{x}$ and a set of unknown hidden units/nodes $\hat{h}$.
+!eblock
+
+!bblock
+Additionally there can be bias nodes for the hidden and visible layers. These biases are normally set to $1$.
+!eblock
+
+!bblock
+BMs are stackable, meaning they cwe can train a BM which serves as input to another BM. We can construct deep networks for learning complex PDFs. The layers can be trained one after another, a feature which makes them popular in deep learning
+!eblock
+
+However, they are often hard to train. This leads to the introduction of so-called restricted BMs, or RBMS.
+Here we take away all lateral connections between nodes in the visible layer as well as connections between nodes in the hidden layer. The network is illustrated in the figure below.
 
 FIGURE: [figures/RBM.pdf, width=800 frac=1.0]
 
@@ -381,25 +2423,23 @@ FIGURE: [figures/RBM.pdf, width=800 frac=1.0]
 ===== The network =====
 
 _The network layers_:
-  o The function $\mathbf{x}$ represents the visible layer, a vector of $M$ elements (nodes). This layer represents both what the RBM might be given as training input, \textit{and} what we want it to be able to reconstruct. This might for example be the pixels of an image, the spin values of the Ising model, or coefficients representing speech.
+  o A function $\mathbf{x}$ that represents the visible layer, a vector of $M$ elements (nodes). This layer represents both what the RBM might be given as training input, and what we want it to be able to reconstruct. This might for example be the pixels of an image, the spin values of the Ising model, or coefficients representing speech.
   o The function $\mathbf{h}$ represents the hidden, or latent, layer. A vector of $N$ elements (nodes). Also called "feature detectors".
-
-!split
-===== Goals =====
 
 The goal of the hidden layer is to increase the model's expressive power. We encode complex interactions between visible variables by introducing additional, hidden variables that interact with visible degrees of freedom in a simple manner, yet still reproduce the complex correlations between visible degrees in the data once marginalized over (integrated out).
 
 Examples of this trick being employed in physics: 
   o The Hubbard-Stratonovich transformation
   o The introduction of ghost fields in gauge theory
-
+  o Shadow wave functions in Quantum Monte Carlo simulations
 _The network parameters, to be optimized/learned_:
-  o $\mathbf{a}$ represents the visible bias, a vector of same lenght as $\mathbf{x}$.
+  o $\mathbf{a}$ represents the visible bias, a vector of same length as $\mathbf{x}$.
   o $\mathbf{b}$ represents the hidden bias, a vector of same lenght as $\mathbf{h}$.
   o $W$ represents the interaction weights, a matrix of size $M\times N$.
 
-!split
-===== Joint distribution and the Energy function =====
+
+
+=== Joint distribution ===
 The restricted Boltzmann machine is described by a Bolztmann distribution
 !bt
 \begin{align}
@@ -414,8 +2454,8 @@ where $Z$ is the normalization constant or partition function, defined as
 !et
 It is common to ignore $T_0$ by setting it to one. 
 
-!split
-===== Network Elements =====
+
+=== Network Elements, the energy function  ===
 
 The function $E(\mathbf{x},\mathbf{h})$ gives the _energy_ of a
 configuration (pair of vectors) $(\mathbf{x}, \mathbf{h})$. The lower
@@ -424,8 +2464,21 @@ function also depends on the parameters $\mathbf{a}$, $\mathbf{b}$ and
 $W$. Thus, when we adjust them during the learning procedure, we are
 adjusting the energy function to best fit our problem.
 
-!split
-===== Defining different types of RBMs =====
+An expression for the energy function is
+!bt
+\[
+E(\hat{x},\hat{h}) = -\sum_{ia}^{NA}b_i^a \alpha_i^a(x_i)-\sum_{jd}^{MD}c_j^d \beta_j^d(h_j)-\sum_{ijad}^{NAMD}b_i^a \alpha_i^a(x_i)c_j^d \beta_j^d(h_j)w_{ij}^{ad}.
+\]
+!et
+
+Here $\beta_j^d(h_j)$ and $\alpha_i^a(x_j)$ are so-called transfer functions that map a given input value to a desired feature value. The labels $a$ and $d$ denote that there can be multiple transfer functions per variable. The first sum depends only on the visible units. The second on the hidden ones. _Note_ that there is no connection between nodes in a layer.
+
+The quantities $b$ and $c$ can be interpreted as the visible and hidden biases, respectively.
+
+The connection between the nodes in the two layers is given by the weights $w_{ij}$. 
+
+=== Defining different types of RBMs ===
+
 There are different variants of RBMs, and the differences lie in the types of visible and hidden units we choose as well as in the implementation of the energy function $E(\mathbf{x},\mathbf{h})$. 
 
 !bblock Binary-Binary RBM:
@@ -448,9 +2501,8 @@ Another varient is the RBM where the visible units are Gaussian while the hidden
 !et
 !eblock
 
-!split
-===== More about RBMs =====
-o Useful when we model continuous data (i.e., we wish $\mathbf{x}$ to be continuous)
+
+o RBMs are Useful when we model continuous data (i.e., we wish $\mathbf{x}$ to be continuous)
 o Requires a smaller learning rate, since there's no upper bound to the value a component might take in the reconstruction
 
 Other types of units include:
@@ -460,54 +2512,8 @@ Other types of units include:
  o Rectified linear units
 
 
-!split
-===== Sampling: Metropolis sampling =====
-In order to sample from the RBM probability distribution it is common to use Markov Chain Monte Carlo (MCMC) algorithms such as Metropolis-Hastings or Gibbs sampling.
+=== Cost function ===
 
-
-
-Metropolis sampling starts by suggesting a new configuration $\bm{x}^{k+1}$. In the brute force method this is done by some random change of the visible units. The new configuration is then accepted with the acceptance probability
-!bt
-\begin{align}
-	A(\bm{x}^k \rightarrow \bm{x}^{k+1}) = \text{min} (1, \frac{P(\bm{x}^{k+1})}{P(\bm{x}^k)}),
-\end{align} 
-!et
-where we need the marginalized probability
-!bt
-\begin{align}
-	P(\bm{x})  &= \sum_\mathbf{h} P_{rbm}(\mathbf{x}, \mathbf{h}) \\
-				&= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}.
-\end{align}
-!et
-
-!split
-===== Sampling: Gibbs sampling =====
-
-In this method we sample from the joint probability $P_{rbm} (\mathbf{x}, \mathbf{h})$ by way of a two step sampling process. We alternately update the visible and hidden units.
-New samples are generated according to the conditional probabilities $P(x_i|\mathbf{h})$ and $P(h_j|\mathbf{x})$ respectively and accepted with the probability of $1$. While the the visible nodes are dependent on the hidden nodes and vice versa, the nodes are independent of other nodes within the same layer. This is due to there being no intra layer interactions in the restricted Boltzmann machine.
-
-The conditional probabilities are often referred to as the activitation functions in the neural networks context due to their role in determining the node outputs. For the binary-binary RBM they are
-!bt
-\begin{align}
-	P(h_j = 1 | \bm{x}) &= \frac{1}{1 + e^{-b_j - \sum_i x_i w_{ij}}} \\
-	P(x_i = 1 | \bm{h}) &= \frac{1}{1 + e^{-a_j - \sum_j h_j w_{ij}}},
-\end{align}
-!et
-where we recognize the logistic sigmoid function $\sigma (x) = 1/(1+exp(-x))$.
-
-!split
-===== Gaussian RBM =====
-For the Gaussian-Binary RBM the conditional probabilities are
-!bt
-\begin{align}
-	P(x_i|\mathbf{h}) &= \mathcal{N}(x_i; a_i+ \sum_j h_j w_{ij}, \sigma^2) \\
-	P(h_j=1|\mathbf{x}) &=  \frac{1}{1+e^{-b_j-\frac{1}{\sigma^2} \sum_i x_i w_{ij}}},
-\end{align}
-!et
-while the visible units now follow a normal distribution, we see the hidden units again follow the logistic sigmoid function.
-
-!split
-===== Cost function =====
 When working with a training dataset, the most common training approach is maximizing the log-likelihood of the training data. The log likelihood characterizes the log-probability of generating the observed data using our generative model. Using this method our cost function is chosen as the negative log-likelihood. The learning then consists of trying to find parameters that maximize the probability of the dataset, and is known as Maximum Likelihood Estimation (MLE).
 Denoting the parameters as $\bm{\theta} = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{MN}$, the log-likelihood is given by
 !bt
@@ -519,8 +2525,8 @@ Denoting the parameters as $\bm{\theta} = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{
 where we used that the normalization constant does not depend on the data, $\langle \text{log} Z(\{ \theta_i\}) \rangle = \text{log} Z(\{ \theta_i\})$
 Our cost function is the negative log-likelihood, $\mathcal{C}(\{ \theta_i \}) = - \mathcal{L}(\{ \theta_i \})$
 
-!split
-===== Optimization / Training =====
+=== Optimization / Training ===
+
 The training procedure of choice often is Stochastic Gradient Descent (SGD). It consists of a series of iterations where we update the parameters according to the equation
 !bt
 \begin{align}
@@ -551,9 +2557,13 @@ and used the statistical mechanics relationship between expectation values and t
 \end{align}
 !et
 
-!split 
-=====  More on RBMs =====
-The data-dependent term in the gradient is known as the positive phase of the gradient, while the model-dependent term is known as the negative phase of the gradient. The aim of the training is to lower the energy of configurations that are near observed data points (increasing their probability), and raising the energy of configurations that are far from observed data points (decreasing their probability).
+The data-dependent term in the gradient is known as the positive phase
+of the gradient, while the model-dependent term is known as the
+negative phase of the gradient. The aim of the training is to lower
+the energy of configurations that are near observed data points
+(increasing their probability), and raising the energy of
+configurations that are far from observed data points (decreasing
+their probability).
 
 The gradient of the negative log-likelihood cost function of a Binary-Binary RBM is then
 !bt
@@ -563,62 +2573,169 @@ The gradient of the negative log-likelihood cost function of a Binary-Binary RBM
 	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial b_{ij}} =& \langle h_i \rangle_{data} - \langle h_i \rangle_{model}. \\
 \end{align}
 !et
-To get the expecation values with respect to the \textit{data}, we set the visible units to each of the observed samples in the training data, then update the hidden units according to the conditional probability found before. We then average over all samples in the training data to calculate expectation values with respect to the data. 
+To get the expectation values with respect to the *data*, we set the visible units to each of the observed samples in the training data, then update the hidden units according to the conditional probability found before. We then average over all samples in the training data to calculate expectation values with respect to the data. 
 
-!split
-===== Which sampling to use =====
-To get the expectation values with respect to the \textit{model}, we use Gibbs sampling. We can either initialize the $\bm{x}$ randomly or with a training sample. While we ideally want a large number of Gibbs iterations $n\rightarrow n$, one might decide to truncate it earlier for efficiency. Doing this while having intialized $\bm{x}$ with a training data vector is referred to as contrastive divergence (CD), because one is then closer to approximating the gradient of this function than the negative log-likelihood. The contrastive divergence function is the difference between two Kullback-Leibler divergences (also called relative entropy), which measure how one probability distribution diverges from a second, expected probability distribution (in this case the estimated one from the ground truth one).
 
-!split
+
+
+=== Kullback-Leibler relative entropy ===
+
+When the goal of the training is to approximate a probability
+distribution, as it is in generative modeling, another relevant
+measure is the _Kullback-Leibler divergence_, also known as the
+relative entropy or Shannon entropy. It is a non-symmetric measure of the
+dissimilarity between two probability density functions $p$ and
+$q$. If $p$ is the unkown probability which we approximate with $q$,
+we can measure the difference by
+!bt
+\begin{align}
+	\text{KL}(p||q) = \int_{-\infty}^{\infty} p (\bm{x}) \log \frac{p(\bm{x})}{q(\bm{x})}  d\bm{x}.
+\end{align}
+!et
+
+Thus, the Kullback-Leibler divergence between the distribution of the
+training data $f(\bm{x})$ and the model distribution $p(\bm{x}|
+\bm{\theta})$ is
+
+!bt
+\begin{align}
+	\text{KL} (f(\bm{x})|| p(\bm{x}| \bm{\theta})) =& \int_{-\infty}^{\infty}
+	f (\bm{x}) \log \frac{f(\bm{x})}{p(\bm{x}| \bm{\theta})} d\bm{x} \\
+	=& \int_{-\infty}^{\infty} f(\bm{x}) \log f(\bm{x}) d\bm{x} - \int_{-\infty}^{\infty} f(\bm{x}) \log
+	p(\bm{x}| \bm{\theta}) d\bm{x} \\
+	%=& \mathbb{E}_{f(\bm{x})} (\log f(\bm{x})) - \mathbb{E}_{f(\bm{x})} (\log p(\bm{x}| \bm{\theta}))
+	=& \langle \log f(\bm{x}) \rangle_{f(\bm{x})} - \langle \log p(\bm{x}| \bm{\theta}) \rangle_{f(\bm{x})} \\
+	=& \langle \log f(\bm{x}) \rangle_{data} + \langle E(\bm{x}) \rangle_{data} + \log Z \\
+	=& \langle \log f(\bm{x}) \rangle_{data} + \mathcal{C}_{LL} .
+\end{align}
+!et
+
+The first term is constant with respect to $\bm{\theta}$ since $f(\bm{x})$ is independent of $\bm{\theta}$. Thus the Kullback-Leibler Divergence is minimal when the second term is minimal. The second term is the log-likelihood cost function, hence minimizing the Kullback-Leibler divergence is equivalent to maximizing the log-likelihood.
+
+
+To further understand generative models it is useful to study the
+gradient of the cost function which is needed in order to minimize it
+using methods like stochastic gradient descent. 
+
+The partition function is the generating function of
+expectation values, in particular there are mathematical relationships
+between expectation values and the log-partition function. In this
+case we have
+!bt
+\begin{align}
+	\langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{model}
+	= \int p(\bm{x}| \bm{\theta}) \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} d\bm{x} 
+	= -\frac{\partial \log Z(\theta_i)}{ \partial  \theta_i} .
+\end{align}
+!et
+
+Here $\langle \cdot \rangle_{model}$ is the expectation value over the model probability distribution $p(\bm{x}| \bm{\theta})$.
+
+===== Setting up for gradient descent calculations =====
+
+Using the previous relationship we can express the gradient of the cost function as
+
+!bt
+\begin{align}
+	\frac{\partial \mathcal{C}_{LL}}{\partial \theta_i}
+	=& \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{data} + \frac{\partial \log Z(\theta_i)}{ \partial  \theta_i} \\
+	=& \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{data} - \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{model} \\
+	%=& \langle O_i(\bm{x}) \rangle_{data} - \langle O_i(\bm{x}) \rangle_{model}
+\end{align}
+!et
+
+This expression shows that the gradient of the log-likelihood cost
+function is a _difference of moments_, with one calculated from
+the data and one calculated from the model. The data-dependent term is
+called the _positive phase_ and the model-dependent term is
+called the _negative phase_ of the gradient. We see now that
+minimizing the cost function results in lowering the energy of
+configurations $\bm{x}$ near points in the training data and
+increasing the energy of configurations not observed in the training
+data. That means we increase the model's probability of configurations
+similar to those in the training data.
+
+
+The gradient of the cost function also demonstrates why gradients of
+unsupervised, generative models must be computed differently from for
+those of for example FNNs. While the data-dependent expectation value
+is easily calculated based on the samples $\bm{x}_i$ in the training
+data, we must sample from the model in order to generate samples from
+which to caclulate the model-dependent term. We sample from the model
+by using MCMC-based methods. We can not sample from the model directly
+because the partition function $Z$ is generally intractable.
+
+As in supervised machine learning problems, the goal is also here to
+perform well on _unseen_ data, that is to have good
+generalization from the training data. The distribution $f(x)$ we
+approximate is not the _true_ distribution we wish to estimate,
+it is limited to the training data. Hence, in unsupervised training as
+well it is important to prevent overfitting to the training data. Thus
+it is common to add regularizers to the cost function in the same
+manner as we discussed for say linear regression.
+
+
+
 ===== RBMs for the quantum many body problem =====
+
 The idea of applying RBMs to quantum many body problems was presented by G. Carleo and M. Troyer, working with ETH Zurich and Microsoft Research.
 
 Some of their motivation included
 
-* "The wave function $\Psi$ is a monolithic mathematical quantity that contains all the information on a quantum state, be it a single particle or a complex molecule. In principle, an exponential amount of information is needed to fully encode a generic many-body quantum state."
+* The wave function $\Psi$ is a monolithic mathematical quantity that contains all the information on a quantum state, be it a single particle or a complex molecule. In principle, an exponential amount of information is needed to fully encode a generic many-body quantum state.
 * There are still interesting open problems, including fundamental questions ranging from the dynamical properties of high-dimensional systems to the exact ground-state properties of strongly interacting fermions.
 * The difficulty lies in finding a general strategy to reduce the exponential complexity of the full many-body wave function down to its most essential features. That is
- o $\rightarrow$ Dimensional reduction
- o $\rightarrow$ Feature extraction
+ o Dimensional reduction
+ o Feature extraction
 * Among the most successful techniques to attack these challenges, artifical neural networks play a prominent role.
 * Want to understand whether an artifical neural network may adapt to describe a quantum system.
 
-!split
-===== Choose the right RBM ===== 
 
 Carleo and Troyer applied the RBM to the quantum mechanical spin lattice systems of the Ising model and Heisenberg model, with encouraging results. Our goal is to test the method on systems of moving particles. For the spin lattice systems it was natural to use a binary-binary RBM, with the nodes taking values of 1 and -1. For moving particles, on the other hand, we want the visible nodes to be continuous, representing position coordinates. Thus, we start by choosing a Gaussian-binary RBM, where the visible nodes are continuous and hidden nodes take on values of 0 or 1. If eventually we would like the hidden nodes to be continuous as well the rectified linear units seem like the most relevant choice.
 
-!split
+
+
+
 ===== Representing the wave function =====
-The wavefunction should be a probability amplitude depending on $\bm{x}$. The RBM model is given by the joint distribution of $\bm{x}$ and $\bm{h}$
+
+The wavefunction should be a probability amplitude depending on
+ $\bm{x}$. The RBM model is given by the joint distribution of
+ $\bm{x}$ and $\bm{h}$
+
 !bt
 \begin{align}
-	F_{rbm}(\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})}.
-\end{align}
-!et
-To find the marginal distribution of $\bm{x}$ we set:
-!bt
-\begin{align}
-	F_{rbm}(\mathbf{x}) &= \sum_\mathbf{h} F_{rbm}(\mathbf{x}, \mathbf{h}) \\
-				&= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}.
-\end{align}
-!et
-Now this is what we use to represent the wave function, calling it a neural-network quantum state (NQS)
-!bt
-\begin{align}
-	\Psi (\mathbf{X}) &= F_{rbm}(\mathbf{x}) \\
-	&= \frac{1}{Z}\sum_{\bm{h}} e^{-E(\mathbf{x}, \mathbf{h})} \\
-	&= \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma^2}} \\
-	&= \frac{1}{Z} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{x_i w_{ij}}{\sigma^2}}). \\
+        F_{rbm}(\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})}.
 \end{align}
 !et
 
-!split
-===== Choose the cost function =====
-Now we don't necessarily have training data (unless we generate it by using some other method). However, what we do have is the variational principle which allows us to obtain the ground state wave function by minimizing the expectation value of the energy of a trial wavefunction (corresponding to the untrained NQS). Similarly to the traditional variational Monte Carlo method then, it is the local energy we wish to minimize. The gradient to use for the stochastic gradient descent procedure is
+To find the marginal distribution of $\bm{x}$ we set:
+
 !bt
 \begin{align}
-	G_i = \frac{\partial \langle E_L \rangle}{\partial \theta_i}
+        F_{rbm}(\mathbf{x}) &= \sum_\mathbf{h} F_{rbm}(\mathbf{x}, \mathbf{h}) \\
+                                &= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}.
+\end{align}
+!et
+
+Now this is what we use to represent the wave function, calling it a neural-network quantum state (NQS)
+!bt
+\begin{align}
+        \Psi (\mathbf{X}) &= F_{rbm}(\mathbf{x}) \\
+        &= \frac{1}{Z}\sum_{\bm{h}} e^{-E(\mathbf{x}, \mathbf{h})} \\
+        &= \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_\
+{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma^2}} \\
+        &= \frac{1}{Z} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{x\
+_i w_{ij}}{\sigma^2}}). \\
+\end{align}
+!et
+
+===== Choose the cost function =====
+
+Now we don't necessarily have training data (unless we generate it by using some other method). However, what we do have is the variational principle which allows us to obtain the ground state wave function by minimizing the expectation value of the energy of a trial wavefunction (corresponding to the untrained NQS). Similarly to the traditional variational Monte Carlo method then, it is the local energy we wish to minimize. The gradient to use for the stochastic gradient descent procedure is
+
+!bt
+\begin{align}
+	C_i = \frac{\partial \langle E_L \rangle}{\partial \theta_i}
 	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle ),
 \end{align}
 !et
@@ -628,11 +2745,624 @@ where the local energy is given by
 	E_L = \frac{1}{\Psi} \hat{\mathbf{H}} \Psi.
 \end{align}
 !et
-!split
-===== The physical system =====
-As described in more detail in the project, we start by investigating a harmonic oscillator system, with the Hamiltonian given by
+
+
+
+=== Mathematical details ===
+
+Because we are restricted to potential functions which are positive it
+is convenient to express them as exponentials, so that
+
 !bt
 \begin{align}
-	\hat{\mathbf{H}} = \sum_p^P (-\frac{1}{2}\nabla_p^2 + \frac{1}{2}\omega^2 r_p^2 ) + \sum_{p<q} \frac{1}{r_{pq}}.
+	\phi_C (\bm{x}_C) = e^{-E_C(\bm{x}_C)}
 \end{align}
 !et
+
+where $E(\bm{x}_C)$ is called an *energy function*, and the
+exponential representation is the *Boltzmann distribution*. The
+joint distribution is defined as the product of potentials.
+
+The joint distribution of the random variables is then
+
+!bt
+\begin{align}
+	p(\bm{x}) =& \frac{1}{Z} \prod_C \phi_C (\bm{x}_C) \nonumber \\
+	=& \frac{1}{Z} \prod_C e^{-E_C(\bm{x}_C)} \nonumber \\
+	=& \frac{1}{Z} e^{-\sum_C E_C(\bm{x}_C)} \nonumber \\
+	=& \frac{1}{Z} e^{-E(\bm{x})}.
+\end{align} 
+!et
+!bt
+\begin{align}
+	p_{BM}(\bm{x}, \bm{h}) = \frac{1}{Z_{BM}} e^{-\frac{1}{T}E_{BM}(\bm{x}, \bm{h})} ,
+\end{align}
+!et
+
+with the partition function 
+!bt
+\begin{align}
+	Z_{BM} = \int \int e^{-\frac{1}{T} E_{BM}(\tilde{\bm{x}}, \tilde{\bm{h}})} d\tilde{\bm{x}} d\tilde{\bm{h}} .
+\end{align}
+!et
+
+$T$ is a physics-inspired parameter named temperature and will be assumed to be 1 unless otherwise stated. The energy function of the Boltzmann machine determines the interactions between the nodes and is defined  
+
+!bt
+\begin{align}
+	E_{BM}(\bm{x}, \bm{h}) =& - \sum_{i, k}^{M, K} a_i^k \alpha_i^k (x_i)
+	- \sum_{j, l}^{N, L} b_j^l \beta_j^l (h_j) 
+	- \sum_{i,j,k,l}^{M,N,K,L} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j) \nonumber \\
+	&- \sum_{i, m=i+1, k}^{M, M, K} \alpha_i^k (x_i) v_{im}^k \alpha_m^k (x_m)
+	- \sum_{j,n=j+1,l}^{N,N,L} \beta_j^l (h_j) u_{jn}^l \beta_n^l (h_n).
+\end{align}
+!et
+
+Here $\alpha_i^k (x_i)$ and $\beta_j^l (h_j)$ are one-dimensional
+transfer functions or mappings from the given input value to the
+desired feature value. They can be arbitrary functions of the input
+variables and are independent of the parameterization (parameters
+referring to weight and biases), meaning they are not affected by
+training of the model. The indices $k$ and $l$ indicate that there can
+be multiple transfer functions per variable.  Furthermore, $a_i^k$ and
+$b_j^l$ are the visible and hidden bias. $w_{ij}^{kl}$ are weights of
+the \textbf{inter-layer} connection terms which connect visible and
+hidden units. $ v_{im}^k$ and $u_{jn}^l$ are weights of the
+\textbf{intra-layer} connection terms which connect the visible units
+to each other and the hidden units to each other, respectively.
+
+
+
+We remove the intra-layer connections by setting $v_{im}$ and $u_{jn}$
+to zero. The expression for the energy of the RBM is then
+
+!bt
+\begin{align}
+	E_{RBM}(\bm{x}, \bm{h}) = - \sum_{i, k}^{M, K} a_i^k \alpha_i^k (x_i)
+	- \sum_{j, l}^{N, L} b_j^l \beta_j^l (h_j) 
+	- \sum_{i,j,k,l}^{M,N,K,L} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j). 
+\end{align}
+!et
+resulting in 
+!bt
+\begin{align}
+	P_{RBM} (\bm{x}) =& \int P_{RBM} (\bm{x}, \tilde{\bm{h}})  d \tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\bm{x}, \tilde{\bm{h}}) } d\tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} \int e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)
+	+ \sum_{j, l} b_j^l \beta_j^l (\tilde{h}_j) 
+	+ \sum_{i,j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} 
+	d\tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\int \prod_j^N e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) 
+	+ \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} d\tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\biggl( \int e^{\sum_l b_1^l \beta_1^l (\tilde{h}_1) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i1}^{kl} \beta_1^l (\tilde{h}_1)} d \tilde{h}_1 \nonumber \\
+	& \times \int e^{\sum_l b_2^l \beta_2^l (\tilde{h}_2) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i2}^{kl} \beta_2^l (\tilde{h}_2)} d \tilde{h}_2 \nonumber \\
+	& \times ... \nonumber \\
+	& \times \int e^{\sum_l b_N^l \beta_N^l (\tilde{h}_N) + \sum_{i,k,l} \alpha_i^k (x_i) w_{iN}^{kl} \beta_N^l (\tilde{h}_N)} d \tilde{h}_N \biggr) \nonumber \\
+	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j
+\end{align}
+!et
+
+Similarly
+
+!bt
+\begin{align}
+	P_{RBM} (\bm{h}) =& \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\tilde{\bm{x}}, \bm{h})} d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} e^{\sum_{j, l} b_j^l \beta_j^l (h_j)}
+	\prod_i^M \int e^{\sum_k a_i^k \alpha_i^k (\tilde{x}_i)
+	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} d\tilde{x}_i
+\end{align}
+!et
+
+
+Using Bayes theorem
+
+!bt
+\begin{align}
+	P_{RBM} (\bm{h}|\bm{x}) =& \frac{P_{RBM} (\bm{x}, \bm{h})}{P_{RBM} (\bm{x})} \nonumber \\
+	=& \frac{\frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)
+	+ \sum_{j, l} b_j^l \beta_j^l (h_j) 
+	+ \sum_{i,j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)}}
+	{\frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j} \nonumber \\
+	=& \prod_j^N \frac{e^{\sum_l b_j^l \beta_j^l (h_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)} }
+	{\int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j}
+\end{align}
+!et
+
+Similarly
+
+!bt
+\begin{align}
+	P_{RBM} (\bm{x}|\bm{h}) =&  \frac{P_{RBM} (\bm{x}, \bm{h})}{P_{RBM} (\bm{h})} \nonumber \\
+	=& \prod_i^M \frac{e^{\sum_k a_i^k \alpha_i^k (x_i)
+	+ \sum_{j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)}}
+	{\int e^{\sum_k a_i^k \alpha_i^k (\tilde{x}_i)
+	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} d\tilde{x}_i}
+\end{align}
+!et
+
+
+
+
+The original RBM had binary visible and hidden nodes. They were
+showned to be universal approximators of discrete distributions.
+It was also shown that adding hidden units yields
+strictly improved modelling power. The common choice of binary values
+are 0 and 1. However, in some physics applications, -1 and 1 might be
+a more natural choice. We will here use 0 and 1.
+
+
+!bt
+\begin{align}
+	E_{BB}(\bm{x}, \mathbf{h}) = - \sum_i^M x_i a_i- \sum_j^N b_j h_j - \sum_{i,j}^{M,N} x_i w_{ij} h_j.
+\end{align}
+!et
+
+
+
+!bt
+\begin{align}
+	p_{BB}(\bm{x}, \bm{h}) =& \frac{1}{Z_{BB}} e^{\sum_i^M a_i x_i + \sum_j^N b_j h_j + \sum_{ij}^{M,N} x_i w_{ij} h_j} \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}}
+\end{align}
+!et
+
+with the partition function
+
+!bt
+\begin{align}
+	Z_{BB} = \sum_{\bm{x}, \bm{h}} e^{\bm{x}^T \bm{a} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} .
+\end{align}
+!et
+
+=== Marginal Probability Density Functions ===
+
+In order to find the probability of any configuration of the visible units we derive the marginal probability density function.
+
+!bt
+\begin{align}
+	p_{BB} (\bm{x}) =& \sum_{\bm{h}} p_{BB} (\bm{x}, \bm{h}) \\
+	=& \frac{1}{Z_{BB}} \sum_{\bm{h}} e^{\bm{x}^T \bm{a} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \sum_{\bm{h}} e^{\sum_j^N (b_j + \bm{x}^T \bm{w}_{\ast j})h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \sum_{\bm{h}} \prod_j^N e^{ (b_j + \bm{x}^T \bm{w}_{\ast j})h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \bigg ( \sum_{h_1} e^{(b_1 + \bm{x}^T \bm{w}_{\ast 1})h_1}
+	\times \sum_{h_2} e^{(b_2 + \bm{x}^T \bm{w}_{\ast 2})h_2} \times \nonumber \\
+	& ... \times \sum_{h_2} e^{(b_N + \bm{x}^T \bm{w}_{\ast N})h_N} \bigg ) \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \prod_j^N \sum_{h_j} e^{(b_j + \bm{x}^T \bm{w}_{\ast j}) h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}) .
+\end{align}
+!et
+
+A similar derivation yields the marginal probability of the hidden units
+
+!bt
+\begin{align}
+	p_{BB} (\bm{h}) = \frac{1}{Z_{BB}} e^{\bm{b}^T \bm{h}} \prod_i^M (1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h}}) .
+\end{align}
+!et
+
+=== Conditional Probability Density Functions ===
+
+We derive the probability of the hidden units given the visible units using Bayes' rule
+
+!bt
+\begin{align}
+	p_{BB} (\bm{h}|\bm{x}) =& \frac{p_{BB} (\bm{x}, \bm{h})}{p_{BB} (\bm{x})} \nonumber \\
+	=& \frac{ \frac{1}{Z_{BB}}  e^{\bm{x}^T \bm{a} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} }
+	        {\frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}})} \nonumber \\
+	=& \frac{  e^{\bm{x}^T \bm{a}} e^{ \sum_j^N (b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j} }
+	        { e^{\bm{x}^T \bm{a}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}})} \nonumber \\
+	=& \prod_j^N \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \prod_j^N p_{BB} (h_j| \bm{x}) .
+\end{align}
+!et
+
+From this we find the probability of a hidden unit being "on" or "off":
+
+!bt
+\begin{align}
+	p_{BB} (h_j=1 | \bm{x}) =&   \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \\
+	=&  \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} )}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \\
+	=&  \frac{ 1 }{1 + e^{-(b_j + \bm{x}^T \bm{w}_{\ast j})} } ,
+\end{align}
+!et
+and
+
+!bt
+\begin{align}
+	p_{BB} (h_j=0 | \bm{x}) =\frac{ 1 }{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}} } .
+\end{align}
+!et
+
+
+Similarly we have that the conditional probability of the visible units given the hidden are
+
+!bt
+\begin{align}
+	p_{BB} (\bm{x}|\bm{h}) =& \prod_i^M \frac{ e^{ (a_i + \bm{w}_{i\ast}^T \bm{h}) x_i} }{ 1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h}} } \\
+	&= \prod_i^M p_{BB} (x_i | \bm{h}) .
+\end{align}
+!et
+
+
+!bt
+\begin{align}
+	p_{BB} (x_i=1 | \bm{h}) =& \frac{1}{1 + e^{-(a_i + \bm{w}_{i\ast}^T \bm{h} )}} \\
+	p_{BB} (x_i=0 | \bm{h}) =& \frac{1}{1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h} }} .
+\end{align}
+!et
+
+
+
+
+
+=== Gaussian-Binary Restricted Boltzmann Machines ===
+
+
+Inserting into the expression for $E_{RBM}(\bm{x},\bm{h})$ in equation  results in the energy
+
+!bt
+\begin{align}
+	E_{GB}(\bm{x}, \bm{h}) =& \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2}
+	- \sum_j^N b_j h_j 
+	-\sum_{ij}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2} \nonumber \\
+	=& \vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 - \bm{b}^T \bm{h} 
+	- (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h} . 
+\end{align}
+!et
+
+=== Joint Probability Density Function ===
+
+!bt
+\begin{align}
+	p_{GB} (\bm{x}, \bm{h}) =& \frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{- \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2}
+	+ \sum_j^N b_j h_j 
+	+\sum_{ij}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2}} \nonumber \\
+	=& \frac{1}{Z_{GB}} \prod_{ij}^{M,N} e^{-\frac{(x_i - a_i)^2}{2\sigma_i^2}
+	+ b_j h_j 
+	+\frac{x_i w_{ij} h_j}{\sigma_i^2}} ,
+\end{align}
+!et
+
+with the partition function given by
+
+!bt
+\begin{align}
+	Z_{GB} =& \int \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} e^{-\vert\vert\frac{\tilde{\bm{x}} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \tilde{\bm{h}} 
+	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\tilde{\bm{h}}} d\tilde{\bm{x}} .
+\end{align}
+!et
+
+=== Marginal Probability Density Functions ===
+
+We proceed to find the marginal probability densitites of the
+Gaussian-binary RBM. We first marginalize over the binary hidden units
+to find $p_{GB} (\bm{x})$
+
+!bt
+\begin{align}
+	p_{GB} (\bm{x}) =& \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} p_{GB} (\bm{x}, \tilde{\bm{h}}) \nonumber \\
+	=& \frac{1}{Z_{GB}} \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} 
+	e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \tilde{\bm{h}} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\tilde{\bm{h}}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2}
+	\prod_j^N (1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}} ) .
+\end{align}
+!et
+
+We next marginalize over the visible units. This is the first time we
+marginalize over continuous values. We rewrite the exponential factor
+dependent on $\bm{x}$ as a Gaussian function before we integrate in
+the last step.
+
+!bt
+\begin{align}
+	p_{GB} (\bm{h}) =& \int p_{GB} (\tilde{\bm{x}}, \bm{h}) d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} \int e^{-\vert\vert\frac{\tilde{\bm{x}} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\bm{h}} d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h} } \int \prod_i^M
+	e^{- \frac{(\tilde{x}_i - a_i)^2}{2\sigma_i^2} + \frac{\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{\sigma_i^2} } d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h} }
+	\biggl( \int e^{- \frac{(\tilde{x}_1 - a_1)^2}{2\sigma_1^2} + \frac{\tilde{x}_1 \bm{w}_{1\ast}^T \bm{h}}{\sigma_1^2} } d\tilde{x}_1 \nonumber \\
+	& \times \int e^{- \frac{(\tilde{x}_2 - a_2)^2}{2\sigma_2^2} + \frac{\tilde{x}_2 \bm{w}_{2\ast}^T \bm{h}}{\sigma_2^2} } d\tilde{x}_2 \nonumber \\
+	& \times ... \nonumber \\
+	&\times \int e^{- \frac{(\tilde{x}_M - a_M)^2}{2\sigma_M^2} + \frac{\tilde{x}_M \bm{w}_{M\ast}^T \bm{h}}{\sigma_M^2} } d\tilde{x}_M \biggr) \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{(\tilde{x}_i - a_i)^2 - 2\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \tilde{x}_i \bm{w}_{i\ast}^T \bm{h}) + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \bm{w}_{i\ast}^T \bm{h}) + (a_i + \bm{w}_{i\ast}^T \bm{h})^2 - (a_i + \bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{(\tilde{x}_i - (a_i + \bm{w}_{i\ast}^T \bm{h}))^2 - a_i^2 -2a_i \bm{w}_{i\ast}^T \bm{h} - (\bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}
+	\int e^{- \frac{(\tilde{x}_i - a_i - \bm{w}_{i\ast}^T \bm{h})^2}{2\sigma_i^2}}
+	d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\sqrt{2\pi \sigma_i^2}
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}} .
+\end{align}
+!et
+
+=== Conditional Probability Density Functions ===
+
+We finish by deriving the conditional probabilities.
+!bt 
+\begin{align}
+	p_{GB} (\bm{h}| \bm{x}) =& \frac{p_{GB} (\bm{x}, \bm{h})}{p_{GB} (\bm{x})} \nonumber \\
+	=& \frac{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}}}
+	{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2}
+	\prod_j^N (1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}} ) }
+	\nonumber \\
+	=& \prod_j^N \frac{e^{(b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j})h_j } }
+	{1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \prod_j^N p_{GB} (h_j|\bm{x}).
+\end{align}
+!et
+The conditional probability of a binary hidden unit $h_j$ being on or off again takes the form of a sigmoid function
+
+!bt
+\begin{align}
+	p_{GB} (h_j =1 | \bm{x}) =& \frac{e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j} } }
+	{1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \frac{1}{1 + e^{-b_j - (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \\
+	p_{GB} (h_j =0 | \bm{x}) =&
+	\frac{1}{1 + e^{b_j +(\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} .
+\end{align}
+!et
+
+The conditional probability of the continuous $\bm{x}$ now has another form, however.
+
+!bt
+\begin{align}
+	p_{GB} (\bm{x}|\bm{h})
+	=& \frac{p_{GB} (\bm{x}, \bm{h})}{p_{GB} (\bm{h})} \nonumber \\
+	=& \frac{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}}}
+	{\frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\sqrt{2\pi \sigma_i^2}
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	\frac{e^{- \frac{(x_i - a_i)^2}{2\sigma_i^2} + \frac{x_i \bm{w}_{i\ast}^T \bm{h}}{2\sigma_i^2} }}
+	{e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	\frac{e^{-\frac{x_i^2 - 2a_i x_i + a_i^2 - 2x_i \bm{w}_{i\ast}^T\bm{h} }{2\sigma_i^2} } }
+	{e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	e^{- \frac{x_i^2 - 2a_i x_i + a_i^2 - 2x_i \bm{w}_{i\ast}^T\bm{h}
+	+ 2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2}
+	{2\sigma_i^2} }
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	e^{ - \frac{(x_i - b_i - \bm{w}_{i\ast}^T \bm{h})^2}{2\sigma_i^2}} \nonumber \\
+	=& \prod_i^M \mathcal{N}
+	(x_i | b_i + \bm{w}_{i\ast}^T \bm{h}, \sigma_i^2) \\
+	\Rightarrow p_{GB} (x_i|\bm{h}) =& \mathcal{N}
+	(x_i | b_i + \bm{w}_{i\ast}^T \bm{h}, \sigma_i^2) .
+\end{align}
+!et
+
+
+The form of these conditional probabilities explains the name
+"Gaussian" and the form of the Gaussian-binary energy function. We see
+that the conditional probability of $x_i$ given $\bm{h}$ is a normal
+distribution with mean $b_i + \bm{w}_{i\ast}^T \bm{h}$ and variance
+$\sigma_i^2$.
+
+
+===== Neural Quantum States =====
+
+
+The wavefunction should be a probability amplitude depending on $\bm{x}$. The RBM model is given by the joint distribution of $\bm{x}$ and $\bm{h}$
+!bt
+\begin{align}
+	F_{rbm}(\bm{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\bm{x},\mathbf{h})}
+\end{align}
+!et
+To find the marginal distribution of $\bm{x}$ we set:
+
+!bt
+\begin{align}
+	F_{rbm}(\mathbf{x}) &= \sum_\mathbf{h} F_{rbm}(\mathbf{x}, \mathbf{h}) \\
+				&= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}
+\end{align}
+!et
+
+Now this is what we use to represent the wave function, calling it a neural-network quantum state (NQS)
+
+!bt
+\begin{align}
+	\Psi (\mathbf{X}) &= F_{rbm}(\mathbf{x}) \\
+	&= \frac{1}{Z}\sum_{\bm{h}} e^{-E(\mathbf{x}, \mathbf{h})} \\
+	&= \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma^2}} \\
+	&= \frac{1}{Z} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{x_i w_{ij}}{\sigma^2}}) \\
+\end{align}
+!et
+
+The above wavefunction is the most general one because it allows for
+complex valued wavefunctions. However it fundamentally changes the
+probabilistic foundation of the RBM, because what is usually a
+probability in the RBM framework is now a an amplitude. This means
+that a lot of the theoretical framework usually used to interpret the
+model, i.e. graphical models, conditional probabilities, and Markov
+random fields, breaks down. If we assume the wavefunction to be
+postive definite, however, we can use the RBM to represent the squared
+wavefunction, and thereby a probability. This also makes it possible
+to sample from the model using Gibbs sampling, because we can obtain
+the conditional probabilities.
+
+!bt
+\begin{align}
+	|\Psi (\mathbf{X})|^2 &= F_{rbm}(\mathbf{X}) \\
+	\Rightarrow \Psi (\mathbf{X}) &= \sqrt{F_{rbm}(\mathbf{X})} \\
+	&= \frac{1}{\sqrt{Z}}\sqrt{\sum_{\{h_j\}} e^{-E(\mathbf{X}, \mathbf{h})}} \\
+	&= \frac{1}{\sqrt{Z}} \sqrt{\sum_{\{h_j\}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{X_i w_{ij} h_j}{\sigma^2}} }\\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \sqrt{\sum_{\{h_j\}} \prod_j^N e^{b_j h_j + \sum_i^M \frac{X_i w_{ij} h_j}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \sqrt{\prod_j^N \sum_{h_j}  e^{b_j h_j + \sum_i^M \frac{X_i w_{ij} h_j}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \prod_j^N \sqrt{e^0 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \prod_j^N \sqrt{1 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}} \\
+\end{align}
+!et
+
+=== Cost function ===
+
+This is where we deviate from what is common in machine
+learning. Rather than defining a cost function based on some dataset,
+our cost function is the energy of the quantum mechanical system. From
+the variational principle we know that minizing this energy should
+lead to the ground state wavefunction. As stated previously the local
+energy is given by
+
+!bt
+\begin{align}
+	E_L = \frac{1}{\Psi} \hat{\mathbf{H}} \Psi,
+\end{align}
+!et
+and the gradient is
+
+!bt
+\begin{align}
+	G_i = \frac{\partial \langle E_L \rangle}{\partial \alpha_i}
+	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} \rangle ),
+\end{align}
+!et
+where $\alpha_i = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{MN}$.
+
+
+We use that $\frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} 
+	= \frac{\partial \ln{\Psi}}{\partial \alpha_i}$,
+and find
+
+!bt
+\begin{align}
+	\ln{\Psi({\mathbf{X}})} &= -\ln{Z} - \sum_m^M \frac{(X_m - a_m)^2}{2\sigma^2}
+	+ \sum_n^N \ln({1 + e^{b_n + \sum_i^M \frac{X_i w_{in}}{\sigma^2}})}.
+\end{align}
+!et
+
+This gives
+
+!bt
+\begin{align}
+	\frac{\partial }{\partial a_m} \ln\Psi
+	&= 	\frac{1}{\sigma^2} (X_m - a_m) \\
+	\frac{\partial }{\partial b_n} \ln\Psi
+	&=
+	\frac{1}{e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1} \\
+	\frac{\partial }{\partial w_{mn}} \ln\Psi
+	&= \frac{X_m}{\sigma^2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)}.
+\end{align}
+!et
+
+If $\Psi = \sqrt{F_{rbm}}$ we have
+
+!bt
+\begin{align}
+	\ln{\Psi({\mathbf{X}})} &= -\frac{1}{2}\ln{Z} - \sum_m^M \frac{(X_m - a_m)^2}{4\sigma^2}
+	+ \frac{1}{2}\sum_n^N \ln({1 + e^{b_n + \sum_i^M \frac{X_i w_{in}}{\sigma^2}})},
+\end{align}
+!et
+which results in
+
+!bt
+\begin{align}
+	\frac{\partial }{\partial a_m} \ln\Psi
+	&= 	\frac{1}{2\sigma^2} (X_m - a_m) \\
+	\frac{\partial }{\partial b_n} \ln\Psi
+	&=
+	\frac{1}{2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)} \\
+	\frac{\partial }{\partial w_{mn}} \ln\Psi
+	&= \frac{X_m}{2\sigma^2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)}.
+\end{align}
+!et
+
+
+Let us assume again that our Hamiltonian is 
+!bt
+\begin{align}
+	\hat{\mathbf{H}} = \sum_p^P (-\frac{1}{2}\nabla_p^2 + \frac{1}{2}\omega^2 r_p^2 ) + \sum_{p<q} \frac{1}{r_{pq}},
+\end{align}
+!et
+
+
+where the first summation term represents the standard harmonic
+oscillator part and the latter the repulsive interaction between two
+electrons. Natural units ($\hbar=c=e=m_e=1$) are used, and $P$ is the
+number of particles. This gives us the following expression for the
+local energy ($D$ being the number of dimensions)
+
+!bt
+\begin{align}
+	E_L &= \frac{1}{\Psi} \mathbf{H} \Psi \\
+	&= \frac{1}{\Psi} (\sum_p^P (-\frac{1}{2}\nabla_p^2 + \frac{1}{2}\omega^2 r_p^2 ) + \sum_{p<q} \frac{1}{r_{pq}}) \Psi \\
+	&= -\frac{1}{2}\frac{1}{\Psi} \sum_p^P \nabla_p^2 \Psi 
+	+ \frac{1}{2}\omega^2 \sum_p^P  r_p^2  + \sum_{p<q} \frac{1}{r_{pq}} \\
+	&= -\frac{1}{2}\frac{1}{\Psi} \sum_p^P \sum_d^D \frac{\partial^2 \Psi}{\partial x_{pd}^2} + \frac{1}{2}\omega^2 \sum_p^P  r_p^2  + \sum_{p<q} \frac{1}{r_{pq}} \\
+	&= \frac{1}{2} \sum_p^P \sum_d^D (-(\frac{\partial}{\partial x_{pd}} \ln\Psi)^2 -\frac{\partial^2}{\partial x_{pd}^2} \ln\Psi + \omega^2 x_{pd}^2)  + \sum_{p<q} \frac{1}{r_{pq}}. \\
+\end{align}
+!et
+
+
+Letting each visible node in the Boltzmann machine 
+represent one coordinate of one particle, we obtain
+
+!bt
+\begin{align}
+	E_L &=
+	\frac{1}{2} \sum_m^M (-(\frac{\partial}{\partial v_m} \ln\Psi)^2 -\frac{\partial^2}{\partial v_m^2} \ln\Psi + \omega^2 v_m^2)  + \sum_{p<q} \frac{1}{r_{pq}},
+\end{align}
+!et
+where we have that
+
+!bt
+\begin{align}
+	\frac{\partial}{\partial x_m} \ln\Psi
+	&= - \frac{1}{\sigma^2}(x_m - a_m) + \frac{1}{\sigma^2} \sum_n^N \frac{w_{mn}}{e^{-b_n - \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1} \\
+	\frac{\partial^2}{\partial x_m^2} \ln\Psi
+	&= - \frac{1}{\sigma^2} + \frac{1}{\sigma^4}\sum_n^N \omega_{mn}^2 \frac{e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}}}{(e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1)^2}.
+\end{align}
+!et
+
+We now have all the expressions neeeded to calculate the gradient of
+the expected local energy with respect to the RBM parameters
+$\frac{\partial \langle E_L \rangle}{\partial \alpha_i}$.
+
+If we use $\Psi = \sqrt{F_{rbm}}$ we obtain
+!bt
+\begin{align}
+	\frac{\partial}{\partial x_m} \ln\Psi
+	&= - \frac{1}{2\sigma^2}(x_m - a_m) + \frac{1}{2\sigma^2} \sum_n^N
+ 	\frac{w_{mn}}{e^{-b_n-\frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1}
+	\\
+	\frac{\partial^2}{\partial x_m^2} \ln\Psi
+	&= - \frac{1}{2\sigma^2} + \frac{1}{2\sigma^4}\sum_n^N \omega_{mn}^2 \frac{e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}}}{(e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1)^2}.
+\end{align}
+!et
+The difference between this equation and the previous one is that we multiply by a factor $1/2$.
+
+
+
+
+
+===== Running the codes =====
+
+You can find the codes for the simple two-electron case at the Github repository URL:"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/BoltzmannMachines/MLcpp/src/CppCode/ob". Only c++ as of now. 
+Python codes to come.
+!bblock Energy as function of iterations, $N=2$ electrons  =====
+FIGURE: [figures/figN2.pdf, width=700 frac=0.9]
+!eblock
+
+
