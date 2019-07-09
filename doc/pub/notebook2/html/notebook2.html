@@ -183,7 +183,11 @@ div { text-align: justify; text-justify: inter-word; }
                '___sec70'),
               ('Neural Quantum States', 2, None, '___sec71'),
               ('Cost function', 3, None, '___sec72'),
-              ('Running the codes', 2, None, '___sec73')]}
+              ('Running the codes', 2, None, '___sec73'),
+              ('Python version for the two non-interacting particles',
+               2,
+               None,
+               '___sec74')]}
 end of tocinfo -->
 
 <body>
@@ -223,7 +227,7 @@ MathJax.Hub.Config({
 
 <br>
 <p>
-<center><h4>Apr 26, 2019</h4></center> <!-- date -->
+<center><h4>Jul 9, 2019</h4></center> <!-- date -->
 <br>
 
 <h2 id="___sec0">Introduction </h2>
@@ -3964,6 +3968,268 @@ Python codes to come.
 </div>
 
 
+<h2 id="___sec74">Python version for the two non-interacting particles </h2>
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<span style="color: #408080; font-style: italic"># Using gaussian rng for new positions and Metropolis- Hastings </span>
+<span style="color: #408080; font-style: italic"># Added restricted boltzmann machine method for dealing with the wavefunction</span>
+<span style="color: #408080; font-style: italic"># RBM code based heavily off of:</span>
+<span style="color: #408080; font-style: italic"># https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/BoltzmannMachines/MLcpp/src/CppCode/ob</span>
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> exp, sqrt
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">random</span> <span style="color: #008000; font-weight: bold">import</span> random, seed, normalvariate
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">mpl_toolkits.mplot3d</span> <span style="color: #008000; font-weight: bold">import</span> Axes3D
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib</span> <span style="color: #008000; font-weight: bold">import</span> cm
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib.ticker</span> <span style="color: #008000; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">sys</span>
+
+
+
+<span style="color: #408080; font-style: italic"># Trial wave function for the 2-electron quantum dot in two dims</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">WaveFunction</span>(r,a,b,w):
+    sigma<span style="color: #666666">=1.0</span>
+    sig2 <span style="color: #666666">=</span> sigma<span style="color: #666666">**2</span>
+    Psi1 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+    Psi2 <span style="color: #666666">=</span> <span style="color: #666666">1.0</span>
+    Q <span style="color: #666666">=</span> Qfac(r,b,w)
+    
+    <span style="color: #008000; font-weight: bold">for</span> iq <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
+        <span style="color: #008000; font-weight: bold">for</span> ix <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+            Psi1 <span style="color: #666666">+=</span> (r[iq,ix]<span style="color: #666666">-</span>a[iq,ix])<span style="color: #666666">**2</span>
+            
+    <span style="color: #008000; font-weight: bold">for</span> ih <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberHidden):
+        Psi2 <span style="color: #666666">*=</span> (<span style="color: #666666">1.0</span> <span style="color: #666666">+</span> np<span style="color: #666666">.</span>exp(Q[ih]))
+        
+    Psi1 <span style="color: #666666">=</span> np<span style="color: #666666">.</span>exp(<span style="color: #666666">-</span>Psi1<span style="color: #666666">/</span>(<span style="color: #666666">2*</span>sig2))
+
+    <span style="color: #008000; font-weight: bold">return</span> Psi1<span style="color: #666666">*</span>Psi2
+
+<span style="color: #408080; font-style: italic"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">LocalEnergy</span>(r,a,b,w):
+    sigma<span style="color: #666666">=1.0</span>
+    sig2 <span style="color: #666666">=</span> sigma<span style="color: #666666">**2</span>
+    locenergy <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+    
+    Q <span style="color: #666666">=</span> Qfac(r,b,w)
+
+    <span style="color: #008000; font-weight: bold">for</span> iq <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
+        <span style="color: #008000; font-weight: bold">for</span> ix <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+            sum1 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+            sum2 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+            <span style="color: #008000; font-weight: bold">for</span> ih <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberHidden):
+                sum1 <span style="color: #666666">+=</span> w[iq,ix,ih]<span style="color: #666666">/</span>(<span style="color: #666666">1+</span>np<span style="color: #666666">.</span>exp(<span style="color: #666666">-</span>Q[ih]))
+                sum2 <span style="color: #666666">+=</span> w[iq,ix,ih]<span style="color: #666666">**2</span> <span style="color: #666666">*</span> np<span style="color: #666666">.</span>exp(Q[ih]) <span style="color: #666666">/</span> (<span style="color: #666666">1.0</span> <span style="color: #666666">+</span> np<span style="color: #666666">.</span>exp(Q[ih]))<span style="color: #666666">**2</span>
+    
+            dlnpsi1 <span style="color: #666666">=</span> <span style="color: #666666">-</span>(r[iq,ix] <span style="color: #666666">-</span> a[iq,ix]) <span style="color: #666666">/</span>sig2 <span style="color: #666666">+</span> sum1<span style="color: #666666">/</span>sig2
+            dlnpsi2 <span style="color: #666666">=</span> <span style="color: #666666">-1/</span>sig2 <span style="color: #666666">+</span> sum2<span style="color: #666666">/</span>sig2<span style="color: #666666">**2</span>
+            locenergy <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>(<span style="color: #666666">-</span>dlnpsi1<span style="color: #666666">*</span>dlnpsi1 <span style="color: #666666">-</span> dlnpsi2 <span style="color: #666666">+</span> r[iq,ix]<span style="color: #666666">**2</span>)
+            
+    <span style="color: #008000; font-weight: bold">if</span>(interaction<span style="color: #666666">==</span><span style="color: #008000">True</span>):
+        <span style="color: #008000; font-weight: bold">for</span> iq1 <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
+            <span style="color: #008000; font-weight: bold">for</span> iq2 <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(iq1):
+                distance <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+                <span style="color: #008000; font-weight: bold">for</span> ix <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+                    distance <span style="color: #666666">+=</span> (r[iq1,ix] <span style="color: #666666">-</span> r[iq2,ix])<span style="color: #666666">**2</span>
+                    
+                locenergy <span style="color: #666666">+=</span> <span style="color: #666666">1/</span>sqrt(distance)
+                
+    <span style="color: #008000; font-weight: bold">return</span> locenergy
+
+<span style="color: #408080; font-style: italic"># Derivate of wave function ansatz as function of variational parameters</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">DerivativeWFansatz</span>(r,a,b,w):
+    
+    sigma<span style="color: #666666">=1.0</span>
+    sig2 <span style="color: #666666">=</span> sigma<span style="color: #666666">**2</span>
+    
+    Q <span style="color: #666666">=</span> Qfac(r,b,w)
+    
+    WfDer <span style="color: #666666">=</span> np<span style="color: #666666">.</span>empty((<span style="color: #666666">3</span>,),dtype<span style="color: #666666">=</span><span style="color: #008000">object</span>)
+    WfDer <span style="color: #666666">=</span> [np<span style="color: #666666">.</span>copy(a),np<span style="color: #666666">.</span>copy(b),np<span style="color: #666666">.</span>copy(w)]
+    
+    WfDer[<span style="color: #666666">0</span>] <span style="color: #666666">=</span> (r<span style="color: #666666">-</span>a)<span style="color: #666666">/</span>sig2
+    WfDer[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> <span style="color: #666666">1</span> <span style="color: #666666">/</span> (<span style="color: #666666">1</span> <span style="color: #666666">+</span> np<span style="color: #666666">.</span>exp(<span style="color: #666666">-</span>Q))
+    
+    <span style="color: #008000; font-weight: bold">for</span> ih <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberHidden):
+        WfDer[<span style="color: #666666">2</span>][:,:,ih] <span style="color: #666666">=</span> w[:,:,ih] <span style="color: #666666">/</span> (sig2<span style="color: #666666">*</span>(<span style="color: #666666">1+</span>np<span style="color: #666666">.</span>exp(<span style="color: #666666">-</span>Q[ih])))
+            
+    <span style="color: #008000; font-weight: bold">return</span>  WfDer
+
+<span style="color: #408080; font-style: italic"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">QuantumForce</span>(r,a,b,w):
+
+    sigma<span style="color: #666666">=1.0</span>
+    sig2 <span style="color: #666666">=</span> sigma<span style="color: #666666">**2</span>
+    
+    qforce <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
+    sum1 <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
+    
+    Q <span style="color: #666666">=</span> Qfac(r,b,w)
+    
+    <span style="color: #008000; font-weight: bold">for</span> ih <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberHidden):
+        sum1 <span style="color: #666666">+=</span> w[:,:,ih]<span style="color: #666666">/</span>(<span style="color: #666666">1+</span>np<span style="color: #666666">.</span>exp(<span style="color: #666666">-</span>Q[ih]))
+    
+    qforce <span style="color: #666666">=</span> <span style="color: #666666">2*</span>(<span style="color: #666666">-</span>(r<span style="color: #666666">-</span>a)<span style="color: #666666">/</span>sig2 <span style="color: #666666">+</span> sum1<span style="color: #666666">/</span>sig2)
+    
+    <span style="color: #008000; font-weight: bold">return</span> qforce
+    
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">Qfac</span>(r,b,w):
+    Q <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberHidden), np<span style="color: #666666">.</span>double)
+    temp <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberHidden), np<span style="color: #666666">.</span>double)
+    
+    <span style="color: #008000; font-weight: bold">for</span> ih <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberHidden):
+        temp[ih] <span style="color: #666666">=</span> (r<span style="color: #666666">*</span>w[:,:,ih])<span style="color: #666666">.</span>sum()
+        
+    Q <span style="color: #666666">=</span> b <span style="color: #666666">+</span> temp
+    
+    <span style="color: #008000; font-weight: bold">return</span> Q
+    
+<span style="color: #408080; font-style: italic"># Computing the derivative of the energy and the energy </span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">EnergyMinimization</span>(a,b,w):
+
+    NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">10000</span>
+    <span style="color: #408080; font-style: italic"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D <span style="color: #666666">=</span> <span style="color: #666666">0.5</span>
+    TimeStep <span style="color: #666666">=</span> <span style="color: #666666">0.05</span>
+    <span style="color: #408080; font-style: italic"># positions</span>
+    PositionOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
+    PositionNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
+    <span style="color: #408080; font-style: italic"># Quantum force</span>
+    QuantumForceOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
+    QuantumForceNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
+
+    <span style="color: #408080; font-style: italic"># seed for rng generator </span>
+    seed()
+    energy <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+    DeltaE <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+
+    EnergyDer <span style="color: #666666">=</span> np<span style="color: #666666">.</span>empty((<span style="color: #666666">3</span>,),dtype<span style="color: #666666">=</span><span style="color: #008000">object</span>)
+    DeltaPsi <span style="color: #666666">=</span> np<span style="color: #666666">.</span>empty((<span style="color: #666666">3</span>,),dtype<span style="color: #666666">=</span><span style="color: #008000">object</span>)
+    DerivativePsiE <span style="color: #666666">=</span> np<span style="color: #666666">.</span>empty((<span style="color: #666666">3</span>,),dtype<span style="color: #666666">=</span><span style="color: #008000">object</span>)
+    EnergyDer <span style="color: #666666">=</span> [np<span style="color: #666666">.</span>copy(a),np<span style="color: #666666">.</span>copy(b),np<span style="color: #666666">.</span>copy(w)]
+    DeltaPsi <span style="color: #666666">=</span> [np<span style="color: #666666">.</span>copy(a),np<span style="color: #666666">.</span>copy(b),np<span style="color: #666666">.</span>copy(w)]
+    DerivativePsiE <span style="color: #666666">=</span> [np<span style="color: #666666">.</span>copy(a),np<span style="color: #666666">.</span>copy(b),np<span style="color: #666666">.</span>copy(w)]
+    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">3</span>): EnergyDer[i]<span style="color: #666666">.</span>fill(<span style="color: #666666">0.0</span>)
+    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">3</span>): DeltaPsi[i]<span style="color: #666666">.</span>fill(<span style="color: #666666">0.0</span>)
+    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">3</span>): DerivativePsiE[i]<span style="color: #666666">.</span>fill(<span style="color: #666666">0.0</span>)
+
+    
+    <span style="color: #408080; font-style: italic">#Initial position</span>
+    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
+        <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+            PositionOld[i,j] <span style="color: #666666">=</span> normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)
+    wfold <span style="color: #666666">=</span> WaveFunction(PositionOld,a,b,w)
+    QuantumForceOld <span style="color: #666666">=</span> QuantumForce(PositionOld,a,b,w)
+
+    <span style="color: #408080; font-style: italic">#Loop over MC MCcycles</span>
+    <span style="color: #008000; font-weight: bold">for</span> MCcycle <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberMCcycles):
+        <span style="color: #408080; font-style: italic">#Trial position moving one particle at the time</span>
+        <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
+            <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+                PositionNew[i,j] <span style="color: #666666">=</span> PositionOld[i,j]<span style="color: #666666">+</span>normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)<span style="color: #666666">+</span>\
+                                       QuantumForceOld[i,j]<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*</span>D
+            wfnew <span style="color: #666666">=</span> WaveFunction(PositionNew,a,b,w)
+            QuantumForceNew <span style="color: #666666">=</span> QuantumForce(PositionNew,a,b,w)
+            
+            GreensFunction <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+            <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+                GreensFunction <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">+</span>QuantumForceNew[i,j])<span style="color: #666666">*</span>\
+                                      (D<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">-</span>QuantumForceNew[i,j])<span style="color: #666666">-</span>\
+                                      PositionNew[i,j]<span style="color: #666666">+</span>PositionOld[i,j])
+      
+            GreensFunction <span style="color: #666666">=</span> exp(GreensFunction)
+            ProbabilityRatio <span style="color: #666666">=</span> GreensFunction<span style="color: #666666">*</span>wfnew<span style="color: #666666">**2/</span>wfold<span style="color: #666666">**2</span>
+            <span style="color: #408080; font-style: italic">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #008000; font-weight: bold">if</span> random() <span style="color: #666666">&lt;=</span> ProbabilityRatio:
+                <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+                    PositionOld[i,j] <span style="color: #666666">=</span> PositionNew[i,j]
+                    QuantumForceOld[i,j] <span style="color: #666666">=</span> QuantumForceNew[i,j]
+                wfold <span style="color: #666666">=</span> wfnew
+        <span style="color: #408080; font-style: italic">#print(&quot;wf new:        &quot;, wfnew)</span>
+        <span style="color: #408080; font-style: italic">#print(&quot;force on 1 new:&quot;, QuantumForceNew[0,:])</span>
+        <span style="color: #408080; font-style: italic">#print(&quot;pos of 1 new:  &quot;, PositionNew[0,:])</span>
+        <span style="color: #408080; font-style: italic">#print(&quot;force on 2 new:&quot;, QuantumForceNew[1,:])</span>
+        <span style="color: #408080; font-style: italic">#print(&quot;pos of 2 new:  &quot;, PositionNew[1,:])</span>
+        DeltaE <span style="color: #666666">=</span> LocalEnergy(PositionOld,a,b,w)
+        DerPsi <span style="color: #666666">=</span> DerivativeWFansatz(PositionOld,a,b,w)
+        
+        DeltaPsi[<span style="color: #666666">0</span>] <span style="color: #666666">+=</span> DerPsi[<span style="color: #666666">0</span>]
+        DeltaPsi[<span style="color: #666666">1</span>] <span style="color: #666666">+=</span> DerPsi[<span style="color: #666666">1</span>]
+        DeltaPsi[<span style="color: #666666">2</span>] <span style="color: #666666">+=</span> DerPsi[<span style="color: #666666">2</span>]
+        
+        energy <span style="color: #666666">+=</span> DeltaE
+
+        DerivativePsiE[<span style="color: #666666">0</span>] <span style="color: #666666">+=</span> DerPsi[<span style="color: #666666">0</span>]<span style="color: #666666">*</span>DeltaE
+        DerivativePsiE[<span style="color: #666666">1</span>] <span style="color: #666666">+=</span> DerPsi[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>DeltaE
+        DerivativePsiE[<span style="color: #666666">2</span>] <span style="color: #666666">+=</span> DerPsi[<span style="color: #666666">2</span>]<span style="color: #666666">*</span>DeltaE
+            
+    <span style="color: #408080; font-style: italic"># We calculate mean values</span>
+    energy <span style="color: #666666">/=</span> NumberMCcycles
+    DerivativePsiE[<span style="color: #666666">0</span>] <span style="color: #666666">/=</span> NumberMCcycles
+    DerivativePsiE[<span style="color: #666666">1</span>] <span style="color: #666666">/=</span> NumberMCcycles
+    DerivativePsiE[<span style="color: #666666">2</span>] <span style="color: #666666">/=</span> NumberMCcycles
+    DeltaPsi[<span style="color: #666666">0</span>] <span style="color: #666666">/=</span> NumberMCcycles
+    DeltaPsi[<span style="color: #666666">1</span>] <span style="color: #666666">/=</span> NumberMCcycles
+    DeltaPsi[<span style="color: #666666">2</span>] <span style="color: #666666">/=</span> NumberMCcycles
+    EnergyDer[<span style="color: #666666">0</span>]  <span style="color: #666666">=</span> <span style="color: #666666">2*</span>(DerivativePsiE[<span style="color: #666666">0</span>]<span style="color: #666666">-</span>DeltaPsi[<span style="color: #666666">0</span>]<span style="color: #666666">*</span>energy)
+    EnergyDer[<span style="color: #666666">1</span>]  <span style="color: #666666">=</span> <span style="color: #666666">2*</span>(DerivativePsiE[<span style="color: #666666">1</span>]<span style="color: #666666">-</span>DeltaPsi[<span style="color: #666666">1</span>]<span style="color: #666666">*</span>energy)
+    EnergyDer[<span style="color: #666666">2</span>]  <span style="color: #666666">=</span> <span style="color: #666666">2*</span>(DerivativePsiE[<span style="color: #666666">2</span>]<span style="color: #666666">-</span>DeltaPsi[<span style="color: #666666">2</span>]<span style="color: #666666">*</span>energy)
+    <span style="color: #008000; font-weight: bold">return</span> energy, EnergyDer
+
+
+<span style="color: #408080; font-style: italic">#Here starts the main program with variable declarations</span>
+NumberParticles <span style="color: #666666">=</span> <span style="color: #666666">2</span>
+Dimension <span style="color: #666666">=</span> <span style="color: #666666">2</span>
+NumberHidden <span style="color: #666666">=</span> <span style="color: #666666">2</span>
+
+interaction<span style="color: #666666">=</span><span style="color: #008000">False</span>
+
+<span style="color: #408080; font-style: italic"># guess for parameters</span>
+a<span style="color: #666666">=</span>np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>normal(loc<span style="color: #666666">=0.0</span>, scale<span style="color: #666666">=0.001</span>, size<span style="color: #666666">=</span>(NumberParticles,Dimension))
+b<span style="color: #666666">=</span>np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>normal(loc<span style="color: #666666">=0.0</span>, scale<span style="color: #666666">=0.001</span>, size<span style="color: #666666">=</span>(NumberHidden))
+w<span style="color: #666666">=</span>np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>normal(loc<span style="color: #666666">=0.0</span>, scale<span style="color: #666666">=0.001</span>, size<span style="color: #666666">=</span>(NumberParticles,Dimension,NumberHidden))
+<span style="color: #408080; font-style: italic"># Set up iteration using stochastic gradient method</span>
+Energy <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+EDerivative <span style="color: #666666">=</span> np<span style="color: #666666">.</span>empty((<span style="color: #666666">3</span>,),dtype<span style="color: #666666">=</span><span style="color: #008000">object</span>)
+EDerivative <span style="color: #666666">=</span> [np<span style="color: #666666">.</span>copy(a),np<span style="color: #666666">.</span>copy(b),np<span style="color: #666666">.</span>copy(w)]
+<span style="color: #408080; font-style: italic"># Learning rate eta, max iterations, need to change to adaptive learning rate</span>
+eta <span style="color: #666666">=</span> <span style="color: #666666">0.001</span>
+MaxIterations <span style="color: #666666">=</span> <span style="color: #666666">50</span>
+<span style="color: #008000">iter</span> <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+np<span style="color: #666666">.</span>seterr(invalid<span style="color: #666666">=</span><span style="color: #BA2121">&#39;raise&#39;</span>)
+Energies <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(MaxIterations)
+EnergyDerivatives1 <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(MaxIterations)
+EnergyDerivatives2 <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(MaxIterations)
+
+<span style="color: #008000; font-weight: bold">while</span> <span style="color: #008000">iter</span> <span style="color: #666666">&lt;</span> MaxIterations:
+    Energy, EDerivative <span style="color: #666666">=</span> EnergyMinimization(a,b,w)
+    agradient <span style="color: #666666">=</span> EDerivative[<span style="color: #666666">0</span>]
+    bgradient <span style="color: #666666">=</span> EDerivative[<span style="color: #666666">1</span>]
+    wgradient <span style="color: #666666">=</span> EDerivative[<span style="color: #666666">2</span>]
+    a <span style="color: #666666">-=</span> eta<span style="color: #666666">*</span>agradient
+    b <span style="color: #666666">-=</span> eta<span style="color: #666666">*</span>bgradient 
+    w <span style="color: #666666">-=</span> eta<span style="color: #666666">*</span>wgradient 
+    Energies[<span style="color: #008000">iter</span>] <span style="color: #666666">=</span> Energy
+    <span style="color: #008000; font-weight: bold">print</span>(<span style="color: #BA2121">&quot;Energy:&quot;</span>,Energy)
+    <span style="color: #408080; font-style: italic">#EnergyDerivatives1[iter] = EDerivative[0] </span>
+    <span style="color: #408080; font-style: italic">#EnergyDerivatives2[iter] = EDerivative[1]</span>
+    <span style="color: #408080; font-style: italic">#EnergyDerivatives3[iter] = EDerivative[2] </span>
+
+
+    <span style="color: #008000">iter</span> <span style="color: #666666">+=</span> <span style="color: #666666">1</span>
+
+<span style="color: #408080; font-style: italic">#nice printout with Pandas</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">pandas</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">pd</span>
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">pandas</span> <span style="color: #008000; font-weight: bold">import</span> DataFrame
+pd<span style="color: #666666">.</span>set_option(<span style="color: #BA2121">&#39;max_columns&#39;</span>, <span style="color: #666666">6</span>)
+data <span style="color: #666666">=</span>{<span style="color: #BA2121">&#39;Energy&#39;</span>:Energies}<span style="color: #408080; font-style: italic">#,&#39;A Derivative&#39;:EnergyDerivatives1,&#39;B Derivative&#39;:EnergyDerivatives2,&#39;Weights Derivative&#39;:EnergyDerivatives3}</span>
+
+frame <span style="color: #666666">=</span> pd<span style="color: #666666">.</span>DataFrame(data)
+<span style="color: #008000; font-weight: bold">print</span>(frame)
+</pre></div>
 <p>
 
 <!-- ------------------- end of main content --------------- -->
