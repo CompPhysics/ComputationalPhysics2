@@ -5,6 +5,3 @@ A theoretical understanding of the behavior of quantum-mechanical many-body syst
 The aim of this course is to present applications of, through various computational projects, some of the most widely used many-body methods with pertinent algorithms and high-performance computing topics such as advanced parallelization techniques and object orientation. Furthermore, elements of Machine Learning and quantum computing may be presented if of interest.
 The methods and algorithms that will be studied may vary from year to year depending on the interests of the participants, but the main focus will be on systems from computational material science, solid-state physics, atomic and molecular physics, nuclear physics and quantum chemistry. The most relevant algorithms and methods are microscopic mean-field theories (Hartree-Fock and Kohn-Sham theories and density functional theories), large-scale diagonalization methods, coupled-cluster theory, and quantum Monte Carlo like Variational Monte Carlo and Diffusion Monte Carlo approaches. Methods to study phase transitions for both fermionic and bosonic systems can also be studied.
 
-
-Piazza is used for discussions, see https://piazza.com/configure-classes/spring2019/fys4411
-You can enlist at https://piazza.com/uio.no/spring2019/fys4411
