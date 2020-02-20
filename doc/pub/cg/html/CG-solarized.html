@@ -128,54 +128,33 @@ div { text-align: justify; text-justify: inter-word; }
                2,
                None,
                '___sec40'),
-              ('Automatic differentiation', 2, None, '___sec41'),
-              ('Using autograd', 2, None, '___sec42'),
-              ('Autograd with more complicated functions', 2, None, '___sec43'),
-              ('More complicated functions using the elements of their '
-               'arguments directly',
-               2,
-               None,
-               '___sec44'),
-              ('Functions using mathematical functions from Numpy',
-               2,
-               None,
-               '___sec45'),
-              ('More autograd', 2, None, '___sec46'),
-              ('And  with loops', 2, None, '___sec47'),
-              ('Using recursion', 2, None, '___sec48'),
-              ('Unsupported functions', 2, None, '___sec49'),
-              ('The syntax a.dot(b) when finding the dot product',
-               2,
-               None,
-               '___sec50'),
-              ('Recommended to avoid', 2, None, '___sec51'),
-              ('Stochastic Gradient Descent', 2, None, '___sec52'),
-              ('Computation of gradients', 2, None, '___sec53'),
-              ('SGD example', 2, None, '___sec54'),
-              ('The gradient step', 2, None, '___sec55'),
-              ('Simple example code', 2, None, '___sec56'),
-              ('When do we stop?', 2, None, '___sec57'),
-              ('Slightly different approach', 2, None, '___sec58'),
-              ('Program for stochastic gradient', 2, None, '___sec59'),
+              ('Stochastic Gradient Descent', 2, None, '___sec41'),
+              ('Computation of gradients', 2, None, '___sec42'),
+              ('SGD example', 2, None, '___sec43'),
+              ('The gradient step', 2, None, '___sec44'),
+              ('Simple example code', 2, None, '___sec45'),
+              ('When do we stop?', 2, None, '___sec46'),
+              ('Slightly different approach', 2, None, '___sec47'),
+              ('Program for stochastic gradient', 2, None, '___sec48'),
               ('Using gradient descent methods, limitations',
                2,
                None,
-               '___sec60'),
-              ('Codes from numerical recipes', 2, None, '___sec61'),
+               '___sec49'),
+              ('Codes from numerical recipes', 2, None, '___sec50'),
               ('Finding the minimum of the harmonic oscillator model in one '
                'dimension',
                2,
                None,
-               '___sec62'),
-              ('Functions to observe', 2, None, '___sec63'),
+               '___sec51'),
+              ('Functions to observe', 2, None, '___sec52'),
               ('Python program for 2-electrons in 2 dimensions',
                2,
                None,
-               '___sec64'),
-              ("Using Broyden's algorithm in scipy", 2, None, '___sec65'),
-              ('How do we proceed?', 2, None, '___sec66'),
-              ('Modified code', 2, None, '___sec67'),
-              ('Resampling analysis', 2, None, '___sec68')]}
+               '___sec53'),
+              ("Using Broyden's algorithm in scipy", 2, None, '___sec54'),
+              ('How do we proceed?', 2, None, '___sec55'),
+              ('Modified code', 2, None, '___sec56'),
+              ('Resampling analysis', 2, None, '___sec57')]}
 end of tocinfo -->
 
 <body>
@@ -217,7 +196,7 @@ MathJax.Hub.Config({
 <center>[2] <b>Department of Physics and Astronomy and National Superconducting Cyclotron Laboratory, Michigan State University</b></center>
 <br>
 <p>
-<center><h4>Feb 13, 2020</h4></center> <!-- date -->
+<center><h4>Feb 20, 2020</h4></center> <!-- date -->
 <br>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
@@ -1386,393 +1365,7 @@ over the scalar \( \alpha > 0 \).
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec41">Automatic differentiation </h2>
-Python has tools for so-called <b>automatic differentiation</b>.
-Consider the following example
-$$
-f(x) = \sin\left(2\pi x + x^2\right)
-$$
-
-which has the following derivative
-$$
-f'(x) = \cos\left(2\pi x + x^2\right)\left(2\pi + 2x\right) 
-$$
-
-Using <b>autograd</b> we have
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-
-<span style="color: #228B22"># To do elementwise differentiation:</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> elementwise_grad <span style="color: #8B008B; font-weight: bold">as</span> egrad 
-
-<span style="color: #228B22"># To plot:</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span> 
-
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(x):
-    <span style="color: #8B008B; font-weight: bold">return</span> np.sin(<span style="color: #B452CD">2</span>*np.pi*x + x**<span style="color: #B452CD">2</span>)
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f_grad_analytic</span>(x):
-    <span style="color: #8B008B; font-weight: bold">return</span> np.cos(<span style="color: #B452CD">2</span>*np.pi*x + x**<span style="color: #B452CD">2</span>)*(<span style="color: #B452CD">2</span>*np.pi + <span style="color: #B452CD">2</span>*x)
-
-<span style="color: #228B22"># Do the comparison:</span>
-x = np.linspace(<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1000</span>)
-
-f_grad = egrad(f)
-
-computed = f_grad(x)
-analytic = f_grad_analytic(x)
-
-plt.title(<span style="color: #CD5555">&#39;Derivative computed from Autograd compared with the analytical derivative&#39;</span>)
-plt.plot(x,computed,label=<span style="color: #CD5555">&#39;autograd&#39;</span>)
-plt.plot(x,analytic,label=<span style="color: #CD5555">&#39;analytic&#39;</span>)
-
-plt.xlabel(<span style="color: #CD5555">&#39;x&#39;</span>)
-plt.ylabel(<span style="color: #CD5555">&#39;y&#39;</span>)
-plt.legend()
-
-plt.show()
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The max absolute difference is: %g&quot;</span>%(np.max(np.abs(computed - analytic))))
-</pre></div>
-<p>
-<!-- !split  -->
-
-<h2 id="___sec42">Using autograd </h2>
-
-<p>
-Here we
-experiment with what kind of functions Autograd is capable
-of finding the gradient of. The following Python functions are just
-meant to illustrate what Autograd can do, but please feel free to
-experiment with other, possibly more complicated, functions as well.
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f1</span>(x):
-    <span style="color: #8B008B; font-weight: bold">return</span> x**<span style="color: #B452CD">3</span> + <span style="color: #B452CD">1</span>
-
-f1_grad = grad(f1)
-
-<span style="color: #228B22"># Remember to send in float as argument to the computed gradient from Autograd!</span>
-a = <span style="color: #B452CD">1.0</span>
-
-<span style="color: #228B22"># See the evaluated gradient at a using autograd:</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The gradient of f1 evaluated at a = %g using autograd is: %g&quot;</span>%(a,f1_grad(a)))
-
-<span style="color: #228B22"># Compare with the analytical derivative, that is f1&#39;(x) = 3*x**2 </span>
-grad_analytical = <span style="color: #B452CD">3</span>*a**<span style="color: #B452CD">2</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The gradient of f1 evaluated at a = %g by finding the analytic expression is: %g&quot;</span>%(a,grad_analytical))
-</pre></div>
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec43">Autograd with more complicated functions </h2>
-
-<p>
-To differentiate with respect to two (or more) arguments of a Python
-function, Autograd need to know at which variable the function if
-being differentiated with respect to.
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f2</span>(x1,x2):
-    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">3</span>*x1**<span style="color: #B452CD">3</span> + x2*(x1 - <span style="color: #B452CD">5</span>) + <span style="color: #B452CD">1</span>
-
-<span style="color: #228B22"># By sending the argument 0, Autograd will compute the derivative w.r.t the first variable, in this case x1</span>
-f2_grad_x1 = grad(f2,<span style="color: #B452CD">0</span>)
-
-<span style="color: #228B22"># ... and differentiate w.r.t x2 by sending 1 as an additional arugment to grad</span>
-f2_grad_x2 = grad(f2,<span style="color: #B452CD">1</span>)
-
-x1 = <span style="color: #B452CD">1.0</span>
-x2 = <span style="color: #B452CD">3.0</span> 
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;Evaluating at x1 = %g, x2 = %g&quot;</span>%(x1,x2))
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;-&quot;</span>*<span style="color: #B452CD">30</span>)
-
-<span style="color: #228B22"># Compare with the analytical derivatives:</span>
-
-<span style="color: #228B22"># Derivative of f2 w.r.t x1 is: 9*x1**2 + x2:</span>
-f2_grad_x1_analytical = <span style="color: #B452CD">9</span>*x1**<span style="color: #B452CD">2</span> + x2
-
-<span style="color: #228B22"># Derivative of f2 w.r.t x2 is: x1 - 5:</span>
-f2_grad_x2_analytical = x1 - <span style="color: #B452CD">5</span>
-
-<span style="color: #228B22"># See the evaluated derivations:</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The derivative of f2 w.r.t x1: %g&quot;</span>%( f2_grad_x1(x1,x2) ))
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The analytical derivative of f2 w.r.t x1: %g&quot;</span>%( f2_grad_x1(x1,x2) ))
-
-<span style="color: #8B008B; font-weight: bold">print</span>()
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The derivative of f2 w.r.t x2: %g&quot;</span>%( f2_grad_x2(x1,x2) ))
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The analytical derivative of f2 w.r.t x2: %g&quot;</span>%( f2_grad_x2(x1,x2) ))
-</pre></div>
-<p>
-Note that the grad function will not produce the true gradient of the function. The true gradient of a function with two or more variables will produce a vector, where each element is the function differentiated w.r.t a variable.
-
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec44">More complicated functions using the elements of their arguments directly </h2>
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f3</span>(x): <span style="color: #228B22"># Assumes x is an array of length 5 or higher</span>
-    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">2</span>*x[<span style="color: #B452CD">0</span>] + <span style="color: #B452CD">3</span>*x[<span style="color: #B452CD">1</span>] + <span style="color: #B452CD">5</span>*x[<span style="color: #B452CD">2</span>] + <span style="color: #B452CD">7</span>*x[<span style="color: #B452CD">3</span>] + <span style="color: #B452CD">11</span>*x[<span style="color: #B452CD">4</span>]**<span style="color: #B452CD">2</span>
-
-f3_grad = grad(f3)
-
-x = np.linspace(<span style="color: #B452CD">0</span>,<span style="color: #B452CD">4</span>,<span style="color: #B452CD">5</span>)
-
-<span style="color: #228B22"># Print the computed gradient:</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The computed gradient of f3 is: &quot;</span>, f3_grad(x))
-
-<span style="color: #228B22"># The analytical gradient is: (2, 3, 5, 7, 22*x[4])</span>
-f3_grad_analytical = np.array([<span style="color: #B452CD">2</span>, <span style="color: #B452CD">3</span>, <span style="color: #B452CD">5</span>, <span style="color: #B452CD">7</span>, <span style="color: #B452CD">22</span>*x[<span style="color: #B452CD">4</span>]])
-
-<span style="color: #228B22"># Print the analytical gradient:</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The analytical gradient of f3 is: &quot;</span>, f3_grad_analytical)
-</pre></div>
-<p>
-Note that in this case, when sending an array as input argument, the
-output from Autograd is another array. This is the true gradient of
-the function, as opposed to the function in the previous example. By
-using arrays to represent the variables, the output from Autograd
-might be easier to work with, as the output is closer to what one
-could expect form a gradient-evaluting function.
-
-<p>
-<!-- !split  -->
-
-<h2 id="___sec45">Functions using mathematical functions from Numpy </h2>
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f4</span>(x):
-    <span style="color: #8B008B; font-weight: bold">return</span> np.sqrt(<span style="color: #B452CD">1</span>+x**<span style="color: #B452CD">2</span>) + np.exp(x) + np.sin(<span style="color: #B452CD">2</span>*np.pi*x)
-
-f4_grad = grad(f4)
-
-x = <span style="color: #B452CD">2.7</span>
-
-<span style="color: #228B22"># Print the computed derivative:</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The computed derivative of f4 at x = %g is: %g&quot;</span>%(x,f4_grad(x)))
-
-<span style="color: #228B22"># The analytical derivative is: x/sqrt(1 + x**2) + exp(x) + cos(2*pi*x)*2*pi</span>
-f4_grad_analytical = x/np.sqrt(<span style="color: #B452CD">1</span> + x**<span style="color: #B452CD">2</span>) + np.exp(x) + np.cos(<span style="color: #B452CD">2</span>*np.pi*x)*<span style="color: #B452CD">2</span>*np.pi
-
-<span style="color: #228B22"># Print the analytical gradient:</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The analytical gradient of f4 at x = %g is: %g&quot;</span>%(x,f4_grad_analytical))
-</pre></div>
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec46">More autograd </h2>
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f5</span>(x):
-    <span style="color: #8B008B; font-weight: bold">if</span> x &gt;= <span style="color: #B452CD">0</span>:
-        <span style="color: #8B008B; font-weight: bold">return</span> x**<span style="color: #B452CD">2</span>
-    <span style="color: #8B008B; font-weight: bold">else</span>:
-        <span style="color: #8B008B; font-weight: bold">return</span> -<span style="color: #B452CD">3</span>*x + <span style="color: #B452CD">1</span>
-
-f5_grad = grad(f5)
-
-x = <span style="color: #B452CD">2.7</span>
-
-<span style="color: #228B22"># Print the computed derivative:</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The computed derivative of f5 at x = %g is: %g&quot;</span>%(x,f5_grad(x)))
-</pre></div>
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec47">And  with loops </h2>
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f6_for</span>(x):
-    val = <span style="color: #B452CD">0</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(<span style="color: #B452CD">10</span>):
-        val = val + x**i
-    <span style="color: #8B008B; font-weight: bold">return</span> val
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f6_while</span>(x):
-    val = <span style="color: #B452CD">0</span>
-    i = <span style="color: #B452CD">0</span>
-    <span style="color: #8B008B; font-weight: bold">while</span> i &lt; <span style="color: #B452CD">10</span>:
-        val = val + x**i
-        i = i + <span style="color: #B452CD">1</span>
-    <span style="color: #8B008B; font-weight: bold">return</span> val
-
-f6_for_grad = grad(f6_for)
-f6_while_grad = grad(f6_while)
-
-x = <span style="color: #B452CD">0.5</span>
-
-<span style="color: #228B22"># Print the computed derivaties of f6_for and f6_while</span>
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The computed derivative of f6_for at x = %g is: %g&quot;</span>%(x,f6_for_grad(x)))
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The computed derivative of f6_while at x = %g is: %g&quot;</span>%(x,f6_while_grad(x)))
-</pre></div>
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #228B22"># Both of the functions are implementation of the sum: sum(x**i) for i = 0, ..., 9</span>
-<span style="color: #228B22"># The analytical derivative is: sum(i*x**(i-1)) </span>
-f6_grad_analytical = <span style="color: #B452CD">0</span>
-<span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(<span style="color: #B452CD">10</span>):
-    f6_grad_analytical += i*x**(i-<span style="color: #B452CD">1</span>)
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The analytical derivative of f6 at x = %g is: %g&quot;</span>%(x,f6_grad_analytical))
-</pre></div>
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec48">Using recursion </h2>
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f7</span>(n): <span style="color: #228B22"># Assume that n is an integer</span>
-    <span style="color: #8B008B; font-weight: bold">if</span> n == <span style="color: #B452CD">1</span> <span style="color: #8B008B">or</span> n == <span style="color: #B452CD">0</span>:
-        <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">1</span>
-    <span style="color: #8B008B; font-weight: bold">else</span>:
-        <span style="color: #8B008B; font-weight: bold">return</span> n*f7(n-<span style="color: #B452CD">1</span>)
-
-f7_grad = grad(f7)
-
-n = <span style="color: #B452CD">2.0</span>
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The computed derivative of f7 at n = %d is: %g&quot;</span>%(n,f7_grad(n)))
-
-<span style="color: #228B22"># The function f7 is an implementation of the factorial of n.</span>
-<span style="color: #228B22"># By using the product rule, one can find that the derivative is:</span>
-
-f7_grad_analytical = <span style="color: #B452CD">0</span>
-<span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(<span style="color: #658b00">int</span>(n)-<span style="color: #B452CD">1</span>):
-    tmp = <span style="color: #B452CD">1</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> k <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(<span style="color: #658b00">int</span>(n)-<span style="color: #B452CD">1</span>):
-        <span style="color: #8B008B; font-weight: bold">if</span> k != i:
-            tmp *= (n - k)
-    f7_grad_analytical += tmp
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The analytical derivative of f7 at n = %d is: %g&quot;</span>%(n,f7_grad_analytical))
-</pre></div>
-<p>
-Note that if n is equal to zero or one, Autograd will give an error message. This message appears when the output is independent on input.
-
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec49">Unsupported functions </h2>
-Autograd supports many features. However, there are some functions that is not supported (yet) by Autograd.
-
-<p>
-Assigning a value to the variable being differentiated with respect to
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f8</span>(x): <span style="color: #228B22"># Assume x is an array</span>
-    x[<span style="color: #B452CD">2</span>] = <span style="color: #B452CD">3</span>
-    <span style="color: #8B008B; font-weight: bold">return</span> x*<span style="color: #B452CD">2</span>
-
-f8_grad = grad(f8)
-
-x = <span style="color: #B452CD">8.4</span>
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The derivative of f8 is:&quot;</span>,f8_grad(x))
-</pre></div>
-<p>
-Here, Autograd tells us that an 'ArrayBox' does not support item assignment. The item assignment is done when the program tries to assign x[2] to the value 3. However, Autograd has implemented the computation of the derivative such that this assignment is not possible.
-
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec50">The syntax a.dot(b) when finding the dot product </h2>
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f9</span>(a): <span style="color: #228B22"># Assume a is an array with 2 elements</span>
-    b = np.array([<span style="color: #B452CD">1.0</span>,<span style="color: #B452CD">2.0</span>])
-    <span style="color: #8B008B; font-weight: bold">return</span> a.dot(b)
-
-f9_grad = grad(f9)
-
-x = np.array([<span style="color: #B452CD">1.0</span>,<span style="color: #B452CD">0.0</span>])
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The derivative of f9 is:&quot;</span>,f9_grad(x))
-</pre></div>
-<p>
-Here we are told that the 'dot' function does not belong to Autograd's
-version of a Numpy array.  To overcome this, an alternative syntax
-which also computed the dot product can be used:
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">autograd.numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">autograd</span> <span style="color: #8B008B; font-weight: bold">import</span> grad
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f9_alternative</span>(x): <span style="color: #228B22"># Assume a is an array with 2 elements</span>
-    b = np.array([<span style="color: #B452CD">1.0</span>,<span style="color: #B452CD">2.0</span>])
-    <span style="color: #8B008B; font-weight: bold">return</span> np.dot(x,b) <span style="color: #228B22"># The same as x_1*b_1 + x_2*b_2</span>
-
-f9_alternative_grad = grad(f9_alternative)
-
-x = np.array([<span style="color: #B452CD">3.0</span>,<span style="color: #B452CD">0.0</span>])
-
-<span style="color: #8B008B; font-weight: bold">print</span>(<span style="color: #CD5555">&quot;The gradient of f9 is:&quot;</span>,f9_alternative_grad(x))
-
-<span style="color: #228B22"># The analytical gradient of the dot product of vectors x and b with two elements (x_1,x_2) and (b_1, b_2) respectively</span>
-<span style="color: #228B22"># w.r.t x is (b_1, b_2).</span>
-</pre></div>
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec51">Recommended to avoid </h2>
-The documentation recommends to avoid inplace operations such as
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span>a += b
-a -= b
-a*= b
-a /=b
-</pre></div>
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="___sec52">Stochastic Gradient Descent </h2>
+<h2 id="___sec41">Stochastic Gradient Descent </h2>
 
 <p>
 Stochastic gradient descent (SGD) and variants thereof address some of
@@ -1790,7 +1383,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec53">Computation of gradients </h2>
+<h2 id="___sec42">Computation of gradients </h2>
 
 <p>
 This in turn means that the gradient can be
@@ -1810,7 +1403,7 @@ minibatches. We denote these minibatches by \( B_k \) where
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec54">SGD example </h2>
+<h2 id="___sec43">SGD example </h2>
 As an example, suppose we have \( 10 \) data points \( (\mathbf{x}_1,\cdots, \mathbf{x}_{10}) \) 
 and we choose to have \( M=5 \) minibathces,
 then each minibatch contains two data points. In particular we have
@@ -1834,7 +1427,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec55">The gradient step </h2>
+<h2 id="___sec44">The gradient step </h2>
 
 <p>
 Thus a gradient descent step now looks like 
@@ -1853,7 +1446,7 @@ the number of minibatches, as exemplified in the code below.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec56">Simple example code </h2>
+<h2 id="___sec45">Simple example code </h2>
 
 <p>
 
@@ -1885,7 +1478,7 @@ all \( n \) datapoints.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec57">When do we stop? </h2>
+<h2 id="___sec46">When do we stop? </h2>
 
 <p>
 A natural question is when do we stop the search for a new minimum?
@@ -1902,7 +1495,7 @@ gave the lowest value.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec58">Slightly different approach </h2>
+<h2 id="___sec47">Slightly different approach </h2>
 
 <p>
 Another approach is to let the step length \( \gamma_j \) depend on the
@@ -1950,7 +1543,7 @@ j = <span style="color: #B452CD">0</span>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec59">Program for stochastic gradient </h2>
+<h2 id="___sec48">Program for stochastic gradient </h2>
 
 <p>
 
@@ -2025,7 +1618,7 @@ plt.show()
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec60">Using gradient descent methods, limitations </h2>
+<h2 id="___sec49">Using gradient descent methods, limitations </h2>
 
 <ul>
 <li> <b>Gradient descent (GD) finds local minima of our function</b>. Since the GD algorithm is deterministic, if it converges, it will converge to a local minimum of our energy function. Because in ML we are often dealing with extremely rugged landscapes with many local minima, this can lead to poor performance.</li>
@@ -2038,7 +1631,7 @@ plt.show()
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec61">Codes from numerical recipes </h2>
+<h2 id="___sec50">Codes from numerical recipes </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2057,7 +1650,7 @@ Below we show only excerpts from the main program. For the full program, see the
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec62">Finding the minimum of the harmonic oscillator model in one dimension </h2>
+<h2 id="___sec51">Finding the minimum of the harmonic oscillator model in one dimension </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2093,7 +1686,7 @@ Below we show only excerpts from the main program. For the full program, see the
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec63">Functions to observe </h2>
+<h2 id="___sec52">Functions to observe </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -2128,7 +1721,7 @@ After roughly 10-20 iterations I got a converged result in terms of \( \alpha \)
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec64">Python program for 2-electrons in 2 dimensions </h2>
+<h2 id="___sec53">Python program for 2-electrons in 2 dimensions </h2>
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
@@ -2279,7 +1872,7 @@ Niterations = <span style="color: #B452CD">50</span>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec65">Using Broyden's algorithm in scipy </h2>
+<h2 id="___sec54">Using Broyden's algorithm in scipy </h2>
 The following function uses the above described BFGS algorithm. Here we have defined a function which calculates the energy and a function which computes the first derivative.
 <p>
 
@@ -2480,7 +2073,7 @@ Note that the <b>minimize</b> function returns the finale values for the variabl
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec66">How do we proceed? </h2>
+<h2 id="___sec55">How do we proceed? </h2>
 There are several paths which can be chosen. One is to extend the brute force gradient descent method with an adapative stochastic gradient. There are several examples of this. A recent approach based on <a href="https://arxiv.org/pdf/1805.09416.pdf" target="_blank">the Langevin equations</a> seems like a promising approach for general and possibly non-convex optimization problems.
 
 <p>
@@ -2489,7 +2082,7 @@ Here we would like to point out that our next step is now to use the optimal val
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec67">Modified code </h2>
+<h2 id="___sec56">Modified code </h2>
 The modified code here uses the BFGS algorithm but performs now a production run and writes to file all average values of the energy. The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/Resampling" target="_blank">sampling functions</a> can be used to perform both a blocking analysis, or a standard bootstrap and jackknife analysis.
 
 <p>
@@ -2698,7 +2291,7 @@ outfile.close()
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec68">Resampling analysis </h2>
+<h2 id="___sec57">Resampling analysis </h2>
 The next step is then to use the above data sets and perform a resampling analysis, either using say the Bootstrap method or the Blocking method. Since the data will be correlated, we would recommend to use the non-iid Bootstrap code here
 
 <p>
