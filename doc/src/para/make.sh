@@ -19,10 +19,7 @@ name=$1
 rm -f *.tar.gz
 
 opt="--encoding=utf-8"
-# Note: Makefile examples contain constructions like ${PROG} which
-# looks like Mako constructions, but they are not. Use --no_mako
-# to turn off Mako processing.
-opt="--no_mako"
+opt=
 
 rm -f *.aux
 
@@ -44,7 +41,7 @@ system doconce split_html $html.html --method=space10
 # Bootstrap style
 html=${name}-bs
 system doconce format html $name --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=$html $opt
-system doconce split_html $html.html --method=split --pagination --nav_button=bottom
+#system doconce split_html $html.html --method=split --pagination --nav_button=bottom
 
 # IPython notebook
 system doconce format ipynb $name $opt
@@ -52,15 +49,15 @@ system doconce format ipynb $name $opt
 
 # Ordinary plain LaTeX document
 rm -f *.aux  # important after beamer
-system doconce format pdflatex $name --minted_latex_style=trac --latex_admon=paragraph $opt
-system doconce ptex2tex $name envir=minted
+system doconce format pdflatex $name  $opt
+system doconce ptex2tex $name envir=verbatim
 # Add special packages
 doconce subst "% Add user's preamble" "\g<1>\n\\usepackage{simplewick}" $name.tex
 doconce replace 'section{' 'section*{' $name.tex
 pdflatex -shell-escape $name
 pdflatex -shell-escape $name
-mv -f $name.pdf ${name}-minted.pdf
-cp $name.tex ${name}-plain-minted.tex
+mv -f $name.pdf ${name}-print.pdf
+cp $name.tex ${name}-plain-print.tex
 
 
 
