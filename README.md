@@ -92,7 +92,7 @@ the theory and varous algorithms discussed during the lectures. We recommend str
 * Øyvind Sigmundson Schøyen, oyvinssc@student.matnat.uio.no 	 
 
 ## Practicalities
-This course will be delivered in a hybrid mode, with online and on site lectures and on site and online laboratory sessions. 
+This course will be delivered in a hybrid mode, with online and on site lectures and on site and online laboratory sessions. The first week (January 11-15) is fully digital and the computer lab and the lectures will be done via zoom. 
 
 1. Two lectures per week, spring semester, 10 ECTS. The lectures will be fully online. The lectures will be recorded and linked to this site and the official University of Oslo website for the course;
 2. Thre hours of laboratory sessions for work on computational projects and exercises for each group. Due to social distancing, at most 15 participants can attend. There will  also be fully digital laboratory sessions for those who cannot attend;
@@ -182,7 +182,7 @@ Here we list several useful Python libraries we strongly recommend (if you use a
 
 ## Textbooks
 
-_Recommended textbooks_:
+_Recommended textbooks_: Material to be added here
 
 ## Face coverings. 
 As of now this is not required, but the situation may change. If face covering will be required during the semester, we will fill in more details. 
