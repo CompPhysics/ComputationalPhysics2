@@ -45,19 +45,9 @@ studied.
 
 ## Learning outcomes
 
-This course aims at giving you insights and knowledge about many of
-the central algorithms used in Data Analysis and Machine Learning.
-The course is project based and through various numerical projects,
-normally three, you will be exposed to fundamental research problems
-in these fields, with the aim to reproduce state of the art scientific
-results. Both supervised and unsupervised methods will be covered. The
-emphasis is on a frequentist approach, although we will try to link it
-with a Bayesian approach as well. You will learn to develop and
-structure large codes for studying different cases where Machine
-Learning is applied to, get acquainted with computing facilities and
-learn to handle large scientific projects. A good scientific and
-ethical conduct is emphasized throughout the course. More
-specifically, after this course you will
+The course introduces a variety of central algorithms and methods for professional studies of quantum mechanical systems, with relevance for several problems in physics, materials science and quantum chemistry. The course is project based and through the various projects, normally two, the participants will be exposed to fundamental research problems in these fields, with the aim to reproduce state of the art scientific results. The students will learn to develop and structure large codes for studying these systems, get aquainted with supercomputing facilities and learn to handle large scientific projects. A good scientific and ethical conduct is emphasized throughout the course.
+
+The course is also a continuation of FYS3150 – Computational Physics, and it will give a further treatment of several of the numerical methods given there.
 
 
 ## Prerequisites
@@ -72,7 +62,7 @@ or MAT-INF1100/MAT-INF1100L/BIOS1100/KJM-INF1100. Most universities
 offer nowadays a basic programming course (often compulsory) where
 Python is the recurring programming language.
 
-We recommend also that you have some background in quantum mechanics, typically at the levl of FYS2140 and/or FYS3110.
+We recommend also that you have some background in quantum mechanics, typically at the level of FYS2140 and/or FYS3110.
 
 ## The course has two central parts
 
@@ -88,24 +78,24 @@ the theory and varous algorithms discussed during the lectures. We recommend str
 * _Office hours_: *Anytime*! For the  spring Semester 2021 (SS21), as a rule of thumb office hours are planned via computer or telephone. Individual or group office hours will be performed via zoom. Feel free to send an email for planning. In person meetings may also be possible if allowed by the University of Oslo's COVID-19 instructions (see below for links).
 
 
-##  Teaching Assistants FS20
-* Øyvind Sigmundson Schøyen, oyvinssc@student.matnat.uio.no 	 
+##  Teaching Assistants Spring Semester 21
+* _Name_:  Øyvind Sigmundson Schøyen, 
+* _Email_: oyvinssc@student.matnat.uio.no 	 
+* _Office_: Department of Physics, University of Oslo, Eastern wing, room FØ452
+* _Office hours_: For the  spring Semester 2021 (SS21), as a rule of thumb office hours are planned via computer or telephone. Individual or group office hours will be performed via zoom. Feel free to send an email for planning. In person meetings may also be possible if allowed by the University of Oslo's COVID-19 instructions (see below for links).
 
 ## Practicalities
 This course will be delivered in a hybrid mode, with online and on site lectures and on site and online laboratory sessions. The first week (January 11-15) is fully digital and the computer lab and the lectures will be done via zoom. 
 
 1. Two lectures per week, spring semester, 10 ECTS. The lectures will be fully online. The lectures will be recorded and linked to this site and the official University of Oslo website for the course;
 2. Thre hours of laboratory sessions for work on computational projects and exercises for each group. Due to social distancing, at most 15 participants can attend. There will  also be fully digital laboratory sessions for those who cannot attend;
-3. Three projects which are graded and count 1/3 each of the final grade;
-4. A selected number of weekly assignments;
-5. The course is part of the CS Master of Science program, but is open to other bachelor and Master of Science students at the University of Oslo;
-6. The course is offered as a FYS4411 (Master of Science level) and a FYS9411 (PhD level) course;
-7. We use Piazza for course communication, a special link on how to register to Piazza can be found at the official University of Oslo page for the course or just use the link here https://piazza.com/uio.no/fall2020/fysstk4155. Canvas is used for communication and delivery and grading of projects, with feedback;
-8. Videos of teaching material are available via the links at https://compphysics.github.io/MachineLearning/doc/web/course.html;
-9. Weekly emails with summary of activities will be mailed to all participants;
+3. Two projects which are graded and count 1/3 each of the final grade;
+4. The course is offered as a FYS4411 (Master of Science level) and a FYS9411 (PhD level) course;
+5. Videos of teaching material are available via the links at https://www.uio.no/studier/emner/matnat/fys/FYS4411/v21/timeplan/index.html#FOR;
+6. Weekly emails with summary of activities will be mailed to all participants;
 
 ## Grading
-Grading scale: Grades are awarded on a scale from A to F, where A is the best grade and F is a fail. There are three projects which are graded and each project counts 1/3 of the final grade. The total score is thus the average from all three projects.
+Grading scale: Grades are awarded on a scale from A to F, where A is the best grade and F is a fail. There are two projects which are graded and each project counts 1/2 of the final grade. The total score is thus the average from the two  projects.
 
 The final number of points is based on the average of all projects (including eventual additional points) and the grade follows the following table:
 
@@ -180,9 +170,17 @@ Here we list several useful Python libraries we strongly recommend (if you use a
 * _Keras_:https://keras.io/ is a high-level neural networks API, written in Python and capable of running on top of TensorFlow, CNTK, or Theano
 * And many more such as _pytorch_:https://pytorch.org/,  _Theano_:https://pypi.org/project/Theano/ etc 
 
+###  Useful C++ libraries
+
+* _Armadillo_: http://arma.sourceforge.net/ Armadillo is a high quality linear algebra library (matrix maths) for the C++ language, aiming towards a good balance between speed and ease of use
+* _Eigen_: http://eigen.tuxfamily.org/index.php?title=Main_Page Eigen is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
+* _Scythe_: http://scythe.lsa.umich.edu/ The Scythe Statistical Library is an open source C++ library for statistical computation
+* _Autodiff_: https://autodiff.github.io/ autodiff is a C++17 library that uses modern and advanced programming techniques to enable automatic computation of derivatives in an efficient and easy way.
+* _Optmilib_: https://www.kthohr.com/optimlib.html OptimLib is a lightweight C++ library of numerical optimization methods for nonlinear functions.
+
 ## Textbooks
 
-_Recommended textbooks_: Material to be added here
+_Recommended textbooks_: Lecture Notes by Morten Hjorth-Jensen and Bernd A. Berg, Markov Chain Monte Carlo Simulations and their Statistical Analysis, World Scientific, 2004, chapters 1, 2
 
 ## Face coverings. 
 As of now this is not required, but the situation may change. If face covering will be required during the semester, we will fill in more details. 
