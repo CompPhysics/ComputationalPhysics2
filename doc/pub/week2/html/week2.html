@@ -67,41 +67,31 @@ div { text-align: justify; text-justify: inter-word; }
 <!-- tocinfo
 {'highest level': 2,
  'sections': [('Overview of week 3', 2, None, '___sec0'),
-              ('Introduction', 2, None, '___sec1'),
-              ('Structure and Aims', 3, None, '___sec2'),
-              ('This notebook', 3, None, '___sec3'),
-              ('Basic Quantum Monte Carlo', 2, None, '___sec4'),
+              ('Setting up a VMC code', 2, None, '___sec1'),
+              ('Introduction', 2, None, '___sec2'),
+              ('Structure and Aims', 3, None, '___sec3'),
+              ('This notebook', 3, None, '___sec4'),
+              ('Basic Quantum Monte Carlo', 2, None, '___sec5'),
               ('Linking with standard statistical expressions for expectation '
                'values',
                3,
                None,
-               '___sec5'),
-              ('Simple example, the hydrogen atom', 3, None, '___sec6'),
+               '___sec6'),
+              ('Simple example, the hydrogen atom', 3, None, '___sec7'),
               ('Second example, the harmonic oscillator in one dimension',
                3,
                None,
-               '___sec7'),
-              ('The Metropolis algorithm', 2, None, '___sec8'),
+               '___sec8'),
+              ('The Metropolis algorithm', 2, None, '___sec9'),
               ('The system: two electrons in a harmonic oscillator trap in two '
                'dimensions',
                2,
                None,
-               '___sec9'),
+               '___sec10'),
               ('First code attempt for the two-electron case',
                3,
                None,
-               '___sec10'),
-              ('Importance sampling', 2, None, '___sec11'),
-              ('Code example for the interacting case with importance sampling',
-               3,
-               None,
-               '___sec12'),
-              ('Technical aspects, improvements and how to define the cost '
-               'function',
-               2,
-               None,
-               '___sec13'),
-              ('Simple example', 3, None, '___sec14')]}
+               '___sec11')]}
 end of tocinfo -->
 
 <body>
@@ -143,7 +133,7 @@ MathJax.Hub.Config({
 <center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
 <br>
 <p>
-<center><h4>Dec 14, 2020</h4></center> <!-- date -->
+<center><h4>Jan 21, 2021</h4></center> <!-- date -->
 <br>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
@@ -161,42 +151,27 @@ MathJax.Hub.Config({
 
 
 <p>
-<div class="alert alert-block alert-block alert-text-normal">
-<b>Teaching Material, videos and written material.</b>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="___sec1">Setting up a VMC code </h2>
+
 <p>
+In setting up a C++ code for variational Monte Carlo calculations, we will use an excellent framework developed by a former Computational Physics student, Morten Ledum, now PhD student at the Hylleraas center for Quantum Chemistry.
+The GitHub repository is at <a href="https://github.com/mortele/VMC" target="_blank"><tt>https://github.com/mortele/VMC</tt></a>.
 
-<ul>
-<li> Overview video</li>
-<li> Lecture notes and reading assignments</li>
-<li> Recommended background literature</li>
-</ul>
-</div>
+<p>
+We will discuss this both in our forthcoming lectures and during our lab sessions.
 
+<h2 id="___sec2">Introduction </h2>
 
-<h2 id="___sec1">Introduction </h2>
-
-<h3 id="___sec2">Structure and Aims </h3>
+<h3 id="___sec3">Structure and Aims </h3>
 
 <p>
 These notebooks serve the aim of linking traditional variational Monte
 Carlo VMC calculations methods with recent progress on solving
 many-particle problems using Machine Learning algorithms.
 
-<p>
-Furthermore, when linking with Machine Learning algorithms, in particular
-so-called Boltzmann Machines, there are interesting connections between
-these algorithms and so-called <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.90.053304" target="_blank">Shadow Wave functions (SWFs)</a> (and references therein). The implications of the latter have been explored in various Monte Carlo calculations.
-
-<p>
-In total there are three notebooks:
-
-<ol>
-<li> the one you are reading now on Variational Monte Carlo methods,</li> 
-<li> notebook 2 on Machine Learning and quantum mechanical problems and in particular on Boltzmann Machines,</li> 
-<li> and finally notebook 3 on the link between Boltzmann machines and SWFs.</li> 
-</ol>
-
-<h3 id="___sec3">This notebook </h3>
+<h3 id="___sec4">This notebook </h3>
 
 <p>
 In this notebook the aim is to give you an introduction as well as an
@@ -204,7 +179,7 @@ understanding of the basic elements that are needed in order to
 develop a professional variational Monte Carlo code. We will focus on
 a simple system of two particles in an oscillator trap (or
 alternatively two fermions moving in a Coulombic potential). The particles can
-interact via a repulsive or an attrative force.
+interact via a repulsive or an attrative force.  It is thus similar to the system described in project 1.
 
 <p>
 The advantage of these systems is that for two particles (boson or
@@ -230,69 +205,15 @@ best possible variational parameters. Furthermore it will define the
 so-called <b>cost</b> function, a commonly encountered quantity in Machine
 Learning algorithms. Minimizing the latter is the one which leads to
 the determination of the optimal parameters in basically all Machine Learning algorithms.
-For our purposes, it will serve as the first link between VMC methods and Machine Learning methods.
+This is a possible topic for project 2.
 
 <p>
 Topics like Markov Chain Monte Carlo and various resampling techniques
 are also central to Machine Learning methods. Presenting them in the
 context of VMC approaches leads hopefully to an easier starting point
-for the understanding of these methods.
+for the understanding of these methods for those of you who will do the machine lerning variant of project 2.
 
-<p>
-Finally, the reader may ask what do we actually want to achieve with
-complicating life with Machine Learning methods when we can easily
-study interacting systems with standard Monte Carlo approaches.  Our
-hope is that by adding additional degrees of freedom via Machine
-Learning algorithms, we can let the algorithms we employ learn the
-parameters of the model via a given optimization algorithm. In
-standard Monte Carlo calculations the practitioners end up with fine tuning
-the trial wave function using all possible insights about the system
-understudy. This may not always lead to the best possible ansatz and
-can in the long run be rather time-consuming. In fields like nuclear
-many-body physics with complicated interaction terms, guessing an
-analytical form for the trial wave fuction can be difficult. Letting
-the machine learn the form of the trial function or find the optimal
-parameters may lead to insights about the problem which cannot be
-obtained by selecting various trial wave functions.
-
-<p>
-The emerging and rapidly expanding fields of Machine Learning and Quantum Computing hold also great promise in tackling the 
-dimensionality problems (the so-called dimensionality curse in many-body problems) we encounter when studying 
-complicated many-body problems. 
-The approach to Machine Learning we will focus on 
- is inspired by the idea of representing the wave function with
-a restricted Boltzmann machine (RBM), presented recently by <a href="http://science.sciencemag.org/content/355/6325/602" target="_blank">G. Carleo and M. Troyer, Science <b>355</b>, Issue 6325, pp. 602-606 (2017)</a>. They
-named such a wave function/network a <em>neural network quantum state</em> (NQS). In their article they apply it to the quantum mechanical
-spin lattice systems of the Ising model and Heisenberg model, with
-encouraging results.
-
-<p>
-Machine learning (ML) is an extremely rich field, in spite of its young age. The
-increases we have seen during the last three decades in computational
-capabilities have been followed by developments of methods and
-techniques for analyzing and handling large data sets, relying heavily
-on statistics, computer science and mathematics.  The field is rather
-new and developing rapidly. 
-Machine learning is the science of giving computers the ability to
-learn without being explicitly programmed.  The idea is that there
-exist generic algorithms which can be used to find patterns in a broad
-class of data sets without having to write code specifically for each
-problem. The algorithm will build its own logic based on the data.
-
-<p>
-Machine learning is a subfield of computer science, and is closely
-related to computational statistics.  It evolved from the study of
-pattern recognition in artificial intelligence (AI) research, and has
-made contributions to AI tasks like computer vision, natural language
-processing and speech recognition. It has also, especially in later
-years, found applications in a wide variety of other areas, including
-bioinformatics, economy, physics, finance and marketing.
-An excellent reference we will come to back to is <a href="https://arxiv.org/abs/1803.08823" target="_blank">Mehta <em>et al.</em>, arXiv:1803.08823</a>.
-
-<p>
-Our focus will first be on the basics of VMC calculations.
-
-<h2 id="___sec4">Basic Quantum Monte Carlo  </h2>
+<h2 id="___sec5">Basic Quantum Monte Carlo  </h2>
 
 <p>
 We start with the variational principle.
@@ -379,7 +300,7 @@ $$
 
 Here we have used the notation \( \overline{E} \) to label the expectation value of the energy.
 
-<h3 id="___sec5">Linking with standard statistical expressions for expectation values </h3>
+<h3 id="___sec6">Linking with standard statistical expressions for expectation values </h3>
 
 <p>
 In order to bring in the Monte Carlo machinery, we define first a likelihood distribution, or probability density distribution (PDF). Using our ansatz for the trial wave function \( \psi_T(\boldsymbol{R};\boldsymbol{\alpha}) \) we define a PDF
@@ -429,7 +350,7 @@ The Algorithm for performing a variational Monte Carlo calculations runs as this
 
 Observe that the jumping in space is governed by the variable <em>step</em>. This is called brute-force sampling and is normally replaced by what is called <b>importance sampling</b>, discussed in more detail below here.
 
-<h3 id="___sec6">Simple example, the hydrogen atom </h3>
+<h3 id="___sec7">Simple example, the hydrogen atom </h3>
 
 The radial Schroedinger equation for the hydrogen atom can be
 written as (when we have gotten rid of the first derivative term in the kinetic energy and used \( rR(r)=u(r) \))
@@ -484,7 +405,7 @@ To have analytical local energies saves us from computing numerically
 the second derivative, a feature which often increases our numerical
 expenditure with a factor of three or more. Integratng up the local energy (recall to bring back the PDF in the integration) gives  \( \overline{E}[\boldsymbol{\alpha}]=\alpha(\alpha/2-1) \).
 
-<h3 id="___sec7">Second example, the harmonic oscillator in one dimension </h3>
+<h3 id="___sec8">Second example, the harmonic oscillator in one dimension </h3>
 
 <p>
 We present here another well-known example, the harmonic oscillator in
@@ -687,7 +608,7 @@ $$
 <b>This gives an important information: the exact wave function leads to zero variance!</b>
 As we will see below, many practitioners perform a minimization on both the energy and the variance.
 
-<h2 id="___sec8">The Metropolis algorithm </h2>
+<h2 id="___sec9">The Metropolis algorithm </h2>
 
 <p>
 Till now we have not yet discussed the derivation of the Metropolis algorithm. We assume the reader has some familiarity with the mathematics of Markov chains.
@@ -800,7 +721,7 @@ with eigenvalue 1. Therefore, for the Metropolis method to converge
 to this result, we must show that \( M \) has only one eigenvalue with this
 magnitude, and all other eigenvalues are smaller.
 
-<h2 id="___sec9">The system: two electrons in a harmonic oscillator trap in two dimensions </h2>
+<h2 id="___sec10">The system: two electrons in a harmonic oscillator trap in two dimensions </h2>
 
 <p>
 The Hamiltonian of the quantum dot is given by
@@ -855,7 +776,7 @@ dimensions.
 
 <p>
 The relevant local energy becomes then 
-$$ \lim_{r_{12} \rightarrow 0}E_L(R)= \frac{1}{{\calR}_T(r_{12})}\left(2\frac{d^2}{dr_{ij}^2}+\frac{4}{r_{ij}}\frac{d}{dr_{ij}}+\frac{2}{r_{ij}}-\frac{l(l+1)}{r_{ij}^2}+2E \right){\cal R}_T(r_{12})
+$$ \lim_{r_{12} \rightarrow 0}E_L(R)= \frac{1}{{\cal R}_T(r_{12})}\left(2\frac{d^2}{dr_{ij}^2}+\frac{4}{r_{ij}}\frac{d}{dr_{ij}}+\frac{2}{r_{ij}}-\frac{l(l+1)}{r_{ij}^2}+2E \right){\cal R}_T(r_{12})
 = 0.  
 $$
 
@@ -880,7 +801,7 @@ for the correlation part of the wave fuction.
 For general systems containing more than say two electrons, we have this
 condition for each electron pair \( ij \).
 
-<h3 id="___sec10">First code attempt for the two-electron case </h3>
+<h3 id="___sec11">First code attempt for the two-electron case </h3>
 
 <p>
 First, as with the hydrogen case, we declare where to store files.
@@ -1050,491 +971,13 @@ fig<span style="color: #666666">.</span>colorbar(surf, shrink<span style="color:
 save_fig(<span style="color: #BA2121">&quot;QdotMetropolis&quot;</span>)
 plt<span style="color: #666666">.</span>show()
 </pre></div>
-
-<h2 id="___sec11">Importance sampling </h2>
-
 <p>
-The above way of performing a Monte Carlo calculation is not the most efficient one. 
-We need to replace the brute force Metropolis algorithm with a walk in
-coordinate space biased by the trial wave function.  This approach is
-based on the Fokker-Planck equation and the Langevin equation for
-generating a trajectory in coordinate space.  The link between the
-Fokker-Planck equation and the Langevin equations are explained, only
-partly, in the slides below.  An excellent reference on topics like
-Brownian motion, Markov chains, the Fokker-Planck equation and the
-Langevin equation is the text by <a href="http://www.elsevier.com/books/stochastic-processes-in-physics-and-chemistry/van-kampen/978-0-444-52965-7" target="_blank">Van Kampen</a>
-Here we will focus first on the implementation part first.
-
-<p>
-For a diffusion process characterized by a time-dependent probability density \( P(x,t) \) in one dimension the Fokker-Planck
-equation reads (for one particle /walker) 
-$$
-   \frac{\partial P}{\partial t} = D\frac{\partial }{\partial x}\left(\frac{\partial }{\partial x} -F\right)P(x,t),
-$$
-
-where \( F \) is a drift term and \( D \) is the diffusion coefficient.
-
-<p>
-The new positions in coordinate space are given as the solutions of the Langevin equation using Euler's method, namely,
-we go from the Langevin equation
-$$ 
-   \frac{\partial x(t)}{\partial t} = DF(x(t)) +\eta,
-$$
-
-with \( \eta \) a random variable,
-yielding a new position 
-$$
-   y = x+DF(x)\Delta t +\xi\sqrt{\Delta t},
-$$
-
-where \( \xi \) is gaussian random variable and \( \Delta t \) is a chosen time step. 
-The quantity \( D \) is, in atomic units, equal to \( 1/2 \) and comes from the factor \( 1/2 \) in the kinetic energy operator. Note that \( \Delta t \) is to be viewed as a parameter. Values of \( \Delta t \in [0.001,0.01] \) yield in general rather stable values of the ground state energy.
-
-<p>
-The process of isotropic diffusion characterized by a time-dependent probability density \( P(\mathbf{x},t) \) obeys (as an approximation) the so-called Fokker-Planck equation 
-$$
-   \frac{\partial P}{\partial t} = \sum_i D\frac{\partial }{\partial \mathbf{x_i}}\left(\frac{\partial }{\partial \mathbf{x_i}} -\mathbf{F_i}\right)P(\mathbf{x},t),
-$$
-
-where \( \mathbf{F_i} \) is the \( i^{th} \) component of the drift term (drift velocity) caused by an external potential, and \( D \) is the diffusion coefficient. The convergence to a stationary probability density can be obtained by setting the left hand side to zero. The resulting equation will be satisfied if and only if all the terms of the sum are equal zero,
-$$
-\frac{\partial^2 P}{\partial {\mathbf{x_i}^2}} = P\frac{\partial}{\partial {\mathbf{x_i}}}\mathbf{F_i} + \mathbf{F_i}\frac{\partial}{\partial {\mathbf{x_i}}}P.
-$$
-
-<p>
-The drift vector should be of the form \( \mathbf{F} = g(\mathbf{x}) \frac{\partial P}{\partial \mathbf{x}} \). Then,
-$$
-\frac{\partial^2 P}{\partial {\mathbf{x_i}^2}} = P\frac{\partial g}{\partial P}\left( \frac{\partial P}{\partial {\mathbf{x}_i}}  \right)^2 + P g \frac{\partial ^2 P}{\partial {\mathbf{x}_i^2}}  + g \left( \frac{\partial P}{\partial {\mathbf{x}_i}}  \right)^2.
-$$
-
-The condition of stationary density means that the left hand side equals zero. In other words, the terms containing first and second derivatives have to cancel each other. It is possible only if \( g = \frac{1}{P} \), which yields
-$$
-\mathbf{F} = 2\frac{1}{\Psi_T}\nabla\Psi_T,
-$$
-
-which is known as the so-called <em>quantum force</em>. This term is responsible for pushing the walker towards regions of configuration space where the trial wave function is large, increasing the efficiency of the simulation in contrast to the Metropolis algorithm where the walker has the same probability of moving in every direction.
-
-<p>
-The Fokker-Planck equation yields a (the solution to the equation) transition probability given by the Green's function
-$$
-  G(y,x,\Delta t) = \frac{1}{(4\pi D\Delta t)^{3N/2}} \exp{\left(-(y-x-D\Delta t F(x))^2/4D\Delta t\right)}
-$$
-
-which in turn means that our brute force Metropolis algorithm
-$$ 
-    A(y,x) = \mathrm{min}(1,q(y,x))),
-$$
-
-with \( q(y,x) = |\Psi_T(y)|^2/|\Psi_T(x)|^2 \) is now replaced by the <a href="http://scitation.aip.org/content/aip/journal/jcp/21/6/10.1063/1.1699114" target="_blank">Metropolis-Hastings algorithm</a>. See also  <a href="http://biomet.oxfordjournals.org/content/57/1/97.abstract" target="_blank">Hasting's original article</a>, 
-$$
-q(y,x) = \frac{G(x,y,\Delta t)|\Psi_T(y)|^2}{G(y,x,\Delta t)|\Psi_T(x)|^2}
-$$
-
-<h3 id="___sec12">Code example for the interacting case with importance sampling </h3>
-
-<p>
-We are now ready to implement importance sampling. This is done here for the two-electron case with the Coulomb interaction, as in the previous example. We have two variational parameters \( \alpha \) and \( \beta \). After the set up of files
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic"># Common imports</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">os</span>
-
-<span style="color: #408080; font-style: italic"># Where to save the figures and data files</span>
-PROJECT_ROOT_DIR <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;Results&quot;</span>
-FIGURE_ID <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;Results/FigureFiles&quot;</span>
-DATA_ID <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;Results/VMCQdotImportance&quot;</span>
-
-<span style="color: #008000; font-weight: bold">if</span> <span style="color: #AA22FF; font-weight: bold">not</span> os<span style="color: #666666">.</span>path<span style="color: #666666">.</span>exists(PROJECT_ROOT_DIR):
-    os<span style="color: #666666">.</span>mkdir(PROJECT_ROOT_DIR)
-
-<span style="color: #008000; font-weight: bold">if</span> <span style="color: #AA22FF; font-weight: bold">not</span> os<span style="color: #666666">.</span>path<span style="color: #666666">.</span>exists(FIGURE_ID):
-    os<span style="color: #666666">.</span>makedirs(FIGURE_ID)
-
-<span style="color: #008000; font-weight: bold">if</span> <span style="color: #AA22FF; font-weight: bold">not</span> os<span style="color: #666666">.</span>path<span style="color: #666666">.</span>exists(DATA_ID):
-    os<span style="color: #666666">.</span>makedirs(DATA_ID)
-
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">image_path</span>(fig_id):
-    <span style="color: #008000; font-weight: bold">return</span> os<span style="color: #666666">.</span>path<span style="color: #666666">.</span>join(FIGURE_ID, fig_id)
-
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">data_path</span>(dat_id):
-    <span style="color: #008000; font-weight: bold">return</span> os<span style="color: #666666">.</span>path<span style="color: #666666">.</span>join(DATA_ID, dat_id)
-
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">save_fig</span>(fig_id):
-    plt<span style="color: #666666">.</span>savefig(image_path(fig_id) <span style="color: #666666">+</span> <span style="color: #BA2121">&quot;.png&quot;</span>, <span style="color: #008000">format</span><span style="color: #666666">=</span><span style="color: #BA2121">&#39;png&#39;</span>)
-
-outfile <span style="color: #666666">=</span> <span style="color: #008000">open</span>(data_path(<span style="color: #BA2121">&quot;VMCQdotImportance.dat&quot;</span>),<span style="color: #BA2121">&#39;w&#39;</span>)
-</pre></div>
-<p>
-we move on to the set up of the trial wave function, the analytical expression for the local energy and the analytical expression for the quantum force.
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
-<span style="color: #408080; font-style: italic"># Using gaussian rng for new positions and Metropolis- Hastings </span>
-<span style="color: #408080; font-style: italic"># No energy minimization</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> exp, sqrt
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">random</span> <span style="color: #008000; font-weight: bold">import</span> random, seed, normalvariate
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">mpl_toolkits.mplot3d</span> <span style="color: #008000; font-weight: bold">import</span> Axes3D
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib</span> <span style="color: #008000; font-weight: bold">import</span> cm
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib.ticker</span> <span style="color: #008000; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">sys</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">numba</span> <span style="color: #008000; font-weight: bold">import</span> jit,njit
-
-
-<span style="color: #408080; font-style: italic"># Trial wave function for the 2-electron quantum dot in two dims</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">WaveFunction</span>(r,alpha,beta):
-    r1 <span style="color: #666666">=</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
-    r2 <span style="color: #666666">=</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> r12<span style="color: #666666">/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    <span style="color: #008000; font-weight: bold">return</span> exp(<span style="color: #666666">-0.5*</span>alpha<span style="color: #666666">*</span>(r1<span style="color: #666666">+</span>r2)<span style="color: #666666">+</span>deno)
-
-<span style="color: #408080; font-style: italic"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">LocalEnergy</span>(r,alpha,beta):
-    
-    r1 <span style="color: #666666">=</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r2 <span style="color: #666666">=</span> (r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    deno2 <span style="color: #666666">=</span> deno<span style="color: #666666">*</span>deno
-    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0.5*</span>(<span style="color: #666666">1-</span>alpha<span style="color: #666666">*</span>alpha)<span style="color: #666666">*</span>(r1 <span style="color: #666666">+</span> r2) <span style="color: #666666">+2.0*</span>alpha <span style="color: #666666">+</span> <span style="color: #666666">1.0/</span>r12<span style="color: #666666">+</span>deno2<span style="color: #666666">*</span>(alpha<span style="color: #666666">*</span>r12<span style="color: #666666">-</span>deno2<span style="color: #666666">+2*</span>beta<span style="color: #666666">*</span>deno<span style="color: #666666">-1.0/</span>r12)
-
-<span style="color: #408080; font-style: italic"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">QuantumForce</span>(r,alpha,beta):
-
-    qforce <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    qforce[<span style="color: #666666">0</span>,:] <span style="color: #666666">=</span> <span style="color: #666666">-2*</span>r[<span style="color: #666666">0</span>,:]<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>(r[<span style="color: #666666">0</span>,:]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,:])<span style="color: #666666">*</span>deno<span style="color: #666666">*</span>deno<span style="color: #666666">/</span>r12
-    qforce[<span style="color: #666666">1</span>,:] <span style="color: #666666">=</span> <span style="color: #666666">-2*</span>r[<span style="color: #666666">1</span>,:]<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>(r[<span style="color: #666666">1</span>,:]<span style="color: #666666">-</span>r[<span style="color: #666666">0</span>,:])<span style="color: #666666">*</span>deno<span style="color: #666666">*</span>deno<span style="color: #666666">/</span>r12
-    <span style="color: #008000; font-weight: bold">return</span> qforce
-</pre></div>
-<p>
-The Monte Carlo sampling includes now the Metropolis-Hastings algorithm, with the additional complication of having to evaluate the <b>quantum force</b> and the Green's function which is the solution of the Fokker-Planck equation.
-
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic"># The Monte Carlo sampling with the Metropolis algo</span>
-<span style="color: #408080; font-style: italic"># jit decorator tells Numba to compile this function.</span>
-<span style="color: #408080; font-style: italic"># The argument types will be inferred by Numba when function is called.</span>
-<span style="color: #AA22FF">@jit</span>()
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">MonteCarloSampling</span>():
-
-    NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">100000</span>
-    <span style="color: #408080; font-style: italic"># Parameters in the Fokker-Planck simulation of the quantum force</span>
-    D <span style="color: #666666">=</span> <span style="color: #666666">0.5</span>
-    TimeStep <span style="color: #666666">=</span> <span style="color: #666666">0.05</span>
-    <span style="color: #408080; font-style: italic"># positions</span>
-    PositionOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    PositionNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    <span style="color: #408080; font-style: italic"># Quantum force</span>
-    QuantumForceOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    QuantumForceNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-
-    <span style="color: #408080; font-style: italic"># seed for rng generator </span>
-    seed()
-    <span style="color: #408080; font-style: italic"># start variational parameter  loops, two parameters here</span>
-    alpha <span style="color: #666666">=</span> <span style="color: #666666">0.9</span>
-    <span style="color: #008000; font-weight: bold">for</span> ia <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(MaxVariations):
-        alpha <span style="color: #666666">+=</span> <span style="color: #666666">.025</span>
-        AlphaValues[ia] <span style="color: #666666">=</span> alpha
-        beta <span style="color: #666666">=</span> <span style="color: #666666">0.2</span> 
-        <span style="color: #008000; font-weight: bold">for</span> jb <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(MaxVariations):
-            beta <span style="color: #666666">+=</span> <span style="color: #666666">.01</span>
-            BetaValues[jb] <span style="color: #666666">=</span> beta
-            energy <span style="color: #666666">=</span> energy2 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-            DeltaE <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-            <span style="color: #408080; font-style: italic">#Initial position</span>
-            <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
-                <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                    PositionOld[i,j] <span style="color: #666666">=</span> normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)
-            wfold <span style="color: #666666">=</span> WaveFunction(PositionOld,alpha,beta)
-            QuantumForceOld <span style="color: #666666">=</span> QuantumForce(PositionOld,alpha, beta)
-
-            <span style="color: #408080; font-style: italic">#Loop over MC MCcycles</span>
-            <span style="color: #008000; font-weight: bold">for</span> MCcycle <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberMCcycles):
-                <span style="color: #408080; font-style: italic">#Trial position moving one particle at the time</span>
-                <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
-                    <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                        PositionNew[i,j] <span style="color: #666666">=</span> PositionOld[i,j]<span style="color: #666666">+</span>normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)<span style="color: #666666">+</span>\
-                                           QuantumForceOld[i,j]<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*</span>D
-                    wfnew <span style="color: #666666">=</span> WaveFunction(PositionNew,alpha,beta)
-                    QuantumForceNew <span style="color: #666666">=</span> QuantumForce(PositionNew,alpha, beta)
-                    GreensFunction <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-                    <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                        GreensFunction <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">+</span>QuantumForceNew[i,j])<span style="color: #666666">*</span>\
-	                              (D<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">-</span>QuantumForceNew[i,j])<span style="color: #666666">-</span>\
-                                      PositionNew[i,j]<span style="color: #666666">+</span>PositionOld[i,j])
-      
-                    GreensFunction <span style="color: #666666">=</span> exp(GreensFunction)
-                    ProbabilityRatio <span style="color: #666666">=</span> GreensFunction<span style="color: #666666">*</span>wfnew<span style="color: #666666">**2/</span>wfold<span style="color: #666666">**2</span>
-                    <span style="color: #408080; font-style: italic">#Metropolis-Hastings test to see whether we accept the move</span>
-                    <span style="color: #008000; font-weight: bold">if</span> random() <span style="color: #666666">&lt;=</span> ProbabilityRatio:
-                       <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                           PositionOld[i,j] <span style="color: #666666">=</span> PositionNew[i,j]
-                           QuantumForceOld[i,j] <span style="color: #666666">=</span> QuantumForceNew[i,j]
-                       wfold <span style="color: #666666">=</span> wfnew
-                DeltaE <span style="color: #666666">=</span> LocalEnergy(PositionOld,alpha,beta)
-                energy <span style="color: #666666">+=</span> DeltaE
-                energy2 <span style="color: #666666">+=</span> DeltaE<span style="color: #666666">**2</span>
-            <span style="color: #408080; font-style: italic"># We calculate mean, variance and error (no blocking applied)</span>
-            energy <span style="color: #666666">/=</span> NumberMCcycles
-            energy2 <span style="color: #666666">/=</span> NumberMCcycles
-            variance <span style="color: #666666">=</span> energy2 <span style="color: #666666">-</span> energy<span style="color: #666666">**2</span>
-            error <span style="color: #666666">=</span> sqrt(variance<span style="color: #666666">/</span>NumberMCcycles)
-            Energies[ia,jb] <span style="color: #666666">=</span> energy    
-            outfile<span style="color: #666666">.</span>write(<span style="color: #BA2121">&#39;</span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&#39;</span> <span style="color: #666666">%</span>(alpha,beta,energy,variance,error))
-    <span style="color: #008000; font-weight: bold">return</span> Energies, AlphaValues, BetaValues
-</pre></div>
-<p>
-The main part here contains the setup of the variational parameters, the energies and the variance.
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%"><span></span><span style="color: #408080; font-style: italic">#Here starts the main program with variable declarations</span>
-NumberParticles <span style="color: #666666">=</span> <span style="color: #666666">2</span>
-Dimension <span style="color: #666666">=</span> <span style="color: #666666">2</span>
-MaxVariations <span style="color: #666666">=</span> <span style="color: #666666">10</span>
-Energies <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((MaxVariations,MaxVariations))
-AlphaValues <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(MaxVariations)
-BetaValues <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(MaxVariations)
-(Energies, AlphaValues, BetaValues) <span style="color: #666666">=</span> MonteCarloSampling()
-outfile<span style="color: #666666">.</span>close()
-<span style="color: #408080; font-style: italic"># Prepare for plots</span>
-fig <span style="color: #666666">=</span> plt<span style="color: #666666">.</span>figure()
-ax <span style="color: #666666">=</span> fig<span style="color: #666666">.</span>gca(projection<span style="color: #666666">=</span><span style="color: #BA2121">&#39;3d&#39;</span>)
-<span style="color: #408080; font-style: italic"># Plot the surface.</span>
-X, Y <span style="color: #666666">=</span> np<span style="color: #666666">.</span>meshgrid(AlphaValues, BetaValues)
-surf <span style="color: #666666">=</span> ax<span style="color: #666666">.</span>plot_surface(X, Y, Energies,cmap<span style="color: #666666">=</span>cm<span style="color: #666666">.</span>coolwarm,linewidth<span style="color: #666666">=0</span>, antialiased<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)
-<span style="color: #408080; font-style: italic"># Customize the z axis.</span>
-zmin <span style="color: #666666">=</span> np<span style="color: #666666">.</span>matrix(Energies)<span style="color: #666666">.</span>min()
-zmax <span style="color: #666666">=</span> np<span style="color: #666666">.</span>matrix(Energies)<span style="color: #666666">.</span>max()
-ax<span style="color: #666666">.</span>set_zlim(zmin, zmax)
-ax<span style="color: #666666">.</span>set_xlabel(<span style="color: #BA2121">r&#39;$\alpha$&#39;</span>)
-ax<span style="color: #666666">.</span>set_ylabel(<span style="color: #BA2121">r&#39;$\beta$&#39;</span>)
-ax<span style="color: #666666">.</span>set_zlabel(<span style="color: #BA2121">r&#39;$\langle E \rangle$&#39;</span>)
-ax<span style="color: #666666">.</span>zaxis<span style="color: #666666">.</span>set_major_locator(LinearLocator(<span style="color: #666666">10</span>))
-ax<span style="color: #666666">.</span>zaxis<span style="color: #666666">.</span>set_major_formatter(FormatStrFormatter(<span style="color: #BA2121">&#39;</span><span style="color: #BB6688; font-weight: bold">%.02f</span><span style="color: #BA2121">&#39;</span>))
-<span style="color: #408080; font-style: italic"># Add a color bar which maps values to colors.</span>
-fig<span style="color: #666666">.</span>colorbar(surf, shrink<span style="color: #666666">=0.5</span>, aspect<span style="color: #666666">=5</span>)
-save_fig(<span style="color: #BA2121">&quot;QdotImportance&quot;</span>)
-plt<span style="color: #666666">.</span>show()
-</pre></div>
-
-<h2 id="___sec13">Technical aspects, improvements and how to define the cost function </h2>
-
-<p>
-The above procedure is also not the smartest one. Looping over all
-variational parameters becomes expensive and we see from the previous
-plot that the surface is not very smooth, indicating that we need many more
-Monte Carlo cycles in order to reliably define an energy minimum.
-
-<p>
-What we can do however is to perform some preliminary calculations
-with selected variational parameters (normally with less Monte Carlo
-cycles than those used in a full production calculation). For every
-step we evaluate the derivatives of the energy as functions of the
-variational parameters. When the derivatives disappear we have
-hopefully reached the global minimum.
-
-<p>
-At this point we have the optimal variational parameters and can start
-our large-scale production run.  To find the optimal parameters
-entails the computation of the gradients of the energy and
-optimization algorithms like various <b>gradient descent</b> methods.
-This is an art by itself and is discussed for example in <a href="http://compphysics.github.io/ComputationalPhysics2/doc/pub/cg/html/cg.html" target="_blank">our lectures on optimization methods</a>. We refer the reader to these notes for more details.
-
-<p>
-This part allows us also to link with the true working horse of every
-Machine Learning algorithm, namely the optimization part. This
-normally involves one of the stochastic gradient descent algorithms
-discussed in the above lecture notes. We will come back to these topics in the second notebook.
-
-<p>
-In order to apply these optmization algortihms we anticipate partly what is to come in notebook 2 on
-Boltzmann machines. Our cost (or loss) function is here given by the
-expectation value of the energy as function of the variational
-parameters.
-
-<p>
-To find the derivatives of the local energy expectation value as
-function of the variational parameters, we can use the chain rule and
-the hermiticity of the Hamiltonian.
-
-<p>
-Let us define 
-$$
-\bar{E}_{\alpha_i}=\frac{d\langle  E_L\rangle}{d\alpha_i}.
-$$
-
-as the derivative of the energy with respect to the variational parameter \( \alpha_i \)
-We define also the derivative of the trial function (skipping the subindex \( T \)) as 
-$$
-\bar{\Psi}_{i}=\frac{d\Psi}{d\alpha_i}.
-$$
-
-<p>
-The elements of the gradient of the local energy are then (using the
-chain rule and the hermiticity of the Hamiltonian) 
-
-$$ \bar{E}_{i}=
-2\left( \langle \frac{\bar{\Psi}_{i}}{\Psi}E_L\rangle -\langle
-\frac{\bar{\Psi}_{i}}{\Psi}\rangle\langle E_L \rangle\right).  
-$$
-
-<p>
-From a computational point of view it means that we need to compute
-the expectation values of 
-$$ \langle
-\frac{\bar{\Psi}_{i}}{\Psi}E_L\rangle, 
-$$
-
-<p>
-and 
-
-$$ \langle
-\frac{\bar{\Psi}_{i}}{\Psi}\rangle\langle E_L\rangle 
-$$
-
-<p>
-These integrals are evaluted using MC intergration (with all its possible
-error sources).  We can then use methods like stochastic gradient or
-other minimization methods to find the optimal variational parameters
-
-<p>
-As an alternative to the energy as cost function, we could use the variance as the cost function.
-As discussed earlier, if we have the exact wave function, the variance is exactly equal to zero.
-Suppose the trial function (our model) is the exact wave function.
-
-<p>
-The variance is defined as 
-
-$$
-\sigma_E = \langle E^2\rangle - \langle E\rangle^2.
-$$
-
-Some practitioners perform Monte Carlo calculations by minimizing both the energy and the variance.
-
-<p>
-In order to minimize the variance we need the derivatives of 
-$$
-\sigma_E = \langle E^2\rangle - \langle E\rangle^2,
-$$
-
-with respect to the variational parameters. The derivatives of the variance can then be used to defined the
-so-called Hessian matrix, which in turn allows us to use minimization methods like Newton's method or 
-standard gradient methods.
-
-<p>
-This leads to however a more complicated expression, with obvious errors when evaluating many more integrals by Monte Carlo integration. It is normally less used, see however <a href="https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.94.150201" target="_blank">Filippi and Umrigar</a>. The expression becomes complicated
-$$
-\bar{E}_{ij} = 2\left[ \langle (\frac{\bar{\Psi}_{ij}}{\Psi}+\frac{\bar{\Psi}_{j}}{\Psi}\frac{\bar{\Psi}_{i}}{\Psi})(E_L-\langle E\rangle)\rangle -\langle \frac{\bar{\Psi}_{i}}{\Psi}\rangle\bar{E}_j-\langle \frac{\bar{\Psi}_{j}}{\Psi}\rangle\bar{E}_i\right] +\langle \frac{\bar{\Psi}_{i}}{\Psi}E_L{_j}\rangle +\langle \frac{\bar{\Psi}_{j}}{\Psi}E_L{_i}\rangle -\langle \frac{\bar{\Psi}_{i}}{\Psi}\rangle\langle E_L{_j}\rangle \langle \frac{\bar{\Psi}_{j}}{\Psi}\rangle\langle E_L{_i}\rangle.  
-$$
-
-<p>
-Evaluating the cost function means having to evaluate the above second derivative of the energy.
-
-<p>
-Before we proceed with code examples, let us look at some simple examples, here the one-particle harmonic oscillator in one dimension. This serves as a very useful check when developing a code. The first code discussed is the two-dimensional non-interacting harmonic oscillator.
-
-<h3 id="___sec14">Simple example </h3>
-
-<p>
-Let us illustrate what is needed in our calculations using a simple
-example, the harmonic oscillator in one dimension.  For the harmonic
-oscillator in one-dimension we have a trial wave function and
-probability
-
-$$
-\begin{equation*}
-\psi_T(x) = e^{-\alpha^2 x^2} \qquad P_T(x)dx = \frac{e^{-2\alpha^2 x^2}dx}{\int dx e^{-2\alpha^2 x^2}}
-\end{equation*}
-$$
-
-with \( \alpha \) being the variational parameter. 
-We obtain then the following local energy
-$$
-\begin{equation*}
-E_L[\alpha] = \alpha^2+x^2\left(\frac{1}{2}-2\alpha^2\right),
-\end{equation*}
-$$
-
-which results in the expectation value for the local energy
-$$
-\begin{equation*}
-\langle  E_L[\alpha]\rangle = \frac{1}{2}\alpha^2+\frac{1}{8\alpha^2}
-\end{equation*}
-$$
-
-<p>
-The derivative of the energy with respect to \( \alpha \) gives
-$$
-\begin{equation*}
-\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \alpha-\frac{1}{4\alpha^3}
-\end{equation*}
-$$
-
-and a second derivative which is always positive (meaning that we find a minimum)
-$$
-\begin{equation*}
-\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = 1+\frac{3}{4\alpha^4}
-\end{equation*}
-$$
-
-The condition
-$$
-\begin{equation*}
-\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
-\end{equation*}
-$$
-
-gives the optimal \( \alpha=1/\sqrt{2} \), as expected.
-
-<p>
-We can also minimize the variance. In our simple model the variance is
-$$
-\begin{equation*}
-\sigma^2[\alpha] = \frac{1}{2}\alpha^4-\frac{1}{4}+\frac{1}{32\alpha^4},
-\end{equation*}
-$$
-
-with first derivative
-$$
-\begin{equation*}
-\frac{d \sigma^2[\alpha]}{d\alpha} = 2\alpha^3-\frac{1}{8\alpha^5}
-\end{equation*}
-$$
-
-and a second derivative which is always positive (as expected for a convex function)
-$$
-\begin{equation*}
-\frac{d^2\sigma^2[\alpha]}{d\alpha^2} = 6\alpha^2+\frac{5}{8\alpha^6}
-\end{equation*}
-$$
-
-<p>
-In general we end up computing the expectation value of the energy in
-terms of some parameters \( \alpha_0,\alpha_1,\dots,\alpha_n \) and we
-search for a minimum in this multi-variable parameter space.  This
-leads to an energy minimization problem <em>where we need the derivative
-of the energy as a function of the variational parameters</em>.
-
-<p>
-In the above example this was easy and we were able to find the
-expression for the derivative by simple derivations.  However, in our
-actual calculations the energy is represented by a multi-dimensional
-integral with several variational parameters.
 
 <!-- ------------------- end of main content --------------- -->
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2020, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
 </center>
 
 
