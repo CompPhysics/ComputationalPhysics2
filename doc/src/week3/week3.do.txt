@@ -6,15 +6,304 @@ DATE: today
 !split
 ===== Overview of week 4, January 25-29 =====
 !bblock  Topics
-* Metropolis-Hastings sampling (Importance Sampling)
+* Metropolis-Hastings sampling and Importance Sampling
 * Fokker-Planck and Langevin equations
 !eblock
 
 !bblock Teaching Material, videos and written material
-* Overview video
+* Overview video on "Metropolis algoritm":"https://www.youtube.com/watch?v=OgO1gpXSUzU&ab_channel=MITOpenCourseWare"
 * Lecture notes and reading assignments
-* Recommended background literature
 !eblock
+
+
+!split
+===== Basics of the Metropolis Algorithm =====
+
+
+The Metropolis et al.
+algorithm was invented by Metropolis et. a
+and is often simply called the Metropolis algorithm.
+It is a method to sample a normalized probability
+distribution by a stochastic process. We define ${\cal P}_i^{(n)}$ to
+be the probability for finding the system in the state $i$ at step $n$.
+The algorithm is then
+
+!split
+=====  The basic of the Metropolis Algorithm =====
+
+* Sample a possible new state $j$ with some probability $T_{i\rightarrow j}$.
+* Accept the new state $j$ with probability $A_{i \rightarrow j}$ and use it as the next sample.
+* With probability $1-A_{i\rightarrow j}$ the move is rejected and the original state $i$ is used again as a sample.
+
+
+We wish to derive the required properties of $T$ and $A$ such that
+${\cal P}_i^{(n\rightarrow \infty)} \rightarrow p_i$ so that starting
+from any distribution, the method converges to the correct distribution.
+Note that the description here is for a discrete probability distribution.
+Replacing probabilities $p_i$ with expressions like $p(x_i)dx_i$ will
+take all of these over to the corresponding continuum expressions.
+
+!split
+===== More on the Metropolis =====
+
+The dynamical equation for ${\cal P}_i^{(n)}$ can be written directly from
+the description above. The probability of being in the state $i$ at step $n$
+is given by the probability of being in any state $j$ at the previous step,
+and making an accepted transition to $i$ added to the probability of
+being in the state $i$, making a transition to any state $j$ and
+rejecting the move:
+!bt
+\begin{equation}
+\label{eq:eq1}
+{\cal P}^{(n)}_i = \sum_j \left [
+{\cal P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
++{\cal P}^{(n-1)}_iT_{i\rightarrow j}\left ( 1- A_{i\rightarrow j} \right)
+\right ] \,.
+\end{equation}
+!et
+
+!split
+=====  Metropolis algorithm, setting it up =====
+Since the probability of making some transition must be 1,
+$\sum_j T_{i\rightarrow j} = 1$, and Eq. (ref{eq:eq1}) becomes
+
+!bt
+\begin{equation}
+{\cal P}^{(n)}_i = {\cal P}^{(n-1)}_i +
+ \sum_j \left [
+{\cal P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
+-{\cal P}^{(n-1)}_iT_{i\rightarrow j}A_{i\rightarrow j}
+\right ] \,.
+\end{equation}
+!et
+
+!split
+===== Metropolis continues =====
+
+For large $n$ we require that ${\cal P}^{(n\rightarrow \infty)}_i = p_i$,
+the desired probability distribution. Taking this limit, gives the
+balance requirement
+
+!bt
+\begin{equation}
+\sum_j \left [p_jT_{j\rightarrow i} A_{j\rightarrow i}-p_iT_{i\rightarrow j}A_{i\rightarrow j}
+\right ] = 0,
+\end{equation}
+!et
+
+
+!split
+===== Detailed Balance =====
+
+The balance requirement is very weak. Typically the much stronger detailed
+balance requirement is enforced, that is rather than the sum being
+set to zero, we set each term separately to zero and use this
+to determine the acceptance probabilities. Rearranging, the result is
+
+!bt
+\begin{equation}
+\frac{ A_{j\rightarrow i}}{A_{i\rightarrow j}}
+= \frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}} \,.
+\end{equation}
+!et
+
+!split
+===== More on Detailed Balance =====
+
+The Metropolis choice is to maximize the $A$ values, that is
+
+!bt
+\begin{equation}
+A_{j \rightarrow i} = \min \left ( 1,
+\frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}}\right ).
+\end{equation}
+!et
+
+Other choices are possible, but they all correspond to multilplying
+$A_{i\rightarrow j}$ and $A_{j\rightarrow i}$ by the same constant
+smaller than unity.\footnote{The penalty function method uses just such
+a factor to compensate for $p_i$ that are evaluated stochastically
+and are therefore noisy.}
+
+Having chosen the acceptance probabilities, we have guaranteed that
+if the  ${\cal P}_i^{(n)}$ has equilibrated, that is if it is equal to $p_i$,
+it will remain equilibrated. Next we need to find the circumstances for
+convergence to equilibrium.
+
+!split
+===== Dynamical Equation =====
+
+The dynamical equation can be written as
+
+!bt
+\begin{equation}
+{\cal P}^{(n)}_i = \sum_j M_{ij}{\cal P}^{(n-1)}_j
+\end{equation}
+!et
+with the matrix $M$ given by
+
+!bt
+\begin{equation}
+M_{ij} = \delta_{ij}\left [ 1 -\sum_k T_{i\rightarrow k} A_{i \rightarrow k}
+\right ] + T_{j\rightarrow i} A_{j\rightarrow i} \,.
+\end{equation}
+!et
+
+Summing over $i$ shows that $\sum_i M_{ij} = 1$, and since
+$\sum_k T_{i\rightarrow k} = 1$, and $A_{i \rightarrow k} \leq 1$, the
+elements of the matrix satisfy $M_{ij} \geq 0$. The matrix $M$ is therefore
+a stochastic matrix.
+
+
+!split
+===== Interpreting the Metropolis Algorithm =====
+
+The Metropolis method is simply the power method for computing the
+right eigenvector of $M$ with the largest magnitude eigenvalue.
+By construction, the correct probability distribution is a right eigenvector
+with eigenvalue 1. Therefore, for the Metropolis method to converge
+to this result, we must show that $M$ has only one eigenvalue with this
+magnitude, and all other eigenvalues are smaller.
+
+Even a defective matrix has at least one left and right eigenvector for
+each eigenvalue. An example of a defective matrix is
+
+
+!bt
+\[
+\begin{bmatrix}
+0 & 1\\
+0 & 0 \\
+\end{bmatrix},
+\]
+!et
+with two zero eigenvalues, only one right eigenvector
+
+!bt
+\[
+\begin{bmatrix}
+1 \\
+0\\
+\end{bmatrix}
+\]
+!et
+and only one left eigenvector $(0\ 1)$.
+
+!split
+===== Gershgorin bounds and Metropolis =====
+
+The Gershgorin bounds for the eigenvalues can be derived by multiplying on
+the left with the eigenvector with the maximum and minimum eigenvalues,
+
+!bt
+\[
+\begin{eqnarray}
+\sum_i \psi^{\rm max}_i M_{ij} &=& \lambda_{\rm max}  \psi^{\rm max}_j
+\nonumber\\
+\sum_i \psi^{\rm min}_i M_{ij} &=& \lambda_{\rm min}  \psi^{\rm min}_j
+\end{eqnarray}
+\]
+!et
+
+!split
+===== Normalizing the Eigenvectors =====
+
+Next we choose the normalization of these eigenvectors so that the
+largest element (or one of the equally largest elements)
+has value 1. Let's call this element $k$, and
+we can therefore bound the magnitude of the other elements to be less
+than or equal to 1.
+This leads to the inequalities, using the property that $M_{ij}\geq 0$,
+
+!bt
+\begin{eqnarray}
+\sum_i M_{ik} \leq \lambda_{\rm max}
+\nonumber\\
+M_{kk}-\sum_{i \neq k} M_{ik} \geq \lambda_{\rm min}
+\end{eqnarray}
+!et
+where the equality from the maximum
+will occur only if the eigenvector takes the value 1 for all values of
+$i$ where $M_{ik} \neq 0$, and the equality for the minimum will
+occur only if the eigenvector takes the value -1 for all values of $i\neq k$
+where $M_{ik} \neq 0$.
+
+
+!split
+===== More Metropolis analysis =====
+
+That the maximum eigenvalue is 1 follows immediately from the property
+that $\sum_i M_{ik} = 1$. Similarly the minimum eigenvalue can be -1,
+but only if $M_{kk} = 0$ and the magnitude of all the other elements
+$\psi_i^{\rm min}$ of
+the eigenvector that multiply nonzero elements $M_{ik}$ are -1.
+
+Let's first see what the properties of $M$ must be
+to eliminate any -1 eigenvalues. 
+To have a -1 eigenvalue, the left eigenvector must contain only $\pm 1$
+and $0$ values. Taking in turn each $\pm 1$ value as the maximum, so that
+it corresponds to the index $k$, the nonzero $M_{ik}$ values must
+correspond to $i$ index values of the eigenvector which have opposite
+sign elements. That is, the $M$ matrix must break up into sets of
+states that always make transitions from set A to set B ... back to set A.
+In particular, there can be no rejections of these moves in the cycle
+since the -1 eigenvalue requires $M_{kk}=0$. To guarantee no eigenvalues
+with eigenvalue -1, we simply have to make sure that there are no
+cycles among states. Notice that this is generally trivial since such
+cycles cannot have any rejections at any stage. An example of such
+a cycle is sampling a noninteracting Ising spin. If the transition is
+taken to flip the spin, and the energy difference is zero, the Boltzmann
+factor will not change and the move will always be accepted. The system
+will simply flip from up to down to up to down ad infinitum. Including
+a rejection probability or using a heat bath algorithm
+immediately fixes the problem.
+
+!split
+===== Final Considerations I =====
+
+Next we need to make sure that there is only one left eigenvector
+with eigenvalue 1. To get an eigenvalue 1, the left eigenvector must be 
+constructed from only ones and zeroes. It is straightforward to
+see that a vector made up of
+ones and zeroes can only be an eigenvector with eigenvalue 1 if the 
+matrix element $M_{ij} = 0$ for all cases where $\psi_i \neq \psi_j$.
+That is we can choose an index $i$ and take $\psi_i = 1$.
+We require all elements $\psi_j$ where $M_{ij} \neq 0$ to also have
+the value $1$. Continuing we then require all elements $\psi_\ell$ $M_{j\ell}$
+to have value $1$. Only if the matrix $M$ can be put into block diagonal
+form can there be more than one choice for the left eigenvector with
+eigenvalue 1. We therefore require that the transition matrix not
+be in block diagonal form. This simply means that we must choose
+the transition probability so that we can get from any allowed state
+to any other in a series of transitions.
+
+!split
+===== Final Considerations II =====
+
+
+Finally, we note that for a defective matrix, with more eigenvalues
+than independent eigenvectors for eigenvalue 1,
+the left and right
+eigenvectors of eigenvalue 1 would be orthogonal.
+Here the left eigenvector is all 1
+except for states that can never be reached, and the right eigenvector
+is $p_i > 0$ except for states that give zero probability. We already
+require that we can reach
+all states that contribute to $p_i$. Therefore the left and right
+eigenvectors with eigenvalue 1 do not correspond to a defective sector
+of the matrix and they are unique. The Metropolis algorithm therefore
+converges exponentially to the desired distribution.
+
+
+!split
+===== Final Considerations III =====
+
+The requirements for the transition $T_{i \rightarrow j}$ are
+* A series of transitions must let us to get from any allowed state to any other by a finite series of transitions.
+* The transitions cannot be grouped into sets of states, A, B, C ,... such that transitions from $A$ go to $B$, $B$ to $C$ etc and finally back to $A$. With condition (a) satisfied, this condition will always be satisfied if either $T_{i \rightarrow i} \neq 0$ or there are some rejected moves.
+
+
+
 
 
 !split
