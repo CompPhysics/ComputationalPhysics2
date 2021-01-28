@@ -1,0 +1,439 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/doconce/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Week 4 January 25-29: Metropolis Algoritm and Markov Chains, Importance Sampling, Fokker-Planck and Langevin equations">
+
+<title>Week 4 January 25-29: Metropolis Algoritm and Markov Chains, Importance Sampling, Fokker-Planck and Langevin equations</title>
+
+<!-- Bootstrap style: bootstrap -->
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<!-- not necessary
+<link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+-->
+
+<style type="text/css">
+
+/* Add scrollbar to dropdown menus in bootstrap navigation bar */
+.dropdown-menu {
+   height: auto;
+   max-height: 400px;
+   overflow-x: hidden;
+}
+
+/* Adds an invisible element before each target to offset for the navigation
+   bar */
+.anchor::before {
+  content:"";
+  display:block;
+  height:50px;      /* fixed header height for style bootstrap */
+  margin:-50px 0 0; /* negative fixed header height */
+}
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [('Overview of week 4, January 25-29',
+               2,
+               None,
+               'overview-of-week-4-january-25-29'),
+              ('Basics of the Metropolis Algorithm',
+               2,
+               None,
+               'basics-of-the-metropolis-algorithm'),
+              ('The basic of the Metropolis Algorithm',
+               2,
+               None,
+               'the-basic-of-the-metropolis-algorithm'),
+              ('More on the Metropolis', 2, None, 'more-on-the-metropolis'),
+              ('Metropolis algorithm, setting it up',
+               2,
+               None,
+               'metropolis-algorithm-setting-it-up'),
+              ('Metropolis continues', 2, None, 'metropolis-continues'),
+              ('Detailed Balance', 2, None, 'detailed-balance'),
+              ('More on Detailed Balance', 2, None, 'more-on-detailed-balance'),
+              ('Dynamical Equation', 2, None, 'dynamical-equation'),
+              ('Interpreting the Metropolis Algorithm',
+               2,
+               None,
+               'interpreting-the-metropolis-algorithm'),
+              ('Gershgorin bounds and Metropolis',
+               2,
+               None,
+               'gershgorin-bounds-and-metropolis'),
+              ('Normalizing the Eigenvectors',
+               2,
+               None,
+               'normalizing-the-eigenvectors'),
+              ('More Metropolis analysis', 2, None, 'more-metropolis-analysis'),
+              ('Final Considerations I', 2, None, 'final-considerations-i'),
+              ('Final Considerations II', 2, None, 'final-considerations-ii'),
+              ('Final Considerations III', 2, None, 'final-considerations-iii'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling, program elements',
+               2,
+               None,
+               'importance-sampling-program-elements'),
+              ('Importance sampling, program elements',
+               2,
+               None,
+               'importance-sampling-program-elements'),
+              ('Importance sampling, program elements',
+               2,
+               None,
+               'importance-sampling-program-elements'),
+              ('Importance sampling, program elements',
+               2,
+               None,
+               'importance-sampling-program-elements'),
+              ('Importance sampling, program elements',
+               2,
+               None,
+               'importance-sampling-program-elements'),
+              ('Importance sampling, program elements',
+               2,
+               None,
+               'importance-sampling-program-elements'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Importance sampling', 2, None, 'importance-sampling'),
+              ('Use the "C++ random class for random number '
+               'generations":"http://www.cplusplus.com/reference/random/"',
+               2,
+               None,
+               'use-the-c-random-class-for-random-number-generations-http-www-cplusplus-com-reference-random'),
+              ('Use the C++ random class for RNGs, the Mersenne twister class',
+               2,
+               None,
+               'use-the-c-random-class-for-rngs-the-mersenne-twister-class'),
+              ('Use the C++ random class for RNGs, the Metropolis test',
+               2,
+               None,
+               'use-the-c-random-class-for-rngs-the-metropolis-test'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations'),
+              ('Importance sampling, Fokker-Planck and Langevin equations',
+               2,
+               None,
+               'importance-sampling-fokker-planck-and-langevin-equations')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- Bootstrap navigation bar -->
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="week3-bs.html">Week 4 January 25-29: Metropolis Algoritm and Markov Chains, Importance Sampling, Fokker-Planck and Langevin equations</a>
+  </div>
+
+  <div class="navbar-collapse collapse navbar-responsive-collapse">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+     <!-- navigation toc: --> <li><a href="._week3-bs001.html#overview-of-week-4-january-25-29" style="font-size: 80%;">Overview of week 4, January 25-29</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs002.html#basics-of-the-metropolis-algorithm" style="font-size: 80%;">Basics of the Metropolis Algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs003.html#the-basic-of-the-metropolis-algorithm" style="font-size: 80%;">The basic of the Metropolis Algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs004.html#more-on-the-metropolis" style="font-size: 80%;">More on the Metropolis</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs005.html#metropolis-algorithm-setting-it-up" style="font-size: 80%;">Metropolis algorithm, setting it up</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs006.html#metropolis-continues" style="font-size: 80%;">Metropolis continues</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs007.html#detailed-balance" style="font-size: 80%;">Detailed Balance</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs008.html#more-on-detailed-balance" style="font-size: 80%;">More on Detailed Balance</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs009.html#dynamical-equation" style="font-size: 80%;">Dynamical Equation</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs010.html#interpreting-the-metropolis-algorithm" style="font-size: 80%;">Interpreting the Metropolis Algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs011.html#gershgorin-bounds-and-metropolis" style="font-size: 80%;">Gershgorin bounds and Metropolis</a></li>
+     <!-- navigation toc: --> <li><a href="#normalizing-the-eigenvectors" style="font-size: 80%;">Normalizing the Eigenvectors</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs013.html#more-metropolis-analysis" style="font-size: 80%;">More Metropolis analysis</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs014.html#final-considerations-i" style="font-size: 80%;">Final Considerations I</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs015.html#final-considerations-ii" style="font-size: 80%;">Final Considerations II</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs016.html#final-considerations-iii" style="font-size: 80%;">Final Considerations III</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs027.html#importance-sampling-program-elements" style="font-size: 80%;">Importance sampling, program elements</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs027.html#importance-sampling-program-elements" style="font-size: 80%;">Importance sampling, program elements</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs027.html#importance-sampling-program-elements" style="font-size: 80%;">Importance sampling, program elements</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs027.html#importance-sampling-program-elements" style="font-size: 80%;">Importance sampling, program elements</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs027.html#importance-sampling-program-elements" style="font-size: 80%;">Importance sampling, program elements</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs027.html#importance-sampling-program-elements" style="font-size: 80%;">Importance sampling, program elements</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs039.html#importance-sampling" style="font-size: 80%;">Importance sampling</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs040.html#use-the-c-random-class-for-random-number-generations-http-www-cplusplus-com-reference-random" style="font-size: 80%;">Use the "C++ random class for random number generations":"http://www.cplusplus.com/reference/random/"</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs041.html#use-the-c-random-class-for-rngs-the-mersenne-twister-class" style="font-size: 80%;">Use the C++ random class for RNGs, the Mersenne twister class</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs042.html#use-the-c-random-class-for-rngs-the-metropolis-test" style="font-size: 80%;">Use the C++ random class for RNGs, the Metropolis test</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week3-bs069.html#importance-sampling-fokker-planck-and-langevin-equations" style="font-size: 80%;">Importance sampling, Fokker-Planck and Langevin equations</a></li>
+
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+</div> <!-- end of navigation bar -->
+
+<div class="container">
+
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
+
+<a name="part0012"></a>
+<!-- !split -->
+
+<h2 id="normalizing-the-eigenvectors" class="anchor">Normalizing the Eigenvectors </h2>
+
+<p>
+Next we choose the normalization of these eigenvectors so that the
+largest element (or one of the equally largest elements)
+has value 1. Let's call this element \( k \), and
+we can therefore bound the magnitude of the other elements to be less
+than or equal to 1.
+This leads to the inequalities, using the property that \( M_{ij}\geq 0 \),
+
+$$
+\begin{eqnarray}
+\sum_i M_{ik} \leq \lambda_{\rm max}
+\nonumber\\
+M_{kk}-\sum_{i \neq k} M_{ik} \geq \lambda_{\rm min}
+\end{eqnarray}
+$$
+
+where the equality from the maximum
+will occur only if the eigenvector takes the value 1 for all values of
+\( i \) where \( M_{ik} \neq 0 \), and the equality for the minimum will
+occur only if the eigenvector takes the value -1 for all values of \( i\neq k \)
+where \( M_{ik} \neq 0 \).
+
+<p>
+<p>
+<!-- navigation buttons at the bottom of the page -->
+<ul class="pagination">
+<li><a href="._week3-bs011.html">&laquo;</a></li>
+  <li><a href="._week3-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week3-bs004.html">5</a></li>
+  <li><a href="._week3-bs005.html">6</a></li>
+  <li><a href="._week3-bs006.html">7</a></li>
+  <li><a href="._week3-bs007.html">8</a></li>
+  <li><a href="._week3-bs008.html">9</a></li>
+  <li><a href="._week3-bs009.html">10</a></li>
+  <li><a href="._week3-bs010.html">11</a></li>
+  <li><a href="._week3-bs011.html">12</a></li>
+  <li class="active"><a href="._week3-bs012.html">13</a></li>
+  <li><a href="._week3-bs013.html">14</a></li>
+  <li><a href="._week3-bs014.html">15</a></li>
+  <li><a href="._week3-bs015.html">16</a></li>
+  <li><a href="._week3-bs016.html">17</a></li>
+  <li><a href="._week3-bs017.html">18</a></li>
+  <li><a href="._week3-bs018.html">19</a></li>
+  <li><a href="._week3-bs019.html">20</a></li>
+  <li><a href="._week3-bs020.html">21</a></li>
+  <li><a href="._week3-bs021.html">22</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week3-bs069.html">70</a></li>
+  <li><a href="._week3-bs013.html">&raquo;</a></li>
+</ul>
+<!-- ------------------- end of main content --------------- -->
+
+</div>  <!-- end container -->
+<!-- include javascript, jQuery *first* -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap footer
+<footer>
+<a href="https://..."><img width="250" align=right src="https://..."></a>
+</footer>
+-->
+
+
+<center style="font-size:80%">
+<!-- copyright only on the titlepage -->
+</center>
+
+
+</body>
+</html>
+    
+
