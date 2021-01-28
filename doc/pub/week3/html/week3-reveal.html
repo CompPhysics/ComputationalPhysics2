@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="Week 4 January 25-29: Metropolis Algoritm and Markov Chains, Importance Sampling, Fokker-Planck and Langevin equations">
 
@@ -13,7 +13,7 @@
 
 
 
-<!-- reveal.js: http://lab.hakim.se/reveal-js/ -->
+<!-- reveal.js: https://lab.hakim.se/reveal-js/ -->
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
@@ -76,10 +76,10 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
      .reveal .alert-block > p, .alert-block > ul {margin-bottom:1em}
      /*.reveal .alert li {margin-top: 1em}*/
      .reveal .alert-block p+p {margin-top:5px}
-     /*.reveal .alert-notice { background-image: url(http://hplgit.github.io/doconce/bundled/html_images/small_gray_notice.png); }
-     .reveal .alert-summary  { background-image:url(http://hplgit.github.io/doconce/bundled/html_images/small_gray_summary.png); }
-     .reveal .alert-warning { background-image: url(http://hplgit.github.io/doconce/bundled/html_images/small_gray_warning.png); }
-     .reveal .alert-question {background-image:url(http://hplgit.github.io/doconce/bundled/html_images/small_gray_question.png); } */
+     /*.reveal .alert-notice { background-image: url(https://hplgit.github.io/doconce/bundled/html_images/small_gray_notice.png); }
+     .reveal .alert-summary  { background-image:url(https://hplgit.github.io/doconce/bundled/html_images/small_gray_summary.png); }
+     .reveal .alert-warning { background-image: url(https://hplgit.github.io/doconce/bundled/html_images/small_gray_warning.png); }
+     .reveal .alert-question {background-image:url(https://hplgit.github.io/doconce/bundled/html_images/small_gray_question.png); } */
 
 </style>
 
@@ -148,40 +148,398 @@ MathJax.Hub.Config({
 <center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
 <br>
 <p>&nbsp;<br>
-<center><h4>Dec 14, 2020</h4></center> <!-- date -->
+<center><h4>Jan 28, 2021</h4></center> <!-- date -->
 <br>
 <p>
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2020, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
 </center>
 </section>
 
 
 <section>
-<h2 id="___sec0">Overview of week 4, January 25-29 </h2>
+<h2 id="overview-of-week-4-january-25-29">Overview of week 4, January 25-29 </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Topics.</b>
+<b>Topics</b>
 <ul>
-<p><li> Metropolis-Hastings sampling (Importance Sampling)</li>
+<p><li> Metropolis-Hastings sampling and Importance Sampling</li>
 <p><li> Fokker-Planck and Langevin equations</li>
 </ul>
 </div>
 
 <p>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Teaching Material, videos and written material.</b>
+<b>Teaching Material, videos and written material</b>
 <ul>
-<p><li> Overview video</li>
-<p><li> Lecture notes and reading assignments</li>
-<p><li> Recommended background literature</li>
+<p><li> Overview video on <a href="https://www.youtube.com/watch?v=h1NOS_wxgGg&ab_channel=JeffPicton" target="_blank">Metropolis algoritm</a></li>
+<p><li> Lecture notes here.</li>
 </ul>
 </div>
 </section>
 
 
 <section>
-<h2 id="___sec1">Importance sampling </h2>
+<h2 id="basics-of-the-metropolis-algorithm">Basics of the Metropolis Algorithm </h2>
+
+<p>
+The Metropolis et al.
+algorithm was invented by Metropolis et. a
+and is often simply called the Metropolis algorithm.
+It is a method to sample a normalized probability
+distribution by a stochastic process. We define \( {\cal P}_i^{(n)} \) to
+be the probability for finding the system in the state \( i \) at step \( n \).
+The algorithm is then
+</section>
+
+
+<section>
+<h2 id="the-basic-of-the-metropolis-algorithm">The basic of the Metropolis Algorithm </h2>
+
+<ul>
+<p><li> Sample a possible new state \( j \) with some probability \( T_{i\rightarrow j} \).</li>
+<p><li> Accept the new state \( j \) with probability \( A_{i \rightarrow j} \) and use it as the next sample.</li>
+<p><li> With probability \( 1-A_{i\rightarrow j} \) the move is rejected and the original state \( i \) is used again as a sample.</li>
+</ul>
+<p>
+
+We wish to derive the required properties of \( T \) and \( A \) such that
+\( {\cal P}_i^{(n\rightarrow \infty)} \rightarrow p_i \) so that starting
+from any distribution, the method converges to the correct distribution.
+Note that the description here is for a discrete probability distribution.
+Replacing probabilities \( p_i \) with expressions like \( p(x_i)dx_i \) will
+take all of these over to the corresponding continuum expressions.
+</section>
+
+
+<section>
+<h2 id="more-on-the-metropolis">More on the Metropolis </h2>
+
+<p>
+The dynamical equation for \( {\cal P}_i^{(n)} \) can be written directly from
+the description above. The probability of being in the state \( i \) at step \( n \)
+is given by the probability of being in any state \( j \) at the previous step,
+and making an accepted transition to \( i \) added to the probability of
+being in the state \( i \), making a transition to any state \( j \) and
+rejecting the move:
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\tag{1}
+{\cal P}^{(n)}_i = \sum_j \left [
+{\cal P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
++{\cal P}^{(n-1)}_iT_{i\rightarrow j}\left ( 1- A_{i\rightarrow j} \right)
+\right ] \,.
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="metropolis-algorithm-setting-it-up">Metropolis algorithm, setting it up </h2>
+Since the probability of making some transition must be 1,
+\( \sum_j T_{i\rightarrow j} = 1 \), and Eq. <a href="#mjx-eqn-1">(1)</a> becomes
+
+<p>&nbsp;<br>
+$$
+\begin{equation}
+{\cal P}^{(n)}_i = {\cal P}^{(n-1)}_i +
+ \sum_j \left [
+{\cal P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
+-{\cal P}^{(n-1)}_iT_{i\rightarrow j}A_{i\rightarrow j}
+\right ] \,.
+\tag{2}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="metropolis-continues">Metropolis continues </h2>
+
+<p>
+For large \( n \) we require that \( {\cal P}^{(n\rightarrow \infty)}_i = p_i \),
+the desired probability distribution. Taking this limit, gives the
+balance requirement
+
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\sum_j \left [p_jT_{j\rightarrow i} A_{j\rightarrow i}-p_iT_{i\rightarrow j}A_{i\rightarrow j}
+\right ] = 0,
+\tag{3}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="detailed-balance">Detailed Balance </h2>
+
+<p>
+The balance requirement is very weak. Typically the much stronger detailed
+balance requirement is enforced, that is rather than the sum being
+set to zero, we set each term separately to zero and use this
+to determine the acceptance probabilities. Rearranging, the result is
+
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\frac{ A_{j\rightarrow i}}{A_{i\rightarrow j}}
+= \frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}} \,.
+\tag{4}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="more-on-detailed-balance">More on Detailed Balance </h2>
+
+<p>
+The Metropolis choice is to maximize the \( A \) values, that is
+
+<p>&nbsp;<br>
+$$
+\begin{equation}
+A_{j \rightarrow i} = \min \left ( 1,
+\frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}}\right ).
+\tag{5}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+<p>
+Other choices are possible, but they all correspond to multilplying
+\( A_{i\rightarrow j} \) and \( A_{j\rightarrow i} \) by the same constant
+smaller than unity.\footnote{The penalty function method uses just such
+a factor to compensate for \( p_i \) that are evaluated stochastically
+and are therefore noisy.}
+
+<p>
+Having chosen the acceptance probabilities, we have guaranteed that
+if the  \( {\cal P}_i^{(n)} \) has equilibrated, that is if it is equal to \( p_i \),
+it will remain equilibrated. Next we need to find the circumstances for
+convergence to equilibrium.
+</section>
+
+
+<section>
+<h2 id="dynamical-equation">Dynamical Equation </h2>
+
+<p>
+The dynamical equation can be written as
+
+<p>&nbsp;<br>
+$$
+\begin{equation}
+{\cal P}^{(n)}_i = \sum_j M_{ij}{\cal P}^{(n-1)}_j
+\tag{6}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+with the matrix \( M \) given by
+
+<p>&nbsp;<br>
+$$
+\begin{equation}
+M_{ij} = \delta_{ij}\left [ 1 -\sum_k T_{i\rightarrow k} A_{i \rightarrow k}
+\right ] + T_{j\rightarrow i} A_{j\rightarrow i} \,.
+\tag{7}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+<p>
+Summing over \( i \) shows that \( \sum_i M_{ij} = 1 \), and since
+\( \sum_k T_{i\rightarrow k} = 1 \), and \( A_{i \rightarrow k} \leq 1 \), the
+elements of the matrix satisfy \( M_{ij} \geq 0 \). The matrix \( M \) is therefore
+a stochastic matrix.
+</section>
+
+
+<section>
+<h2 id="interpreting-the-metropolis-algorithm">Interpreting the Metropolis Algorithm </h2>
+
+<p>
+The Metropolis method is simply the power method for computing the
+right eigenvector of \( M \) with the largest magnitude eigenvalue.
+By construction, the correct probability distribution is a right eigenvector
+with eigenvalue 1. Therefore, for the Metropolis method to converge
+to this result, we must show that \( M \) has only one eigenvalue with this
+magnitude, and all other eigenvalues are smaller.
+
+<p>
+Even a defective matrix has at least one left and right eigenvector for
+each eigenvalue. An example of a defective matrix is
+
+<p>&nbsp;<br>
+$$
+\begin{bmatrix}
+0 & 1\\
+0 & 0 \\
+\end{bmatrix},
+$$
+<p>&nbsp;<br>
+
+with two zero eigenvalues, only one right eigenvector
+
+<p>&nbsp;<br>
+$$
+\begin{bmatrix}
+1 \\
+0\\
+\end{bmatrix}
+$$
+<p>&nbsp;<br>
+
+and only one left eigenvector \( (0\ 1) \).
+</section>
+
+
+<section>
+<h2 id="gershgorin-bounds-and-metropolis">Gershgorin bounds and Metropolis </h2>
+
+<p>
+The Gershgorin bounds for the eigenvalues can be derived by multiplying on
+the left with the eigenvector with the maximum and minimum eigenvalues,
+
+<p>&nbsp;<br>
+$$
+\begin{align}
+\sum_i \psi^{\rm max}_i M_{ij} =& \lambda_{\rm max}  \psi^{\rm max}_j
+\nonumber\\
+\sum_i \psi^{\rm min}_i M_{ij} =& \lambda_{\rm min}  \psi^{\rm min}_j
+\tag{8}
+\end{align}
+$$
+<p>&nbsp;<br>
+</section>
+
+
+<section>
+<h2 id="normalizing-the-eigenvectors">Normalizing the Eigenvectors </h2>
+
+<p>
+Next we choose the normalization of these eigenvectors so that the
+largest element (or one of the equally largest elements)
+has value 1. Let's call this element \( k \), and
+we can therefore bound the magnitude of the other elements to be less
+than or equal to 1.
+This leads to the inequalities, using the property that \( M_{ij}\geq 0 \),
+
+<p>&nbsp;<br>
+$$
+\begin{eqnarray}
+\sum_i M_{ik} \leq \lambda_{\rm max}
+\nonumber\\
+M_{kk}-\sum_{i \neq k} M_{ik} \geq \lambda_{\rm min}
+\end{eqnarray}
+$$
+<p>&nbsp;<br>
+
+where the equality from the maximum
+will occur only if the eigenvector takes the value 1 for all values of
+\( i \) where \( M_{ik} \neq 0 \), and the equality for the minimum will
+occur only if the eigenvector takes the value -1 for all values of \( i\neq k \)
+where \( M_{ik} \neq 0 \).
+</section>
+
+
+<section>
+<h2 id="more-metropolis-analysis">More Metropolis analysis </h2>
+
+<p>
+That the maximum eigenvalue is 1 follows immediately from the property
+that \( \sum_i M_{ik} = 1 \). Similarly the minimum eigenvalue can be -1,
+but only if \( M_{kk} = 0 \) and the magnitude of all the other elements
+\( \psi_i^{\rm min} \) of
+the eigenvector that multiply nonzero elements \( M_{ik} \) are -1.
+
+<p>
+Let's first see what the properties of \( M \) must be
+to eliminate any -1 eigenvalues. 
+To have a -1 eigenvalue, the left eigenvector must contain only \( \pm 1 \)
+and \( 0 \) values. Taking in turn each \( \pm 1 \) value as the maximum, so that
+it corresponds to the index \( k \), the nonzero \( M_{ik} \) values must
+correspond to \( i \) index values of the eigenvector which have opposite
+sign elements. That is, the \( M \) matrix must break up into sets of
+states that always make transitions from set A to set B ... back to set A.
+In particular, there can be no rejections of these moves in the cycle
+since the -1 eigenvalue requires \( M_{kk}=0 \). To guarantee no eigenvalues
+with eigenvalue -1, we simply have to make sure that there are no
+cycles among states. Notice that this is generally trivial since such
+cycles cannot have any rejections at any stage. An example of such
+a cycle is sampling a noninteracting Ising spin. If the transition is
+taken to flip the spin, and the energy difference is zero, the Boltzmann
+factor will not change and the move will always be accepted. The system
+will simply flip from up to down to up to down ad infinitum. Including
+a rejection probability or using a heat bath algorithm
+immediately fixes the problem.
+</section>
+
+
+<section>
+<h2 id="final-considerations-i">Final Considerations I </h2>
+
+<p>
+Next we need to make sure that there is only one left eigenvector
+with eigenvalue 1. To get an eigenvalue 1, the left eigenvector must be 
+constructed from only ones and zeroes. It is straightforward to
+see that a vector made up of
+ones and zeroes can only be an eigenvector with eigenvalue 1 if the 
+matrix element \( M_{ij} = 0 \) for all cases where \( \psi_i \neq \psi_j \).
+That is we can choose an index \( i \) and take \( \psi_i = 1 \).
+We require all elements \( \psi_j \) where \( M_{ij} \neq 0 \) to also have
+the value \( 1 \). Continuing we then require all elements \( \psi_\ell \) $M_{j\ell}$
+to have value \( 1 \). Only if the matrix \( M \) can be put into block diagonal
+form can there be more than one choice for the left eigenvector with
+eigenvalue 1. We therefore require that the transition matrix not
+be in block diagonal form. This simply means that we must choose
+the transition probability so that we can get from any allowed state
+to any other in a series of transitions.
+</section>
+
+
+<section>
+<h2 id="final-considerations-ii">Final Considerations II </h2>
+
+<p>
+Finally, we note that for a defective matrix, with more eigenvalues
+than independent eigenvectors for eigenvalue 1,
+the left and right
+eigenvectors of eigenvalue 1 would be orthogonal.
+Here the left eigenvector is all 1
+except for states that can never be reached, and the right eigenvector
+is \( p_i > 0 \) except for states that give zero probability. We already
+require that we can reach
+all states that contribute to \( p_i \). Therefore the left and right
+eigenvectors with eigenvalue 1 do not correspond to a defective sector
+of the matrix and they are unique. The Metropolis algorithm therefore
+converges exponentially to the desired distribution.
+</section>
+
+
+<section>
+<h2 id="final-considerations-iii">Final Considerations III </h2>
+
+<p>
+The requirements for the transition \( T_{i \rightarrow j} \) are
+
+<ul>
+<p><li> A series of transitions must let us to get from any allowed state to any other by a finite series of transitions.</li>
+<p><li> The transitions cannot be grouped into sets of states, A, B, C ,... such that transitions from \( A \) go to \( B \), \( B \) to \( C \) etc and finally back to \( A \). With condition (a) satisfied, this condition will always be satisfied if either \( T_{i \rightarrow i} \neq 0 \) or there are some rejected moves.</li>
+</ul>
+</section>
+
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -208,7 +566,7 @@ where \( F \) is a drift term and \( D \) is the diffusion coefficient.
 
 
 <section>
-<h2 id="___sec2">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -235,7 +593,7 @@ The quantity \( D \) is, in atomic units, equal to \( 1/2 \) and comes from the 
 
 
 <section>
-<h2 id="___sec3">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -257,7 +615,7 @@ $$
 
 
 <section>
-<h2 id="___sec4">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -281,7 +639,7 @@ which is known as the so-called <em>quantum force</em>. This term is responsible
 
 
 <section>
-<h2 id="___sec5">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -310,7 +668,7 @@ $$
 
 
 <section>
-<h2 id="___sec6">Importance sampling, program elements </h2>
+<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -318,7 +676,7 @@ The full code is <a href="https://github.com/CompPhysics/ComputationalPhysics2/t
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span><span style="color: #00688B; font-weight: bold">void</span> VMCSolver::runMonteCarloIntegration()
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span><span style="color: #00688B; font-weight: bold">void</span> VMCSolver::runMonteCarloIntegration()
 {
   rOld = zeros&lt;mat&gt;(nParticles, nDimensions);
   rNew = zeros&lt;mat&gt;(nParticles, nDimensions);
@@ -347,13 +705,13 @@ The full code is <a href="https://github.com/CompPhysics/ComputationalPhysics2/t
 
 
 <section>
-<h2 id="___sec7">Importance sampling, program elements </h2>
+<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span>  <span style="color: #8B008B; font-weight: bold">for</span>(<span style="color: #00688B; font-weight: bold">int</span> cycle = <span style="color: #B452CD">0</span>; cycle &lt; nCycles; cycle++) {
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span>  <span style="color: #8B008B; font-weight: bold">for</span>(<span style="color: #00688B; font-weight: bold">int</span> cycle = <span style="color: #B452CD">0</span>; cycle &lt; nCycles; cycle++) {
 
     <span style="color: #228B22">// Store the current value of the wave function</span>
     waveFunctionOld = waveFunction(rOld);
@@ -379,13 +737,13 @@ The full code is <a href="https://github.com/CompPhysics/ComputationalPhysics2/t
 
 
 <section>
-<h2 id="___sec8">Importance sampling, program elements </h2>
+<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span>  <span style="color: #228B22">// loop over Monte Carlo cycles</span>
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span>  <span style="color: #228B22">// loop over Monte Carlo cycles</span>
       <span style="color: #228B22">// Recalculate the value of the wave function and the quantum force</span>
       waveFunctionNew = waveFunction(rNew);
       QuantumForce(rNew,QForceNew) = QForceNew*h/waveFunctionNew;
@@ -418,13 +776,13 @@ The full code is <a href="https://github.com/CompPhysics/ComputationalPhysics2/t
 
 
 <section>
-<h2 id="___sec9">Importance sampling, program elements </h2>
+<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Note numerical derivatives.</b>
+<b>Note numerical derivatives</b>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span><span style="color: #00688B; font-weight: bold">double</span> VMCSolver::QuantumForce(<span style="color: #8B008B; font-weight: bold">const</span> mat &amp;r, mat &amp;QForce)
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span><span style="color: #00688B; font-weight: bold">double</span> VMCSolver::QuantumForce(<span style="color: #8B008B; font-weight: bold">const</span> mat &amp;r, mat &amp;QForce)
 {
     mat rPlus = zeros&lt;mat&gt;(nParticles, nDimensions);
     mat rMinus = zeros&lt;mat&gt;(nParticles, nDimensions);
@@ -455,7 +813,7 @@ The full code is <a href="https://github.com/CompPhysics/ComputationalPhysics2/t
 
 
 <section>
-<h2 id="___sec10">Importance sampling, program elements </h2>
+<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -486,7 +844,7 @@ The function \( f(r_{ij}) \) will depends on the system under study. In the equa
 
 
 <section>
-<h2 id="___sec11">Importance sampling, program elements </h2>
+<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -512,7 +870,7 @@ $$
 
 
 <section>
-<h2 id="___sec12">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -535,7 +893,7 @@ $$
 
 
 <section>
-<h2 id="___sec13">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -552,7 +910,7 @@ We discuss here how to calculate these quantities in an optimal way,
 
 
 <section>
-<h2 id="___sec14">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -579,7 +937,7 @@ $$
 
 
 <section>
-<h2 id="___sec15">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -605,7 +963,7 @@ In our algorithm we will move one particle  at the time, say the \( kth \)-parti
 
 
 <section>
-<h2 id="___sec16">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -642,7 +1000,7 @@ $$
 
 
 <section>
-<h2 id="___sec17">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -664,7 +1022,7 @@ for all dimensions and with \( i \) running over all particles.
 
 
 <section>
-<h2 id="___sec18">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -694,7 +1052,7 @@ with both expressions scaling as \( \mathcal{O}(N) \).
 
 
 <section>
-<h2 id="___sec19">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -727,7 +1085,7 @@ $$
 
 
 <section>
-<h2 id="___sec20">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -751,7 +1109,7 @@ $$
 
 
 <section>
-<h2 id="___sec21">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -784,7 +1142,7 @@ is the relative distance.
 
 
 <section>
-<h2 id="___sec22">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -806,7 +1164,7 @@ $$
 
 
 <section>
-<h2 id="___sec23">Importance sampling </h2>
+<h2 id="importance-sampling">Importance sampling </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -831,13 +1189,13 @@ $$
 
 
 <section>
-<h2 id="___sec24">Use the <a href="http://www.cplusplus.com/reference/random/" target="_blank">C++ random class for random number generations</a>  </h2>
+<h2 id="use-the-c-random-class-for-random-number-generations-http-www-cplusplus-com-reference-random">Use the <a href="http://www.cplusplus.com/reference/random/" target="_blank">C++ random class for random number generations</a>  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span> <span style="color: #228B22">// Initialize the seed and call the Mersienne algo</span>
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span> <span style="color: #228B22">// Initialize the seed and call the Mersienne algo</span>
   std::random_device rd;
   std::mt19937_64 gen(rd());
   <span style="color: #228B22">// Set up the uniform distribution for x \in [[0, 1]</span>
@@ -850,7 +1208,7 @@ $$
 
 
 <section>
-<h2 id="___sec25">Use the C++ random class for RNGs, the Mersenne twister class  </h2>
+<h2 id="use-the-c-random-class-for-rngs-the-mersenne-twister-class">Use the C++ random class for RNGs, the Mersenne twister class  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -858,7 +1216,7 @@ $$
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span> <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> cycles = <span style="color: #B452CD">1</span>; cycles &lt;= NumberMCsamples; cycles++){ 
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span> <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> cycles = <span style="color: #B452CD">1</span>; cycles &lt;= NumberMCsamples; cycles++){ 
     <span style="color: #228B22">// new position </span>
     <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> i = <span style="color: #B452CD">0</span>; i &lt; NumberParticles; i++) { 
       <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> j = <span style="color: #B452CD">0</span>; j &lt; Dimension; j++) {
@@ -873,7 +1231,7 @@ $$
 
 
 <section>
-<h2 id="___sec26">Use the C++ random class for RNGs, the Metropolis test  </h2>
+<h2 id="use-the-c-random-class-for-rngs-the-metropolis-test">Use the C++ random class for RNGs, the Metropolis test  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -881,7 +1239,7 @@ $$
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%"><span></span>      <span style="color: #228B22">//  Metropolis-Hastings algorithm</span>
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span>      <span style="color: #228B22">//  Metropolis-Hastings algorithm</span>
       <span style="color: #00688B; font-weight: bold">double</span> GreensFunction = <span style="color: #B452CD">0.0</span>;            
       <span style="color: #8B008B; font-weight: bold">for</span> (<span style="color: #00688B; font-weight: bold">int</span> j = <span style="color: #B452CD">0</span>; j &lt; Dimension; j++) {
         GreensFunction += <span style="color: #B452CD">0.5</span>*(OldQuantumForce(i,j)+NewQuantumForce(i,j))*
@@ -903,7 +1261,7 @@ $$
 
 
 <section>
-<h2 id="___sec27">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -927,7 +1285,7 @@ in the range \( [x, x + dx] \) .
 
 
 <section>
-<h2 id="___sec28">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -959,7 +1317,7 @@ sample functions.
 
 
 <section>
-<h2 id="___sec29">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -987,7 +1345,7 @@ the reverse \( W(y\rightarrow y') \) may be very different.
 
 
 <section>
-<h2 id="___sec30">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1016,7 +1374,7 @@ which goes to zero when \( T \) tends to zero.
 
 
 <section>
-<h2 id="___sec31">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1053,7 +1411,7 @@ function \( \delta(\mathbf{x}) \) at  \( t=0 \).
 
 
 <section>
-<h2 id="___sec32">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1089,7 +1447,7 @@ that is no time-dependence. Note our change of notation for \( W \)
 
 
 <section>
-<h2 id="___sec33">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1122,7 +1480,7 @@ $$
 
 
 <section>
-<h2 id="___sec34">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1147,7 +1505,7 @@ $$
 
 
 <section>
-<h2 id="___sec35">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1172,7 +1530,7 @@ $$
 
 
 <section>
-<h2 id="___sec36">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1202,7 +1560,7 @@ to the diffusion equation.
 
 
 <section>
-<h2 id="___sec37">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1236,7 +1594,7 @@ $$
 
 
 <section>
-<h2 id="___sec38">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1261,7 +1619,7 @@ $$
 
 
 <section>
-<h2 id="___sec39">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1284,7 +1642,7 @@ $$
 
 
 <section>
-<h2 id="___sec40">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1301,7 +1659,7 @@ We assume that \( W(\mathbf{x},\tau|\mathbf{x}-\xi) \) takes non-negligible valu
 
 
 <section>
-<h2 id="___sec41">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1320,7 +1678,7 @@ $$
 
 
 <section>
-<h2 id="___sec42">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1340,7 +1698,7 @@ we get simply \( W(\mathbf{x},s|\mathbf{x}_0) \) due to normalization.
 
 
 <section>
-<h2 id="___sec43">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1359,7 +1717,7 @@ $$
 
 
 <section>
-<h2 id="___sec44">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1381,7 +1739,7 @@ we get simply \( W(\mathbf{x},s|\mathbf{x}_0) \) due to normalization.
 
 
 <section>
-<h2 id="___sec45">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1406,7 +1764,7 @@ $$
 
 
 <section>
-<h2 id="___sec46">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1429,7 +1787,7 @@ $$
 
 
 <section>
-<h2 id="___sec47">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1449,9 +1807,9 @@ position with velocity (momentum).
 
 
 <section>
-<h2 id="___sec48">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Langevin equation.</b>
+<b>Langevin equation</b>
 <p>
 Consider a particle  suspended in a liquid. On its path through the liquid it will continuously collide with the liquid molecules. Because on average the particle  will collide more often on the front side than on the back side, it will experience a systematic force proportional with its velocity, and directed opposite to its velocity. Besides this systematic force the particle  will experience a stochastic force  \( \mathbf{F}(t) \). 
 The equations of motion are 
@@ -1465,9 +1823,9 @@ The equations of motion are
 
 
 <section>
-<h2 id="___sec49">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Langevin equation.</b>
+<b>Langevin equation</b>
 <p>
 From hydrodynamics  we know that the friction constant  \( \xi \) is given by
 <p>&nbsp;<br>
@@ -1490,9 +1848,9 @@ $$
 
 
 <section>
-<h2 id="___sec50">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Langevin equation.</b>
+<b>Langevin equation</b>
 <p>
 If we want to get some useful information out of this, we have to average over all possible realizations of 
 \( \mathbf{F}(t) \), with the initial velocity as a condition. A useful quantity for example is
@@ -1514,9 +1872,9 @@ $$
 
 
 <section>
-<h2 id="___sec51">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Langevin equation.</b>
+<b>Langevin equation</b>
 <p>
 In order to continue we have to make some assumptions about the conditional averages of the stochastic forces. 
 In view of the chaotic character of the stochastic forces the following 
@@ -1555,9 +1913,9 @@ This result is called the fluctuation-dissipation theorem .
 
 
 <section>
-<h2 id="___sec52">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Langevin equation.</b>
+<b>Langevin equation</b>
 <p>
 Integrating 
 <p>&nbsp;<br>
@@ -1585,9 +1943,9 @@ $$
 
 
 <section>
-<h2 id="___sec53">Importance sampling, Fokker-Planck and Langevin equations </h2>
+<h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Langevin equation.</b>
+<b>Langevin equation</b>
 <p>
 For very large \( t \) this becomes
 <p>&nbsp;<br>
