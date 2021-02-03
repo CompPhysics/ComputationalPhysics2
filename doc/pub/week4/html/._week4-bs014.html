@@ -330,54 +330,74 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0000"></a>
-<!-- ------------------- main content ---------------------- -->
+<a name="part0014"></a>
+<!-- !split -->
 
-
-
-<div class="jumbotron">
-<center><h1>Week 5 February 1-5: Importance Sampling, Fokker-Planck and Langevin equations</h1></center>  <!-- document title -->
-
-<p>
-<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
-
-<center>
-<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
-</center>
-
-<p>
-<!-- institution(s) -->
-
-<center>[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b></center>
-<center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
-<br>
-<p>
-<center><h4>Feb 3, 2021</h4></center> <!-- date -->
-<br>
+<h2 id="importance-sampling-program-elements" class="anchor">Importance sampling, program elements </h2>
+<div class="panel panel-default">
+<div class="panel-body">
+<p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
 <p>
 
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #B00040">double</span> VMCSolver<span style="color: #666666">::</span>QuantumForce(<span style="color: #008000; font-weight: bold">const</span> mat <span style="color: #666666">&amp;</span>r, mat <span style="color: #666666">&amp;</span>QForce)
+{
+    mat rPlus <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>mat<span style="color: #666666">&gt;</span>(nParticles, nDimensions);
+    mat rMinus <span style="color: #666666">=</span> zeros<span style="color: #666666">&lt;</span>mat<span style="color: #666666">&gt;</span>(nParticles, nDimensions);
+    rPlus <span style="color: #666666">=</span> rMinus <span style="color: #666666">=</span> r;
+    <span style="color: #B00040">double</span> waveFunctionMinus <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> waveFunctionPlus <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #B00040">double</span> waveFunctionCurrent <span style="color: #666666">=</span> waveFunction(r);
 
-<p><a href="._week4-bs001.html" class="btn btn-primary btn-lg">Read &raquo;</a></p>
+    <span style="color: #408080; font-style: italic">// Kinetic energy</span>
+
+    <span style="color: #B00040">double</span> kineticEnergy <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+    <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; i <span style="color: #666666">&lt;</span> nParticles; i<span style="color: #666666">++</span>) {
+        <span style="color: #008000; font-weight: bold">for</span>(<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> nDimensions; j<span style="color: #666666">++</span>) {
+            rPlus(i,j) <span style="color: #666666">+=</span> h;
+            rMinus(i,j) <span style="color: #666666">-=</span> h;
+            waveFunctionMinus <span style="color: #666666">=</span> waveFunction(rMinus);
+            waveFunctionPlus <span style="color: #666666">=</span> waveFunction(rPlus);
+            QForce(i,j) <span style="color: #666666">=</span>  (waveFunctionPlus<span style="color: #666666">-</span>waveFunctionMinus);
+            rPlus(i,j) <span style="color: #666666">=</span> r(i,j);
+            rMinus(i,j) <span style="color: #666666">=</span> r(i,j);
+        }
+    }
+}
+</pre></div>
+<p>
+</div>
+</div>
 
 
-</div> <!-- end jumbotron -->
-
+<p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-  <li class="active"><a href="._week4-bs000.html">1</a></li>
-  <li><a href="._week4-bs001.html">2</a></li>
-  <li><a href="._week4-bs002.html">3</a></li>
-  <li><a href="._week4-bs003.html">4</a></li>
-  <li><a href="._week4-bs004.html">5</a></li>
-  <li><a href="._week4-bs005.html">6</a></li>
+<li><a href="._week4-bs013.html">&laquo;</a></li>
+  <li><a href="._week4-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
   <li><a href="._week4-bs006.html">7</a></li>
   <li><a href="._week4-bs007.html">8</a></li>
   <li><a href="._week4-bs008.html">9</a></li>
   <li><a href="._week4-bs009.html">10</a></li>
+  <li><a href="._week4-bs010.html">11</a></li>
+  <li><a href="._week4-bs011.html">12</a></li>
+  <li><a href="._week4-bs012.html">13</a></li>
+  <li><a href="._week4-bs013.html">14</a></li>
+  <li class="active"><a href="._week4-bs014.html">15</a></li>
+  <li><a href="._week4-bs015.html">16</a></li>
+  <li><a href="._week4-bs016.html">17</a></li>
+  <li><a href="._week4-bs017.html">18</a></li>
+  <li><a href="._week4-bs018.html">19</a></li>
+  <li><a href="._week4-bs019.html">20</a></li>
+  <li><a href="._week4-bs020.html">21</a></li>
+  <li><a href="._week4-bs021.html">22</a></li>
+  <li><a href="._week4-bs022.html">23</a></li>
+  <li><a href="._week4-bs023.html">24</a></li>
   <li><a href="">...</a></li>
   <li><a href="._week4-bs058.html">59</a></li>
-  <li><a href="._week4-bs001.html">&raquo;</a></li>
+  <li><a href="._week4-bs015.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
@@ -394,7 +414,7 @@ MathJax.Hub.Config({
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright only on the titlepage -->
 </center>
 
 
