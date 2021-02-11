@@ -1,19 +1,19 @@
 <!--
 Automatically generated HTML file from DocOnce source
-(https://github.com/hplgit/doconce/)
+(https://github.com/doconce/doconce/)
 -->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 6 February 8-12: Gradient methods, steepest descent and Conjugate Gradient Methods">
+<meta name="description" content="Week 6 February 8-12: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods">
 
-<title>Week 6 February 8-12: Gradient methods, steepest descent and Conjugate Gradient Methods</title>
+<title>Week 6 February 8-12: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods</title>
 
 
-<link href="https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_styles/style_solarized_box/css/solarized_light_code.css" rel="stylesheet" type="text/css" title="light"/>
-<script src="https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_styles/style_solarized_box/js/highlight.pack.js"></script>
+<link href="https://cdn.rawgit.com/doconce/doconce/master/bundled/html_styles/style_solarized_box/css/solarized_light_code.css" rel="stylesheet" type="text/css" title="light"/>
+<script src="https://cdn.rawgit.com/doconce/doconce/master/bundled/html_styles/style_solarized_box/js/highlight.pack.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
 <link href="https://thomasf.github.io/solarized-css/solarized-light.min.css" rel="stylesheet">
@@ -48,10 +48,10 @@ pre {
 .alert-block > p, .alert-block > ul {margin-bottom:1em}
 .alert li {margin-top: 1em}
 .alert-block p+p {margin-top:5px}
-.alert-notice { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_notice.png); }
-.alert-summary  { background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_summary.png); }
-.alert-warning { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_warning.png); }
-.alert-question {background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_question.png); }
+.alert-notice { background-image: url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_notice.png); }
+.alert-summary  { background-image:url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_summary.png); }
+.alert-warning { background-image: url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_warning.png); }
+.alert-question {background-image:url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_question.png); }
 
 div { text-align: justify; text-justify: inter-word; }
 </style>
@@ -61,104 +61,176 @@ div { text-align: justify; text-justify: inter-word; }
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [('Overview of week 5, February 1-5', 2, None, '___sec0'),
-              ('Motivation', 2, None, '___sec1'),
-              ('Simple example and demonstration', 2, None, '___sec2'),
-              ('Simple example and demonstration', 2, None, '___sec3'),
+ 'sections': [('Overview of week 6, February 8-12',
+               2,
+               None,
+               'overview-of-week-6-february-8-12'),
+              ('Motivation', 2, None, 'motivation'),
+              ('Simple example and demonstration',
+               2,
+               None,
+               'simple-example-and-demonstration'),
+              ('Simple example and demonstration',
+               2,
+               None,
+               'simple-example-and-demonstration'),
               ('Exercise 1: Find the local energy for the harmonic oscillator',
                2,
                None,
-               '___sec4'),
-              ('Variance in the simple model', 2, None, '___sec5'),
-              ('Computing the derivatives', 2, None, '___sec6'),
+               'exercise-1-find-the-local-energy-for-the-harmonic-oscillator'),
+              ('Variance in the simple model',
+               2,
+               None,
+               'variance-in-the-simple-model'),
+              ('Computing the derivatives',
+               2,
+               None,
+               'computing-the-derivatives'),
               ('Expressions for finding the derivatives of the local energy',
                2,
                None,
-               '___sec7'),
-              ('Derivatives of the local energy', 2, None, '___sec8'),
+               'expressions-for-finding-the-derivatives-of-the-local-energy'),
+              ('Derivatives of the local energy',
+               2,
+               None,
+               'derivatives-of-the-local-energy'),
               ('Exercise 2: General expression for the derivative of the '
                'energy',
                2,
                None,
-               '___sec9'),
+               'exercise-2-general-expression-for-the-derivative-of-the-energy'),
               ("Brief reminder on Newton-Raphson's method",
                2,
                None,
-               '___sec10'),
-              ('The equations', 2, None, '___sec11'),
-              ('Simple geometric interpretation', 2, None, '___sec12'),
-              ('Extending to more than one variable', 2, None, '___sec13'),
-              ('Steepest descent', 2, None, '___sec14'),
-              ('More on Steepest descent', 2, None, '___sec15'),
-              ('The ideal', 2, None, '___sec16'),
+               'brief-reminder-on-newton-raphson-s-method'),
+              ('The equations', 2, None, 'the-equations'),
+              ('Simple geometric interpretation',
+               2,
+               None,
+               'simple-geometric-interpretation'),
+              ('Extending to more than one variable',
+               2,
+               None,
+               'extending-to-more-than-one-variable'),
+              ('Steepest descent', 2, None, 'steepest-descent'),
+              ('More on Steepest descent', 2, None, 'more-on-steepest-descent'),
+              ('The ideal', 2, None, 'the-ideal'),
               ('The sensitiveness of the gradient descent',
                2,
                None,
-               '___sec17'),
-              ('Convex functions', 2, None, '___sec18'),
-              ('Convex function', 2, None, '___sec19'),
-              ('Conditions on convex functions', 2, None, '___sec20'),
-              ('More on convex functions', 2, None, '___sec21'),
-              ('Some simple problems', 2, None, '___sec22'),
-              ('Standard steepest descent', 2, None, '___sec23'),
-              ('Gradient method', 2, None, '___sec24'),
-              ('Steepest descent  method', 2, None, '___sec25'),
-              ('Steepest descent  method', 2, None, '___sec26'),
-              ('Final expressions', 2, None, '___sec27'),
-              ('Code examples for steepest descent', 2, None, '___sec28'),
+               'the-sensitiveness-of-the-gradient-descent'),
+              ('Convex functions', 2, None, 'convex-functions'),
+              ('Convex function', 2, None, 'convex-function'),
+              ('Conditions on convex functions',
+               2,
+               None,
+               'conditions-on-convex-functions'),
+              ('More on convex functions', 2, None, 'more-on-convex-functions'),
+              ('Some simple problems', 2, None, 'some-simple-problems'),
+              ('Standard steepest descent',
+               2,
+               None,
+               'standard-steepest-descent'),
+              ('Gradient method', 2, None, 'gradient-method'),
+              ('Steepest descent  method', 2, None, 'steepest-descent-method'),
+              ('Steepest descent  method', 2, None, 'steepest-descent-method'),
+              ('Final expressions', 2, None, 'final-expressions'),
+              ('Code examples for steepest descent',
+               2,
+               None,
+               'code-examples-for-steepest-descent'),
               ('Simple codes for  steepest descent and conjugate gradient '
                'using a $2\\times 2$ matrix, in c++, Python code to come',
                2,
                None,
-               '___sec29'),
+               'simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come'),
               ('The routine for the steepest descent method',
                2,
                None,
-               '___sec30'),
-              ('Steepest descent example', 2, None, '___sec31'),
-              ('Conjugate gradient method', 2, None, '___sec32'),
-              ('Conjugate gradient method', 2, None, '___sec33'),
-              ('Conjugate gradient method', 2, None, '___sec34'),
-              ('Conjugate gradient method', 2, None, '___sec35'),
-              ('Conjugate gradient method and iterations', 2, None, '___sec36'),
-              ('Conjugate gradient method', 2, None, '___sec37'),
-              ('Conjugate gradient method', 2, None, '___sec38'),
-              ('Conjugate gradient method', 2, None, '___sec39'),
+               'the-routine-for-the-steepest-descent-method'),
+              ('Steepest descent example', 2, None, 'steepest-descent-example'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method and iterations',
+               2,
+               None,
+               'conjugate-gradient-method-and-iterations'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
               ('Simple implementation of the Conjugate gradient algorithm',
                2,
                None,
-               '___sec40'),
+               'simple-implementation-of-the-conjugate-gradient-algorithm'),
               ('Broyden–Fletcher–Goldfarb–Shanno algorithm',
                2,
                None,
-               '___sec41'),
-              ('Stochastic Gradient Descent', 2, None, '___sec42'),
-              ('Computation of gradients', 2, None, '___sec43'),
-              ('SGD example', 2, None, '___sec44'),
-              ('The gradient step', 2, None, '___sec45'),
-              ('Simple example code', 2, None, '___sec46'),
-              ('When do we stop?', 2, None, '___sec47'),
-              ('Slightly different approach', 2, None, '___sec48'),
-              ('Program for stochastic gradient', 2, None, '___sec49'),
+               'broyden-fletcher-goldfarb-shanno-algorithm'),
+              ('Stochastic Gradient Descent',
+               2,
+               None,
+               'stochastic-gradient-descent'),
+              ('Computation of gradients', 2, None, 'computation-of-gradients'),
+              ('SGD example', 2, None, 'sgd-example'),
+              ('The gradient step', 2, None, 'the-gradient-step'),
+              ('Simple example code', 2, None, 'simple-example-code'),
+              ('When do we stop?', 2, None, 'when-do-we-stop'),
+              ('Slightly different approach',
+               2,
+               None,
+               'slightly-different-approach'),
+              ('Program for stochastic gradient',
+               2,
+               None,
+               'program-for-stochastic-gradient'),
               ('Using gradient descent methods, limitations',
                2,
                None,
-               '___sec50'),
-              ('Codes from numerical recipes', 2, None, '___sec51'),
+               'using-gradient-descent-methods-limitations'),
+              ('Codes from numerical recipes',
+               2,
+               None,
+               'codes-from-numerical-recipes'),
               ('Finding the minimum of the harmonic oscillator model in one '
                'dimension',
                2,
                None,
-               '___sec52'),
-              ('Functions to observe', 2, None, '___sec53'),
+               'finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension'),
+              ('Functions to observe', 2, None, 'functions-to-observe'),
               ('Python program for 2-electrons in 2 dimensions',
                2,
                None,
-               '___sec54'),
-              ("Using Broyden's algorithm in scipy", 2, None, '___sec55'),
-              ('How do we proceed?', 2, None, '___sec56'),
-              ('Modified code', 2, None, '___sec57'),
-              ('Resampling analysis', 2, None, '___sec58')]}
+               'python-program-for-2-electrons-in-2-dimensions'),
+              ("Using Broyden's algorithm in scipy",
+               2,
+               None,
+               'using-broyden-s-algorithm-in-scipy'),
+              ('How do we proceed?', 2, None, 'how-do-we-proceed'),
+              ('Modified code', 2, None, 'modified-code'),
+              ('Resampling analysis', 2, None, 'resampling-analysis')]}
 end of tocinfo -->
 
 <body>
@@ -184,7 +256,7 @@ MathJax.Hub.Config({
 
 
 
-<center><h1>Week 6 February 8-12: Gradient methods, steepest descent and Conjugate Gradient Methods</h1></center>  <!-- document title -->
+<center><h1>Week 6 February 8-12: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods</h1></center>  <!-- document title -->
 
 <p>
 <!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
@@ -200,17 +272,18 @@ MathJax.Hub.Config({
 <center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
 <br>
 <p>
-<center><h4>Dec 14, 2020</h4></center> <!-- date -->
+<center><h4>Feb 11, 2021</h4></center> <!-- date -->
 <br>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec0">Overview of week 5, February 1-5 </h2>
+<h2 id="overview-of-week-6-february-8-12">Overview of week 6, February 8-12 </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Topics.</b>
+<b>Topics</b>
 <p>
 
 <ul>
+<li> Finalize discussion on importance sampling and Fokker-Planck and Langevin equations</li>
 <li> Gradient Descent methods, Steepest Descent</li>
 <li> Conjugate Gradient Descent</li>
 </ul>
@@ -219,13 +292,13 @@ MathJax.Hub.Config({
 
 <p>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Teaching Material, videos and written material.</b>
+<b>Teaching Material, videos and written material</b>
 <p>
 
 <ul>
-<li> Overview video</li>
-<li> Lecture notes and reading assignments</li>
-<li> Recommended background literature</li>
+<li> On importance sampling, see notes from last week at <a href="http://compphysics.github.io/ComputationalPhysics2/doc/pub/week4/html/week4-reveal.html" target="_blank"><tt>http://compphysics.github.io/ComputationalPhysics2/doc/pub/week4/html/week4-reveal.html</tt></a></li>
+<li> These lecture notes</li>
+<li> Recommended background literature, <a href="https://web.stanford.edu/~boyd/cvxbook/" target="_blank">Convex Optimization</a> by Boyd and Vandenberghe. Their <a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxslides.pdf" target="_blank">lecture slides</a> are very useful (warning, these are some 300 pages).</li>
 </ul>
 </div>
 
@@ -233,7 +306,7 @@ MathJax.Hub.Config({
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec1">Motivation  </h2>
+<h2 id="motivation">Motivation  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -256,7 +329,7 @@ Newton's method can be easily used in finding the minimum of the local energy.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec2">Simple example and demonstration </h2>
+<h2 id="simple-example-and-demonstration">Simple example and demonstration </h2>
 
 <p>
 Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
@@ -278,7 +351,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec3">Simple example and demonstration </h2>
+<h2 id="simple-example-and-demonstration">Simple example and demonstration </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -313,7 +386,7 @@ gives the optimal \( \alpha=1 \), as expected.
 <p>
 <!-- --- begin exercise --- -->
 
-<h2 id="___sec4">Exercise 1: Find the local energy for the harmonic oscillator </h2>
+<h2 id="exercise-1-find-the-local-energy-for-the-harmonic-oscillator">Exercise 1: Find the local energy for the harmonic oscillator </h2>
 
 <p>
 <b>a)</b>
@@ -333,11 +406,12 @@ Repeat the above steps in two dimensions for \( N \) bosons or electrons. What i
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec5">Variance in the simple model </h2>
+<h2 id="variance-in-the-simple-model">Variance in the simple model </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 We can also minimize the variance. In our simple model the variance is
+
 $$
 \sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}^2.
 $$
@@ -349,9 +423,11 @@ which yields a second derivative which is always positive.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec6">Computing the derivatives </h2>
+<h2 id="computing-the-derivatives">Computing the derivatives </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
+<p>
+
 <p>
 In general we end up computing the expectation value of the energy in terms 
 of some parameters \( \alpha_0,\alpha_1,\dots,\alpha_n \)
@@ -371,7 +447,7 @@ to resort to expensive numerical derivations?
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec7">Expressions for finding the derivatives of the local energy </h2>
+<h2 id="expressions-for-finding-the-derivatives-of-the-local-energy">Expressions for finding the derivatives of the local energy </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -397,7 +473,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec8">Derivatives of the local energy </h2>
+<h2 id="derivatives-of-the-local-energy">Derivatives of the local energy </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -424,7 +500,7 @@ $$
 <p>
 <!-- --- begin exercise --- -->
 
-<h2 id="___sec9">Exercise 2: General expression for the derivative of the energy </h2>
+<h2 id="exercise-2-general-expression-for-the-derivative-of-the-energy">Exercise 2: General expression for the derivative of the energy </h2>
 
 <p>
 <b>a)</b>
@@ -443,7 +519,7 @@ Find the corresponding expression for the variance.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec10">Brief reminder on Newton-Raphson's method </h2>
+<h2 id="brief-reminder-on-newton-raphson-s-method">Brief reminder on Newton-Raphson's method </h2>
 
 <p>
 Let us quickly remind ourselves how we derive the above method.
@@ -460,7 +536,7 @@ normally discourage the use of this method.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec11">The equations </h2>
+<h2 id="the-equations">The equations </h2>
 
 <p>
 The Newton-Raphson formula consists geometrically of extending the
@@ -496,7 +572,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec12">Simple geometric interpretation </h2>
+<h2 id="simple-geometric-interpretation">Simple geometric interpretation </h2>
 
 <p>
 The above is Newton-Raphson's method. It has a simple geometric
@@ -514,7 +590,7 @@ vanishes, then Newton-Raphson may fail totally
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec13">Extending to more than one variable </h2>
+<h2 id="extending-to-more-than-one-variable">Extending to more than one variable </h2>
 
 <p>
 Newton's method can be generalized to systems of several non-linear equations
@@ -569,7 +645,7 @@ more than two non-linear equations. In our case, the Jacobian matrix is given by
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec14">Steepest descent </h2>
+<h2 id="steepest-descent">Steepest descent </h2>
 
 <p>
 The basic idea of gradient descent is
@@ -593,7 +669,7 @@ we are always moving towards smaller function values, i.e a minimum.
 <p>
 <!-- !split  -->
 
-<h2 id="___sec15">More on Steepest descent </h2>
+<h2 id="more-on-steepest-descent">More on Steepest descent </h2>
 
 <p>
 The previous observation is the basis of the method of steepest
@@ -612,7 +688,7 @@ the learning rate within the context of Machine Learning.
 <p>
 <!-- !split  -->
 
-<h2 id="___sec16">The ideal </h2>
+<h2 id="the-ideal">The ideal </h2>
 
 <p>
 Ideally the sequence \( \{\mathbf{x}_k \}_{k=0} \) converges to a global
@@ -638,7 +714,7 @@ Note that the gradient is a function of \( \mathbf{x} =
 <p>
 <!-- !split  -->
 
-<h2 id="___sec17">The sensitiveness of the gradient descent </h2>
+<h2 id="the-sensitiveness-of-the-gradient-descent">The sensitiveness of the gradient descent </h2>
 
 <p>
 The gradient descent method 
@@ -657,7 +733,7 @@ randomness. One such method is that of Stochastic Gradient Descent
 <p>
 <!-- !split  -->
 
-<h2 id="___sec18">Convex functions </h2>
+<h2 id="convex-functions">Convex functions </h2>
 
 <p>
 Ideally we want our cost/loss function to be convex(concave).
@@ -677,7 +753,7 @@ regular polygons (triangles, rectangles, pentagons, etc...).
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec19">Convex function </h2>
+<h2 id="convex-function">Convex function </h2>
 
 <p>
 <b>Convex function</b>: Let \( X \subset \mathbb{R}^n \) be a convex set. Assume that the function \( f: X \rightarrow \mathbb{R} \) is continuous, then \( f \) is said to be convex if $$f(tx_1 + (1-t)x_2) \leq tf(x_1) + (1-t)f(x_2) $$ for all \( x_1, x_2 \in X \) and for all \( t \in [0,1] \). If \( \leq \) is replaced with a strict inequaltiy in the definition, we demand \( x_1 \neq x_2 \) and \( t\in(0,1) \) then \( f \) is said to be strictly convex. For a single variable function, convexity means that if you draw a straight line connecting \( f(x_1) \) and \( f(x_2) \), the value of the function on the interval \( [x_1,x_2] \) is always below the line as illustrated below.
@@ -685,7 +761,7 @@ regular polygons (triangles, rectangles, pentagons, etc...).
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec20">Conditions on convex functions </h2>
+<h2 id="conditions-on-convex-functions">Conditions on convex functions </h2>
 
 <p>
 In the following we state first and second-order conditions which
@@ -695,7 +771,7 @@ details and proofs we refer to: <a href="http://stanford.edu/boyd/cvxbook/, 2004
 
 <p>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>First order condition.</b>
+<b>First order condition</b>
 <p>
 Suppose \( f \) is differentiable (i.e \( \nabla f(x) \) is well defined for
 all \( x \) in the domain of \( f \)). Then \( f \) is convex if and only if \( D_f \)
@@ -710,7 +786,7 @@ note that it is always below the graph.
 
 <p>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Second order condition.</b>
+<b>Second order condition</b>
 <p>
 Assume that \( f \) is twice
 differentiable, i.e the Hessian matrix exists at each point in
@@ -727,7 +803,7 @@ This condition is particularly useful since it gives us an procedure for determi
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec21">More on convex functions </h2>
+<h2 id="more-on-convex-functions">More on convex functions </h2>
 
 <p>
 The next result is of great importance to us and the reason why we are
@@ -743,7 +819,7 @@ is convex the following result provides invaluable information:
 
 <p>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Any minimum is global for convex functions.</b>
+<b>Any minimum is global for convex functions</b>
 <p>
 Consider the problem of finding \( x \in \mathbb{R}^n \) such that \( f(x) \)
 is minimal, where \( f \) is convex and differentiable. Then, any point
@@ -757,7 +833,7 @@ This result means that if we know that the cost/loss function is convex and we a
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec22">Some simple problems </h2>
+<h2 id="some-simple-problems">Some simple problems </h2>
 
 <ol>
 <li> Show that \( f(x)=x^2 \) is convex for \( x \in \mathbb{R} \) using the definition of convexity. Hint: If you re-write the definition, \( f \) is convex if the following holds for all \( x,y \in D_f \) and any \( \lambda \in [0,1] \) $\lambda f(x)+(1-\lambda)f(y)-f(\lambda x + (1-\lambda) y ) \geq 0$.</li>
@@ -784,7 +860,7 @@ Using the definition of convexity, try to show that a function satisfying the pr
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec23">Standard steepest descent </h2>
+<h2 id="standard-steepest-descent">Standard steepest descent </h2>
 
 <p>
 Before we proceed, we would like to discuss the approach called the
@@ -820,7 +896,7 @@ When we have found the exact solution, \( \hat{r}=0 \).
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec24">Gradient method </h2>
+<h2 id="gradient-method">Gradient method </h2>
 
 <p>
 The residual is zero when we reach the minimum of the quadratic equation
@@ -837,7 +913,7 @@ symmetric.  This defines also the Hessian and we want it to be  positive definit
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec25">Steepest descent  method </h2>
+<h2 id="steepest-descent-method">Steepest descent  method </h2>
 
 <p>
 We denote the initial guess for \( \hat{x} \) as \( \hat{x}_0 \). 
@@ -860,7 +936,7 @@ instead.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec26">Steepest descent  method </h2>
+<h2 id="steepest-descent-method">Steepest descent  method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -890,7 +966,7 @@ and
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec27">Final expressions </h2>
+<h2 id="final-expressions">Final expressions </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -933,19 +1009,19 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec28">Code examples for steepest descent </h2>
+<h2 id="code-examples-for-steepest-descent">Code examples for steepest descent </h2>
 
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec29">Simple codes for  steepest descent and conjugate gradient using a \( 2\times 2 \) matrix, in c++, Python code to come </h2>
+<h2 id="simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come">Simple codes for  steepest descent and conjugate gradient using a \( 2\times 2 \) matrix, in c++, Python code to come </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%"><span></span><span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;cmath&gt;</span><span style="color: #1e889b"></span>
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span><span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;cmath&gt;</span><span style="color: #1e889b"></span>
 <span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;iostream&gt;</span><span style="color: #1e889b"></span>
 <span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;fstream&gt;</span><span style="color: #1e889b"></span>
 <span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;iomanip&gt;</span><span style="color: #1e889b"></span>
@@ -961,7 +1037,7 @@ $$
   x0(<span style="color: #B452CD">0</span>) = x0(<span style="color: #B452CD">1</span>) = <span style="color: #B452CD">0</span>;
   <span style="color: #228B22">// Set the matrix</span>
   A(<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>) =  <span style="color: #B452CD">3</span>;    A(<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>) =  <span style="color: #B452CD">2</span>;   A(<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>) =  <span style="color: #B452CD">2</span>;   A(<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>) =  <span style="color: #B452CD">6</span>;
-  b(<span style="color: #B452CD">0</span>) = <span style="color: #B452CD">2</span>; b(<span style="color: #B452CD">1</span>) = -<span style="color: #B452CD">8</span>;
+  b(<span style="color: #B452CD">0</span>) = <span style="color: #B452CD">2</span>; b(<span style="color: #B452CD">1</span>) = <span style="color: #B452CD">-8</span>;
   cout &lt;&lt; <span style="color: #CD5555">&quot;The Matrix A that we are using: &quot;</span> &lt;&lt; endl;
   A.Print();
   cout &lt;&lt; endl;
@@ -978,14 +1054,14 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec30">The routine for the steepest descent method </h2>
+<h2 id="the-routine-for-the-steepest-descent-method">The routine for the steepest descent method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%"><span></span>Vector <span style="color: #008b45">SteepestDescent</span>(Matrix A, Vector b, Vector x0){
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span>Vector <span style="color: #008b45">SteepestDescent</span>(Matrix A, Vector b, Vector x0){
   <span style="color: #00688B; font-weight: bold">int</span> IterMax, i;
   <span style="color: #00688B; font-weight: bold">int</span> dim = x0.Dimension();
   <span style="color: #8B008B; font-weight: bold">const</span> <span style="color: #00688B; font-weight: bold">double</span> tolerance = <span style="color: #B452CD">1.0e-14</span>;
@@ -1014,12 +1090,12 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec31">Steepest descent example </h2>
+<h2 id="steepest-descent-example">Steepest descent example </h2>
 
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
 <span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy.linalg</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">la</span>
 
 <span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">scipy.optimize</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">sopt</span>
@@ -1045,7 +1121,7 @@ And then as countor plot
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span>pt.axis(<span style="color: #CD5555">&quot;equal&quot;</span>)
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span>pt.axis(<span style="color: #CD5555">&quot;equal&quot;</span>)
 pt.contour(xmesh, ymesh, fmesh)
 guesses = [np.array([<span style="color: #B452CD">2</span>, <span style="color: #B452CD">2.</span>/<span style="color: #B452CD">5</span>])]
 </pre></div>
@@ -1054,7 +1130,7 @@ Find guesses
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span>x = guesses[-<span style="color: #B452CD">1</span>]
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span>x = guesses[-<span style="color: #B452CD">1</span>]
 s = -df(x)
 </pre></div>
 <p>
@@ -1062,7 +1138,7 @@ Run it!
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f1d</span>(alpha):
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f1d</span>(alpha):
     <span style="color: #8B008B; font-weight: bold">return</span> f(x + alpha*s)
 
 alpha_opt = sopt.golden(f1d)
@@ -1075,7 +1151,7 @@ What happened?
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span>pt.axis(<span style="color: #CD5555">&quot;equal&quot;</span>)
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span>pt.axis(<span style="color: #CD5555">&quot;equal&quot;</span>)
 pt.contour(xmesh, ymesh, fmesh, <span style="color: #B452CD">50</span>)
 it_array = np.array(guesses)
 pt.plot(it_array.T[<span style="color: #B452CD">0</span>], it_array.T[<span style="color: #B452CD">1</span>], <span style="color: #CD5555">&quot;x-&quot;</span>)
@@ -1083,7 +1159,7 @@ pt.plot(it_array.T[<span style="color: #B452CD">0</span>], it_array.T[<span styl
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec32">Conjugate gradient method </h2>
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1113,7 +1189,7 @@ this inner product. Being conjugate is a symmetric relation: if \( \hat{s} \) is
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec33">Conjugate gradient method </h2>
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1131,7 +1207,7 @@ which is zero unless \( i=j \).
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec34">Conjugate gradient method </h2>
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1158,7 +1234,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec35">Conjugate gradient method </h2>
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1190,7 +1266,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec36">Conjugate gradient method and iterations </h2>
+<h2 id="conjugate-gradient-method-and-iterations">Conjugate gradient method and iterations </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1226,7 +1302,7 @@ instead.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec37">Conjugate gradient method </h2>
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1256,7 +1332,7 @@ hence the name conjugate gradient method.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec38">Conjugate gradient method </h2>
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1285,7 +1361,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec39">Conjugate gradient method </h2>
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1323,14 +1399,14 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec40">Simple implementation of the Conjugate gradient algorithm </h2>
+<h2 id="simple-implementation-of-the-conjugate-gradient-algorithm">Simple implementation of the Conjugate gradient algorithm </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%"><span></span>  Vector <span style="color: #008b45">ConjugateGradient</span>(Matrix A, Vector b, Vector x0){
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span>  Vector <span style="color: #008b45">ConjugateGradient</span>(Matrix A, Vector b, Vector x0){
   <span style="color: #00688B; font-weight: bold">int</span> dim = x0.Dimension();
   <span style="color: #8B008B; font-weight: bold">const</span> <span style="color: #00688B; font-weight: bold">double</span> tolerance = <span style="color: #B452CD">1.0e-14</span>;
   Vector x(dim),r(dim),v(dim),z(dim);
@@ -1362,7 +1438,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec41">Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno algorithm </h2>
+<h2 id="broyden-fletcher-goldfarb-shanno-algorithm">Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno algorithm </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1397,7 +1473,7 @@ over the scalar \( \alpha > 0 \).
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec42">Stochastic Gradient Descent </h2>
+<h2 id="stochastic-gradient-descent">Stochastic Gradient Descent </h2>
 
 <p>
 Stochastic gradient descent (SGD) and variants thereof address some of
@@ -1415,7 +1491,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec43">Computation of gradients </h2>
+<h2 id="computation-of-gradients">Computation of gradients </h2>
 
 <p>
 This in turn means that the gradient can be
@@ -1435,7 +1511,7 @@ minibatches. We denote these minibatches by \( B_k \) where
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec44">SGD example </h2>
+<h2 id="sgd-example">SGD example </h2>
 As an example, suppose we have \( 10 \) data points \( (\mathbf{x}_1,\cdots, \mathbf{x}_{10}) \) 
 and we choose to have \( M=5 \) minibathces,
 then each minibatch contains two data points. In particular we have
@@ -1459,7 +1535,7 @@ $$
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec45">The gradient step </h2>
+<h2 id="the-gradient-step">The gradient step </h2>
 
 <p>
 Thus a gradient descent step now looks like 
@@ -1478,12 +1554,12 @@ the number of minibatches, as exemplified in the code below.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec46">Simple example code </h2>
+<h2 id="simple-example-code">Simple example code </h2>
 
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span> 
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span> 
 
 n = <span style="color: #B452CD">100</span> <span style="color: #228B22">#100 datapoints </span>
 M = <span style="color: #B452CD">5</span>   <span style="color: #228B22">#size of each minibatch</span>
@@ -1510,7 +1586,7 @@ all \( n \) datapoints.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec47">When do we stop? </h2>
+<h2 id="when-do-we-stop">When do we stop? </h2>
 
 <p>
 A natural question is when do we stop the search for a new minimum?
@@ -1527,7 +1603,7 @@ gave the lowest value.
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec48">Slightly different approach </h2>
+<h2 id="slightly-different-approach">Slightly different approach </h2>
 
 <p>
 Another approach is to let the step length \( \gamma_j \) depend on the
@@ -1547,7 +1623,7 @@ function.
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span> 
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span> 
 
 <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">step_length</span>(t,t0,t1):
     <span style="color: #8B008B; font-weight: bold">return</span> t0/(t+t1)
@@ -1575,12 +1651,12 @@ j = <span style="color: #B452CD">0</span>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec49">Program for stochastic gradient </h2>
+<h2 id="program-for-stochastic-gradient">Program for stochastic gradient </h2>
 
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #228B22"># Importing various packages</span>
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #228B22"># Importing various packages</span>
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed
 <span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
@@ -1650,7 +1726,7 @@ plt.show()
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec50">Using gradient descent methods, limitations </h2>
+<h2 id="using-gradient-descent-methods-limitations">Using gradient descent methods, limitations </h2>
 
 <ul>
 <li> <b>Gradient descent (GD) finds local minima of our function</b>. Since the GD algorithm is deterministic, if it converges, it will converge to a local minimum of our energy function. Because in ML we are often dealing with extremely rugged landscapes with many local minima, this can lead to poor performance.</li>
@@ -1663,7 +1739,7 @@ plt.show()
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec51">Codes from numerical recipes </h2>
+<h2 id="codes-from-numerical-recipes">Codes from numerical recipes </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1682,14 +1758,14 @@ Below we show only excerpts from the main program. For the full program, see the
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec52">Finding the minimum of the harmonic oscillator model in one dimension </h2>
+<h2 id="finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension">Finding the minimum of the harmonic oscillator model in one dimension </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%"><span></span><span style="color: #228B22">//   Main function begins here</span>
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span><span style="color: #228B22">//   Main function begins here</span>
 <span style="color: #00688B; font-weight: bold">int</span> <span style="color: #008b45">main</span>()
 {
      <span style="color: #00688B; font-weight: bold">int</span> n, iter;
@@ -1718,7 +1794,7 @@ Below we show only excerpts from the main program. For the full program, see the
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec53">Functions to observe </h2>
+<h2 id="functions-to-observe">Functions to observe </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
@@ -1729,7 +1805,7 @@ These functions need to be changed when you want to your own derivatives.
 <p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%"><span></span><span style="color: #228B22">//  this function defines the expectation value of the local energy</span>
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span><span style="color: #228B22">//  this function defines the expectation value of the local energy</span>
 <span style="color: #00688B; font-weight: bold">double</span> <span style="color: #008b45">Efunction</span>(Vector  &amp;x)
 {
   <span style="color: #00688B; font-weight: bold">double</span> value = x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>)*<span style="color: #B452CD">0.5</span>+<span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">8</span>*x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>));
@@ -1739,7 +1815,7 @@ These functions need to be changed when you want to your own derivatives.
 <span style="color: #228B22">//  this function defines the derivative of the energy </span>
 <span style="color: #00688B; font-weight: bold">void</span> <span style="color: #008b45">dEfunction</span>(Vector &amp;x, Vector &amp;g)
 {
-  g(<span style="color: #B452CD">0</span>) = x(<span style="color: #B452CD">0</span>)-<span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">4</span>*x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>));
+  g(<span style="color: #B452CD">0</span>) = x(<span style="color: #B452CD">0</span>)<span style="color: #B452CD">-1.0</span>/(<span style="color: #B452CD">4</span>*x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>));
 } <span style="color: #228B22">// end of function to evaluate</span>
 </pre></div>
 <p>
@@ -1753,11 +1829,11 @@ After roughly 10-20 iterations I got a converged result in terms of \( \alpha \)
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec54">Python program for 2-electrons in 2 dimensions </h2>
+<h2 id="python-program-for-2-electrons-in-2-dimensions">Python program for 2-electrons in 2 dimensions </h2>
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
 <span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
 <span style="color: #228B22"># Added energy minimization with gradient descent using fixed step size</span>
 <span style="color: #228B22"># To do: replace with optimization codes from scipy and/or use stochastic gradient descent</span>
@@ -1904,12 +1980,12 @@ Niterations = <span style="color: #B452CD">50</span>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec55">Using Broyden's algorithm in scipy </h2>
+<h2 id="using-broyden-s-algorithm-in-scipy">Using Broyden's algorithm in scipy </h2>
 The following function uses the above described BFGS algorithm. Here we have defined a function which calculates the energy and a function which computes the first derivative.
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
 <span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
 <span style="color: #228B22"># Added energy minimization using the BFGS algorithm, see p. 136 of https://www.springer.com/it/book/9780387303031</span>
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
@@ -2105,7 +2181,7 @@ Note that the <b>minimize</b> function returns the finale values for the variabl
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec56">How do we proceed? </h2>
+<h2 id="how-do-we-proceed">How do we proceed? </h2>
 There are several paths which can be chosen. One is to extend the brute force gradient descent method with an adapative stochastic gradient. There are several examples of this. A recent approach based on <a href="https://arxiv.org/pdf/1805.09416.pdf" target="_blank">the Langevin equations</a> seems like a promising approach for general and possibly non-convex optimization problems.
 
 <p>
@@ -2114,13 +2190,13 @@ Here we would like to point out that our next step is now to use the optimal val
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec57">Modified code </h2>
+<h2 id="modified-code">Modified code </h2>
 The modified code here uses the BFGS algorithm but performs now a production run and writes to file all average values of the energy. The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/Resampling" target="_blank">sampling functions</a> can be used to perform both a blocking analysis, or a standard bootstrap and jackknife analysis.
 
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
 <span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
 <span style="color: #228B22"># Added energy minimization</span>
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
@@ -2323,13 +2399,13 @@ outfile.close()
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec58">Resampling analysis </h2>
+<h2 id="resampling-analysis">Resampling analysis </h2>
 The next step is then to use the above data sets and perform a resampling analysis, either using say the Bootstrap method or the Blocking method. Since the data will be correlated, we would recommend to use the non-iid Bootstrap code here
 
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> std, mean, concatenate, arange, loadtxt, zeros, ceil
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> std, mean, concatenate, arange, loadtxt, zeros, ceil
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.random</span> <span style="color: #8B008B; font-weight: bold">import</span> randint
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
 
@@ -2374,7 +2450,7 @@ The blocking code, based on the article of <a href="https://journals.aps.org/pre
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%"><span></span><span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> log2, zeros, mean, var, <span style="color: #658b00">sum</span>, loadtxt, arange, array, cumsum, dot, transpose, diagonal
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> log2, zeros, mean, var, <span style="color: #658b00">sum</span>, loadtxt, arange, array, cumsum, dot, transpose, diagonal
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.linalg</span> <span style="color: #8B008B; font-weight: bold">import</span> inv
 
 <span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">block</span>(x):
@@ -2419,7 +2495,7 @@ x = loadtxt(<span style="color: #CD5555">&quot;Energies.dat&quot;</span>)
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2020, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
 </center>
 
 
