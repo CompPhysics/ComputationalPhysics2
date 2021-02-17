@@ -1,19 +1,19 @@
 <!--
 Automatically generated HTML file from DocOnce source
-(https://github.com/hplgit/doconce/)
+(https://github.com/doconce/doconce/)
 -->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="DocOnce: https://github.com/hplgit/doconce/" />
+<meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 7 February 15-19: Stochastic Gradient Descent">
+<meta name="description" content="Week 7 February 15-19: Gradient Methods">
 
-<title>Week 7 February 15-19: Stochastic Gradient Descent</title>
+<title>Week 7 February 15-19: Gradient Methods</title>
 
 
-<link href="https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_styles/style_solarized_box/css/solarized_light_code.css" rel="stylesheet" type="text/css" title="light"/>
-<script src="https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_styles/style_solarized_box/js/highlight.pack.js"></script>
+<link href="https://cdn.rawgit.com/doconce/doconce/master/bundled/html_styles/style_solarized_box/css/solarized_light_code.css" rel="stylesheet" type="text/css" title="light"/>
+<script src="https://cdn.rawgit.com/doconce/doconce/master/bundled/html_styles/style_solarized_box/js/highlight.pack.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
 <link href="https://thomasf.github.io/solarized-css/solarized-light.min.css" rel="stylesheet">
@@ -48,10 +48,10 @@ pre {
 .alert-block > p, .alert-block > ul {margin-bottom:1em}
 .alert li {margin-top: 1em}
 .alert-block p+p {margin-top:5px}
-.alert-notice { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_notice.png); }
-.alert-summary  { background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_summary.png); }
-.alert-warning { background-image: url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_warning.png); }
-.alert-question {background-image:url(https://cdn.rawgit.com/hplgit/doconce/master/bundled/html_images/small_yellow_question.png); }
+.alert-notice { background-image: url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_notice.png); }
+.alert-summary  { background-image:url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_summary.png); }
+.alert-warning { background-image: url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_warning.png); }
+.alert-question {background-image:url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_question.png); }
 
 div { text-align: justify; text-justify: inter-word; }
 </style>
@@ -61,17 +61,200 @@ div { text-align: justify; text-justify: inter-word; }
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [('Overview of week 7, February 15-19', 2, None, '___sec0')]}
+ 'sections': [('Overview of week 7, February 15-19',
+               2,
+               None,
+               'overview-of-week-7-february-15-19'),
+              ('Top-down start', 2, None, 'top-down-start'),
+              ('Motivation', 2, None, 'motivation'),
+              ('Simple example and demonstration',
+               2,
+               None,
+               'simple-example-and-demonstration'),
+              ('Simple example and demonstration',
+               2,
+               None,
+               'simple-example-and-demonstration'),
+              ('Exercise 1: Find the local energy for the harmonic oscillator',
+               2,
+               None,
+               'exercise-1-find-the-local-energy-for-the-harmonic-oscillator'),
+              ('Variance in the simple model',
+               2,
+               None,
+               'variance-in-the-simple-model'),
+              ('Computing the derivatives',
+               2,
+               None,
+               'computing-the-derivatives'),
+              ('Expressions for finding the derivatives of the local energy',
+               2,
+               None,
+               'expressions-for-finding-the-derivatives-of-the-local-energy'),
+              ('Derivatives of the local energy',
+               2,
+               None,
+               'derivatives-of-the-local-energy'),
+              ('Exercise 2: General expression for the derivative of the '
+               'energy',
+               2,
+               None,
+               'exercise-2-general-expression-for-the-derivative-of-the-energy'),
+              ('Python program for 2-electrons in 2 dimensions',
+               2,
+               None,
+               'python-program-for-2-electrons-in-2-dimensions'),
+              ("Using Broyden's algorithm in scipy",
+               2,
+               None,
+               'using-broyden-s-algorithm-in-scipy'),
+              ("Brief reminder on Newton-Raphson's method",
+               2,
+               None,
+               'brief-reminder-on-newton-raphson-s-method'),
+              ('The equations', 2, None, 'the-equations'),
+              ('Simple geometric interpretation',
+               2,
+               None,
+               'simple-geometric-interpretation'),
+              ('Extending to more than one variable',
+               2,
+               None,
+               'extending-to-more-than-one-variable'),
+              ('Steepest descent', 2, None, 'steepest-descent'),
+              ('More on Steepest descent', 2, None, 'more-on-steepest-descent'),
+              ('The ideal', 2, None, 'the-ideal'),
+              ('The sensitiveness of the gradient descent',
+               2,
+               None,
+               'the-sensitiveness-of-the-gradient-descent'),
+              ('Convex functions', 2, None, 'convex-functions'),
+              ('Convex function', 2, None, 'convex-function'),
+              ('Conditions on convex functions',
+               2,
+               None,
+               'conditions-on-convex-functions'),
+              ('More on convex functions', 2, None, 'more-on-convex-functions'),
+              ('Some simple problems', 2, None, 'some-simple-problems'),
+              ('Standard steepest descent',
+               2,
+               None,
+               'standard-steepest-descent'),
+              ('Gradient method', 2, None, 'gradient-method'),
+              ('Steepest descent  method', 2, None, 'steepest-descent-method'),
+              ('Steepest descent  method', 2, None, 'steepest-descent-method'),
+              ('Final expressions', 2, None, 'final-expressions'),
+              ('Code examples for steepest descent',
+               2,
+               None,
+               'code-examples-for-steepest-descent'),
+              ('Simple codes for  steepest descent and conjugate gradient '
+               'using a $2\\times 2$ matrix, in c++, Python code to come',
+               2,
+               None,
+               'simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come'),
+              ('The routine for the steepest descent method',
+               2,
+               None,
+               'the-routine-for-the-steepest-descent-method'),
+              ('Steepest descent example', 2, None, 'steepest-descent-example'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method and iterations',
+               2,
+               None,
+               'conjugate-gradient-method-and-iterations'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Simple implementation of the Conjugate gradient algorithm',
+               2,
+               None,
+               'simple-implementation-of-the-conjugate-gradient-algorithm'),
+              ('Broyden–Fletcher–Goldfarb–Shanno algorithm',
+               2,
+               None,
+               'broyden-fletcher-goldfarb-shanno-algorithm'),
+              ('Stochastic Gradient Descent',
+               2,
+               None,
+               'stochastic-gradient-descent'),
+              ('Computation of gradients', 2, None, 'computation-of-gradients'),
+              ('SGD example', 2, None, 'sgd-example'),
+              ('The gradient step', 2, None, 'the-gradient-step'),
+              ('Simple example code', 2, None, 'simple-example-code'),
+              ('When do we stop?', 2, None, 'when-do-we-stop'),
+              ('Slightly different approach',
+               2,
+               None,
+               'slightly-different-approach'),
+              ('Program for stochastic gradient',
+               2,
+               None,
+               'program-for-stochastic-gradient'),
+              ('Using gradient descent methods, limitations',
+               2,
+               None,
+               'using-gradient-descent-methods-limitations'),
+              ('Codes from numerical recipes',
+               2,
+               None,
+               'codes-from-numerical-recipes'),
+              ('Finding the minimum of the harmonic oscillator model in one '
+               'dimension',
+               2,
+               None,
+               'finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension'),
+              ('Functions to observe', 2, None, 'functions-to-observe')]}
 end of tocinfo -->
 
 <body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
 
     
 <!-- ------------------- main content ---------------------- -->
 
 
 
-<center><h1>Week 7 February 15-19: Stochastic Gradient Descent</h1></center>  <!-- document title -->
+<center><h1>Week 7 February 15-19: Gradient Methods</h1></center>  <!-- document title -->
 
 <p>
 <!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
@@ -87,18 +270,18 @@ end of tocinfo -->
 <center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
 <br>
 <p>
-<center><h4>Dec 14, 2020</h4></center> <!-- date -->
+<center><h4>Feb 17, 2021</h4></center> <!-- date -->
 <br>
 <p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<h2 id="___sec0">Overview of week 7, February 15-19 </h2>
+<h2 id="overview-of-week-7-february-15-19">Overview of week 7, February 15-19 </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Topics.</b>
+<b>Topics</b>
 <p>
 
 <ul>
-<li> Gradient Descent methods, Stochastic gradient descent</li>
+<li> Gradient Descent methods, Steepest descent and Stochastic gradient descent</li>
 <li> Conjugate Gradient Descent</li>
 </ul>
 </div>
@@ -106,14 +289,1898 @@ end of tocinfo -->
 
 <p>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Teaching Material, videos and written material.</b>
+<b>Teaching Material, videos and written material</b>
 <p>
 
 <ul>
-<li> Overview video</li>
-<li> Lecture notes and reading assignments</li>
-<li> Recommended background literature</li>
+<li> These lecture notes</li>
+<li> Recommended background literature, <a href="https://web.stanford.edu/~boyd/cvxbook/" target="_blank">Convex Optimization</a> by Boyd and Vandenberghe. Their <a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxslides.pdf" target="_blank">lecture slides</a> are very useful (warning, these are some 300 pages).</li>
 </ul>
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="top-down-start">Top-down start </h2>
+
+<ul>
+<li> We will start with a top-down view, with a simple harmonic oscillator problem in one dimension as case.</li>
+<li> Thereafter we continue with implementing the simplest possible steepest descent approach to our two-electron problem with an electrostatic (Coulomb) interaction. Our code includes also importance sampling. The simple Python code here illustrates the basic elements which need to be included in our own code.</li>
+<li> Then we move on to the mathematical description of various gradient methods.</li>
+</ul>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="motivation">Motivation  </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Our aim with this part of the project is to be able to
+
+<ul>
+<li> find an optimal value for the variational parameters using only some few Monte Carlo cycles</li>
+<li> use these optimal values for the variational parameters to perform a large-scale Monte Carlo calculation</li>
+</ul>
+
+To achieve this will look at methods like <em>Steepest descent</em> and the <em>conjugate gradient method</em>. Both these methods allow us to find
+the minima of a multivariable  function like our energy (function of several variational parameters). 
+Alternatively, you can always use Newton's method. In particular, since we will normally have one variational parameter,
+Newton's method can be easily used in finding the minimum of the local energy.
+
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="simple-example-and-demonstration">Simple example and demonstration </h2>
+
+<p>
+Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
+For the harmonic oscillator in one-dimension we have a  trial wave function and probability
+$$
+\psi_T(x;\alpha) = \exp{-(\frac{1}{2}\alpha^2x^2)},
+$$
+
+which results in a local energy 
+$$
+\frac{1}{2}\left(\alpha^2+x^2(1-\alpha^4)\right).
+$$
+
+We can compare our numerically calculated energies with the exact energy as function of \( \alpha \)
+$$
+\overline{E}[\alpha] = \frac{1}{4}\left(\alpha^2+\frac{1}{\alpha^2}\right).
+$$
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="simple-example-and-demonstration">Simple example and demonstration </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The derivative of the energy with respect to \( \alpha \) gives
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \frac{1}{2}\alpha-\frac{1}{2\alpha^3}
+\end{equation*}
+$$
+
+and a second derivative which is always positive (meaning that we find a minimum)
+$$
+\begin{equation*}
+\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = \frac{1}{2}+\frac{3}{2\alpha^4}
+\end{equation*}
+$$
+
+The condition
+$$
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
+\end{equation*}
+$$
+
+gives the optimal \( \alpha=1 \), as expected.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<p>
+<!-- --- begin exercise --- -->
+
+<h2 id="exercise-1-find-the-local-energy-for-the-harmonic-oscillator">Exercise 1: Find the local energy for the harmonic oscillator </h2>
+
+<p>
+<b>a)</b>
+Derive the local energy for the harmonic oscillator in one dimension and find its expectation value.
+
+<p>
+<b>b)</b>
+Show also that the optimal value of optimal \( \alpha=1 \)
+
+<p>
+<b>c)</b>
+Repeat the above steps in two dimensions for \( N \) bosons or electrons. What is the optimal value of \( \alpha \)?
+
+<p>
+<!-- --- end exercise --- -->
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="variance-in-the-simple-model">Variance in the simple model </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We can also minimize the variance. In our simple model the variance is
+
+$$
+\sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}^2.
+$$
+
+which yields a second derivative which is always positive.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="computing-the-derivatives">Computing the derivatives </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+In general we end up computing the expectation value of the energy in terms 
+of some parameters \( \alpha_0,\alpha_1,\dots,\alpha_n \)
+and we search for a minimum in this multi-variable parameter space.  
+This leads to an energy minimization problem <em>where we need the derivative of the energy as a function of the variational parameters</em>.
+
+<p>
+In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
+However, in our actual calculations the energy is represented by a multi-dimensional integral with several variational parameters.
+How can we can then obtain the derivatives of the energy with respect to the variational parameters without having 
+to resort to expensive numerical derivations?
+
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="expressions-for-finding-the-derivatives-of-the-local-energy">Expressions for finding the derivatives of the local energy </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.
+
+<p>
+Let us define 
+$$
+\bar{E}_{\alpha}=\frac{d\langle  E_L[\alpha]\rangle}{d\alpha}.
+$$
+
+as the derivative of the energy with respect to the variational parameter \( \alpha \) (we limit ourselves to one parameter only).
+In the above example this was easy and we obtain a simple expression for the derivative.
+We define also the derivative of the trial function (skipping the subindex \( T \)) as 
+$$
+\bar{\psi}_{\alpha}=\frac{d\psi[\alpha]\rangle}{d\alpha}.
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="derivatives-of-the-local-energy">Derivatives of the local energy </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)
+$$
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+$$
+
+From a computational point of view it means that you need to compute the expectation values of 
+$$
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle,
+$$
+
+and
+$$
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<p>
+<!-- --- begin exercise --- -->
+
+<h2 id="exercise-2-general-expression-for-the-derivative-of-the-energy">Exercise 2: General expression for the derivative of the energy </h2>
+
+<p>
+<b>a)</b>
+Show that 
+$$
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+$$
+
+<p>
+<b>b)</b>
+Find the corresponding expression for the variance.
+
+<p>
+<!-- --- end exercise --- -->
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="python-program-for-2-electrons-in-2-dimensions">Python program for 2-electrons in 2 dimensions </h2>
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
+<span style="color: #228B22"># Added energy minimization with gradient descent using fixed step size</span>
+<span style="color: #228B22"># To do: replace with optimization codes from scipy and/or use stochastic gradient descent</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed, normalvariate
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">mpl_toolkits.mplot3d</span> <span style="color: #8B008B; font-weight: bold">import</span> Axes3D
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib</span> <span style="color: #8B008B; font-weight: bold">import</span> cm
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.ticker</span> <span style="color: #8B008B; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">sys</span>
+
+
+
+<span style="color: #228B22"># Trial wave function for the 2-electron quantum dot in two dims</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">WaveFunction</span>(r,alpha,beta):
+    r1 = r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r2 = r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = r12/(<span style="color: #B452CD">1</span>+beta*r12)
+    <span style="color: #8B008B; font-weight: bold">return</span> exp(-<span style="color: #B452CD">0.5</span>*alpha*(r1+r2)+deno)
+
+<span style="color: #228B22"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">LocalEnergy</span>(r,alpha,beta):
+    
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0.5</span>*(<span style="color: #B452CD">1</span>-alpha*alpha)*(r1 + r2) +<span style="color: #B452CD">2.0</span>*alpha + <span style="color: #B452CD">1.0</span>/r12+deno2*(alpha*r12-deno2+<span style="color: #B452CD">2</span>*beta*deno-<span style="color: #B452CD">1.0</span>/r12)
+
+<span style="color: #228B22"># Derivate of wave function ansatz as function of variational parameters</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">DerivativeWFansatz</span>(r,alpha,beta):
+    
+    WfDer  = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    WfDer[<span style="color: #B452CD">0</span>] = -<span style="color: #B452CD">0.5</span>*(r1+r2)
+    WfDer[<span style="color: #B452CD">1</span>] = -r12*r12*deno2
+    <span style="color: #8B008B; font-weight: bold">return</span>  WfDer
+
+<span style="color: #228B22"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">QuantumForce</span>(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    qforce[<span style="color: #B452CD">0</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">0</span>,:]*alpha*(r[<span style="color: #B452CD">0</span>,:]-r[<span style="color: #B452CD">1</span>,:])*deno*deno/r12
+    qforce[<span style="color: #B452CD">1</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">1</span>,:]*alpha*(r[<span style="color: #B452CD">1</span>,:]-r[<span style="color: #B452CD">0</span>,:])*deno*deno/r12
+    <span style="color: #8B008B; font-weight: bold">return</span> qforce
+    
+
+<span style="color: #228B22"># Computing the derivative of the energy and the energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">EnergyMinimization</span>(alpha, beta):
+
+    NumberMCcycles= <span style="color: #B452CD">10000</span>
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    <span style="color: #228B22"># seed for rng generator </span>
+    seed()
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    EnergyDer = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+    DeltaPsi = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+    DerivativePsiE = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
+        DeltaPsi += DerPsi
+        energy += DeltaE
+        DerivativePsiE += DerPsi*DeltaE
+            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    DerivativePsiE /= NumberMCcycles
+    DeltaPsi /= NumberMCcycles
+    EnergyDer  = <span style="color: #B452CD">2</span>*(DerivativePsiE-DeltaPsi*energy)
+    <span style="color: #8B008B; font-weight: bold">return</span> energy, EnergyDer
+
+
+<span style="color: #228B22">#Here starts the main program with variable declarations</span>
+NumberParticles = <span style="color: #B452CD">2</span>
+Dimension = <span style="color: #B452CD">2</span>
+<span style="color: #228B22"># guess for variational parameters</span>
+alpha = <span style="color: #B452CD">0.9</span>
+beta = <span style="color: #B452CD">0.2</span>
+<span style="color: #228B22"># Set up iteration using gradient descent method</span>
+Energy = <span style="color: #B452CD">0</span>
+EDerivative = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+eta = <span style="color: #B452CD">0.01</span>
+Niterations = <span style="color: #B452CD">50</span>
+<span style="color: #228B22"># </span>
+<span style="color: #8B008B; font-weight: bold">for</span> <span style="color: #658b00">iter</span> <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Niterations):
+    Energy, EDerivative = EnergyMinimization(alpha,beta)
+    alphagradient = EDerivative[<span style="color: #B452CD">0</span>]
+    betagradient = EDerivative[<span style="color: #B452CD">1</span>]
+    alpha -= eta*alphagradient
+    beta -= eta*betagradient 
+
+<span style="color: #658b00">print</span>(alpha, beta)
+<span style="color: #658b00">print</span>(Energy, EDerivative[<span style="color: #B452CD">0</span>], EDerivative[<span style="color: #B452CD">1</span>])
+</pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="using-broyden-s-algorithm-in-scipy">Using Broyden's algorithm in scipy </h2>
+The following function uses the above described BFGS algorithm. Here we have defined a function which calculates the energy and a function which computes the first derivative.
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
+<span style="color: #228B22"># Added energy minimization using the BFGS algorithm, see p. 136 of https://www.springer.com/it/book/9780387303031</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed, normalvariate
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">mpl_toolkits.mplot3d</span> <span style="color: #8B008B; font-weight: bold">import</span> Axes3D
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib</span> <span style="color: #8B008B; font-weight: bold">import</span> cm
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.ticker</span> <span style="color: #8B008B; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.optimize</span> <span style="color: #8B008B; font-weight: bold">import</span> minimize
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">sys</span>
+
+
+<span style="color: #228B22"># Trial wave function for the 2-electron quantum dot in two dims</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">WaveFunction</span>(r,alpha,beta):
+    r1 = r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r2 = r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = r12/(<span style="color: #B452CD">1</span>+beta*r12)
+    <span style="color: #8B008B; font-weight: bold">return</span> exp(-<span style="color: #B452CD">0.5</span>*alpha*(r1+r2)+deno)
+
+<span style="color: #228B22"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">LocalEnergy</span>(r,alpha,beta):
+    
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0.5</span>*(<span style="color: #B452CD">1</span>-alpha*alpha)*(r1 + r2) +<span style="color: #B452CD">2.0</span>*alpha + <span style="color: #B452CD">1.0</span>/r12+deno2*(alpha*r12-deno2+<span style="color: #B452CD">2</span>*beta*deno-<span style="color: #B452CD">1.0</span>/r12)
+
+<span style="color: #228B22"># Derivate of wave function ansatz as function of variational parameters</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">DerivativeWFansatz</span>(r,alpha,beta):
+    
+    WfDer  = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    WfDer[<span style="color: #B452CD">0</span>] = -<span style="color: #B452CD">0.5</span>*(r1+r2)
+    WfDer[<span style="color: #B452CD">1</span>] = -r12*r12*deno2
+    <span style="color: #8B008B; font-weight: bold">return</span>  WfDer
+
+<span style="color: #228B22"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">QuantumForce</span>(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    qforce[<span style="color: #B452CD">0</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">0</span>,:]*alpha*(r[<span style="color: #B452CD">0</span>,:]-r[<span style="color: #B452CD">1</span>,:])*deno*deno/r12
+    qforce[<span style="color: #B452CD">1</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">1</span>,:]*alpha*(r[<span style="color: #B452CD">1</span>,:]-r[<span style="color: #B452CD">0</span>,:])*deno*deno/r12
+    <span style="color: #8B008B; font-weight: bold">return</span> qforce
+    
+
+<span style="color: #228B22"># Computing the derivative of the energy and the energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">EnergyDerivative</span>(x0):
+
+    
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    NumberMCcycles= <span style="color: #B452CD">10000</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    alpha = x0[<span style="color: #B452CD">0</span>]
+    beta = x0[<span style="color: #B452CD">1</span>]
+    EnergyDer = <span style="color: #B452CD">0.0</span>
+    DeltaPsi = <span style="color: #B452CD">0.0</span>
+    DerivativePsiE = <span style="color: #B452CD">0.0</span> 
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
+        DeltaPsi += DerPsi
+        energy += DeltaE
+        DerivativePsiE += DerPsi*DeltaE
+            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    DerivativePsiE /= NumberMCcycles
+    DeltaPsi /= NumberMCcycles
+    EnergyDer  = <span style="color: #B452CD">2</span>*(DerivativePsiE-DeltaPsi*energy)
+    <span style="color: #8B008B; font-weight: bold">return</span> EnergyDer
+
+
+<span style="color: #228B22"># Computing the expectation value of the local energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">Energy</span>(x0):
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    alpha = x0[<span style="color: #B452CD">0</span>]
+    beta = x0[<span style="color: #B452CD">1</span>]
+    NumberMCcycles= <span style="color: #B452CD">10000</span>
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        energy += DeltaE
+            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    <span style="color: #8B008B; font-weight: bold">return</span> energy
+
+
+
+
+<span style="color: #228B22">#Here starts the main program with variable declarations</span>
+NumberParticles = <span style="color: #B452CD">2</span>
+Dimension = <span style="color: #B452CD">2</span>
+<span style="color: #228B22"># seed for rng generator </span>
+seed()
+<span style="color: #228B22"># guess for variational parameters</span>
+x0 = np.array([<span style="color: #B452CD">0.9</span>,<span style="color: #B452CD">0.2</span>])
+<span style="color: #228B22"># Using Broydens method</span>
+res = minimize(Energy, x0, method=<span style="color: #CD5555">&#39;BFGS&#39;</span>, jac=EnergyDerivative, options={<span style="color: #CD5555">&#39;gtol&#39;</span>: <span style="color: #B452CD">1e-4</span>,<span style="color: #CD5555">&#39;disp&#39;</span>: <span style="color: #8B008B; font-weight: bold">True</span>})
+<span style="color: #658b00">print</span>(res.x)
+</pre></div>
+<p>
+Note that the <b>minimize</b> function returns the finale values for the variable \( \alpha=x0[0] \) and \( \beta=x0[1] \) in the array \( x \).
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="brief-reminder-on-newton-raphson-s-method">Brief reminder on Newton-Raphson's method </h2>
+
+<p>
+Let us quickly remind ourselves how we derive the above method.
+
+<p>
+Perhaps the most celebrated of all one-dimensional root-finding
+routines is Newton's method, also called the Newton-Raphson
+method. This method  requires the evaluation of both the
+function \( f \) and its derivative \( f' \) at arbitrary points. 
+If you can only calculate the derivative
+numerically and/or your function is not of the smooth type, we
+normally discourage the use of this method.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="the-equations">The equations </h2>
+
+<p>
+The Newton-Raphson formula consists geometrically of extending the
+tangent line at a current point until it crosses zero, then setting
+the next guess to the abscissa of that zero-crossing.  The mathematics
+behind this method is rather simple. Employing a Taylor expansion for
+\( x \) sufficiently close to the solution \( s \), we have
+
+$$
+    f(s)=0=f(x)+(s-x)f'(x)+\frac{(s-x)^2}{2}f''(x) +\dots.
+    \label{eq:taylornr}
+$$
+
+<p>
+For small enough values of the function and for well-behaved
+functions, the terms beyond linear are unimportant, hence we obtain
+
+$$
+   f(x)+(s-x)f'(x)\approx 0,
+$$
+
+yielding
+$$
+   s\approx x-\frac{f(x)}{f'(x)}.
+$$
+
+<p>
+Having in mind an iterative procedure, it is natural to start iterating with
+$$
+   x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}.
+$$
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="simple-geometric-interpretation">Simple geometric interpretation </h2>
+
+<p>
+The above is Newton-Raphson's method. It has a simple geometric
+interpretation, namely \( x_{n+1} \) is the point where the tangent from
+\( (x_n,f(x_n)) \) crosses the \( x \)-axis.  Close to the solution,
+Newton-Raphson converges fast to the desired result. However, if we
+are far from a root, where the higher-order terms in the series are
+important, the Newton-Raphson formula can give grossly inaccurate
+results. For instance, the initial guess for the root might be so far
+from the true root as to let the search interval include a local
+maximum or minimum of the function.  If an iteration places a trial
+guess near such a local extremum, so that the first derivative nearly
+vanishes, then Newton-Raphson may fail totally
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="extending-to-more-than-one-variable">Extending to more than one variable </h2>
+
+<p>
+Newton's method can be generalized to systems of several non-linear equations
+and variables. Consider the case with two equations
+$$
+   \begin{array}{cc} f_1(x_1,x_2) &=0\\
+                     f_2(x_1,x_2) &=0,\end{array}
+$$
+
+which we Taylor expand to obtain
+
+$$
+   \begin{array}{cc} 0=f_1(x_1+h_1,x_2+h_2)=&f_1(x_1,x_2)+h_1
+                     \partial f_1/\partial x_1+h_2
+                     \partial f_1/\partial x_2+\dots\\
+                     0=f_2(x_1+h_1,x_2+h_2)=&f_2(x_1,x_2)+h_1
+                     \partial f_2/\partial x_1+h_2
+                     \partial f_2/\partial x_2+\dots
+                       \end{array}.
+$$
+
+Defining the Jacobian matrix \( \hat{J} \) we have
+$$
+ \hat{J}=\left( \begin{array}{cc}
+                         \partial f_1/\partial x_1  & \partial f_1/\partial x_2 \\
+                          \partial f_2/\partial x_1     &\partial f_2/\partial x_2
+             \end{array} \right),
+$$
+
+we can rephrase Newton's method as
+$$
+\left(\begin{array}{c} x_1^{n+1} \\ x_2^{n+1} \end{array} \right)=
+\left(\begin{array}{c} x_1^{n} \\ x_2^{n} \end{array} \right)+
+\left(\begin{array}{c} h_1^{n} \\ h_2^{n} \end{array} \right),
+$$
+
+where we have defined
+$$
+   \left(\begin{array}{c} h_1^{n} \\ h_2^{n} \end{array} \right)=
+   -{\bf \hat{J}}^{-1}
+   \left(\begin{array}{c} f_1(x_1^{n},x_2^{n}) \\ f_2(x_1^{n},x_2^{n}) \end{array} \right).
+$$
+
+We need thus to compute the inverse of the Jacobian matrix and it
+is to understand that difficulties  may
+arise in case \( \hat{J} \) is nearly singular.
+
+<p>
+It is rather straightforward to extend the above scheme to systems of
+more than two non-linear equations. In our case, the Jacobian matrix is given by the Hessian that represents the second derivative of cost function.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="steepest-descent">Steepest descent </h2>
+
+<p>
+The basic idea of gradient descent is
+that a function \( F(\mathbf{x}) \), 
+\( \mathbf{x} \equiv (x_1,\cdots,x_n) \), decreases fastest if one goes from \( \bf {x} \) in the
+direction of the negative gradient \( -\nabla F(\mathbf{x}) \).
+
+<p>
+It can be shown that if 
+$$
+\mathbf{x}_{k+1} = \mathbf{x}_k - \gamma_k \nabla F(\mathbf{x}_k),
+$$
+
+with \( \gamma_k > 0 \).
+
+<p>
+For \( \gamma_k \) small enough, then \( F(\mathbf{x}_{k+1}) \leq
+F(\mathbf{x}_k) \). This means that for a sufficiently small \( \gamma_k \)
+we are always moving towards smaller function values, i.e a minimum.
+
+<p>
+<!-- !split  -->
+
+<h2 id="more-on-steepest-descent">More on Steepest descent </h2>
+
+<p>
+The previous observation is the basis of the method of steepest
+descent, which is also referred to as just gradient descent (GD). One
+starts with an initial guess \( \mathbf{x}_0 \) for a minimum of \( F \) and
+computes new approximations according to
+
+$$
+\mathbf{x}_{k+1} = \mathbf{x}_k - \gamma_k \nabla F(\mathbf{x}_k), \ \ k \geq 0.
+$$
+
+<p>
+The parameter \( \gamma_k \) is often referred to as the step length or
+the learning rate within the context of Machine Learning.
+
+<p>
+<!-- !split  -->
+
+<h2 id="the-ideal">The ideal </h2>
+
+<p>
+Ideally the sequence \( \{\mathbf{x}_k \}_{k=0} \) converges to a global
+minimum of the function \( F \). In general we do not know if we are in a
+global or local minimum. In the special case when \( F \) is a convex
+function, all local minima are also global minima, so in this case
+gradient descent can converge to the global solution. The advantage of
+this scheme is that it is conceptually simple and straightforward to
+implement. However the method in this form has some severe
+limitations:
+
+<p>
+In machine learing we are often faced with non-convex high dimensional
+cost functions with many local minima. Since GD is deterministic we
+will get stuck in a local minimum, if the method converges, unless we
+have a very good intial guess. This also implies that the scheme is
+sensitive to the chosen initial condition.
+
+<p>
+Note that the gradient is a function of \( \mathbf{x} =
+(x_1,\cdots,x_n) \) which makes it expensive to compute numerically.
+
+<p>
+<!-- !split  -->
+
+<h2 id="the-sensitiveness-of-the-gradient-descent">The sensitiveness of the gradient descent </h2>
+
+<p>
+The gradient descent method 
+is sensitive to the choice of learning rate \( \gamma_k \). This is due
+to the fact that we are only guaranteed that \( F(\mathbf{x}_{k+1}) \leq
+F(\mathbf{x}_k) \) for sufficiently small \( \gamma_k \). The problem is to
+determine an optimal learning rate. If the learning rate is chosen too
+small the method will take a long time to converge and if it is too
+large we can experience erratic behavior.
+
+<p>
+Many of these shortcomings can be alleviated by introducing
+randomness. One such method is that of Stochastic Gradient Descent
+(SGD), see below.
+
+<p>
+<!-- !split  -->
+
+<h2 id="convex-functions">Convex functions </h2>
+
+<p>
+Ideally we want our cost/loss function to be convex(concave).
+
+<p>
+First we give the definition of a convex set: A set \( C \) in
+\( \mathbb{R}^n \) is said to be convex if, for all \( x \) and \( y \) in \( C \) and
+all \( t \in (0,1) \) , the point \( (1 &#8722; t)x + ty \) also belongs to
+C. Geometrically this means that every point on the line segment
+connecting \( x \) and \( y \) is in \( C \) as discussed below.
+
+<p>
+The convex subsets of \( \mathbb{R} \) are the intervals of
+\( \mathbb{R} \). Examples of convex sets of \( \mathbb{R}^2 \) are the
+regular polygons (triangles, rectangles, pentagons, etc...).
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="convex-function">Convex function </h2>
+
+<p>
+<b>Convex function</b>: Let \( X \subset \mathbb{R}^n \) be a convex set. Assume that the function \( f: X \rightarrow \mathbb{R} \) is continuous, then \( f \) is said to be convex if $$f(tx_1 + (1-t)x_2) \leq tf(x_1) + (1-t)f(x_2) $$ for all \( x_1, x_2 \in X \) and for all \( t \in [0,1] \). If \( \leq \) is replaced with a strict inequaltiy in the definition, we demand \( x_1 \neq x_2 \) and \( t\in(0,1) \) then \( f \) is said to be strictly convex. For a single variable function, convexity means that if you draw a straight line connecting \( f(x_1) \) and \( f(x_2) \), the value of the function on the interval \( [x_1,x_2] \) is always below the line as illustrated below.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conditions-on-convex-functions">Conditions on convex functions </h2>
+
+<p>
+In the following we state first and second-order conditions which
+ensures convexity of a function \( f \). We write \( D_f \) to denote the
+domain of \( f \), i.e the subset of \( R^n \) where \( f \) is defined. For more
+details and proofs we refer to: <a href="http://stanford.edu/boyd/cvxbook/, 2004" target="_blank">S. Boyd and L. Vandenberghe. Convex Optimization. Cambridge University Press</a>.
+
+<p>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>First order condition</b>
+<p>
+Suppose \( f \) is differentiable (i.e \( \nabla f(x) \) is well defined for
+all \( x \) in the domain of \( f \)). Then \( f \) is convex if and only if \( D_f \)
+is a convex set and $$f(y) \geq f(x) + \nabla f(x)^T (y-x) $$ holds
+for all \( x,y \in D_f \). This condition means that for a convex function
+the first order Taylor expansion (right hand side above) at any point
+a global under estimator of the function. To convince yourself you can
+make a drawing of \( f(x) = x^2+1 \) and draw the tangent line to \( f(x) \) and
+note that it is always below the graph.
+</div>
+
+
+<p>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Second order condition</b>
+<p>
+Assume that \( f \) is twice
+differentiable, i.e the Hessian matrix exists at each point in
+\( D_f \). Then \( f \) is convex if and only if \( D_f \) is a convex set and its
+Hessian is positive semi-definite for all \( x\in D_f \). For a
+single-variable function this reduces to \( f''(x) \geq 0 \). Geometrically this means that \( f \) has nonnegative curvature
+everywhere.
+</div>
+
+
+<p>
+This condition is particularly useful since it gives us an procedure for determining if the function under consideration is convex, apart from using the definition.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="more-on-convex-functions">More on convex functions </h2>
+
+<p>
+The next result is of great importance to us and the reason why we are
+going on about convex functions. In machine learning we frequently
+have to minimize a loss/cost function in order to find the best
+parameters for the model we are considering.
+
+<p>
+Ideally we want the
+global minimum (for high-dimensional models it is hard to know
+if we have local or global minimum). However, if the cost/loss function
+is convex the following result provides invaluable information:
+
+<p>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Any minimum is global for convex functions</b>
+<p>
+Consider the problem of finding \( x \in \mathbb{R}^n \) such that \( f(x) \)
+is minimal, where \( f \) is convex and differentiable. Then, any point
+\( x^* \) that satisfies \( \nabla f(x^*) = 0 \) is a global minimum.
+</div>
+
+
+<p>
+This result means that if we know that the cost/loss function is convex and we are able to find a minimum, we are guaranteed that it is a global minimum.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="some-simple-problems">Some simple problems </h2>
+
+<ol>
+<li> Show that \( f(x)=x^2 \) is convex for \( x \in \mathbb{R} \) using the definition of convexity. Hint: If you re-write the definition, \( f \) is convex if the following holds for all \( x,y \in D_f \) and any \( \lambda \in [0,1] \) $\lambda f(x)+(1-\lambda)f(y)-f(\lambda x + (1-\lambda) y ) \geq 0$.</li>
+<li> Using the second order condition show that the following functions are convex on the specified domain.</li>
+
+<ul>
+ <li> \( f(x) = e^x \) is convex for \( x \in \mathbb{R} \).</li>
+ <li> \( g(x) = -\ln(x) \) is convex for \( x \in (0,\infty) \).</li>
+</ul>
+
+<li> Let \( f(x) = x^2 \) and \( g(x) = e^x \). Show that \( f(g(x)) \) and \( g(f(x)) \) is convex for \( x \in \mathbb{R} \). Also show that if \( f(x) \) is any convex function than \( h(x) = e^{f(x)} \) is convex.</li>
+<li> A norm is any function that satisfy the following properties</li>
+
+<ul>
+ <li> \( f(\alpha x) = |\alpha| f(x) \) for all \( \alpha \in \mathbb{R} \).</li>
+ <li> \( f(x+y) \leq f(x) + f(y) \)</li>
+ <li> \( f(x) \leq 0 \) for all \( x \in \mathbb{R}^n \) with equality if and only if \( x = 0 \)</li>
+</ul>
+
+</ol>
+
+Using the definition of convexity, try to show that a function satisfying the properties above is convex (the third condition is not needed to show this).
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="standard-steepest-descent">Standard steepest descent </h2>
+
+<p>
+Before we proceed, we would like to discuss the approach called the
+<b>standard Steepest descent</b>, which again leads to us having to be able
+to compute a matrix. It belongs to the class of Conjugate Gradient methods (CG).
+
+<p>
+<a href="https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf" target="_blank">The success of the CG method</a>
+for finding solutions of non-linear problems is based on the theory
+of conjugate gradients for linear systems of equations. It belongs to
+the class of iterative methods for solving problems from linear
+algebra of the type 
+$$
+\begin{equation*} 
+\hat{A}\hat{x} = \hat{b}.
+\end{equation*} 
+$$
+
+<p>
+In the iterative process we end up with a problem like
+
+$$
+\begin{equation*}
+  \hat{r}= \hat{b}-\hat{A}\hat{x},
+\end{equation*}
+$$
+
+where \( \hat{r} \) is the so-called residual or error in the iterative process.
+
+<p>
+When we have found the exact solution, \( \hat{r}=0 \).
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="gradient-method">Gradient method </h2>
+
+<p>
+The residual is zero when we reach the minimum of the quadratic equation
+$$
+\begin{equation*}
+  P(\hat{x})=\frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T\hat{b},
+\end{equation*}
+$$
+
+<p>
+with the constraint that the matrix \( \hat{A} \) is positive definite and
+symmetric.  This defines also the Hessian and we want it to be  positive definite.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="steepest-descent-method">Steepest descent  method </h2>
+
+<p>
+We denote the initial guess for \( \hat{x} \) as \( \hat{x}_0 \). 
+We can assume without loss of generality that
+$$
+\begin{equation*}
+\hat{x}_0=0,
+\end{equation*}
+$$
+
+or consider the system
+$$
+\begin{equation*}
+\hat{A}\hat{z} = \hat{b}-\hat{A}\hat{x}_0,
+\end{equation*}
+$$
+
+instead.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="steepest-descent-method">Steepest descent  method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+One can show that the solution \( \hat{x} \) is also the unique minimizer of the quadratic form
+$$
+\begin{equation*}
+  f(\hat{x}) = \frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T \hat{x} , \quad \hat{x}\in\mathbf{R}^n. 
+\end{equation*}
+$$
+
+This suggests taking the first basis vector \( \hat{r}_1 \) (see below for definition) 
+to be the gradient of \( f \) at \( \hat{x}=\hat{x}_0 \), 
+which equals
+$$
+\begin{equation*}
+\hat{A}\hat{x}_0-\hat{b},
+\end{equation*}
+$$
+
+and 
+\( \hat{x}_0=0 \) it is equal \( -\hat{b} \).
+
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="final-expressions">Final expressions </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We can compute the residual iteratively as
+$$
+\begin{equation*}
+\hat{r}_{k+1}=\hat{b}-\hat{A}\hat{x}_{k+1},
+ \end{equation*}
+$$
+
+which equals
+$$
+\begin{equation*}
+\hat{b}-\hat{A}(\hat{x}_k+\alpha_k\hat{r}_k),
+ \end{equation*}
+$$
+
+or
+$$
+\begin{equation*}
+(\hat{b}-\hat{A}\hat{x}_k)-\alpha_k\hat{A}\hat{r}_k,
+ \end{equation*}
+$$
+
+which gives
+
+$$
+\alpha_k = \frac{\hat{r}_k^T\hat{r}_k}{\hat{r}_k^T\hat{A}\hat{r}_k}
+$$
+
+leading to the iterative scheme
+$$
+\begin{equation*}
+\hat{x}_{k+1}=\hat{x}_k-\alpha_k\hat{r}_{k},
+ \end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="code-examples-for-steepest-descent">Code examples for steepest descent </h2>
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come">Simple codes for  steepest descent and conjugate gradient using a \( 2\times 2 \) matrix, in c++, Python code to come </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span><span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;cmath&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;iostream&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;fstream&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #1e889b">#include</span> <span style="color: #228B22">&lt;iomanip&gt;</span><span style="color: #1e889b"></span>
+<span style="color: #1e889b">#include</span> <span style="color: #228B22">&quot;vectormatrixclass.h&quot;</span><span style="color: #1e889b"></span>
+<span style="color: #8B008B; font-weight: bold">using</span> <span style="color: #8B008B; font-weight: bold">namespace</span>  std;
+<span style="color: #228B22">//   Main function begins here</span>
+<span style="color: #00688B; font-weight: bold">int</span> <span style="color: #008b45">main</span>(<span style="color: #00688B; font-weight: bold">int</span>  argc, <span style="color: #00688B; font-weight: bold">char</span> * argv[]){
+  <span style="color: #00688B; font-weight: bold">int</span> dim = <span style="color: #B452CD">2</span>;
+  Vector x(dim),xsd(dim), b(dim),x0(dim);
+  Matrix A(dim,dim);
+
+  <span style="color: #228B22">// Set our initial guess</span>
+  x0(<span style="color: #B452CD">0</span>) = x0(<span style="color: #B452CD">1</span>) = <span style="color: #B452CD">0</span>;
+  <span style="color: #228B22">// Set the matrix</span>
+  A(<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>) =  <span style="color: #B452CD">3</span>;    A(<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>) =  <span style="color: #B452CD">2</span>;   A(<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>) =  <span style="color: #B452CD">2</span>;   A(<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>) =  <span style="color: #B452CD">6</span>;
+  b(<span style="color: #B452CD">0</span>) = <span style="color: #B452CD">2</span>; b(<span style="color: #B452CD">1</span>) = <span style="color: #B452CD">-8</span>;
+  cout &lt;&lt; <span style="color: #CD5555">&quot;The Matrix A that we are using: &quot;</span> &lt;&lt; endl;
+  A.Print();
+  cout &lt;&lt; endl;
+  xsd = SteepestDescent(A,b,x0);
+  cout &lt;&lt; <span style="color: #CD5555">&quot;The approximate solution using Steepest Descent is: &quot;</span> &lt;&lt; endl;
+  xsd.Print();
+  cout &lt;&lt; endl;
+}
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="the-routine-for-the-steepest-descent-method">The routine for the steepest descent method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span>Vector <span style="color: #008b45">SteepestDescent</span>(Matrix A, Vector b, Vector x0){
+  <span style="color: #00688B; font-weight: bold">int</span> IterMax, i;
+  <span style="color: #00688B; font-weight: bold">int</span> dim = x0.Dimension();
+  <span style="color: #8B008B; font-weight: bold">const</span> <span style="color: #00688B; font-weight: bold">double</span> tolerance = <span style="color: #B452CD">1.0e-14</span>;
+  Vector x(dim),f(dim),z(dim);
+  <span style="color: #00688B; font-weight: bold">double</span> c,alpha,d;
+  IterMax = <span style="color: #B452CD">30</span>;
+  x = x0;
+  r = A*x-b;
+  i = <span style="color: #B452CD">0</span>;
+  <span style="color: #8B008B; font-weight: bold">while</span> (i &lt;= IterMax){
+    z = A*r;
+    c = dot(r,r);
+    alpha = c/dot(r,z);
+    x = x - alpha*r;
+    r =  A*x-b;
+    <span style="color: #8B008B; font-weight: bold">if</span>(sqrt(dot(r,r)) &lt; tolerance) <span style="color: #8B008B; font-weight: bold">break</span>;
+    i++;
+  }
+  <span style="color: #8B008B; font-weight: bold">return</span> x;
+}
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="steepest-descent-example">Steepest descent example </h2>
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy.linalg</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">la</span>
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">scipy.optimize</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">sopt</span>
+
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">pt</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">mpl_toolkits.mplot3d</span> <span style="color: #8B008B; font-weight: bold">import</span> axes3d
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f</span>(x):
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0.5</span>*x[<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + <span style="color: #B452CD">2.5</span>*x[<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">df</span>(x):
+    <span style="color: #8B008B; font-weight: bold">return</span> np.array([x[<span style="color: #B452CD">0</span>], <span style="color: #B452CD">5</span>*x[<span style="color: #B452CD">1</span>]])
+
+fig = pt.figure()
+ax = fig.gca(projection=<span style="color: #CD5555">&quot;3d&quot;</span>)
+
+xmesh, ymesh = np.mgrid[-<span style="color: #B452CD">2</span>:<span style="color: #B452CD">2</span>:<span style="color: #B452CD">50</span>j,-<span style="color: #B452CD">2</span>:<span style="color: #B452CD">2</span>:<span style="color: #B452CD">50</span>j]
+fmesh = f(np.array([xmesh, ymesh]))
+ax.plot_surface(xmesh, ymesh, fmesh)
+</pre></div>
+<p>
+And then as countor plot
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span>pt.axis(<span style="color: #CD5555">&quot;equal&quot;</span>)
+pt.contour(xmesh, ymesh, fmesh)
+guesses = [np.array([<span style="color: #B452CD">2</span>, <span style="color: #B452CD">2.</span>/<span style="color: #B452CD">5</span>])]
+</pre></div>
+<p>
+Find guesses
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span>x = guesses[-<span style="color: #B452CD">1</span>]
+s = -df(x)
+</pre></div>
+<p>
+Run it!
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">f1d</span>(alpha):
+    <span style="color: #8B008B; font-weight: bold">return</span> f(x + alpha*s)
+
+alpha_opt = sopt.golden(f1d)
+next_guess = x + alpha_opt * s
+guesses.append(next_guess)
+<span style="color: #658b00">print</span>(next_guess)
+</pre></div>
+<p>
+What happened?
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span>pt.axis(<span style="color: #CD5555">&quot;equal&quot;</span>)
+pt.contour(xmesh, ymesh, fmesh, <span style="color: #B452CD">50</span>)
+it_array = np.array(guesses)
+pt.plot(it_array.T[<span style="color: #B452CD">0</span>], it_array.T[<span style="color: #B452CD">1</span>], <span style="color: #CD5555">&quot;x-&quot;</span>)
+</pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+In the CG method we define so-called conjugate directions and two vectors 
+\( \hat{s} \) and \( \hat{t} \)
+are said to be
+conjugate if
+$$
+\begin{equation*}
+\hat{s}^T\hat{A}\hat{t}= 0.
+\end{equation*}
+$$
+
+The philosophy of the CG method is to perform searches in various conjugate directions
+of our vectors \( \hat{x}_i \) obeying the above criterion, namely
+$$
+\begin{equation*}
+\hat{x}_i^T\hat{A}\hat{x}_j= 0.
+\end{equation*}
+$$
+
+Two vectors are conjugate if they are orthogonal with respect to 
+this inner product. Being conjugate is a symmetric relation: if \( \hat{s} \) is conjugate to \( \hat{t} \), then \( \hat{t} \) is conjugate to \( \hat{s} \).
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+An example is given by the eigenvectors of the matrix
+$$
+\begin{equation*}
+\hat{v}_i^T\hat{A}\hat{v}_j= \lambda\hat{v}_i^T\hat{v}_j,
+\end{equation*}
+$$
+
+which is zero unless \( i=j \).
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Assume now that we have a symmetric positive-definite matrix \( \hat{A} \) of size
+\( n\times n \). At each iteration \( i+1 \) we obtain the conjugate direction of a vector
+$$
+\begin{equation*}
+\hat{x}_{i+1}=\hat{x}_{i}+\alpha_i\hat{p}_{i}. 
+\end{equation*}
+$$
+
+We assume that \( \hat{p}_{i} \) is a sequence of \( n \) mutually conjugate directions. 
+Then the \( \hat{p}_{i} \)  form a basis of \( R^n \) and we can expand the solution 
+$  \hat{A}\hat{x} = \hat{b}$ in this basis, namely
+
+$$
+\begin{equation*}
+  \hat{x}  = \sum^{n}_{i=1} \alpha_i \hat{p}_i.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The coefficients are given by
+$$
+\begin{equation*}
+    \mathbf{A}\mathbf{x} = \sum^{n}_{i=1} \alpha_i \mathbf{A} \mathbf{p}_i = \mathbf{b}.
+\end{equation*}
+$$
+
+Multiplying with \( \hat{p}_k^T \)  from the left gives
+
+$$
+\begin{equation*}
+  \hat{p}_k^T \hat{A}\hat{x} = \sum^{n}_{i=1} \alpha_i\hat{p}_k^T \hat{A}\hat{p}_i= \hat{p}_k^T \hat{b},
+\end{equation*}
+$$
+
+and we can define the coefficients \( \alpha_k \) as
+
+$$
+\begin{equation*}
+    \alpha_k = \frac{\hat{p}_k^T \hat{b}}{\hat{p}_k^T \hat{A} \hat{p}_k}
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conjugate-gradient-method-and-iterations">Conjugate gradient method and iterations </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>
+If we choose the conjugate vectors \( \hat{p}_k \) carefully, 
+then we may not need all of them to obtain a good approximation to the solution 
+\( \hat{x} \). 
+We want to regard the conjugate gradient method as an iterative method. 
+This will us to solve systems where \( n \) is so large that the direct 
+method would take too much time.
+
+<p>
+We denote the initial guess for \( \hat{x} \) as \( \hat{x}_0 \). 
+We can assume without loss of generality that
+$$
+\begin{equation*}
+\hat{x}_0=0,
+\end{equation*}
+$$
+
+or consider the system
+$$
+\begin{equation*}
+\hat{A}\hat{z} = \hat{b}-\hat{A}\hat{x}_0,
+\end{equation*}
+$$
+
+instead.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+One can show that the solution \( \hat{x} \) is also the unique minimizer of the quadratic form
+$$
+\begin{equation*}
+  f(\hat{x}) = \frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T \hat{x} , \quad \hat{x}\in\mathbf{R}^n. 
+\end{equation*}
+$$
+
+This suggests taking the first basis vector \( \hat{p}_1 \) 
+to be the gradient of \( f \) at \( \hat{x}=\hat{x}_0 \), 
+which equals
+$$
+\begin{equation*}
+\hat{A}\hat{x}_0-\hat{b},
+\end{equation*}
+$$
+
+and 
+\( \hat{x}_0=0 \) it is equal \( -\hat{b} \).
+The other vectors in the basis will be conjugate to the gradient, 
+hence the name conjugate gradient method.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+Let  \( \hat{r}_k \) be the residual at the \( k \)-th step:
+$$
+\begin{equation*}
+\hat{r}_k=\hat{b}-\hat{A}\hat{x}_k.
+\end{equation*}
+$$
+
+Note that \( \hat{r}_k \) is the negative gradient of \( f \) at 
+\( \hat{x}=\hat{x}_k \), 
+so the gradient descent method would be to move in the direction \( \hat{r}_k \). 
+Here, we insist that the directions \( \hat{p}_k \) are conjugate to each other, 
+so we take the direction closest to the gradient \( \hat{r}_k \)  
+under the conjugacy constraint. 
+This gives the following expression
+$$
+\begin{equation*}
+\hat{p}_{k+1}=\hat{r}_k-\frac{\hat{p}_k^T \hat{A}\hat{r}_k}{\hat{p}_k^T\hat{A}\hat{p}_k} \hat{p}_k.
+\end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+We can also  compute the residual iteratively as
+$$
+\begin{equation*}
+\hat{r}_{k+1}=\hat{b}-\hat{A}\hat{x}_{k+1},
+ \end{equation*}
+$$
+
+which equals
+$$
+\begin{equation*}
+\hat{b}-\hat{A}(\hat{x}_k+\alpha_k\hat{p}_k),
+ \end{equation*}
+$$
+
+or
+$$
+\begin{equation*}
+(\hat{b}-\hat{A}\hat{x}_k)-\alpha_k\hat{A}\hat{p}_k,
+ \end{equation*}
+$$
+
+which gives
+
+$$
+\begin{equation*}
+\hat{r}_{k+1}=\hat{r}_k-\hat{A}\hat{p}_{k},
+ \end{equation*}
+$$
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="simple-implementation-of-the-conjugate-gradient-algorithm">Simple implementation of the Conjugate gradient algorithm </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span>  Vector <span style="color: #008b45">ConjugateGradient</span>(Matrix A, Vector b, Vector x0){
+  <span style="color: #00688B; font-weight: bold">int</span> dim = x0.Dimension();
+  <span style="color: #8B008B; font-weight: bold">const</span> <span style="color: #00688B; font-weight: bold">double</span> tolerance = <span style="color: #B452CD">1.0e-14</span>;
+  Vector x(dim),r(dim),v(dim),z(dim);
+  <span style="color: #00688B; font-weight: bold">double</span> c,t,d;
+
+  x = x0;
+  r = b - A*x;
+  v = r;
+  c = dot(r,r);
+  <span style="color: #00688B; font-weight: bold">int</span> i = <span style="color: #B452CD">0</span>; IterMax = dim;
+  <span style="color: #8B008B; font-weight: bold">while</span>(i &lt;= IterMax){
+    z = A*v;
+    t = c/dot(v,z);
+    x = x + t*v;
+    r = r - t*z;
+    d = dot(r,r);
+    <span style="color: #8B008B; font-weight: bold">if</span>(sqrt(d) &lt; tolerance)
+      <span style="color: #8B008B; font-weight: bold">break</span>;
+    v = r + (d/c)*v;
+    c = d;  i++;
+  }
+  <span style="color: #8B008B; font-weight: bold">return</span> x;
+} 
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="broyden-fletcher-goldfarb-shanno-algorithm">Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno algorithm </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The optimization problem is to minimize \( f(\mathbf {x} ) \) where \( \mathbf {x} \)  is a vector in \( R^{n} \), and \( f \) is a differentiable scalar function. There are no constraints on the values that  \( \mathbf {x} \)  can take.
+
+<p>
+The algorithm begins at an initial estimate for the optimal value \( \mathbf {x}_{0} \) and proceeds iteratively to get a better estimate at each stage.
+
+<p>
+The search direction \( p_k \) at stage \( k \) is given by the solution of the analogue of the Newton equation
+$$
+B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
+$$
+
+<p>
+where \( B_{k} \) is an approximation to the Hessian matrix, which is
+updated iteratively at each stage, and \( \nabla f(\mathbf {x} _{k}) \)
+is the gradient of the function
+evaluated at \( x_k \). 
+A line search in the direction \( p_k \) is then used to
+find the next point \( x_{k+1} \) by minimising 
+$$
+f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
+$$
+
+over the scalar \( \alpha > 0 \).
+
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="stochastic-gradient-descent">Stochastic Gradient Descent </h2>
+
+<p>
+Stochastic gradient descent (SGD) and variants thereof address some of
+the shortcomings of the Gradient descent method discussed above.
+
+<p>
+The underlying idea of SGD comes from the observation that a given 
+function, which we want to minimize, can almost always be written as a
+sum over \( n \) data points \( \{\mathbf{x}_i\}_{i=1}^n \),
+$$
+C(\mathbf{\beta}) = \sum_{i=1}^n c_i(\mathbf{x}_i,
+\mathbf{\beta}). 
+$$
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="computation-of-gradients">Computation of gradients </h2>
+
+<p>
+This in turn means that the gradient can be
+computed as a sum over \( i \)-gradients 
+$$
+\nabla_\beta C(\mathbf{\beta}) = \sum_i^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta}).
+$$
+
+<p>
+Stochasticity/randomness is introduced by only taking the
+gradient on a subset of the data called minibatches.  If there are \( n \)
+data points and the size of each minibatch is \( M \), there will be \( n/M \)
+minibatches. We denote these minibatches by \( B_k \) where
+\( k=1,\cdots,n/M \).
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="sgd-example">SGD example </h2>
+As an example, suppose we have \( 10 \) data points \( (\mathbf{x}_1,\cdots, \mathbf{x}_{10}) \) 
+and we choose to have \( M=5 \) minibathces,
+then each minibatch contains two data points. In particular we have
+\( B_1 = (\mathbf{x}_1,\mathbf{x}_2), \cdots, B_5 =
+(\mathbf{x}_9,\mathbf{x}_{10}) \). Note that if you choose \( M=1 \) you
+have only a single batch with all data points and on the other extreme,
+you may choose \( M=n \) resulting in a minibatch for each datapoint, i.e
+\( B_k = \mathbf{x}_k \).
+
+<p>
+The idea is now to approximate the gradient by replacing the sum over
+all data points with a sum over the data points in one the minibatches
+picked at random in each gradient descent step 
+$$
+\nabla_{\beta}
+C(\mathbf{\beta}) = \sum_{i=1}^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta}) \rightarrow \sum_{i \in B_k}^n \nabla_\beta
+c_i(\mathbf{x}_i, \mathbf{\beta}).
+$$
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="the-gradient-step">The gradient step </h2>
+
+<p>
+Thus a gradient descent step now looks like 
+$$
+\beta_{j+1} = \beta_j - \gamma_j \sum_{i \in B_k}^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta})
+$$
+
+<p>
+where \( k \) is picked at random with equal
+probability from \( [1,n/M] \). An iteration over the number of
+minibathces (n/M) is commonly referred to as an epoch. Thus it is
+typical to choose a number of epochs and for each epoch iterate over
+the number of minibatches, as exemplified in the code below.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="simple-example-code">Simple example code </h2>
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span> 
+
+n = <span style="color: #B452CD">100</span> <span style="color: #228B22">#100 datapoints </span>
+M = <span style="color: #B452CD">5</span>   <span style="color: #228B22">#size of each minibatch</span>
+m = <span style="color: #658b00">int</span>(n/M) <span style="color: #228B22">#number of minibatches</span>
+n_epochs = <span style="color: #B452CD">10</span> <span style="color: #228B22">#number of epochs</span>
+
+j = <span style="color: #B452CD">0</span>
+<span style="color: #8B008B; font-weight: bold">for</span> epoch <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(<span style="color: #B452CD">1</span>,n_epochs+<span style="color: #B452CD">1</span>):
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(m):
+        k = np.random.randint(m) <span style="color: #228B22">#Pick the k-th minibatch at random</span>
+        <span style="color: #228B22">#Compute the gradient using the data in minibatch Bk</span>
+        <span style="color: #228B22">#Compute new suggestion for </span>
+        j += <span style="color: #B452CD">1</span>
+</pre></div>
+<p>
+Taking the gradient only on a subset of the data has two important
+benefits. First, it introduces randomness which decreases the chance
+that our opmization scheme gets stuck in a local minima. Second, if
+the size of the minibatches are small relative to the number of
+datapoints (\( M <  n \)), the computation of the gradient is much
+cheaper since we sum over the datapoints in the \( k-th \) minibatch and not
+all \( n \) datapoints.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="when-do-we-stop">When do we stop? </h2>
+
+<p>
+A natural question is when do we stop the search for a new minimum?
+One possibility is to compute the full gradient after a given number
+of epochs and check if the norm of the gradient is smaller than some
+threshold and stop if true. However, the condition that the gradient
+is zero is valid also for local minima, so this would only tell us
+that we are close to a local/global minimum. However, we could also
+evaluate the cost function at this point, store the result and
+continue the search. If the test kicks in at a later stage we can
+compare the values of the cost function and keep the \( \beta \) that
+gave the lowest value.
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="slightly-different-approach">Slightly different approach </h2>
+
+<p>
+Another approach is to let the step length \( \gamma_j \) depend on the
+number of epochs in such a way that it becomes very small after a
+reasonable time such that we do not move at all.
+
+<p>
+As an example, let \( e = 0,1,2,3,\cdots \) denote the current epoch and let \( t_0, t_1 > 0 \) be two fixed numbers. Furthermore, let \( t = e \cdot m + i \) where \( m \) is the number of minibatches and \( i=0,\cdots,m-1 \). Then the function $$\gamma_j(t; t_0, t_1) = \frac{t_0}{t+t_1} $$ goes to zero as the number of epochs gets large. I.e. we start with a step length \( \gamma_j (0; t_0, t_1) = t_0/t_1 \) which decays in <em>time</em> \( t \).
+
+<p>
+In this way we can fix the number of epochs, compute \( \beta \) and
+evaluate the cost function at the end. Repeating the computation will
+give a different result since the scheme is random by design. Then we
+pick the final \( \beta \) that gives the lowest value of the cost
+function.
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span> 
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">step_length</span>(t,t0,t1):
+    <span style="color: #8B008B; font-weight: bold">return</span> t0/(t+t1)
+
+n = <span style="color: #B452CD">100</span> <span style="color: #228B22">#100 datapoints </span>
+M = <span style="color: #B452CD">5</span>   <span style="color: #228B22">#size of each minibatch</span>
+m = <span style="color: #658b00">int</span>(n/M) <span style="color: #228B22">#number of minibatches</span>
+n_epochs = <span style="color: #B452CD">500</span> <span style="color: #228B22">#number of epochs</span>
+t0 = <span style="color: #B452CD">1.0</span>
+t1 = <span style="color: #B452CD">10</span>
+
+gamma_j = t0/t1
+j = <span style="color: #B452CD">0</span>
+<span style="color: #8B008B; font-weight: bold">for</span> epoch <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(<span style="color: #B452CD">1</span>,n_epochs+<span style="color: #B452CD">1</span>):
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(m):
+        k = np.random.randint(m) <span style="color: #228B22">#Pick the k-th minibatch at random</span>
+        <span style="color: #228B22">#Compute the gradient using the data in minibatch Bk</span>
+        <span style="color: #228B22">#Compute new suggestion for beta</span>
+        t = epoch*m+i
+        gamma_j = step_length(t,t0,t1)
+        j += <span style="color: #B452CD">1</span>
+
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;gamma_j after %d epochs: %g&quot;</span> % (n_epochs,gamma_j))
+</pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="program-for-stochastic-gradient">Program for stochastic gradient </h2>
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eeeedd"><pre style="line-height: 125%;"><span></span><span style="color: #228B22"># Importing various packages</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">sklearn.linear_model</span> <span style="color: #8B008B; font-weight: bold">import</span> SGDRegressor
+
+x = <span style="color: #B452CD">2</span>*np.random.rand(<span style="color: #B452CD">100</span>,<span style="color: #B452CD">1</span>)
+y = <span style="color: #B452CD">4</span>+<span style="color: #B452CD">3</span>*x+np.random.randn(<span style="color: #B452CD">100</span>,<span style="color: #B452CD">1</span>)
+
+xb = np.c_[np.ones((<span style="color: #B452CD">100</span>,<span style="color: #B452CD">1</span>)), x]
+theta_linreg = np.linalg.inv(xb.T.dot(xb)).dot(xb.T).dot(y)
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Own inversion&quot;</span>)
+<span style="color: #658b00">print</span>(theta_linreg)
+sgdreg = SGDRegressor(n_iter = <span style="color: #B452CD">50</span>, penalty=<span style="color: #8B008B; font-weight: bold">None</span>, eta0=<span style="color: #B452CD">0.1</span>)
+sgdreg.fit(x,y.ravel())
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;sgdreg from scikit&quot;</span>)
+<span style="color: #658b00">print</span>(sgdreg.intercept_, sgdreg.coef_)
+
+
+theta = np.random.randn(<span style="color: #B452CD">2</span>,<span style="color: #B452CD">1</span>)
+
+eta = <span style="color: #B452CD">0.1</span>
+Niterations = <span style="color: #B452CD">1000</span>
+m = <span style="color: #B452CD">100</span>
+
+<span style="color: #8B008B; font-weight: bold">for</span> <span style="color: #658b00">iter</span> <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Niterations):
+    gradients = <span style="color: #B452CD">2.0</span>/m*xb.T.dot(xb.dot(theta)-y)
+    theta -= eta*gradients
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;theta frm own gd&quot;</span>)
+<span style="color: #658b00">print</span>(theta)
+
+xnew = np.array([[<span style="color: #B452CD">0</span>],[<span style="color: #B452CD">2</span>]])
+xbnew = np.c_[np.ones((<span style="color: #B452CD">2</span>,<span style="color: #B452CD">1</span>)), xnew]
+ypredict = xbnew.dot(theta)
+ypredict2 = xbnew.dot(theta_linreg)
+
+
+n_epochs = <span style="color: #B452CD">50</span>
+t0, t1 = <span style="color: #B452CD">5</span>, <span style="color: #B452CD">50</span>
+m = <span style="color: #B452CD">100</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">learning_schedule</span>(t):
+    <span style="color: #8B008B; font-weight: bold">return</span> t0/(t+t1)
+
+theta = np.random.randn(<span style="color: #B452CD">2</span>,<span style="color: #B452CD">1</span>)
+
+<span style="color: #8B008B; font-weight: bold">for</span> epoch <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(n_epochs):
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(m):
+        random_index = np.random.randint(m)
+        xi = xb[random_index:random_index+<span style="color: #B452CD">1</span>]
+        yi = y[random_index:random_index+<span style="color: #B452CD">1</span>]
+        gradients = <span style="color: #B452CD">2</span> * xi.T.dot(xi.dot(theta)-yi)
+        eta = learning_schedule(epoch*m+i)
+        theta = theta - eta*gradients
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;theta from own sdg&quot;</span>)
+<span style="color: #658b00">print</span>(theta)
+
+
+plt.plot(xnew, ypredict, <span style="color: #CD5555">&quot;r-&quot;</span>)
+plt.plot(xnew, ypredict2, <span style="color: #CD5555">&quot;b-&quot;</span>)
+plt.plot(x, y ,<span style="color: #CD5555">&#39;ro&#39;</span>)
+plt.axis([<span style="color: #B452CD">0</span>,<span style="color: #B452CD">2.0</span>,<span style="color: #B452CD">0</span>, <span style="color: #B452CD">15.0</span>])
+plt.xlabel(<span style="color: #CD5555">r&#39;$x$&#39;</span>)
+plt.ylabel(<span style="color: #CD5555">r&#39;$y$&#39;</span>)
+plt.title(<span style="color: #CD5555">r&#39;Random numbers &#39;</span>)
+plt.show()
+</pre></div>
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="using-gradient-descent-methods-limitations">Using gradient descent methods, limitations </h2>
+
+<ul>
+<li> <b>Gradient descent (GD) finds local minima of our function</b>. Since the GD algorithm is deterministic, if it converges, it will converge to a local minimum of our energy function. Because in ML we are often dealing with extremely rugged landscapes with many local minima, this can lead to poor performance.</li>
+<li> <b>GD is sensitive to initial conditions</b>. One consequence of the local nature of GD is that initial conditions matter. Depending on where one starts, one will end up at a different local minima. Therefore, it is very important to think about how one initializes the training process. This is true for GD as well as more complicated variants of GD.</li>
+<li> <b>Gradients are computationally expensive to calculate for large datasets</b>. In many cases in statistics and ML, the energy function is a sum of terms, with one term for each data point. For example, in linear regression, \( E \propto \sum_{i=1}^n (y_i - \mathbf{w}^T\cdot\mathbf{x}_i)^2 \); for logistic regression, the square error is replaced by the cross entropy. To calculate the gradient we have to sum over <em>all</em> \( n \) data points. Doing this at every GD step becomes extremely computationally expensive. An ingenious solution to this, is to calculate the gradients using small subsets of the data called &quot;mini batches&quot;. This has the added benefit of introducing stochasticity into our algorithm.</li>
+<li> <b>GD is very sensitive to choices of learning rates</b>. GD is extremely sensitive to the choice of learning rates. If the learning rate is very small, the training process take an extremely long time. For larger learning rates, GD can diverge and give poor results. Furthermore, depending on what the local landscape looks like, we have to modify the learning rates to ensure convergence. Ideally, we would <em>adaptively</em> choose the learning rates to match the landscape.</li>
+<li> <b>GD treats all directions in parameter space uniformly.</b> Another major drawback of GD is that unlike Newton's method, the learning rate for GD is the same in all directions in parameter space. For this reason, the maximum learning rate is set by the behavior of the steepest direction and this can significantly slow down training. Ideally, we would like to take large steps in flat directions and small steps in steep directions. Since we are exploring rugged landscapes where curvatures change, this requires us to keep track of not only the gradient but second derivatives. The ideal scenario would be to calculate the Hessian but this proves to be too computationally expensive.</li> 
+<li> GD can take exponential time to escape saddle points, even with random initialization. As we mentioned, GD is extremely sensitive to initial condition since it determines the particular local minimum GD would eventually reach. However, even with a good initialization scheme, through the introduction of randomness, GD can still take exponential time to escape saddle points.</li>
+</ul>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="codes-from-numerical-recipes">Codes from numerical recipes </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+You can however use codes we have adapted from the text <a href="http://www.nr.com/" target="_blank">Numerical Recipes in C++</a>, see chapter 10.7.  
+Here we present a program, which you also can find at the webpage of the course we use the functions <b>dfpmin</b> and <b>lnsrch</b>.  This is a variant of the Broyden et al algorithm discussed in the previous slide.
+
+<ul>
+<li> The program uses the harmonic oscillator in one dimensions as example.</li>
+<li> The program does not use armadillo to handle vectors and matrices, but employs rather my own vector-matrix class. These auxiliary functions, and the main program <em>model.cpp</em> can all be found under the <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/cg/programs/c%2B%2B" target="_blank">program link here</a>.</li>
+</ul>
+
+Below we show only excerpts from the main program. For the full program, see the above link.
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension">Finding the minimum of the harmonic oscillator model in one dimension </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span><span style="color: #228B22">//   Main function begins here</span>
+<span style="color: #00688B; font-weight: bold">int</span> <span style="color: #008b45">main</span>()
+{
+     <span style="color: #00688B; font-weight: bold">int</span> n, iter;
+     <span style="color: #00688B; font-weight: bold">double</span> gtol, fret;
+     <span style="color: #00688B; font-weight: bold">double</span> alpha;
+     n = <span style="color: #B452CD">1</span>;
+<span style="color: #228B22">//   reserve space in memory for vectors containing the variational</span>
+<span style="color: #228B22">//   parameters</span>
+     Vector g(n), p(n);
+     cout &lt;&lt; <span style="color: #CD5555">&quot;Read in guess for alpha&quot;</span> &lt;&lt; endl;
+     cin &gt;&gt; alpha;
+     gtol = <span style="color: #B452CD">1.0e-5</span>;
+<span style="color: #228B22">//   now call dfmin and compute the minimum</span>
+     p(<span style="color: #B452CD">0</span>) = alpha;
+     dfpmin(p, n, gtol, &amp;iter, &amp;fret, Efunction, dEfunction);
+     cout &lt;&lt; <span style="color: #CD5555">&quot;Value of energy minimum = &quot;</span> &lt;&lt; fret &lt;&lt; endl;
+     cout &lt;&lt; <span style="color: #CD5555">&quot;Number of iterations = &quot;</span> &lt;&lt; iter &lt;&lt; endl;
+     cout &lt;&lt; <span style="color: #CD5555">&quot;Value of alpha at minimum = &quot;</span> &lt;&lt; p(<span style="color: #B452CD">0</span>) &lt;&lt; endl;
+      <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0</span>;
+}  <span style="color: #228B22">// end of main program</span>
+</pre></div>
+
+</div>
+
+
+<p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+
+<h2 id="functions-to-observe">Functions to observe </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+The functions <b>Efunction</b> and <b>dEfunction</b> compute the expectation value of the energy and its derivative.
+They use the the quasi-Newton method of <a href="https://www.springer.com/it/book/9780387303031" target="_blank">Broyden, Fletcher, Goldfarb, and Shanno (BFGS)</a>
+It uses the first derivatives only. The BFGS algorithm has proven good performance even for non-smooth optimizations. 
+These functions need to be changed when you want to your own derivatives.
+<p>
+
+<!-- code=c++ (!bc cppcod) typeset with pygments style "perldoc" -->
+<div class="highlight" style="background: #eee8d5"><pre style="line-height: 125%;"><span></span><span style="color: #228B22">//  this function defines the expectation value of the local energy</span>
+<span style="color: #00688B; font-weight: bold">double</span> <span style="color: #008b45">Efunction</span>(Vector  &amp;x)
+{
+  <span style="color: #00688B; font-weight: bold">double</span> value = x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>)*<span style="color: #B452CD">0.5</span>+<span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">8</span>*x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>));
+  <span style="color: #8B008B; font-weight: bold">return</span> value;
+} <span style="color: #228B22">// end of function to evaluate</span>
+
+<span style="color: #228B22">//  this function defines the derivative of the energy </span>
+<span style="color: #00688B; font-weight: bold">void</span> <span style="color: #008b45">dEfunction</span>(Vector &amp;x, Vector &amp;g)
+{
+  g(<span style="color: #B452CD">0</span>) = x(<span style="color: #B452CD">0</span>)<span style="color: #B452CD">-1.0</span>/(<span style="color: #B452CD">4</span>*x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>)*x(<span style="color: #B452CD">0</span>));
+} <span style="color: #228B22">// end of function to evaluate</span>
+</pre></div>
+<p>
+You need to change these functions in order to compute the local energy for your system. I used 1000
+cycles per call to get a new value of \( \langle E_L[\alpha]\rangle \).
+When I compute the local energy I also compute its derivative.
+After roughly 10-20 iterations I got a converged result in terms of \( \alpha \).
 </div>
 
 
@@ -121,7 +2188,7 @@ end of tocinfo -->
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2020, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
 </center>
 
 
