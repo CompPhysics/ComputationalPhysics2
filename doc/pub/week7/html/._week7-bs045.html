@@ -353,7 +353,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week7-bs042.html#using-gradient-descent-methods-limitations" style="font-size: 80%;">Using gradient descent methods, limitations</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs043.html#codes-from-numerical-recipes" style="font-size: 80%;">Codes from numerical recipes</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs044.html#finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension" style="font-size: 80%;">Finding the minimum of the harmonic oscillator model in one dimension</a></li>
-     <!-- navigation toc: --> <li><a href="._week7-bs045.html#functions-to-observe" style="font-size: 80%;">Functions to observe</a></li>
+     <!-- navigation toc: --> <li><a href="#functions-to-observe" style="font-size: 80%;">Functions to observe</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs046.html#resampling-methods" style="font-size: 80%;">Resampling methods</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs047.html#resampling-approaches-can-be-computationally-expensive" style="font-size: 80%;">Resampling approaches can be computationally expensive</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs048.html#why-resampling-methods" style="font-size: 80%;">Why resampling methods ?</a></li>
@@ -400,54 +400,70 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0000"></a>
-<!-- ------------------- main content ---------------------- -->
+<a name="part0045"></a>
+<!-- !split -->
 
-
-
-<div class="jumbotron">
-<center><h1>Week 8 February 22-26: Gradient Methods, and start Resampling Techniques</h1></center>  <!-- document title -->
-
-<p>
-<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
-
-<center>
-<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
-</center>
-
-<p>
-<!-- institution(s) -->
-
-<center>[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b></center>
-<center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
-<br>
-<p>
-<center><h4>Feb 24, 2021</h4></center> <!-- date -->
-<br>
+<h2 id="functions-to-observe" class="anchor">Functions to observe </h2>
+<div class="panel panel-default">
+<div class="panel-body">
+<p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
+The functions <b>Efunction</b> and <b>dEfunction</b> compute the expectation value of the energy and its derivative.
+They use the the quasi-Newton method of <a href="https://www.springer.com/it/book/9780387303031" target="_self">Broyden, Fletcher, Goldfarb, and Shanno (BFGS)</a>
+It uses the first derivatives only. The BFGS algorithm has proven good performance even for non-smooth optimizations. 
+These functions need to be changed when you want to your own derivatives.
 <p>
 
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #408080; font-style: italic">//  this function defines the expectation value of the local energy</span>
+<span style="color: #B00040">double</span> <span style="color: #0000FF">Efunction</span>(Vector  <span style="color: #666666">&amp;</span>x)
+{
+  <span style="color: #B00040">double</span> value <span style="color: #666666">=</span> x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*0.5+1.0/</span>(<span style="color: #666666">8*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>));
+  <span style="color: #008000; font-weight: bold">return</span> value;
+} <span style="color: #408080; font-style: italic">// end of function to evaluate</span>
 
-<p><a href="._week7-bs001.html" class="btn btn-primary btn-lg">Read &raquo;</a></p>
+<span style="color: #408080; font-style: italic">//  this function defines the derivative of the energy </span>
+<span style="color: #B00040">void</span> <span style="color: #0000FF">dEfunction</span>(Vector <span style="color: #666666">&amp;</span>x, Vector <span style="color: #666666">&amp;</span>g)
+{
+  g(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> x(<span style="color: #666666">0</span>)<span style="color: #666666">-1.0/</span>(<span style="color: #666666">4*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>));
+} <span style="color: #408080; font-style: italic">// end of function to evaluate</span>
+</pre></div>
+<p>
+You need to change these functions in order to compute the local energy for your system. I used 1000
+cycles per call to get a new value of \( \langle E_L[\alpha]\rangle \).
+When I compute the local energy I also compute its derivative.
+After roughly 10-20 iterations I got a converged result in terms of \( \alpha \).
+</div>
+</div>
 
 
-</div> <!-- end jumbotron -->
-
+<p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-  <li class="active"><a href="._week7-bs000.html">1</a></li>
-  <li><a href="._week7-bs001.html">2</a></li>
-  <li><a href="._week7-bs002.html">3</a></li>
-  <li><a href="._week7-bs003.html">4</a></li>
-  <li><a href="._week7-bs004.html">5</a></li>
-  <li><a href="._week7-bs005.html">6</a></li>
-  <li><a href="._week7-bs006.html">7</a></li>
-  <li><a href="._week7-bs007.html">8</a></li>
-  <li><a href="._week7-bs008.html">9</a></li>
-  <li><a href="._week7-bs009.html">10</a></li>
+<li><a href="._week7-bs044.html">&laquo;</a></li>
+  <li><a href="._week7-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week7-bs037.html">38</a></li>
+  <li><a href="._week7-bs038.html">39</a></li>
+  <li><a href="._week7-bs039.html">40</a></li>
+  <li><a href="._week7-bs040.html">41</a></li>
+  <li><a href="._week7-bs041.html">42</a></li>
+  <li><a href="._week7-bs042.html">43</a></li>
+  <li><a href="._week7-bs043.html">44</a></li>
+  <li><a href="._week7-bs044.html">45</a></li>
+  <li class="active"><a href="._week7-bs045.html">46</a></li>
+  <li><a href="._week7-bs046.html">47</a></li>
+  <li><a href="._week7-bs047.html">48</a></li>
+  <li><a href="._week7-bs048.html">49</a></li>
+  <li><a href="._week7-bs049.html">50</a></li>
+  <li><a href="._week7-bs050.html">51</a></li>
+  <li><a href="._week7-bs051.html">52</a></li>
+  <li><a href="._week7-bs052.html">53</a></li>
+  <li><a href="._week7-bs053.html">54</a></li>
+  <li><a href="._week7-bs054.html">55</a></li>
   <li><a href="">...</a></li>
   <li><a href="._week7-bs079.html">80</a></li>
-  <li><a href="._week7-bs001.html">&raquo;</a></li>
+  <li><a href="._week7-bs046.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
@@ -464,7 +480,7 @@ MathJax.Hub.Config({
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright only on the titlepage -->
 </center>
 
 

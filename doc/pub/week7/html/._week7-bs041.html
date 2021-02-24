@@ -349,7 +349,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week7-bs038.html#simple-example-code" style="font-size: 80%;">Simple example code</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs039.html#when-do-we-stop" style="font-size: 80%;">When do we stop?</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs040.html#slightly-different-approach" style="font-size: 80%;">Slightly different approach</a></li>
-     <!-- navigation toc: --> <li><a href="._week7-bs041.html#program-for-stochastic-gradient" style="font-size: 80%;">Program for stochastic gradient</a></li>
+     <!-- navigation toc: --> <li><a href="#program-for-stochastic-gradient" style="font-size: 80%;">Program for stochastic gradient</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs042.html#using-gradient-descent-methods-limitations" style="font-size: 80%;">Using gradient descent methods, limitations</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs043.html#codes-from-numerical-recipes" style="font-size: 80%;">Codes from numerical recipes</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs044.html#finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension" style="font-size: 80%;">Finding the minimum of the harmonic oscillator model in one dimension</a></li>
@@ -400,54 +400,109 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0000"></a>
-<!-- ------------------- main content ---------------------- -->
+<a name="part0041"></a>
+<!-- !split -->
 
-
-
-<div class="jumbotron">
-<center><h1>Week 8 February 22-26: Gradient Methods, and start Resampling Techniques</h1></center>  <!-- document title -->
+<h2 id="program-for-stochastic-gradient" class="anchor">Program for stochastic gradient </h2>
 
 <p>
-<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
 
-<center>
-<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
-</center>
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #408080; font-style: italic"># Importing various packages</span>
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> exp, sqrt
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">random</span> <span style="color: #008000; font-weight: bold">import</span> random, seed
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">sklearn.linear_model</span> <span style="color: #008000; font-weight: bold">import</span> SGDRegressor
 
+x <span style="color: #666666">=</span> <span style="color: #666666">2*</span>np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>rand(<span style="color: #666666">100</span>,<span style="color: #666666">1</span>)
+y <span style="color: #666666">=</span> <span style="color: #666666">4+3*</span>x<span style="color: #666666">+</span>np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randn(<span style="color: #666666">100</span>,<span style="color: #666666">1</span>)
+
+xb <span style="color: #666666">=</span> np<span style="color: #666666">.</span>c_[np<span style="color: #666666">.</span>ones((<span style="color: #666666">100</span>,<span style="color: #666666">1</span>)), x]
+theta_linreg <span style="color: #666666">=</span> np<span style="color: #666666">.</span>linalg<span style="color: #666666">.</span>inv(xb<span style="color: #666666">.</span>T<span style="color: #666666">.</span>dot(xb))<span style="color: #666666">.</span>dot(xb<span style="color: #666666">.</span>T)<span style="color: #666666">.</span>dot(y)
+<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;Own inversion&quot;</span>)
+<span style="color: #008000">print</span>(theta_linreg)
+sgdreg <span style="color: #666666">=</span> SGDRegressor(n_iter <span style="color: #666666">=</span> <span style="color: #666666">50</span>, penalty<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, eta0<span style="color: #666666">=0.1</span>)
+sgdreg<span style="color: #666666">.</span>fit(x,y<span style="color: #666666">.</span>ravel())
+<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;sgdreg from scikit&quot;</span>)
+<span style="color: #008000">print</span>(sgdreg<span style="color: #666666">.</span>intercept_, sgdreg<span style="color: #666666">.</span>coef_)
+
+
+theta <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randn(<span style="color: #666666">2</span>,<span style="color: #666666">1</span>)
+
+eta <span style="color: #666666">=</span> <span style="color: #666666">0.1</span>
+Niterations <span style="color: #666666">=</span> <span style="color: #666666">1000</span>
+m <span style="color: #666666">=</span> <span style="color: #666666">100</span>
+
+<span style="color: #008000; font-weight: bold">for</span> <span style="color: #008000">iter</span> <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Niterations):
+    gradients <span style="color: #666666">=</span> <span style="color: #666666">2.0/</span>m<span style="color: #666666">*</span>xb<span style="color: #666666">.</span>T<span style="color: #666666">.</span>dot(xb<span style="color: #666666">.</span>dot(theta)<span style="color: #666666">-</span>y)
+    theta <span style="color: #666666">-=</span> eta<span style="color: #666666">*</span>gradients
+<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;theta frm own gd&quot;</span>)
+<span style="color: #008000">print</span>(theta)
+
+xnew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array([[<span style="color: #666666">0</span>],[<span style="color: #666666">2</span>]])
+xbnew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>c_[np<span style="color: #666666">.</span>ones((<span style="color: #666666">2</span>,<span style="color: #666666">1</span>)), xnew]
+ypredict <span style="color: #666666">=</span> xbnew<span style="color: #666666">.</span>dot(theta)
+ypredict2 <span style="color: #666666">=</span> xbnew<span style="color: #666666">.</span>dot(theta_linreg)
+
+
+n_epochs <span style="color: #666666">=</span> <span style="color: #666666">50</span>
+t0, t1 <span style="color: #666666">=</span> <span style="color: #666666">5</span>, <span style="color: #666666">50</span>
+m <span style="color: #666666">=</span> <span style="color: #666666">100</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">learning_schedule</span>(t):
+    <span style="color: #008000; font-weight: bold">return</span> t0<span style="color: #666666">/</span>(t<span style="color: #666666">+</span>t1)
+
+theta <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randn(<span style="color: #666666">2</span>,<span style="color: #666666">1</span>)
+
+<span style="color: #008000; font-weight: bold">for</span> epoch <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(n_epochs):
+    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(m):
+        random_index <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randint(m)
+        xi <span style="color: #666666">=</span> xb[random_index:random_index<span style="color: #666666">+1</span>]
+        yi <span style="color: #666666">=</span> y[random_index:random_index<span style="color: #666666">+1</span>]
+        gradients <span style="color: #666666">=</span> <span style="color: #666666">2</span> <span style="color: #666666">*</span> xi<span style="color: #666666">.</span>T<span style="color: #666666">.</span>dot(xi<span style="color: #666666">.</span>dot(theta)<span style="color: #666666">-</span>yi)
+        eta <span style="color: #666666">=</span> learning_schedule(epoch<span style="color: #666666">*</span>m<span style="color: #666666">+</span>i)
+        theta <span style="color: #666666">=</span> theta <span style="color: #666666">-</span> eta<span style="color: #666666">*</span>gradients
+<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;theta from own sdg&quot;</span>)
+<span style="color: #008000">print</span>(theta)
+
+
+plt<span style="color: #666666">.</span>plot(xnew, ypredict, <span style="color: #BA2121">&quot;r-&quot;</span>)
+plt<span style="color: #666666">.</span>plot(xnew, ypredict2, <span style="color: #BA2121">&quot;b-&quot;</span>)
+plt<span style="color: #666666">.</span>plot(x, y ,<span style="color: #BA2121">&#39;ro&#39;</span>)
+plt<span style="color: #666666">.</span>axis([<span style="color: #666666">0</span>,<span style="color: #666666">2.0</span>,<span style="color: #666666">0</span>, <span style="color: #666666">15.0</span>])
+plt<span style="color: #666666">.</span>xlabel(<span style="color: #BA2121">r&#39;$x$&#39;</span>)
+plt<span style="color: #666666">.</span>ylabel(<span style="color: #BA2121">r&#39;$y$&#39;</span>)
+plt<span style="color: #666666">.</span>title(<span style="color: #BA2121">r&#39;Random numbers &#39;</span>)
+plt<span style="color: #666666">.</span>show()
+</pre></div>
 <p>
-<!-- institution(s) -->
-
-<center>[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b></center>
-<center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
-<br>
-<p>
-<center><h4>Feb 24, 2021</h4></center> <!-- date -->
-<br>
-<p>
-
-
-<p><a href="._week7-bs001.html" class="btn btn-primary btn-lg">Read &raquo;</a></p>
-
-
-</div> <!-- end jumbotron -->
-
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-  <li class="active"><a href="._week7-bs000.html">1</a></li>
-  <li><a href="._week7-bs001.html">2</a></li>
-  <li><a href="._week7-bs002.html">3</a></li>
-  <li><a href="._week7-bs003.html">4</a></li>
-  <li><a href="._week7-bs004.html">5</a></li>
-  <li><a href="._week7-bs005.html">6</a></li>
-  <li><a href="._week7-bs006.html">7</a></li>
-  <li><a href="._week7-bs007.html">8</a></li>
-  <li><a href="._week7-bs008.html">9</a></li>
-  <li><a href="._week7-bs009.html">10</a></li>
+<li><a href="._week7-bs040.html">&laquo;</a></li>
+  <li><a href="._week7-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week7-bs033.html">34</a></li>
+  <li><a href="._week7-bs034.html">35</a></li>
+  <li><a href="._week7-bs035.html">36</a></li>
+  <li><a href="._week7-bs036.html">37</a></li>
+  <li><a href="._week7-bs037.html">38</a></li>
+  <li><a href="._week7-bs038.html">39</a></li>
+  <li><a href="._week7-bs039.html">40</a></li>
+  <li><a href="._week7-bs040.html">41</a></li>
+  <li class="active"><a href="._week7-bs041.html">42</a></li>
+  <li><a href="._week7-bs042.html">43</a></li>
+  <li><a href="._week7-bs043.html">44</a></li>
+  <li><a href="._week7-bs044.html">45</a></li>
+  <li><a href="._week7-bs045.html">46</a></li>
+  <li><a href="._week7-bs046.html">47</a></li>
+  <li><a href="._week7-bs047.html">48</a></li>
+  <li><a href="._week7-bs048.html">49</a></li>
+  <li><a href="._week7-bs049.html">50</a></li>
+  <li><a href="._week7-bs050.html">51</a></li>
   <li><a href="">...</a></li>
   <li><a href="._week7-bs079.html">80</a></li>
-  <li><a href="._week7-bs001.html">&raquo;</a></li>
+  <li><a href="._week7-bs042.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
@@ -464,7 +519,7 @@ MathJax.Hub.Config({
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright only on the titlepage -->
 </center>
 
 
