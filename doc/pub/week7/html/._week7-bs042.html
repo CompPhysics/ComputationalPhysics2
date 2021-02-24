@@ -350,7 +350,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week7-bs039.html#when-do-we-stop" style="font-size: 80%;">When do we stop?</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs040.html#slightly-different-approach" style="font-size: 80%;">Slightly different approach</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs041.html#program-for-stochastic-gradient" style="font-size: 80%;">Program for stochastic gradient</a></li>
-     <!-- navigation toc: --> <li><a href="._week7-bs042.html#using-gradient-descent-methods-limitations" style="font-size: 80%;">Using gradient descent methods, limitations</a></li>
+     <!-- navigation toc: --> <li><a href="#using-gradient-descent-methods-limitations" style="font-size: 80%;">Using gradient descent methods, limitations</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs043.html#codes-from-numerical-recipes" style="font-size: 80%;">Codes from numerical recipes</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs044.html#finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension" style="font-size: 80%;">Finding the minimum of the harmonic oscillator model in one dimension</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs045.html#functions-to-observe" style="font-size: 80%;">Functions to observe</a></li>
@@ -400,54 +400,47 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0000"></a>
-<!-- ------------------- main content ---------------------- -->
+<a name="part0042"></a>
+<!-- !split -->
 
+<h2 id="using-gradient-descent-methods-limitations" class="anchor">Using gradient descent methods, limitations </h2>
 
-
-<div class="jumbotron">
-<center><h1>Week 8 February 22-26: Gradient Methods, and start Resampling Techniques</h1></center>  <!-- document title -->
-
-<p>
-<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
-
-<center>
-<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
-</center>
-
-<p>
-<!-- institution(s) -->
-
-<center>[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b></center>
-<center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
-<br>
-<p>
-<center><h4>Feb 24, 2021</h4></center> <!-- date -->
-<br>
-<p>
-
-
-<p><a href="._week7-bs001.html" class="btn btn-primary btn-lg">Read &raquo;</a></p>
-
-
-</div> <!-- end jumbotron -->
+<ul>
+<li> <b>Gradient descent (GD) finds local minima of our function</b>. Since the GD algorithm is deterministic, if it converges, it will converge to a local minimum of our energy function. Because in ML we are often dealing with extremely rugged landscapes with many local minima, this can lead to poor performance.</li>
+<li> <b>GD is sensitive to initial conditions</b>. One consequence of the local nature of GD is that initial conditions matter. Depending on where one starts, one will end up at a different local minima. Therefore, it is very important to think about how one initializes the training process. This is true for GD as well as more complicated variants of GD.</li>
+<li> <b>Gradients are computationally expensive to calculate for large datasets</b>. In many cases in statistics and ML, the energy function is a sum of terms, with one term for each data point. For example, in linear regression, \( E \propto \sum_{i=1}^n (y_i - \mathbf{w}^T\cdot\mathbf{x}_i)^2 \); for logistic regression, the square error is replaced by the cross entropy. To calculate the gradient we have to sum over <em>all</em> \( n \) data points. Doing this at every GD step becomes extremely computationally expensive. An ingenious solution to this, is to calculate the gradients using small subsets of the data called &quot;mini batches&quot;. This has the added benefit of introducing stochasticity into our algorithm.</li>
+<li> <b>GD is very sensitive to choices of learning rates</b>. GD is extremely sensitive to the choice of learning rates. If the learning rate is very small, the training process take an extremely long time. For larger learning rates, GD can diverge and give poor results. Furthermore, depending on what the local landscape looks like, we have to modify the learning rates to ensure convergence. Ideally, we would <em>adaptively</em> choose the learning rates to match the landscape.</li>
+<li> <b>GD treats all directions in parameter space uniformly.</b> Another major drawback of GD is that unlike Newton's method, the learning rate for GD is the same in all directions in parameter space. For this reason, the maximum learning rate is set by the behavior of the steepest direction and this can significantly slow down training. Ideally, we would like to take large steps in flat directions and small steps in steep directions. Since we are exploring rugged landscapes where curvatures change, this requires us to keep track of not only the gradient but second derivatives. The ideal scenario would be to calculate the Hessian but this proves to be too computationally expensive.</li> 
+<li> GD can take exponential time to escape saddle points, even with random initialization. As we mentioned, GD is extremely sensitive to initial condition since it determines the particular local minimum GD would eventually reach. However, even with a good initialization scheme, through the introduction of randomness, GD can still take exponential time to escape saddle points.</li>
+</ul>
 
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-  <li class="active"><a href="._week7-bs000.html">1</a></li>
-  <li><a href="._week7-bs001.html">2</a></li>
-  <li><a href="._week7-bs002.html">3</a></li>
-  <li><a href="._week7-bs003.html">4</a></li>
-  <li><a href="._week7-bs004.html">5</a></li>
-  <li><a href="._week7-bs005.html">6</a></li>
-  <li><a href="._week7-bs006.html">7</a></li>
-  <li><a href="._week7-bs007.html">8</a></li>
-  <li><a href="._week7-bs008.html">9</a></li>
-  <li><a href="._week7-bs009.html">10</a></li>
+<li><a href="._week7-bs041.html">&laquo;</a></li>
+  <li><a href="._week7-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week7-bs034.html">35</a></li>
+  <li><a href="._week7-bs035.html">36</a></li>
+  <li><a href="._week7-bs036.html">37</a></li>
+  <li><a href="._week7-bs037.html">38</a></li>
+  <li><a href="._week7-bs038.html">39</a></li>
+  <li><a href="._week7-bs039.html">40</a></li>
+  <li><a href="._week7-bs040.html">41</a></li>
+  <li><a href="._week7-bs041.html">42</a></li>
+  <li class="active"><a href="._week7-bs042.html">43</a></li>
+  <li><a href="._week7-bs043.html">44</a></li>
+  <li><a href="._week7-bs044.html">45</a></li>
+  <li><a href="._week7-bs045.html">46</a></li>
+  <li><a href="._week7-bs046.html">47</a></li>
+  <li><a href="._week7-bs047.html">48</a></li>
+  <li><a href="._week7-bs048.html">49</a></li>
+  <li><a href="._week7-bs049.html">50</a></li>
+  <li><a href="._week7-bs050.html">51</a></li>
+  <li><a href="._week7-bs051.html">52</a></li>
   <li><a href="">...</a></li>
   <li><a href="._week7-bs079.html">80</a></li>
-  <li><a href="._week7-bs001.html">&raquo;</a></li>
+  <li><a href="._week7-bs043.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
@@ -464,7 +457,7 @@ MathJax.Hub.Config({
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright only on the titlepage -->
 </center>
 
 

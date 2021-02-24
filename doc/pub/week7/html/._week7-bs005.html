@@ -313,7 +313,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week7-bs002.html#brief-reminder-on-newton-raphson-s-method" style="font-size: 80%;">Brief reminder on Newton-Raphson's method</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs003.html#the-equations" style="font-size: 80%;">The equations</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs004.html#simple-geometric-interpretation" style="font-size: 80%;">Simple geometric interpretation</a></li>
-     <!-- navigation toc: --> <li><a href="._week7-bs005.html#extending-to-more-than-one-variable" style="font-size: 80%;">Extending to more than one variable</a></li>
+     <!-- navigation toc: --> <li><a href="#extending-to-more-than-one-variable" style="font-size: 80%;">Extending to more than one variable</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs006.html#steepest-descent" style="font-size: 80%;">Steepest descent</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs007.html#more-on-steepest-descent" style="font-size: 80%;">More on Steepest descent</a></li>
      <!-- navigation toc: --> <li><a href="._week7-bs008.html#the-ideal" style="font-size: 80%;">The ideal</a></li>
@@ -400,54 +400,84 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0000"></a>
-<!-- ------------------- main content ---------------------- -->
+<a name="part0005"></a>
+<!-- !split -->
 
-
-
-<div class="jumbotron">
-<center><h1>Week 8 February 22-26: Gradient Methods, and start Resampling Techniques</h1></center>  <!-- document title -->
+<h2 id="extending-to-more-than-one-variable" class="anchor">Extending to more than one variable </h2>
 
 <p>
-<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
+Newton's method can be generalized to systems of several non-linear equations
+and variables. Consider the case with two equations
+$$
+   \begin{array}{cc} f_1(x_1,x_2) &=0\\
+                     f_2(x_1,x_2) &=0,\end{array}
+$$
 
-<center>
-<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
-</center>
+which we Taylor expand to obtain
+
+$$
+   \begin{array}{cc} 0=f_1(x_1+h_1,x_2+h_2)=&f_1(x_1,x_2)+h_1
+                     \partial f_1/\partial x_1+h_2
+                     \partial f_1/\partial x_2+\dots\\
+                     0=f_2(x_1+h_1,x_2+h_2)=&f_2(x_1,x_2)+h_1
+                     \partial f_2/\partial x_1+h_2
+                     \partial f_2/\partial x_2+\dots
+                       \end{array}.
+$$
+
+Defining the Jacobian matrix \( \hat{J} \) we have
+$$
+ \hat{J}=\left( \begin{array}{cc}
+                         \partial f_1/\partial x_1  & \partial f_1/\partial x_2 \\
+                          \partial f_2/\partial x_1     &\partial f_2/\partial x_2
+             \end{array} \right),
+$$
+
+we can rephrase Newton's method as
+$$
+\left(\begin{array}{c} x_1^{n+1} \\ x_2^{n+1} \end{array} \right)=
+\left(\begin{array}{c} x_1^{n} \\ x_2^{n} \end{array} \right)+
+\left(\begin{array}{c} h_1^{n} \\ h_2^{n} \end{array} \right),
+$$
+
+where we have defined
+$$
+   \left(\begin{array}{c} h_1^{n} \\ h_2^{n} \end{array} \right)=
+   -{\bf \hat{J}}^{-1}
+   \left(\begin{array}{c} f_1(x_1^{n},x_2^{n}) \\ f_2(x_1^{n},x_2^{n}) \end{array} \right).
+$$
+
+We need thus to compute the inverse of the Jacobian matrix and it
+is to understand that difficulties  may
+arise in case \( \hat{J} \) is nearly singular.
 
 <p>
-<!-- institution(s) -->
+It is rather straightforward to extend the above scheme to systems of
+more than two non-linear equations. In our case, the Jacobian matrix is given by the Hessian that represents the second derivative of cost function.
 
-<center>[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b></center>
-<center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
-<br>
 <p>
-<center><h4>Feb 24, 2021</h4></center> <!-- date -->
-<br>
-<p>
-
-
-<p><a href="._week7-bs001.html" class="btn btn-primary btn-lg">Read &raquo;</a></p>
-
-
-</div> <!-- end jumbotron -->
-
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-  <li class="active"><a href="._week7-bs000.html">1</a></li>
+<li><a href="._week7-bs004.html">&laquo;</a></li>
+  <li><a href="._week7-bs000.html">1</a></li>
   <li><a href="._week7-bs001.html">2</a></li>
   <li><a href="._week7-bs002.html">3</a></li>
   <li><a href="._week7-bs003.html">4</a></li>
   <li><a href="._week7-bs004.html">5</a></li>
-  <li><a href="._week7-bs005.html">6</a></li>
+  <li class="active"><a href="._week7-bs005.html">6</a></li>
   <li><a href="._week7-bs006.html">7</a></li>
   <li><a href="._week7-bs007.html">8</a></li>
   <li><a href="._week7-bs008.html">9</a></li>
   <li><a href="._week7-bs009.html">10</a></li>
+  <li><a href="._week7-bs010.html">11</a></li>
+  <li><a href="._week7-bs011.html">12</a></li>
+  <li><a href="._week7-bs012.html">13</a></li>
+  <li><a href="._week7-bs013.html">14</a></li>
+  <li><a href="._week7-bs014.html">15</a></li>
   <li><a href="">...</a></li>
   <li><a href="._week7-bs079.html">80</a></li>
-  <li><a href="._week7-bs001.html">&raquo;</a></li>
+  <li><a href="._week7-bs006.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
@@ -464,7 +494,7 @@ MathJax.Hub.Config({
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright only on the titlepage -->
 </center>
 
 
