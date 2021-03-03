@@ -1,0 +1,472 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/doconce/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Week 8 February 22-26: Gradient Methods, and start Resampling Techniques">
+
+<title>Week 8 February 22-26: Gradient Methods, and start Resampling Techniques</title>
+
+<!-- Bootstrap style: bootstrap -->
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<!-- not necessary
+<link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+-->
+
+<style type="text/css">
+
+/* Add scrollbar to dropdown menus in bootstrap navigation bar */
+.dropdown-menu {
+   height: auto;
+   max-height: 400px;
+   overflow-x: hidden;
+}
+
+/* Adds an invisible element before each target to offset for the navigation
+   bar */
+.anchor::before {
+  content:"";
+  display:block;
+  height:50px;      /* fixed header height for style bootstrap */
+  margin:-50px 0 0; /* negative fixed header height */
+}
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [('Overview of week 8, February 22-26',
+               2,
+               None,
+               'overview-of-week-8-february-22-26'),
+              ("Brief reminder on Newton-Raphson's method",
+               2,
+               None,
+               'brief-reminder-on-newton-raphson-s-method'),
+              ('The equations', 2, None, 'the-equations'),
+              ('Simple geometric interpretation',
+               2,
+               None,
+               'simple-geometric-interpretation'),
+              ('Extending to more than one variable',
+               2,
+               None,
+               'extending-to-more-than-one-variable'),
+              ('Steepest descent', 2, None, 'steepest-descent'),
+              ('More on Steepest descent', 2, None, 'more-on-steepest-descent'),
+              ('The ideal', 2, None, 'the-ideal'),
+              ('The sensitiveness of the gradient descent',
+               2,
+               None,
+               'the-sensitiveness-of-the-gradient-descent'),
+              ('Convex functions', 2, None, 'convex-functions'),
+              ('Convex function', 2, None, 'convex-function'),
+              ('Conditions on convex functions',
+               2,
+               None,
+               'conditions-on-convex-functions'),
+              ('More on convex functions', 2, None, 'more-on-convex-functions'),
+              ('Some simple problems', 2, None, 'some-simple-problems'),
+              ('Standard steepest descent',
+               2,
+               None,
+               'standard-steepest-descent'),
+              ('Gradient method', 2, None, 'gradient-method'),
+              ('Steepest descent  method', 2, None, 'steepest-descent-method'),
+              ('Steepest descent  method', 2, None, 'steepest-descent-method'),
+              ('Final expressions', 2, None, 'final-expressions'),
+              ('Code examples for steepest descent',
+               2,
+               None,
+               'code-examples-for-steepest-descent'),
+              ('Simple codes for  steepest descent and conjugate gradient '
+               'using a $2\\times 2$ matrix, in c++, Python code to come',
+               2,
+               None,
+               'simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come'),
+              ('The routine for the steepest descent method',
+               2,
+               None,
+               'the-routine-for-the-steepest-descent-method'),
+              ('Steepest descent example', 2, None, 'steepest-descent-example'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method and iterations',
+               2,
+               None,
+               'conjugate-gradient-method-and-iterations'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Conjugate gradient method',
+               2,
+               None,
+               'conjugate-gradient-method'),
+              ('Simple implementation of the Conjugate gradient algorithm',
+               2,
+               None,
+               'simple-implementation-of-the-conjugate-gradient-algorithm'),
+              ('Broyden–Fletcher–Goldfarb–Shanno algorithm',
+               2,
+               None,
+               'broyden-fletcher-goldfarb-shanno-algorithm'),
+              ('Stochastic Gradient Descent',
+               2,
+               None,
+               'stochastic-gradient-descent'),
+              ('Computation of gradients', 2, None, 'computation-of-gradients'),
+              ('SGD example', 2, None, 'sgd-example'),
+              ('The gradient step', 2, None, 'the-gradient-step'),
+              ('Simple example code', 2, None, 'simple-example-code'),
+              ('When do we stop?', 2, None, 'when-do-we-stop'),
+              ('Slightly different approach',
+               2,
+               None,
+               'slightly-different-approach'),
+              ('Program for stochastic gradient',
+               2,
+               None,
+               'program-for-stochastic-gradient'),
+              ('Using gradient descent methods, limitations',
+               2,
+               None,
+               'using-gradient-descent-methods-limitations'),
+              ('Codes from numerical recipes',
+               2,
+               None,
+               'codes-from-numerical-recipes'),
+              ('Finding the minimum of the harmonic oscillator model in one '
+               'dimension',
+               2,
+               None,
+               'finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension'),
+              ('Functions to observe', 2, None, 'functions-to-observe'),
+              ('Resampling methods', 2, None, 'resampling-methods'),
+              ('Resampling approaches can be computationally expensive',
+               2,
+               None,
+               'resampling-approaches-can-be-computationally-expensive'),
+              ('Why resampling methods ?', 2, None, 'why-resampling-methods'),
+              ('Statistical analysis', 2, None, 'statistical-analysis'),
+              ('Statistics', 2, None, 'statistics'),
+              ('Statistics, moments', 2, None, 'statistics-moments'),
+              ('Statistics, central moments',
+               2,
+               None,
+               'statistics-central-moments'),
+              ('Statistics, covariance', 2, None, 'statistics-covariance'),
+              ('Statistics, more covariance',
+               2,
+               None,
+               'statistics-more-covariance'),
+              ('Statistics, independent variables',
+               2,
+               None,
+               'statistics-independent-variables'),
+              ('Statistics, more variance',
+               2,
+               None,
+               'statistics-more-variance'),
+              ('Statistics and stochastic processes',
+               2,
+               None,
+               'statistics-and-stochastic-processes'),
+              ('Statistics and sample variables',
+               2,
+               None,
+               'statistics-and-sample-variables'),
+              ('Statistics, sample variance and covariance',
+               2,
+               None,
+               'statistics-sample-variance-and-covariance'),
+              ('Statistics, law of large numbers',
+               2,
+               None,
+               'statistics-law-of-large-numbers'),
+              ('Statistics, more on sample error',
+               2,
+               None,
+               'statistics-more-on-sample-error'),
+              ('Statistics', 2, None, 'statistics'),
+              ('Statistics, central limit theorem',
+               2,
+               None,
+               'statistics-central-limit-theorem'),
+              ('Statistics, more technicalities',
+               2,
+               None,
+               'statistics-more-technicalities'),
+              ('Statistics', 2, None, 'statistics'),
+              ('Statistics and sample variance',
+               2,
+               None,
+               'statistics-and-sample-variance'),
+              ('Statistics, uncorrelated results',
+               2,
+               None,
+               'statistics-uncorrelated-results'),
+              ('Statistics, computations', 2, None, 'statistics-computations'),
+              ('Statistics, more on computations of errors',
+               2,
+               None,
+               'statistics-more-on-computations-of-errors'),
+              ('Statistics, wrapping up 1',
+               2,
+               None,
+               'statistics-wrapping-up-1'),
+              ('Statistics, final expression',
+               2,
+               None,
+               'statistics-final-expression'),
+              ('Statistics, effective number of correlations',
+               2,
+               None,
+               'statistics-effective-number-of-correlations'),
+              ('Can we understand this? Time Auto-correlation Function',
+               2,
+               None,
+               'can-we-understand-this-time-auto-correlation-function'),
+              ('Time Auto-correlation Function',
+               2,
+               None,
+               'time-auto-correlation-function'),
+              ('Time Auto-correlation Function',
+               2,
+               None,
+               'time-auto-correlation-function'),
+              ('Time Auto-correlation Function',
+               2,
+               None,
+               'time-auto-correlation-function'),
+              ('Time Auto-correlation Function',
+               2,
+               None,
+               'time-auto-correlation-function'),
+              ('Time Auto-correlation Function',
+               2,
+               None,
+               'time-auto-correlation-function'),
+              ('Correlation Time', 2, None, 'correlation-time')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- Bootstrap navigation bar -->
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="week7-bs.html">Week 8 February 22-26: Gradient Methods, and start Resampling Techniques</a>
+  </div>
+
+  <div class="navbar-collapse collapse navbar-responsive-collapse">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+     <!-- navigation toc: --> <li><a href="._week7-bs001.html#overview-of-week-8-february-22-26" style="font-size: 80%;">Overview of week 8, February 22-26</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs002.html#brief-reminder-on-newton-raphson-s-method" style="font-size: 80%;">Brief reminder on Newton-Raphson's method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs003.html#the-equations" style="font-size: 80%;">The equations</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs004.html#simple-geometric-interpretation" style="font-size: 80%;">Simple geometric interpretation</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs005.html#extending-to-more-than-one-variable" style="font-size: 80%;">Extending to more than one variable</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs006.html#steepest-descent" style="font-size: 80%;">Steepest descent</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs007.html#more-on-steepest-descent" style="font-size: 80%;">More on Steepest descent</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs008.html#the-ideal" style="font-size: 80%;">The ideal</a></li>
+     <!-- navigation toc: --> <li><a href="#the-sensitiveness-of-the-gradient-descent" style="font-size: 80%;">The sensitiveness of the gradient descent</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs010.html#convex-functions" style="font-size: 80%;">Convex functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs011.html#convex-function" style="font-size: 80%;">Convex function</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs012.html#conditions-on-convex-functions" style="font-size: 80%;">Conditions on convex functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs013.html#more-on-convex-functions" style="font-size: 80%;">More on convex functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs014.html#some-simple-problems" style="font-size: 80%;">Some simple problems</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs015.html#standard-steepest-descent" style="font-size: 80%;">Standard steepest descent</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs016.html#gradient-method" style="font-size: 80%;">Gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs018.html#steepest-descent-method" style="font-size: 80%;">Steepest descent  method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs018.html#steepest-descent-method" style="font-size: 80%;">Steepest descent  method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs019.html#final-expressions" style="font-size: 80%;">Final expressions</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs020.html#code-examples-for-steepest-descent" style="font-size: 80%;">Code examples for steepest descent</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs021.html#simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come" style="font-size: 80%;">Simple codes for  steepest descent and conjugate gradient using a \( 2\times 2 \) matrix, in c++, Python code to come</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs022.html#the-routine-for-the-steepest-descent-method" style="font-size: 80%;">The routine for the steepest descent method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs023.html#steepest-descent-example" style="font-size: 80%;">Steepest descent example</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs031.html#conjugate-gradient-method" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs031.html#conjugate-gradient-method" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs031.html#conjugate-gradient-method" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs031.html#conjugate-gradient-method" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs028.html#conjugate-gradient-method-and-iterations" style="font-size: 80%;">Conjugate gradient method and iterations</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs031.html#conjugate-gradient-method" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs031.html#conjugate-gradient-method" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs031.html#conjugate-gradient-method" style="font-size: 80%;">Conjugate gradient method</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs032.html#simple-implementation-of-the-conjugate-gradient-algorithm" style="font-size: 80%;">Simple implementation of the Conjugate gradient algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs033.html#broyden-fletcher-goldfarb-shanno-algorithm" style="font-size: 80%;">Broyden–Fletcher–Goldfarb–Shanno algorithm</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs034.html#stochastic-gradient-descent" style="font-size: 80%;">Stochastic Gradient Descent</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs035.html#computation-of-gradients" style="font-size: 80%;">Computation of gradients</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs036.html#sgd-example" style="font-size: 80%;">SGD example</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs037.html#the-gradient-step" style="font-size: 80%;">The gradient step</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs038.html#simple-example-code" style="font-size: 80%;">Simple example code</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs039.html#when-do-we-stop" style="font-size: 80%;">When do we stop?</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs040.html#slightly-different-approach" style="font-size: 80%;">Slightly different approach</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs041.html#program-for-stochastic-gradient" style="font-size: 80%;">Program for stochastic gradient</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs042.html#using-gradient-descent-methods-limitations" style="font-size: 80%;">Using gradient descent methods, limitations</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs043.html#codes-from-numerical-recipes" style="font-size: 80%;">Codes from numerical recipes</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs044.html#finding-the-minimum-of-the-harmonic-oscillator-model-in-one-dimension" style="font-size: 80%;">Finding the minimum of the harmonic oscillator model in one dimension</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs045.html#functions-to-observe" style="font-size: 80%;">Functions to observe</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs046.html#resampling-methods" style="font-size: 80%;">Resampling methods</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs047.html#resampling-approaches-can-be-computationally-expensive" style="font-size: 80%;">Resampling approaches can be computationally expensive</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs048.html#why-resampling-methods" style="font-size: 80%;">Why resampling methods ?</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs049.html#statistical-analysis" style="font-size: 80%;">Statistical analysis</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs065.html#statistics" style="font-size: 80%;">Statistics</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs051.html#statistics-moments" style="font-size: 80%;">Statistics, moments</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs052.html#statistics-central-moments" style="font-size: 80%;">Statistics, central moments</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs053.html#statistics-covariance" style="font-size: 80%;">Statistics, covariance</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs054.html#statistics-more-covariance" style="font-size: 80%;">Statistics, more covariance</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs055.html#statistics-independent-variables" style="font-size: 80%;">Statistics, independent variables</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs056.html#statistics-more-variance" style="font-size: 80%;">Statistics, more variance</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs057.html#statistics-and-stochastic-processes" style="font-size: 80%;">Statistics and stochastic processes</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs058.html#statistics-and-sample-variables" style="font-size: 80%;">Statistics and sample variables</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs059.html#statistics-sample-variance-and-covariance" style="font-size: 80%;">Statistics, sample variance and covariance</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs060.html#statistics-law-of-large-numbers" style="font-size: 80%;">Statistics, law of large numbers</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs061.html#statistics-more-on-sample-error" style="font-size: 80%;">Statistics, more on sample error</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs065.html#statistics" style="font-size: 80%;">Statistics</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs063.html#statistics-central-limit-theorem" style="font-size: 80%;">Statistics, central limit theorem</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs064.html#statistics-more-technicalities" style="font-size: 80%;">Statistics, more technicalities</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs065.html#statistics" style="font-size: 80%;">Statistics</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs066.html#statistics-and-sample-variance" style="font-size: 80%;">Statistics and sample variance</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs067.html#statistics-uncorrelated-results" style="font-size: 80%;">Statistics, uncorrelated results</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs068.html#statistics-computations" style="font-size: 80%;">Statistics, computations</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs069.html#statistics-more-on-computations-of-errors" style="font-size: 80%;">Statistics, more on computations of errors</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs070.html#statistics-wrapping-up-1" style="font-size: 80%;">Statistics, wrapping up 1</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs071.html#statistics-final-expression" style="font-size: 80%;">Statistics, final expression</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs072.html#statistics-effective-number-of-correlations" style="font-size: 80%;">Statistics, effective number of correlations</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs073.html#can-we-understand-this-time-auto-correlation-function" style="font-size: 80%;">Can we understand this? Time Auto-correlation Function</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs078.html#time-auto-correlation-function" style="font-size: 80%;">Time Auto-correlation Function</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs078.html#time-auto-correlation-function" style="font-size: 80%;">Time Auto-correlation Function</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs078.html#time-auto-correlation-function" style="font-size: 80%;">Time Auto-correlation Function</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs078.html#time-auto-correlation-function" style="font-size: 80%;">Time Auto-correlation Function</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs078.html#time-auto-correlation-function" style="font-size: 80%;">Time Auto-correlation Function</a></li>
+     <!-- navigation toc: --> <li><a href="._week7-bs079.html#correlation-time" style="font-size: 80%;">Correlation Time</a></li>
+
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+</div> <!-- end of navigation bar -->
+
+<div class="container">
+
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
+
+<a name="part0009"></a>
+<!-- !split  -->
+
+<h2 id="the-sensitiveness-of-the-gradient-descent" class="anchor">The sensitiveness of the gradient descent </h2>
+
+<p>
+The gradient descent method 
+is sensitive to the choice of learning rate \( \gamma_k \). This is due
+to the fact that we are only guaranteed that \( F(\mathbf{x}_{k+1}) \leq
+F(\mathbf{x}_k) \) for sufficiently small \( \gamma_k \). The problem is to
+determine an optimal learning rate. If the learning rate is chosen too
+small the method will take a long time to converge and if it is too
+large we can experience erratic behavior.
+
+<p>
+Many of these shortcomings can be alleviated by introducing
+randomness. One such method is that of Stochastic Gradient Descent
+(SGD), see below.
+
+<p>
+<p>
+<!-- navigation buttons at the bottom of the page -->
+<ul class="pagination">
+<li><a href="._week7-bs008.html">&laquo;</a></li>
+  <li><a href="._week7-bs000.html">1</a></li>
+  <li><a href="._week7-bs001.html">2</a></li>
+  <li><a href="._week7-bs002.html">3</a></li>
+  <li><a href="._week7-bs003.html">4</a></li>
+  <li><a href="._week7-bs004.html">5</a></li>
+  <li><a href="._week7-bs005.html">6</a></li>
+  <li><a href="._week7-bs006.html">7</a></li>
+  <li><a href="._week7-bs007.html">8</a></li>
+  <li><a href="._week7-bs008.html">9</a></li>
+  <li class="active"><a href="._week7-bs009.html">10</a></li>
+  <li><a href="._week7-bs010.html">11</a></li>
+  <li><a href="._week7-bs011.html">12</a></li>
+  <li><a href="._week7-bs012.html">13</a></li>
+  <li><a href="._week7-bs013.html">14</a></li>
+  <li><a href="._week7-bs014.html">15</a></li>
+  <li><a href="._week7-bs015.html">16</a></li>
+  <li><a href="._week7-bs016.html">17</a></li>
+  <li><a href="._week7-bs017.html">18</a></li>
+  <li><a href="._week7-bs018.html">19</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week7-bs079.html">80</a></li>
+  <li><a href="._week7-bs010.html">&raquo;</a></li>
+</ul>
+<!-- ------------------- end of main content --------------- -->
+
+</div>  <!-- end container -->
+<!-- include javascript, jQuery *first* -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap footer
+<footer>
+<a href="https://..."><img width="250" align=right src="https://..."></a>
+</footer>
+-->
+
+
+<center style="font-size:80%">
+<!-- copyright only on the titlepage -->
+</center>
+
+
+</body>
+</html>
+    
+
