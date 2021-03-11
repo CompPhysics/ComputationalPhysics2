@@ -528,7 +528,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week9-bs071.html#note-3" style="font-size: 80%;">Note 3</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs072.html#note-4" style="font-size: 80%;">Note 4</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs073.html#numerical-integration-in-parallel-https-github-com-compphysics-computationalphysics2-blob-gh-pages-doc-programs-lectureprograms-programs-mpi-chapter07-program6-cpp" style="font-size: 80%;">"Numerical integration in parallel":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp"</a></li>
-     <!-- navigation toc: --> <li><a href="._week9-bs074.html#dissection-of-trapezoidal-rule-with-mpi-_reduce" style="font-size: 80%;">Dissection of trapezoidal rule with \( MPI\_reduce \)</a></li>
+     <!-- navigation toc: --> <li><a href="#dissection-of-trapezoidal-rule-with-mpi-_reduce" style="font-size: 80%;">Dissection of trapezoidal rule with \( MPI\_reduce \)</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs080.html#dissection-of-trapezoidal-rule" style="font-size: 80%;">Dissection of trapezoidal rule</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs076.html#integrating-with-_mpi_" style="font-size: 80%;">Integrating with <b>MPI</b></a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs077.html#how-do-i-use-mpi-_reduce" style="font-size: 80%;">How do I use \( MPI\_reduce \)?</a></li>
@@ -586,54 +586,67 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0000"></a>
-<!-- ------------------- main content ---------------------- -->
+<a name="part0074"></a>
+<!-- !split -->
 
-
-
-<div class="jumbotron">
-<center><h1>Week 10 March 8-12: Object-orientation strategies and Parallelization</h1></center>  <!-- document title -->
-
-<p>
-<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
-
-<center>
-<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
-</center>
+<h2 id="dissection-of-trapezoidal-rule-with-mpi-_reduce" class="anchor">Dissection of trapezoidal rule with \( MPI\_reduce \) </h2>
+<div class="panel panel-default">
+<div class="panel-body">
+<p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
 
 <p>
-<!-- institution(s) -->
 
-<center>[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b></center>
-<center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
-<br>
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #408080; font-style: italic">//    Trapezoidal rule and numerical integration usign MPI</span>
+<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span> std;
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;mpi.h&gt;</span><span style="color: #BC7A00"></span>
+<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iostream&gt;</span><span style="color: #BC7A00"></span>
+
+<span style="color: #408080; font-style: italic">//     Here we define various functions called by the main program</span>
+
+<span style="color: #B00040">double</span> <span style="color: #0000FF">int_function</span>(<span style="color: #B00040">double</span> );
+<span style="color: #B00040">double</span> <span style="color: #0000FF">trapezoidal_rule</span>(<span style="color: #B00040">double</span> , <span style="color: #B00040">double</span> , <span style="color: #B00040">int</span> , <span style="color: #B00040">double</span> (<span style="color: #666666">*</span>)(<span style="color: #B00040">double</span>));
+
+<span style="color: #408080; font-style: italic">//   Main function begins here</span>
+<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span> (<span style="color: #B00040">int</span> nargs, <span style="color: #B00040">char</span><span style="color: #666666">*</span> args[])
+{
+  <span style="color: #B00040">int</span> n, local_n, numprocs, my_rank; 
+  <span style="color: #B00040">double</span> a, b, h, local_a, local_b, total_sum, local_sum;   
+  <span style="color: #B00040">double</span>  time_start, time_end, total_time;
+</pre></div>
 <p>
-<center><h4>Mar 5, 2021</h4></center> <!-- date -->
-<br>
+</div>
+</div>
+
+
 <p>
-
-
-<p><a href="._week9-bs001.html" class="btn btn-primary btn-lg">Read &raquo;</a></p>
-
-
-</div> <!-- end jumbotron -->
-
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-  <li class="active"><a href="._week9-bs000.html">1</a></li>
-  <li><a href="._week9-bs001.html">2</a></li>
-  <li><a href="._week9-bs002.html">3</a></li>
-  <li><a href="._week9-bs003.html">4</a></li>
-  <li><a href="._week9-bs004.html">5</a></li>
-  <li><a href="._week9-bs005.html">6</a></li>
-  <li><a href="._week9-bs006.html">7</a></li>
-  <li><a href="._week9-bs007.html">8</a></li>
-  <li><a href="._week9-bs008.html">9</a></li>
-  <li><a href="._week9-bs009.html">10</a></li>
+<li><a href="._week9-bs073.html">&laquo;</a></li>
+  <li><a href="._week9-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week9-bs066.html">67</a></li>
+  <li><a href="._week9-bs067.html">68</a></li>
+  <li><a href="._week9-bs068.html">69</a></li>
+  <li><a href="._week9-bs069.html">70</a></li>
+  <li><a href="._week9-bs070.html">71</a></li>
+  <li><a href="._week9-bs071.html">72</a></li>
+  <li><a href="._week9-bs072.html">73</a></li>
+  <li><a href="._week9-bs073.html">74</a></li>
+  <li class="active"><a href="._week9-bs074.html">75</a></li>
+  <li><a href="._week9-bs075.html">76</a></li>
+  <li><a href="._week9-bs076.html">77</a></li>
+  <li><a href="._week9-bs077.html">78</a></li>
+  <li><a href="._week9-bs078.html">79</a></li>
+  <li><a href="._week9-bs079.html">80</a></li>
+  <li><a href="._week9-bs080.html">81</a></li>
+  <li><a href="._week9-bs081.html">82</a></li>
+  <li><a href="._week9-bs082.html">83</a></li>
+  <li><a href="._week9-bs083.html">84</a></li>
   <li><a href="">...</a></li>
   <li><a href="._week9-bs119.html">120</a></li>
-  <li><a href="._week9-bs001.html">&raquo;</a></li>
+  <li><a href="._week9-bs075.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
@@ -650,7 +663,7 @@ MathJax.Hub.Config({
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright only on the titlepage -->
 </center>
 
 

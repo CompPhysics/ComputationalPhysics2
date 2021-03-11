@@ -475,7 +475,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week9-bs018.html#number-of-operations-when-vectorized" style="font-size: 80%;">Number of operations when vectorized</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs019.html#a-simple-test-case-with-and-without-vectorization-https-github-com-compphysics-computationalphysicsmsu-blob-master-doc-programs-lectureprograms-programs-classes-cpp-program7-cpp" style="font-size: 80%;">"A simple test case with and without vectorization":"https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/LecturePrograms/programs/Classes/cpp/program7.cpp"</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs020.html#compiling-with-and-without-vectorization" style="font-size: 80%;">Compiling with and without vectorization</a></li>
-     <!-- navigation toc: --> <li><a href="._week9-bs021.html#compiling-with-and-without-vectorization-using-clang" style="font-size: 80%;">Compiling with and without vectorization using clang</a></li>
+     <!-- navigation toc: --> <li><a href="#compiling-with-and-without-vectorization-using-clang" style="font-size: 80%;">Compiling with and without vectorization using clang</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs022.html#automatic-vectorization-and-vectorization-inhibitors-criteria" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, criteria</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs023.html#automatic-vectorization-and-vectorization-inhibitors-exit-criteria" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, exit criteria</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs024.html#automatic-vectorization-and-vectorization-inhibitors-straight-line-code" style="font-size: 80%;">Automatic vectorization and vectorization inhibitors, straight-line code</a></li>
@@ -586,54 +586,65 @@ MathJax.Hub.Config({
 
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 
-<a name="part0000"></a>
-<!-- ------------------- main content ---------------------- -->
+<a name="part0021"></a>
+<!-- !split  -->
 
-
-
-<div class="jumbotron">
-<center><h1>Week 10 March 8-12: Object-orientation strategies and Parallelization</h1></center>  <!-- document title -->
-
-<p>
-<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
-
-<center>
-<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
-</center>
-
-<p>
-<!-- institution(s) -->
-
-<center>[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b></center>
-<center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
-<br>
-<p>
-<center><h4>Mar 5, 2021</h4></center> <!-- date -->
-<br>
+<h2 id="compiling-with-and-without-vectorization-using-clang" class="anchor">Compiling with and without vectorization using clang </h2>
+We can compile and link without vectorization with clang compiler
 <p>
 
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>clang<span style="color: #666666">++</span> <span style="color: #666666">-</span>o <span style="color: #666666">-</span>fno<span style="color: #666666">-</span>vectorize novec.x vecexample.cpp
+</pre></div>
+<p>
+and with vectorization
+<p>
 
-<p><a href="._week9-bs001.html" class="btn btn-primary btn-lg">Read &raquo;</a></p>
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>clang<span style="color: #666666">++</span> <span style="color: #666666">-</span>O3 <span style="color: #666666">-</span>Rpass<span style="color: #666666">=</span>loop<span style="color: #666666">-</span>vectorize <span style="color: #666666">-</span>o  vec.x vecexample.cpp 
+</pre></div>
+<p>
+We can also add vectorization analysis, see for example
+<p>
 
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>clang<span style="color: #666666">++</span> <span style="color: #666666">-</span>O3 <span style="color: #666666">-</span>Rpass<span style="color: #666666">-</span>analysis<span style="color: #666666">=</span>loop<span style="color: #666666">-</span>vectorize <span style="color: #666666">-</span>o  vec.x vecexample.cpp 
+</pre></div>
+<p>
+or figure out if vectorization was missed
+<p>
 
-</div> <!-- end jumbotron -->
-
+<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>clang<span style="color: #666666">++</span> <span style="color: #666666">-</span>O3 <span style="color: #666666">-</span>Rpass<span style="color: #666666">-</span>missed<span style="color: #666666">=</span>loop<span style="color: #666666">-</span>vectorize <span style="color: #666666">-</span>o  vec.x vecexample.cpp 
+</pre></div>
+<p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-  <li class="active"><a href="._week9-bs000.html">1</a></li>
-  <li><a href="._week9-bs001.html">2</a></li>
-  <li><a href="._week9-bs002.html">3</a></li>
-  <li><a href="._week9-bs003.html">4</a></li>
-  <li><a href="._week9-bs004.html">5</a></li>
-  <li><a href="._week9-bs005.html">6</a></li>
-  <li><a href="._week9-bs006.html">7</a></li>
-  <li><a href="._week9-bs007.html">8</a></li>
-  <li><a href="._week9-bs008.html">9</a></li>
-  <li><a href="._week9-bs009.html">10</a></li>
+<li><a href="._week9-bs020.html">&laquo;</a></li>
+  <li><a href="._week9-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week9-bs013.html">14</a></li>
+  <li><a href="._week9-bs014.html">15</a></li>
+  <li><a href="._week9-bs015.html">16</a></li>
+  <li><a href="._week9-bs016.html">17</a></li>
+  <li><a href="._week9-bs017.html">18</a></li>
+  <li><a href="._week9-bs018.html">19</a></li>
+  <li><a href="._week9-bs019.html">20</a></li>
+  <li><a href="._week9-bs020.html">21</a></li>
+  <li class="active"><a href="._week9-bs021.html">22</a></li>
+  <li><a href="._week9-bs022.html">23</a></li>
+  <li><a href="._week9-bs023.html">24</a></li>
+  <li><a href="._week9-bs024.html">25</a></li>
+  <li><a href="._week9-bs025.html">26</a></li>
+  <li><a href="._week9-bs026.html">27</a></li>
+  <li><a href="._week9-bs027.html">28</a></li>
+  <li><a href="._week9-bs028.html">29</a></li>
+  <li><a href="._week9-bs029.html">30</a></li>
+  <li><a href="._week9-bs030.html">31</a></li>
   <li><a href="">...</a></li>
   <li><a href="._week9-bs119.html">120</a></li>
-  <li><a href="._week9-bs001.html">&raquo;</a></li>
+  <li><a href="._week9-bs022.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 
@@ -650,7 +661,7 @@ MathJax.Hub.Config({
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright only on the titlepage -->
 </center>
 
 
