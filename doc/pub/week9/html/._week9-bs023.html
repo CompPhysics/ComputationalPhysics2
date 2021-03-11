@@ -222,10 +222,12 @@ The following code starts with a Gaussian distribution with mean value \( \mu =1
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">import</span> <span style="color: #666666">*</span>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #666666">%</span>matplotlib inline
+
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">import</span> <span style="color: #666666">*</span>
 <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">numpy.random</span> <span style="color: #008000; font-weight: bold">import</span> randint, randn
 <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">time</span> <span style="color: #008000; font-weight: bold">import</span> time
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.mlab</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">mlab</span>
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">scipy.stats</span> <span style="color: #008000; font-weight: bold">import</span> norm
 <span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
 
 <span style="color: #408080; font-style: italic"># Returns mean of bootstrap samples                                                                                                                                                </span>
@@ -253,10 +255,13 @@ mu, sigma <span style="color: #666666">=</span> <span style="color: #666666">100
 datapoints <span style="color: #666666">=</span> <span style="color: #666666">10000</span>
 x <span style="color: #666666">=</span> mu <span style="color: #666666">+</span> sigma<span style="color: #666666">*</span>random<span style="color: #666666">.</span>randn(datapoints)
 <span style="color: #408080; font-style: italic"># bootstrap returns the data sample                                                                                                          t = bootstrap(x, stat, datapoints)</span>
-<span style="color: #408080; font-style: italic"># the histogram of the bootstrapped  data                                                                                                    n, binsboot, patches = plt.hist(t, 50, normed=1, facecolor=&#39;red&#39;, alpha=0.75)</span>
+<span style="color: #408080; font-style: italic"># the histogram of the bootstrapped  data  </span>
+t <span style="color: #666666">=</span> bootstrap(x, stat, datapoints)
+<span style="color: #408080; font-style: italic"># the histogram of the bootstrapped  data                                            </span>
+n, binsboot, patches <span style="color: #666666">=</span> plt<span style="color: #666666">.</span>hist(t, bins<span style="color: #666666">=50</span>, density<span style="color: #666666">=</span><span style="color: #BA2121">&#39;true&#39;</span>,histtype<span style="color: #666666">=</span><span style="color: #BA2121">&#39;bar&#39;</span>, color<span style="color: #666666">=</span><span style="color: #BA2121">&#39;red&#39;</span>, alpha<span style="color: #666666">=0.75</span>)
 
 <span style="color: #408080; font-style: italic"># add a &#39;best fit&#39; line                                                                                                                                                          </span>
-y <span style="color: #666666">=</span> mlab<span style="color: #666666">.</span>normpdf( binsboot, mean(t), std(t))
+y <span style="color: #666666">=</span> norm<span style="color: #666666">.</span>pdf( binsboot, mean(t), std(t))
 lt <span style="color: #666666">=</span> plt<span style="color: #666666">.</span>plot(binsboot, y, <span style="color: #BA2121">&#39;r--&#39;</span>, linewidth<span style="color: #666666">=1</span>)
 plt<span style="color: #666666">.</span>xlabel(<span style="color: #BA2121">&#39;Smarts&#39;</span>)
 plt<span style="color: #666666">.</span>ylabel(<span style="color: #BA2121">&#39;Probability&#39;</span>)

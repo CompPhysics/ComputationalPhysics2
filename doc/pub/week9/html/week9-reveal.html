@@ -768,10 +768,12 @@ The following code starts with a Gaussian distribution with mean value \( \mu =1
 <p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span><span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> *
+<div class="highlight" style="background: #eeeedd"><pre style="font-size: 80%; line-height: 125%;"><span></span>%matplotlib inline
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> *
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.random</span> <span style="color: #8B008B; font-weight: bold">import</span> randint, randn
 <span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.mlab</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">mlab</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.stats</span> <span style="color: #8B008B; font-weight: bold">import</span> norm
 <span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
 
 <span style="color: #228B22"># Returns mean of bootstrap samples                                                                                                                                                </span>
@@ -799,10 +801,13 @@ mu, sigma = <span style="color: #B452CD">100</span>, <span style="color: #B452CD
 datapoints = <span style="color: #B452CD">10000</span>
 x = mu + sigma*random.randn(datapoints)
 <span style="color: #228B22"># bootstrap returns the data sample                                                                                                          t = bootstrap(x, stat, datapoints)</span>
-<span style="color: #228B22"># the histogram of the bootstrapped  data                                                                                                    n, binsboot, patches = plt.hist(t, 50, normed=1, facecolor=&#39;red&#39;, alpha=0.75)</span>
+<span style="color: #228B22"># the histogram of the bootstrapped  data  </span>
+t = bootstrap(x, stat, datapoints)
+<span style="color: #228B22"># the histogram of the bootstrapped  data                                            </span>
+n, binsboot, patches = plt.hist(t, bins=<span style="color: #B452CD">50</span>, density=<span style="color: #CD5555">&#39;true&#39;</span>,histtype=<span style="color: #CD5555">&#39;bar&#39;</span>, color=<span style="color: #CD5555">&#39;red&#39;</span>, alpha=<span style="color: #B452CD">0.75</span>)
 
 <span style="color: #228B22"># add a &#39;best fit&#39; line                                                                                                                                                          </span>
-y = mlab.normpdf( binsboot, mean(t), std(t))
+y = norm.pdf( binsboot, mean(t), std(t))
 lt = plt.plot(binsboot, y, <span style="color: #CD5555">&#39;r--&#39;</span>, linewidth=<span style="color: #B452CD">1</span>)
 plt.xlabel(<span style="color: #CD5555">&#39;Smarts&#39;</span>)
 plt.ylabel(<span style="color: #CD5555">&#39;Probability&#39;</span>)
