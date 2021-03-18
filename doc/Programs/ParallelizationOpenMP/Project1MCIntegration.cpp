@@ -21,7 +21,7 @@ int main (int argc, char* argv[])
 
   double wtime;
   cout << "  Compute 4d-integral using Gaussian quadrature with Hermite quadrature." << endl;
-  omp_set_num_threads(4);
+  omp_set_num_threads(8);
   thread_num = omp_get_max_threads ();
   cout << "  The number of processors available = " << omp_get_num_procs () << endl ;
   cout << "  The number of threads available    = " << thread_num <<  endl;
