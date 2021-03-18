@@ -1,4 +1,4 @@
-# Required Technologies
+# Textbooks and practicalities
 
 Course participants are expected to have their own laptops/PCs. We use _Git_ as version control software and the usage of providers like _GitHub_, _GitLab_ or similar are strongly recommended.
 

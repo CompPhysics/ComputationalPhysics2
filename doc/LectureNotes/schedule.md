@@ -1,4 +1,4 @@
-## Practicalities
+# Schedule
 This course will be delivered in a hybrid mode, with online and on site lectures and on site and online laboratory sessions. The first week (January 11-15) is fully digital and the computer lab and the lectures will be done via zoom. 
 
 1. Two lectures per week, spring semester, 10 ECTS. The lectures will be fully online. The lectures will be recorded and linked to this site and the official University of Oslo website for the course;
