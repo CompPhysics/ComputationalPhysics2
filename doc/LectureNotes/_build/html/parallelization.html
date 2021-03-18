@@ -1,0 +1,2406 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5. Parallelization with MPI and OpenMPI &#8212; Advanced Topics in Computational Physics</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="4. Optimization and Vectorization" href="vectorization.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Advanced Topics in Computational Physics</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro.html">
+   Computational Physics 2: computational quantum mechanics
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  About the course
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="schedule.html">
+   Practicalities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="teachers.html">
+   Instructor information
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="teachers.html#teaching-assistants-spring-semester-21">
+   Teaching Assistants Spring Semester 21
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="teachers.html#practicalities">
+   Practicalities
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="teachers.html#grading">
+   Grading
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="textbooks.html">
+   Required Technologies
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Many-Body Physics
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html">
+   1. Many-body Hamiltonians, basic linear algebra and Second Quantization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html#definitions-and-second-quantization">
+   2. Definitions and Second quantization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html#one-body-operators-in-second-quantization">
+   3. One-body operators in second quantization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html#two-body-operators-in-second-quantization">
+   4. Two-body operators in second quantization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html#particle-hole-formalism">
+   5. Particle-hole formalism
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html#summarizing-and-defining-a-normal-ordered-hamiltonian">
+   6. Summarizing and defining a normal-ordered Hamiltonian
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html#hartree-fock-in-second-quantization-and-stability-of-hf-solution">
+   7. Hartree-Fock in second quantization and stability of HF solution
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html#operators-in-second-quantization">
+   8. Operators in second quantization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hartreefocktheory.html">
+   9. Hartree-Fock methods
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hartreefocktheory.html#hartree-fock-in-second-quantization-and-stability-of-hf-solution">
+   10. Hartree-Fock in second quantization and stability of HF solution
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="fcitheory.html">
+   11. Full configuration interaction theory
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="mbpt.html">
+   12. Many-body perturbation theory
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Stochastic Methods
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="vmcdmc.html">
+   1. Variational Monte Carlo methods
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="gradientmethods.html">
+   2. Gradient Methods
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="resamplingmethods.html">
+   3. Resampling Techniques, Bootstrap and Blocking
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="vectorization.html">
+   4. Optimization and Vectorization
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   5. Parallelization with MPI and OpenMPI
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/parallelization.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-much-is-parallelizable">
+   5.1. How much is parallelizable
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#today-s-situation-of-parallel-computing">
+   5.2. Today’s situation of parallel computing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#overhead-present-in-parallel-computing">
+   5.3. Overhead present in parallel computing
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#parallelizing-a-sequential-algorithm">
+   5.4. Parallelizing a sequential algorithm
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#strategies">
+   5.5. Strategies
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-do-i-run-mpi-on-a-pc-laptop-mpi">
+   5.6. How do I run MPI on a PC/Laptop? MPI
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#can-i-do-it-on-my-own-pc-laptop-openmp-installation">
+   5.7. Can I do it on my own PC/laptop? OpenMP installation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installing-mpi">
+   5.8. Installing MPI
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installing-mpi-and-using-qt">
+   5.9. Installing MPI and using Qt
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-is-message-passing-interface-mpi">
+   5.10. What is Message Passing Interface (MPI)?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#going-parallel-with-mpi">
+   5.11. Going Parallel with MPI
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mpi-is-a-library">
+   5.12. MPI is a library
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#bindings-to-mpi-routines">
+   5.13. Bindings to MPI routines
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#communicator">
+   5.14. Communicator
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#some-of-the-most-important-mpi-functions">
+   5.15. Some of the most  important MPI functions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-first-mpi-c-c-program">
+   5.16. The first MPI C/C++ program
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-fortran-program">
+   5.17. The Fortran program
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#note-1">
+   5.18. Note 1
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ordered-output-with-mpibarrier">
+   5.19. Ordered output with MPIBarrier
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#note-2">
+   5.20. Note 2
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ordered-output">
+   5.21. Ordered output
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#note-3">
+   5.22. Note 3
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#note-4">
+   5.23. Note 4
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#numerical-integration-in-parallel">
+   5.24. Numerical integration in parallel
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#dissection-of-trapezoidal-rule-with-mpi-reduce">
+   5.25. Dissection of trapezoidal rule with
+   <span class="math notranslate nohighlight">
+    \(MPI\_reduce\)
+   </span>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#dissection-of-trapezoidal-rule">
+   5.26. Dissection of trapezoidal rule
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#integrating-with-mpi">
+   5.27. Integrating with
+   <strong>
+    MPI
+   </strong>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-do-i-use-mpi-reduce">
+   5.28. How do I use
+   <span class="math notranslate nohighlight">
+    \(MPI\_reduce\)
+   </span>
+   ?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#more-on-mpi-reduce">
+   5.29. More on
+   <span class="math notranslate nohighlight">
+    \(MPI\_Reduce\)
+   </span>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   5.30. Dissection of trapezoidal rule
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id2">
+   5.31. Dissection of trapezoidal rule
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-quantum-dot-program-for-two-electrons">
+   5.32. The quantum dot program for two electrons
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-is-openmp">
+   5.33. What is OpenMP
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#getting-started-things-to-remember">
+   5.34. Getting started, things to remember
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#openmp-syntax">
+   5.35. OpenMP syntax
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#different-openmp-styles-of-parallelism">
+   5.36. Different OpenMP styles of parallelism
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#general-code-structure">
+   5.37. General code structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#parallel-region">
+   5.38. Parallel region
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hello-world-not-again-please">
+   5.39. Hello world, not again, please!
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hello-world-yet-another-variant">
+   5.40. Hello world, yet another variant
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#important-openmp-library-routines">
+   5.41. Important OpenMP library routines
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#private-variables">
+   5.42. Private variables
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#master-region">
+   5.43. Master region
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#parallel-for-loop">
+   5.44. Parallel for loop
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#parallel-computations-and-loops">
+   5.45. Parallel computations and loops
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scheduling-of-loop-computations">
+   5.46. Scheduling of  loop computations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-code-for-loop-scheduling">
+   5.47. Example code for loop scheduling
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example-code-for-loop-scheduling-guided-instead-of-dynamic">
+   5.48. Example code for loop scheduling, guided instead of dynamic
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#more-on-parallel-for-loop">
+   5.49. More on Parallel for loop
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-can-happen-with-this-loop">
+   5.50. What can happen with this loop?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#inner-product">
+   5.51. Inner product
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#different-threads-do-different-tasks">
+   5.52. Different threads do different tasks
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#single-execution">
+   5.53. Single execution
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#coordination-and-synchronization">
+   5.54. Coordination and synchronization
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#data-scope">
+   5.55. Data scope
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#some-remarks">
+   5.56. Some remarks
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#parallelizing-nested-for-loops">
+   5.57. Parallelizing nested for-loops
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#nested-parallelism">
+   5.58. Nested parallelism
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#parallel-tasks">
+   5.59. Parallel tasks
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#common-mistakes">
+   5.60. Common mistakes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#not-all-computations-are-simple">
+   5.61. Not all computations are simple
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#not-all-computations-are-simple-competing-threads">
+   5.62. Not all computations are simple, competing threads
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-to-find-the-max-value-using-openmp">
+   5.63. How to find the max value using OpenMP
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#then-deal-with-the-race-conditions">
+   5.64. Then deal with the race conditions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-can-slow-down-openmp-performance">
+   5.65. What can slow down OpenMP performance?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id3">
+   5.66. What can slow down OpenMP performance?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#find-the-max-location-for-each-thread">
+   5.67. Find the max location for each thread
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#combine-the-values-from-each-thread">
+   5.68. Combine the values from each thread
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#matrix-matrix-multiplication">
+   5.69. Matrix-matrix multiplication
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id4">
+   5.70. Matrix-matrix multiplication
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="parallelization-with-mpi-and-openmpi">
+<h1><span class="section-number">5. </span>Parallelization with MPI and OpenMPI<a class="headerlink" href="#parallelization-with-mpi-and-openmpi" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-much-is-parallelizable">
+<h2><span class="section-number">5.1. </span>How much is parallelizable<a class="headerlink" href="#how-much-is-parallelizable" title="Permalink to this headline">¶</a></h2>
+<p>If any non-parallel code slips into the
+application, the parallel
+performance is limited.</p>
+<p>In many simulations, however, the fraction of non-parallelizable work
+is <span class="math notranslate nohighlight">\(10^{-6}\)</span> or less due to large arrays or objects that are perfectly parallelizable.</p>
+</div>
+<div class="section" id="today-s-situation-of-parallel-computing">
+<h2><span class="section-number">5.2. </span>Today’s situation of parallel computing<a class="headerlink" href="#today-s-situation-of-parallel-computing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Distributed memory is the dominant hardware configuration. There is a large diversity in these machines, from  MPP (massively parallel processing) systems to clusters of off-the-shelf PCs, which are very cost-effective.</p></li>
+<li><p>Message-passing is a mature programming paradigm and widely accepted. It often provides an efficient match to the hardware. It is primarily used for the distributed memory systems, but can also be used on shared memory systems.</p></li>
+<li><p>Modern nodes have nowadays several cores, which makes it interesting to use both shared memory (the given node) and distributed memory (several nodes with communication). This leads often to codes which use both MPI and OpenMP.</p></li>
+</ul>
+<p>Our lectures will focus on both MPI and OpenMP.</p>
+</div>
+<div class="section" id="overhead-present-in-parallel-computing">
+<h2><span class="section-number">5.3. </span>Overhead present in parallel computing<a class="headerlink" href="#overhead-present-in-parallel-computing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Uneven load balance</strong>:  not all the processors can perform useful work at all time.</p></li>
+<li><p><strong>Overhead of synchronization</strong></p></li>
+<li><p><strong>Overhead of communication</strong></p></li>
+<li><p><strong>Extra computation due to parallelization</strong></p></li>
+</ul>
+<p>Due to the above overhead and that certain parts of a sequential
+algorithm cannot be parallelized we may not achieve an optimal parallelization.</p>
+</div>
+<div class="section" id="parallelizing-a-sequential-algorithm">
+<h2><span class="section-number">5.4. </span>Parallelizing a sequential algorithm<a class="headerlink" href="#parallelizing-a-sequential-algorithm" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Identify the part(s) of a sequential algorithm that can be  executed in parallel. This is the difficult part,</p></li>
+<li><p>Distribute the global work and data among <span class="math notranslate nohighlight">\(P\)</span> processors.</p></li>
+</ul>
+</div>
+<div class="section" id="strategies">
+<h2><span class="section-number">5.5. </span>Strategies<a class="headerlink" href="#strategies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Develop codes locally, run with some few processes and test your codes.  Do benchmarking, timing and so forth on local nodes, for example your laptop or PC.</p></li>
+<li><p>When you are convinced that your codes run correctly, you can start your production runs on available supercomputers.</p></li>
+</ul>
+</div>
+<div class="section" id="how-do-i-run-mpi-on-a-pc-laptop-mpi">
+<h2><span class="section-number">5.6. </span>How do I run MPI on a PC/Laptop? MPI<a class="headerlink" href="#how-do-i-run-mpi-on-a-pc-laptop-mpi" title="Permalink to this headline">¶</a></h2>
+<p>To install MPI is rather easy on hardware running unix/linux as operating systems, follow simply the instructions from the <a class="reference external" href="https://www.open-mpi.org/">OpenMPI website</a>. See also subsequent slides.
+When you have made sure you have installed MPI on your PC/laptop,</p>
+<ul class="simple">
+<li><p>Compile with mpicxx/mpic++ or mpif90</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>      # Compile and link
+      mpic++ -O3 -o nameofprog.x nameofprog.cpp
+      #  run code with for example 8 processes using mpirun/mpiexec
+      mpiexec -n 8 ./nameofprog.x
+</pre></div>
+</div>
+</div>
+<div class="section" id="can-i-do-it-on-my-own-pc-laptop-openmp-installation">
+<h2><span class="section-number">5.7. </span>Can I do it on my own PC/laptop? OpenMP installation<a class="headerlink" href="#can-i-do-it-on-my-own-pc-laptop-openmp-installation" title="Permalink to this headline">¶</a></h2>
+<p>If you wish to install MPI and OpenMP
+on your laptop/PC, we recommend the following:</p>
+<ul class="simple">
+<li><p>For OpenMP, the compile option <strong>-fopenmp</strong> is included automatically in recent versions of the C++ compiler and Fortran compilers. For users of different Linux distributions, simply use the available C++ or Fortran compilers and add the above compiler instructions, see also code examples below.</p></li>
+<li><p>For OS X users however, install <strong>libomp</strong></p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>      brew install libomp
+</pre></div>
+</div>
+<p>and compile and link as</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    c++ -o &lt;name executable&gt; &lt;name program.cpp&gt;  -lomp
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-mpi">
+<h2><span class="section-number">5.8. </span>Installing MPI<a class="headerlink" href="#installing-mpi" title="Permalink to this headline">¶</a></h2>
+<p>For linux/ubuntu users, you need to install two packages (alternatively use the synaptic package manager)</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>      sudo apt-get install libopenmpi-dev
+      sudo apt-get install openmpi-bin
+</pre></div>
+</div>
+<p>For OS X users, install brew (after having installed xcode and gcc, needed for the
+gfortran compiler of openmpi) and then install with brew</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       brew install openmpi
+</pre></div>
+</div>
+<p>When running an executable (code.x), run as</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>      mpirun -n 10 ./code.x
+</pre></div>
+</div>
+<p>where we indicate that we want  the number of processes to be 10.</p>
+</div>
+<div class="section" id="installing-mpi-and-using-qt">
+<h2><span class="section-number">5.9. </span>Installing MPI and using Qt<a class="headerlink" href="#installing-mpi-and-using-qt" title="Permalink to this headline">¶</a></h2>
+<p>With openmpi installed, when using Qt, add to your .pro file the instructions <a class="reference external" href="http://dragly.org/2012/03/14/developing-mpi-applications-in-qt-creator/">here</a></p>
+<p>You may need to tell Qt where openmpi is stored.</p>
+</div>
+<div class="section" id="what-is-message-passing-interface-mpi">
+<h2><span class="section-number">5.10. </span>What is Message Passing Interface (MPI)?<a class="headerlink" href="#what-is-message-passing-interface-mpi" title="Permalink to this headline">¶</a></h2>
+<p><strong>MPI</strong> is a library, not a language. It specifies the names, calling sequences and results of functions
+or subroutines to be called from C/C++ or Fortran programs, and the classes and methods that make up the MPI C++
+library. The programs that users write in Fortran, C or C++ are compiled with ordinary compilers and linked
+with the MPI library.</p>
+<p>MPI programs should be able to run
+on all possible machines and run all MPI implementetations without change.</p>
+<p>An MPI computation is a collection of processes communicating with messages.</p>
+</div>
+<div class="section" id="going-parallel-with-mpi">
+<h2><span class="section-number">5.11. </span>Going Parallel with MPI<a class="headerlink" href="#going-parallel-with-mpi" title="Permalink to this headline">¶</a></h2>
+<p><strong>Task parallelism</strong>: the work of a global problem can be divided
+into a number of independent tasks, which rarely need to synchronize.
+Monte Carlo simulations or numerical integration are examples of this.</p>
+<p>MPI is a message-passing library where all the routines
+have corresponding C/C++-binding</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       MPI_Command_name
+</pre></div>
+</div>
+<p>and Fortran-binding (routine names are in uppercase, but can also be in lower case)</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       MPI_COMMAND_NAME
+</pre></div>
+</div>
+</div>
+<div class="section" id="mpi-is-a-library">
+<h2><span class="section-number">5.12. </span>MPI is a library<a class="headerlink" href="#mpi-is-a-library" title="Permalink to this headline">¶</a></h2>
+<p>MPI is a library specification for the message passing interface,
+proposed as a standard.</p>
+<ul class="simple">
+<li><p>independent of hardware;</p></li>
+<li><p>not a language or compiler specification;</p></li>
+<li><p>not a specific implementation or product.</p></li>
+</ul>
+<p>A message passing standard for portability and ease-of-use.
+Designed for high performance.</p>
+<p>Insert communication and synchronization functions where necessary.</p>
+</div>
+<div class="section" id="bindings-to-mpi-routines">
+<h2><span class="section-number">5.13. </span>Bindings to MPI routines<a class="headerlink" href="#bindings-to-mpi-routines" title="Permalink to this headline">¶</a></h2>
+<p>MPI is a message-passing library where all the routines
+have corresponding C/C++-binding</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       MPI_Command_name
+</pre></div>
+</div>
+<p>and Fortran-binding (routine names are in uppercase, but can also be in lower case)</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>       MPI_COMMAND_NAME
+</pre></div>
+</div>
+<p>The discussion in these slides focuses on the C++ binding.</p>
+</div>
+<div class="section" id="communicator">
+<h2><span class="section-number">5.14. </span>Communicator<a class="headerlink" href="#communicator" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>A group of MPI processes with a name (context).</p></li>
+<li><p>Any process is identified by its rank. The rank is only meaningful within a particular communicator.</p></li>
+<li><p>By default the communicator contains all the MPI processes.</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>      MPI_COMM_WORLD 
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Mechanism to identify subset of processes.</p></li>
+<li><p>Promotes modular design of parallel libraries.</p></li>
+</ul>
+</div>
+<div class="section" id="some-of-the-most-important-mpi-functions">
+<h2><span class="section-number">5.15. </span>Some of the most  important MPI functions<a class="headerlink" href="#some-of-the-most-important-mpi-functions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(MPI\_Init\)</span> - initiate an MPI computation</p></li>
+<li><p><span class="math notranslate nohighlight">\(MPI\_Finalize\)</span> - terminate the MPI computation and clean up</p></li>
+<li><p><span class="math notranslate nohighlight">\(MPI\_Comm\_size\)</span> - how many processes participate in a given MPI communicator?</p></li>
+<li><p><span class="math notranslate nohighlight">\(MPI\_Comm\_rank\)</span> - which one am I? (A number between 0 and size-1.)</p></li>
+<li><p><span class="math notranslate nohighlight">\(MPI\_Send\)</span> - send a message to a particular process within an MPI communicator</p></li>
+<li><p><span class="math notranslate nohighlight">\(MPI\_Recv\)</span> - receive a message from a particular process within an MPI communicator</p></li>
+<li><p><span class="math notranslate nohighlight">\(MPI\_reduce\)</span>  or <span class="math notranslate nohighlight">\(MPI\_Allreduce\)</span>, send and receive messages</p></li>
+</ul>
+</div>
+<div class="section" id="the-first-mpi-c-c-program">
+<h2><span class="section-number">5.16. </span><a class="reference external" href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program2.cpp">The first MPI C/C++ program</a><a class="headerlink" href="#the-first-mpi-c-c-program" title="Permalink to this headline">¶</a></h2>
+<p>Let every process write “Hello world” (oh not this program again!!) on the standard output.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    using namespace std;
+    #include &lt;mpi.h&gt;
+    #include &lt;iostream&gt;
+    int main (int nargs, char* args[])
+    {
+    int numprocs, my_rank;
+    //   MPI initializations
+    MPI_Init (&amp;nargs, &amp;args);
+    MPI_Comm_size (MPI_COMM_WORLD, &amp;numprocs);
+    MPI_Comm_rank (MPI_COMM_WORLD, &amp;my_rank);
+    cout &lt;&lt; &quot;Hello world, I have  rank &quot; &lt;&lt; my_rank &lt;&lt; &quot; out of &quot; 
+         &lt;&lt; numprocs &lt;&lt; endl;
+    //  End MPI
+    MPI_Finalize ();
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-fortran-program">
+<h2><span class="section-number">5.17. </span>The Fortran program<a class="headerlink" href="#the-fortran-program" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    PROGRAM hello
+    INCLUDE &quot;mpif.h&quot;
+    INTEGER:: size, my_rank, ierr
+    
+    CALL  MPI_INIT(ierr)
+    CALL MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierr)
+    CALL MPI_COMM_RANK(MPI_COMM_WORLD, my_rank, ierr)
+    WRITE(*,*)&quot;Hello world, I&#39;ve rank &quot;,my_rank,&quot; out of &quot;,size
+    CALL MPI_FINALIZE(ierr)
+    
+    END PROGRAM hello
+</pre></div>
+</div>
+</div>
+<div class="section" id="note-1">
+<h2><span class="section-number">5.18. </span>Note 1<a class="headerlink" href="#note-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The output to screen is not ordered since all processes are trying to write  to screen simultaneously.</p></li>
+<li><p>It is the operating system which opts for an ordering.</p></li>
+<li><p>If we wish to have an organized output, starting from the first process, we may rewrite our program as in the next example.</p></li>
+</ul>
+</div>
+<div class="section" id="ordered-output-with-mpibarrier">
+<h2><span class="section-number">5.19. </span><a class="reference external" href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program3.cpp">Ordered output with MPIBarrier</a><a class="headerlink" href="#ordered-output-with-mpibarrier" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    int main (int nargs, char* args[])
+    {
+     int numprocs, my_rank, i;
+     MPI_Init (&amp;nargs, &amp;args);
+     MPI_Comm_size (MPI_COMM_WORLD, &amp;numprocs);
+     MPI_Comm_rank (MPI_COMM_WORLD, &amp;my_rank);
+     for (i = 0; i &lt; numprocs; i++) {}
+     MPI_Barrier (MPI_COMM_WORLD);
+     if (i == my_rank) {
+     cout &lt;&lt; &quot;Hello world, I have  rank &quot; &lt;&lt; my_rank &lt;&lt; 
+            &quot; out of &quot; &lt;&lt; numprocs &lt;&lt; endl;}
+          MPI_Finalize ();
+</pre></div>
+</div>
+</div>
+<div class="section" id="note-2">
+<h2><span class="section-number">5.20. </span>Note 2<a class="headerlink" href="#note-2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Here we have used the <span class="math notranslate nohighlight">\(MPI\_Barrier\)</span> function to ensure that that every process has completed  its set of instructions in  a particular order.</p></li>
+<li><p>A barrier is a special collective operation that does not allow the processes to continue until all processes in the communicator (here <span class="math notranslate nohighlight">\(MPI\_COMM\_WORLD\)</span>) have called <span class="math notranslate nohighlight">\(MPI\_Barrier\)</span>.</p></li>
+<li><p>The barriers make sure that all processes have reached the same point in the code. Many of the collective operations like <span class="math notranslate nohighlight">\(MPI\_ALLREDUCE\)</span> to be discussed later, have the same property; that is, no process can exit the operation until all processes have started.</p></li>
+</ul>
+<p>However, this is slightly more time-consuming since the processes synchronize between themselves as many times as there
+are processes.  In the next Hello world example we use the send and receive functions in order to a have a synchronized
+action.</p>
+</div>
+<div class="section" id="ordered-output">
+<h2><span class="section-number">5.21. </span><a class="reference external" href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program4.cpp">Ordered output</a><a class="headerlink" href="#ordered-output" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    .....
+    int numprocs, my_rank, flag;
+    MPI_Status status;
+    MPI_Init (&amp;nargs, &amp;args);
+    MPI_Comm_size (MPI_COMM_WORLD, &amp;numprocs);
+    MPI_Comm_rank (MPI_COMM_WORLD, &amp;my_rank);
+    if (my_rank &gt; 0)
+    MPI_Recv (&amp;flag, 1, MPI_INT, my_rank-1, 100, 
+               MPI_COMM_WORLD, &amp;status);
+    cout &lt;&lt; &quot;Hello world, I have  rank &quot; &lt;&lt; my_rank &lt;&lt; &quot; out of &quot; 
+    &lt;&lt; numprocs &lt;&lt; endl;
+    if (my_rank &lt; numprocs-1)
+    MPI_Send (&amp;my_rank, 1, MPI_INT, my_rank+1, 
+              100, MPI_COMM_WORLD);
+    MPI_Finalize ();
+</pre></div>
+</div>
+</div>
+<div class="section" id="note-3">
+<h2><span class="section-number">5.22. </span>Note 3<a class="headerlink" href="#note-3" title="Permalink to this headline">¶</a></h2>
+<p>The basic sending of messages is given by the function <span class="math notranslate nohighlight">\(MPI\_SEND\)</span>, which in C/C++
+is defined as</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    int MPI_Send(void *buf, int count, 
+                 MPI_Datatype datatype, 
+                 int dest, int tag, MPI_Comm comm)}
+</pre></div>
+</div>
+<p>This single command allows the passing of any kind of variable, even a large array, to any group of tasks.
+The variable <strong>buf</strong> is the variable we wish to send while <strong>count</strong>
+is the  number of variables we are passing. If we are passing only a single value, this should be 1.</p>
+<p>If we transfer an array, it is  the overall size of the array.
+For example, if we want to send a 10 by 10 array, count would be <span class="math notranslate nohighlight">\(10\times 10=100\)</span>
+since we are  actually passing 100 values.</p>
+</div>
+<div class="section" id="note-4">
+<h2><span class="section-number">5.23. </span>Note 4<a class="headerlink" href="#note-4" title="Permalink to this headline">¶</a></h2>
+<p>Once you have  sent a message, you must receive it on another task. The function <span class="math notranslate nohighlight">\(MPI\_RECV\)</span>
+is similar to the send call.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    int MPI_Recv( void *buf, int count, MPI_Datatype datatype, 
+                int source, 
+                int tag, MPI_Comm comm, MPI_Status *status )
+</pre></div>
+</div>
+<p>The arguments that are different from those in MPI_SEND are
+<strong>buf</strong> which  is the name of the variable where you will  be storing the received data,
+<strong>source</strong> which  replaces the destination in the send command. This is the return ID of the sender.</p>
+<p>Finally,  we have used  <span class="math notranslate nohighlight">\(MPI\_Status\_status\)</span>,<br />
+where one can check if the receive was completed.</p>
+<p>The output of this code is the same as the previous example, but now
+process 0 sends a message to process 1, which forwards it further
+to process 2, and so forth.</p>
+</div>
+<div class="section" id="numerical-integration-in-parallel">
+<h2><span class="section-number">5.24. </span><a class="reference external" href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp">Numerical integration in parallel</a><a class="headerlink" href="#numerical-integration-in-parallel" title="Permalink to this headline">¶</a></h2>
+<p><strong>Integrating <span class="math notranslate nohighlight">\(\pi\)</span>.</strong></p>
+<ul class="simple">
+<li><p>The code example computes <span class="math notranslate nohighlight">\(\pi\)</span> using the trapezoidal rules.</p></li>
+<li><p>The trapezoidal rule</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+I=\int_a^bf(x) dx\approx h\left(f(a)/2 + f(a+h) +f(a+2h)+\dots +f(b-h)+ f(b)/2\right).
+\]</div>
+<p>Click <a class="reference external" href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp">on this link</a> for the full program.</p>
+</div>
+<div class="section" id="dissection-of-trapezoidal-rule-with-mpi-reduce">
+<h2><span class="section-number">5.25. </span>Dissection of trapezoidal rule with <span class="math notranslate nohighlight">\(MPI\_reduce\)</span><a class="headerlink" href="#dissection-of-trapezoidal-rule-with-mpi-reduce" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    //    Trapezoidal rule and numerical integration usign MPI
+    using namespace std;
+    #include &lt;mpi.h&gt;
+    #include &lt;iostream&gt;
+    
+    //     Here we define various functions called by the main program
+    
+    double int_function(double );
+    double trapezoidal_rule(double , double , int , double (*)(double));
+    
+    //   Main function begins here
+    int main (int nargs, char* args[])
+    {
+      int n, local_n, numprocs, my_rank; 
+      double a, b, h, local_a, local_b, total_sum, local_sum;   
+      double  time_start, time_end, total_time;
+</pre></div>
+</div>
+</div>
+<div class="section" id="dissection-of-trapezoidal-rule">
+<h2><span class="section-number">5.26. </span>Dissection of trapezoidal rule<a class="headerlink" href="#dissection-of-trapezoidal-rule" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>      //  MPI initializations
+      MPI_Init (&amp;nargs, &amp;args);
+      MPI_Comm_size (MPI_COMM_WORLD, &amp;numprocs);
+      MPI_Comm_rank (MPI_COMM_WORLD, &amp;my_rank);
+      time_start = MPI_Wtime();
+      //  Fixed values for a, b and n 
+      a = 0.0 ; b = 1.0;  n = 1000;
+      h = (b-a)/n;    // h is the same for all processes 
+      local_n = n/numprocs;  
+      // make sure n &gt; numprocs, else integer division gives zero
+      // Length of each process&#39; interval of
+      // integration = local_n*h.  
+      local_a = a + my_rank*local_n*h;
+      local_b = local_a + local_n*h;
+</pre></div>
+</div>
+</div>
+<div class="section" id="integrating-with-mpi">
+<h2><span class="section-number">5.27. </span>Integrating with <strong>MPI</strong><a class="headerlink" href="#integrating-with-mpi" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>      total_sum = 0.0;
+      local_sum = trapezoidal_rule(local_a, local_b, local_n, 
+                                   &amp;int_function); 
+      MPI_Reduce(&amp;local_sum, &amp;total_sum, 1, MPI_DOUBLE, 
+                  MPI_SUM, 0, MPI_COMM_WORLD);
+      time_end = MPI_Wtime();
+      total_time = time_end-time_start;
+      if ( my_rank == 0) {
+        cout &lt;&lt; &quot;Trapezoidal rule = &quot; &lt;&lt;  total_sum &lt;&lt; endl;
+        cout &lt;&lt; &quot;Time = &quot; &lt;&lt;  total_time  
+             &lt;&lt; &quot; on number of processors: &quot;  &lt;&lt; numprocs  &lt;&lt; endl;
+      }
+      // End MPI
+      MPI_Finalize ();  
+      return 0;
+    }  // end of main program
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-do-i-use-mpi-reduce">
+<h2><span class="section-number">5.28. </span>How do I use <span class="math notranslate nohighlight">\(MPI\_reduce\)</span>?<a class="headerlink" href="#how-do-i-use-mpi-reduce" title="Permalink to this headline">¶</a></h2>
+<p>Here we have used</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    MPI_reduce( void *senddata, void* resultdata, int count, 
+         MPI_Datatype datatype, MPI_Op, int root, MPI_Comm comm)
+</pre></div>
+</div>
+<p>The two variables <span class="math notranslate nohighlight">\(senddata\)</span> and <span class="math notranslate nohighlight">\(resultdata\)</span> are obvious, besides the fact that one sends the address
+of the variable or the first element of an array.  If they are arrays they need to have the same size.
+The variable <span class="math notranslate nohighlight">\(count\)</span> represents the total dimensionality, 1 in case of just one variable,
+while <span class="math notranslate nohighlight">\(MPI\_Datatype\)</span>
+defines the type of variable which is sent and received.</p>
+<p>The new feature is <span class="math notranslate nohighlight">\(MPI\_Op\)</span>. It defines the type
+of operation we want to do.</p>
+</div>
+<div class="section" id="more-on-mpi-reduce">
+<h2><span class="section-number">5.29. </span>More on <span class="math notranslate nohighlight">\(MPI\_Reduce\)</span><a class="headerlink" href="#more-on-mpi-reduce" title="Permalink to this headline">¶</a></h2>
+<p>In our case, since we are summing
+the rectangle  contributions from every process we define  <span class="math notranslate nohighlight">\(MPI\_Op = MPI\_SUM\)</span>.
+If we have an array or matrix we can search for the largest og smallest element by sending either <span class="math notranslate nohighlight">\(MPI\_MAX\)</span> or
+<span class="math notranslate nohighlight">\(MPI\_MIN\)</span>.  If we want the location as well (which array element) we simply transfer
+<span class="math notranslate nohighlight">\(MPI\_MAXLOC\)</span> or <span class="math notranslate nohighlight">\(MPI\_MINOC\)</span>. If we want the product we write <span class="math notranslate nohighlight">\(MPI\_PROD\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(MPI\_Allreduce\)</span> is defined as</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    MPI_Allreduce( void *senddata, void* resultdata, int count, 
+              MPI_Datatype datatype, MPI_Op, MPI_Comm comm)        
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h2><span class="section-number">5.30. </span>Dissection of trapezoidal rule<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>We use <span class="math notranslate nohighlight">\(MPI\_reduce\)</span> to collect data from each process. Note also the use of the function
+<span class="math notranslate nohighlight">\(MPI\_Wtime\)</span>.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    //  this function defines the function to integrate
+    double int_function(double x)
+    {
+      double value = 4./(1.+x*x);
+      return value;
+    } // end of function to evaluate
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2><span class="section-number">5.31. </span>Dissection of trapezoidal rule<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    //  this function defines the trapezoidal rule
+    double trapezoidal_rule(double a, double b, int n, 
+                             double (*func)(double))
+    {
+      double trapez_sum;
+      double fa, fb, x, step;
+      int    j;
+      step=(b-a)/((double) n);
+      fa=(*func)(a)/2. ;
+      fb=(*func)(b)/2. ;
+      trapez_sum=0.;
+      for (j=1; j &lt;= n-1; j++){
+        x=j*step+a;
+        trapez_sum+=(*func)(x);
+      }
+      trapez_sum=(trapez_sum+fb+fa)*step;
+      return trapez_sum;
+    }  // end trapezoidal_rule 
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-quantum-dot-program-for-two-electrons">
+<h2><span class="section-number">5.32. </span><a class="reference external" href="https://github.com/CompPhysics/ComputationalPhysics2/blob/master/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp">The quantum dot program for two electrons</a><a class="headerlink" href="#the-quantum-dot-program-for-two-electrons" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    // Variational Monte Carlo for atoms with importance sampling, slater det
+    // Test case for 2-electron quantum dot, no classes using Mersenne-Twister RNG
+    #include &quot;mpi.h&quot;
+    #include &lt;cmath&gt;
+    #include &lt;random&gt;
+    #include &lt;string&gt;
+    #include &lt;iostream&gt;
+    #include &lt;fstream&gt;
+    #include &lt;iomanip&gt;
+    #include &quot;vectormatrixclass.h&quot;
+    
+    using namespace  std;
+    // output file as global variable
+    ofstream ofile;  
+    // the step length and its squared inverse for the second derivative 
+    //  Here we define global variables  used in various functions
+    //  These can be changed by using classes
+    int Dimension = 2; 
+    int NumberParticles  = 2;  //  we fix also the number of electrons to be 2
+    
+    // declaration of functions 
+    
+    // The Mc sampling for the variational Monte Carlo 
+    void  MonteCarloSampling(int, double &amp;, double &amp;, Vector &amp;);
+    
+    // The variational wave function
+    double  WaveFunction(Matrix &amp;, Vector &amp;);
+    
+    // The local energy 
+    double  LocalEnergy(Matrix &amp;, Vector &amp;);
+    
+    // The quantum force
+    void  QuantumForce(Matrix &amp;, Matrix &amp;, Vector &amp;);
+    
+    
+    // inline function for single-particle wave function
+    inline double SPwavefunction(double r, double alpha) { 
+       return exp(-alpha*r*0.5);
+    }
+    
+    // inline function for derivative of single-particle wave function
+    inline double DerivativeSPwavefunction(double r, double alpha) { 
+      return -r*alpha;
+    }
+    
+    // function for absolute value of relative distance
+    double RelativeDistance(Matrix &amp;r, int i, int j) { 
+          double r_ij = 0;  
+          for (int k = 0; k &lt; Dimension; k++) { 
+    	r_ij += (r(i,k)-r(j,k))*(r(i,k)-r(j,k));
+          }
+          return sqrt(r_ij); 
+    }
+    
+    // inline function for derivative of Jastrow factor
+    inline double JastrowDerivative(Matrix &amp;r, double beta, int i, int j, int k){
+      return (r(i,k)-r(j,k))/(RelativeDistance(r, i, j)*pow(1.0+beta*RelativeDistance(r, i, j),2));
+    }
+    
+    // function for square of position of single particle
+    double singleparticle_pos2(Matrix &amp;r, int i) { 
+        double r_single_particle = 0;
+        for (int j = 0; j &lt; Dimension; j++) { 
+          r_single_particle  += r(i,j)*r(i,j);
+        }
+        return r_single_particle;
+    }
+    
+    void lnsrch(int n, Vector &amp;xold, double fold, Vector &amp;g, Vector &amp;p, Vector &amp;x,
+    		 double *f, double stpmax, int *check, double (*func)(Vector &amp;p));
+    
+    void dfpmin(Vector &amp;p, int n, double gtol, int *iter, double *fret,
+    	    double(*func)(Vector &amp;p), void (*dfunc)(Vector &amp;p, Vector &amp;g));
+    
+    static double sqrarg;
+    #define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg)
+    
+    
+    static double maxarg1,maxarg2;
+    #define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1) &gt; (maxarg2) ?\
+            (maxarg1) : (maxarg2))
+    
+    
+    // Begin of main program   
+    
+    int main(int argc, char* argv[])
+    {
+    
+      //  MPI initializations
+      int NumberProcesses, MyRank, NumberMCsamples;
+      MPI_Init (&amp;argc, &amp;argv);
+      MPI_Comm_size (MPI_COMM_WORLD, &amp;NumberProcesses);
+      MPI_Comm_rank (MPI_COMM_WORLD, &amp;MyRank);
+      double StartTime = MPI_Wtime();
+      if (MyRank == 0 &amp;&amp; argc &lt;= 1) {
+        cout &lt;&lt; &quot;Bad Usage: &quot; &lt;&lt; argv[0] &lt;&lt; 
+          &quot; Read also output file on same line and number of Monte Carlo cycles&quot; &lt;&lt; endl;
+      }
+      // Read filename and number of Monte Carlo cycles from the command line
+      if (MyRank == 0 &amp;&amp; argc &gt; 2) {
+        string filename = argv[1]; // first command line argument after name of program
+        NumberMCsamples  = atoi(argv[2]);
+        string fileout = filename;
+        string argument = to_string(NumberMCsamples);
+        // Final filename as filename+NumberMCsamples
+        fileout.append(argument);
+        ofile.open(fileout);
+      }
+      // broadcast the number of  Monte Carlo samples
+      MPI_Bcast (&amp;NumberMCsamples, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      // Two variational parameters only
+      Vector VariationalParameters(2);
+      int TotalNumberMCsamples = NumberMCsamples*NumberProcesses; 
+      // Loop over variational parameters
+      for (double alpha = 0.5; alpha &lt;= 1.5; alpha +=0.1){
+        for (double beta = 0.1; beta &lt;= 0.5; beta +=0.05){
+          VariationalParameters(0) = alpha;  // value of alpha
+          VariationalParameters(1) = beta;  // value of beta
+          //  Do the mc sampling  and accumulate data with MPI_Reduce
+          double TotalEnergy, TotalEnergySquared, LocalProcessEnergy, LocalProcessEnergy2;
+          LocalProcessEnergy = LocalProcessEnergy2 = 0.0;
+          MonteCarloSampling(NumberMCsamples, LocalProcessEnergy, LocalProcessEnergy2, VariationalParameters);
+          //  Collect data in total averages
+          MPI_Reduce(&amp;LocalProcessEnergy, &amp;TotalEnergy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+          MPI_Reduce(&amp;LocalProcessEnergy2, &amp;TotalEnergySquared, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+          // Print out results  in case of Master node, set to MyRank = 0
+          if ( MyRank == 0) {
+    	double Energy = TotalEnergy/( (double)NumberProcesses);
+    	double Variance = TotalEnergySquared/( (double)NumberProcesses)-Energy*Energy;
+    	double StandardDeviation = sqrt(Variance/((double)TotalNumberMCsamples)); // over optimistic error
+    	ofile &lt;&lt; setiosflags(ios::showpoint | ios::uppercase);
+    	ofile &lt;&lt; setw(15) &lt;&lt; setprecision(8) &lt;&lt; VariationalParameters(0);
+    	ofile &lt;&lt; setw(15) &lt;&lt; setprecision(8) &lt;&lt; VariationalParameters(1);
+    	ofile &lt;&lt; setw(15) &lt;&lt; setprecision(8) &lt;&lt; Energy;
+    	ofile &lt;&lt; setw(15) &lt;&lt; setprecision(8) &lt;&lt; Variance;
+    	ofile &lt;&lt; setw(15) &lt;&lt; setprecision(8) &lt;&lt; StandardDeviation &lt;&lt; endl;
+          }
+        }
+      }
+      double EndTime = MPI_Wtime();
+      double TotalTime = EndTime-StartTime;
+      if ( MyRank == 0 )  cout &lt;&lt; &quot;Time = &quot; &lt;&lt;  TotalTime  &lt;&lt; &quot; on number of processors: &quot;  &lt;&lt; NumberProcesses  &lt;&lt; endl;
+      if (MyRank == 0)  ofile.close();  // close output file
+      // End MPI
+      MPI_Finalize ();  
+      return 0;
+    }  //  end of main function
+    
+    
+    // Monte Carlo sampling with the Metropolis algorithm  
+    
+    void MonteCarloSampling(int NumberMCsamples, double &amp;cumulative_e, double &amp;cumulative_e2, Vector &amp;VariationalParameters)
+    {
+    
+     // Initialize the seed and call the Mersienne algo
+      std::random_device rd;
+      std::mt19937_64 gen(rd());
+      // Set up the uniform distribution for x \in [[0, 1]
+      std::uniform_real_distribution&lt;double&gt; UniformNumberGenerator(0.0,1.0);
+      std::normal_distribution&lt;double&gt; Normaldistribution(0.0,1.0);
+      // diffusion constant from Schroedinger equation
+      double D = 0.5; 
+      double timestep = 0.05;  //  we fix the time step  for the gaussian deviate
+      // allocate matrices which contain the position of the particles  
+      Matrix OldPosition( NumberParticles, Dimension), NewPosition( NumberParticles, Dimension);
+      Matrix OldQuantumForce(NumberParticles, Dimension), NewQuantumForce(NumberParticles, Dimension);
+      double Energy = 0.0; double EnergySquared = 0.0; double DeltaE = 0.0;
+      //  initial trial positions
+      for (int i = 0; i &lt; NumberParticles; i++) { 
+        for (int j = 0; j &lt; Dimension; j++) {
+          OldPosition(i,j) = Normaldistribution(gen)*sqrt(timestep);
+        }
+      }
+      double OldWaveFunction = WaveFunction(OldPosition, VariationalParameters);
+      QuantumForce(OldPosition, OldQuantumForce, VariationalParameters);
+      // loop over monte carlo cycles 
+      for (int cycles = 1; cycles &lt;= NumberMCsamples; cycles++){ 
+        // new position 
+        for (int i = 0; i &lt; NumberParticles; i++) { 
+          for (int j = 0; j &lt; Dimension; j++) {
+    	// gaussian deviate to compute new positions using a given timestep
+    	NewPosition(i,j) = OldPosition(i,j) + Normaldistribution(gen)*sqrt(timestep)+OldQuantumForce(i,j)*timestep*D;
+    	//	NewPosition(i,j) = OldPosition(i,j) + gaussian_deviate(&amp;idum)*sqrt(timestep)+OldQuantumForce(i,j)*timestep*D;
+          }  
+          //  for the other particles we need to set the position to the old position since
+          //  we move only one particle at the time
+          for (int k = 0; k &lt; NumberParticles; k++) {
+    	if ( k != i) {
+    	  for (int j = 0; j &lt; Dimension; j++) {
+    	    NewPosition(k,j) = OldPosition(k,j);
+    	  }
+    	} 
+          }
+          double NewWaveFunction = WaveFunction(NewPosition, VariationalParameters); 
+          QuantumForce(NewPosition, NewQuantumForce, VariationalParameters);
+          //  we compute the log of the ratio of the greens functions to be used in the 
+          //  Metropolis-Hastings algorithm
+          double GreensFunction = 0.0;            
+          for (int j = 0; j &lt; Dimension; j++) {
+    	GreensFunction += 0.5*(OldQuantumForce(i,j)+NewQuantumForce(i,j))*
+    	  (D*timestep*0.5*(OldQuantumForce(i,j)-NewQuantumForce(i,j))-NewPosition(i,j)+OldPosition(i,j));
+          }
+          GreensFunction = exp(GreensFunction);
+          // The Metropolis test is performed by moving one particle at the time
+          if(UniformNumberGenerator(gen) &lt;= GreensFunction*NewWaveFunction*NewWaveFunction/OldWaveFunction/OldWaveFunction ) { 
+    	for (int  j = 0; j &lt; Dimension; j++) {
+    	  OldPosition(i,j) = NewPosition(i,j);
+    	  OldQuantumForce(i,j) = NewQuantumForce(i,j);
+    	}
+    	OldWaveFunction = NewWaveFunction;
+          }
+        }  //  end of loop over particles
+        // compute local energy  
+        double DeltaE = LocalEnergy(OldPosition, VariationalParameters);
+        // update energies
+        Energy += DeltaE;
+        EnergySquared += DeltaE*DeltaE;
+      }   // end of loop over MC trials   
+      // update the energy average and its squared 
+      cumulative_e = Energy/NumberMCsamples;
+      cumulative_e2 = EnergySquared/NumberMCsamples;
+    }   // end MonteCarloSampling function  
+    
+    
+    // Function to compute the squared wave function and the quantum force
+    
+    double  WaveFunction(Matrix &amp;r, Vector &amp;VariationalParameters)
+    {
+      double wf = 0.0;
+      // full Slater determinant for two particles, replace with Slater det for more particles 
+      wf  = SPwavefunction(singleparticle_pos2(r, 0), VariationalParameters(0))*SPwavefunction(singleparticle_pos2(r, 1),VariationalParameters(0));
+      // contribution from Jastrow factor
+      for (int i = 0; i &lt; NumberParticles-1; i++) { 
+        for (int j = i+1; j &lt; NumberParticles; j++) {
+          wf *= exp(RelativeDistance(r, i, j)/((1.0+VariationalParameters(1)*RelativeDistance(r, i, j))));
+        }
+      }
+      return wf;
+    }
+    
+    // Function to calculate the local energy without numerical derivation of kinetic energy
+    
+    double  LocalEnergy(Matrix &amp;r, Vector &amp;VariationalParameters)
+    {
+    
+      // compute the kinetic and potential energy from the single-particle part
+      // for a many-electron system this has to be replaced by a Slater determinant
+      // The absolute value of the interparticle length
+      Matrix length( NumberParticles, NumberParticles);
+      // Set up interparticle distance
+      for (int i = 0; i &lt; NumberParticles-1; i++) { 
+        for(int j = i+1; j &lt; NumberParticles; j++){
+          length(i,j) = RelativeDistance(r, i, j);
+          length(j,i) =  length(i,j);
+        }
+      }
+      double KineticEnergy = 0.0;
+      // Set up kinetic energy from Slater and Jastrow terms
+      for (int i = 0; i &lt; NumberParticles; i++) { 
+        for (int k = 0; k &lt; Dimension; k++) {
+          double sum1 = 0.0; 
+          for(int j = 0; j &lt; NumberParticles; j++){
+    	if ( j != i) {
+    	  sum1 += JastrowDerivative(r, VariationalParameters(1), i, j, k);
+    	}
+          }
+          KineticEnergy += (sum1+DerivativeSPwavefunction(r(i,k),VariationalParameters(0)))*(sum1+DerivativeSPwavefunction(r(i,k),VariationalParameters(0)));
+        }
+      }
+      KineticEnergy += -2*VariationalParameters(0)*NumberParticles;
+      for (int i = 0; i &lt; NumberParticles-1; i++) {
+          for (int j = i+1; j &lt; NumberParticles; j++) {
+            KineticEnergy += 2.0/(pow(1.0 + VariationalParameters(1)*length(i,j),2))*(1.0/length(i,j)-2*VariationalParameters(1)/(1+VariationalParameters(1)*length(i,j)) );
+          }
+      }
+      KineticEnergy *= -0.5;
+      // Set up potential energy, external potential + eventual electron-electron repulsion
+      double PotentialEnergy = 0;
+      for (int i = 0; i &lt; NumberParticles; i++) { 
+        double DistanceSquared = singleparticle_pos2(r, i);
+        PotentialEnergy += 0.5*DistanceSquared;  // sp energy HO part, note it has the oscillator frequency set to 1!
+      }
+      // Add the electron-electron repulsion
+      for (int i = 0; i &lt; NumberParticles-1; i++) { 
+        for (int j = i+1; j &lt; NumberParticles; j++) {
+          PotentialEnergy += 1.0/length(i,j);          
+        }
+      }
+      double LocalE = KineticEnergy+PotentialEnergy;
+      return LocalE;
+    }
+    
+    // Compute the analytical expression for the quantum force
+    void  QuantumForce(Matrix &amp;r, Matrix &amp;qforce, Vector &amp;VariationalParameters)
+    {
+      // compute the first derivative 
+      for (int i = 0; i &lt; NumberParticles; i++) {
+        for (int k = 0; k &lt; Dimension; k++) {
+          // single-particle part, replace with Slater det for larger systems
+          double sppart = DerivativeSPwavefunction(r(i,k),VariationalParameters(0));
+          //  Jastrow factor contribution
+          double Jsum = 0.0;
+          for (int j = 0; j &lt; NumberParticles; j++) {
+    	if ( j != i) {
+    	  Jsum += JastrowDerivative(r, VariationalParameters(1), i, j, k);
+    	}
+          }
+          qforce(i,k) = 2.0*(Jsum+sppart);
+        }
+      }
+    } // end of QuantumForce function
+    
+    
+    #define ITMAX 200
+    #define EPS 3.0e-8
+    #define TOLX (4*EPS)
+    #define STPMX 100.0
+    
+    void dfpmin(Vector &amp;p, int n, double gtol, int *iter, double *fret,
+    	    double(*func)(Vector &amp;p), void (*dfunc)(Vector &amp;p, Vector &amp;g))
+    {
+    
+      int check,i,its,j;
+      double den,fac,fad,fae,fp,stpmax,sum=0.0,sumdg,sumxi,temp,test;
+      Vector dg(n), g(n), hdg(n), pnew(n), xi(n);
+      Matrix hessian(n,n);
+    
+      fp=(*func)(p);
+      (*dfunc)(p,g);
+      for (i = 0;i &lt; n;i++) {
+        for (j = 0; j&lt; n;j++) hessian(i,j)=0.0;
+        hessian(i,i)=1.0;
+        xi(i) = -g(i);
+        sum += p(i)*p(i);
+      }
+      stpmax=STPMX*FMAX(sqrt(sum),(double)n);
+      for (its=1;its&lt;=ITMAX;its++) {
+        *iter=its;
+        lnsrch(n,p,fp,g,xi,pnew,fret,stpmax,&amp;check,func);
+        fp = *fret;
+        for (i = 0; i&lt; n;i++) {
+          xi(i)=pnew(i)-p(i);
+          p(i)=pnew(i);
+        }
+        test=0.0;
+        for (i = 0;i&lt; n;i++) {
+          temp=fabs(xi(i))/FMAX(fabs(p(i)),1.0);
+          if (temp &gt; test) test=temp;
+        }
+        if (test &lt; TOLX) {
+          return;
+        }
+        for (i=0;i&lt;n;i++) dg(i)=g(i);
+        (*dfunc)(p,g);
+        test=0.0;
+        den=FMAX(*fret,1.0);
+        for (i=0;i&lt;n;i++) {
+          temp=fabs(g(i))*FMAX(fabs(p(i)),1.0)/den;
+          if (temp &gt; test) test=temp;
+        }
+        if (test &lt; gtol) {
+          return;
+        }
+        for (i=0;i&lt;n;i++) dg(i)=g(i)-dg(i);
+        for (i=0;i&lt;n;i++) {
+          hdg(i)=0.0;
+          for (j=0;j&lt;n;j++) hdg(i) += hessian(i,j)*dg(j);
+        }
+        fac=fae=sumdg=sumxi=0.0;
+        for (i=0;i&lt;n;i++) {
+          fac += dg(i)*xi(i);
+          fae += dg(i)*hdg(i);
+          sumdg += SQR(dg(i));
+          sumxi += SQR(xi(i));
+        }
+        if (fac*fac &gt; EPS*sumdg*sumxi) {
+          fac=1.0/fac;
+          fad=1.0/fae;
+          for (i=0;i&lt;n;i++) dg(i)=fac*xi(i)-fad*hdg(i);
+          for (i=0;i&lt;n;i++) {
+    	for (j=0;j&lt;n;j++) {
+    	  hessian(i,j) += fac*xi(i)*xi(j)
+    	    -fad*hdg(i)*hdg(j)+fae*dg(i)*dg(j);
+    	}
+          }
+        }
+        for (i=0;i&lt;n;i++) {
+          xi(i)=0.0;
+          for (j=0;j&lt;n;j++) xi(i) -= hessian(i,j)*g(j);
+        }
+      }
+      cout &lt;&lt; &quot;too many iterations in dfpmin&quot; &lt;&lt; endl;
+    }
+    #undef ITMAX
+    #undef EPS
+    #undef TOLX
+    #undef STPMX
+    
+    #define ALF 1.0e-4
+    #define TOLX 1.0e-7
+    
+    void lnsrch(int n, Vector &amp;xold, double fold, Vector &amp;g, Vector &amp;p, Vector &amp;x,
+    	    double *f, double stpmax, int *check, double (*func)(Vector &amp;p))
+    {
+      int i;
+      double a,alam,alam2,alamin,b,disc,f2,fold2,rhs1,rhs2,slope,sum,temp,
+        test,tmplam;
+    
+      *check=0;
+      for (sum=0.0,i=0;i&lt;n;i++) sum += p(i)*p(i);
+      sum=sqrt(sum);
+      if (sum &gt; stpmax)
+        for (i=0;i&lt;n;i++) p(i) *= stpmax/sum;
+      for (slope=0.0,i=0;i&lt;n;i++)
+        slope += g(i)*p(i);
+      test=0.0;
+      for (i=0;i&lt;n;i++) {
+        temp=fabs(p(i))/FMAX(fabs(xold(i)),1.0);
+        if (temp &gt; test) test=temp;
+      }
+      alamin=TOLX/test;
+      alam=1.0;
+      for (;;) {
+        for (i=0;i&lt;n;i++) x(i)=xold(i)+alam*p(i);
+        *f=(*func)(x);
+        if (alam &lt; alamin) {
+          for (i=0;i&lt;n;i++) x(i)=xold(i);
+          *check=1;
+          return;
+        } else if (*f &lt;= fold+ALF*alam*slope) return;
+        else {
+          if (alam == 1.0)
+    	tmplam = -slope/(2.0*(*f-fold-slope));
+          else {
+    	rhs1 = *f-fold-alam*slope;
+    	rhs2=f2-fold2-alam2*slope;
+    	a=(rhs1/(alam*alam)-rhs2/(alam2*alam2))/(alam-alam2);
+    	b=(-alam2*rhs1/(alam*alam)+alam*rhs2/(alam2*alam2))/(alam-alam2);
+    	if (a == 0.0) tmplam = -slope/(2.0*b);
+    	else {
+    	  disc=b*b-3.0*a*slope;
+    	  if (disc&lt;0.0) cout &lt;&lt; &quot;Roundoff problem in lnsrch.&quot; &lt;&lt; endl;
+    	  else tmplam=(-b+sqrt(disc))/(3.0*a);
+    	}
+    	if (tmplam&gt;0.5*alam)
+    	  tmplam=0.5*alam;
+          }
+        }
+        alam2=alam;
+        f2 = *f;
+        fold2=fold;
+        alam=FMAX(tmplam,0.1*alam);
+      }
+    }
+    #undef ALF
+    #undef TOLX
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-is-openmp">
+<h2><span class="section-number">5.33. </span>What is OpenMP<a class="headerlink" href="#what-is-openmp" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>OpenMP provides high-level thread programming</p></li>
+<li><p>Multiple cooperating threads are allowed to run simultaneously</p></li>
+<li><p>Threads are created and destroyed dynamically in a fork-join pattern</p>
+<ul>
+<li><p>An OpenMP program consists of a number of parallel regions</p></li>
+<li><p>Between two parallel regions there is only one master thread</p></li>
+<li><p>In the beginning of a parallel region, a team of new threads is spawned</p></li>
+<li><p>The newly spawned threads work simultaneously with the master thread</p></li>
+<li><p>At the end of a parallel region, the new threads are destroyed</p></li>
+</ul>
+</li>
+</ul>
+<p>Many good tutorials online and excellent textbook</p>
+<ol class="simple">
+<li><p><a class="reference external" href="http://mitpress.mit.edu/books/using-openmp">Using OpenMP, by B. Chapman, G. Jost, and A. van der Pas</a></p></li>
+<li><p>Many tutorials online like <a class="reference external" href="http://www.openmp.org">OpenMP official site</a></p></li>
+</ol>
+</div>
+<div class="section" id="getting-started-things-to-remember">
+<h2><span class="section-number">5.34. </span>Getting started, things to remember<a class="headerlink" href="#getting-started-things-to-remember" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Remember the header file</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #include &lt;omp.h&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Insert compiler directives in C++ syntax as</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp...
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Compile with for example <em>c++ -fopenmp code.cpp</em></p></li>
+<li><p>Execute</p>
+<ul>
+<li><p>Remember to assign the environment variable <strong>OMP NUM THREADS</strong></p></li>
+<li><p>It specifies the total number of threads inside a parallel region, if not otherwise overwritten</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="openmp-syntax">
+<h2><span class="section-number">5.35. </span>OpenMP syntax<a class="headerlink" href="#openmp-syntax" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Mostly directives</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp construct [ clause ...]
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Some functions and types</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #include &lt;omp.h&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Most apply to a block of code</p></li>
+<li><p>Specifically, a <strong>structured block</strong></p></li>
+<li><p>Enter at top, exit at bottom only, exit(), abort() permitted</p></li>
+</ul>
+</div>
+<div class="section" id="different-openmp-styles-of-parallelism">
+<h2><span class="section-number">5.36. </span>Different OpenMP styles of parallelism<a class="headerlink" href="#different-openmp-styles-of-parallelism" title="Permalink to this headline">¶</a></h2>
+<p>OpenMP supports several different ways to specify thread parallelism</p>
+<ul class="simple">
+<li><p>General parallel regions: All threads execute the code, roughly as if you made a routine of that region and created a thread to run that code</p></li>
+<li><p>Parallel loops: Special case for loops, simplifies data parallel code</p></li>
+<li><p>Task parallelism, new in OpenMP 3</p></li>
+<li><p>Several ways to manage thread coordination, including Master regions and Locks</p></li>
+<li><p>Memory model for shared data</p></li>
+</ul>
+</div>
+<div class="section" id="general-code-structure">
+<h2><span class="section-number">5.37. </span>General code structure<a class="headerlink" href="#general-code-structure" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #include &lt;omp.h&gt;
+    main ()
+    {
+    int var1, var2, var3;
+    /* serial code */
+    /* ... */
+    /* start of a parallel region */
+    #pragma omp parallel private(var1, var2) shared(var3)
+    {
+    /* ... */
+    }
+    /* more serial code */
+    /* ... */
+    /* another parallel region */
+    #pragma omp parallel
+    {
+    /* ... */
+    }
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="parallel-region">
+<h2><span class="section-number">5.38. </span>Parallel region<a class="headerlink" href="#parallel-region" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>A parallel region is a block of code that is executed by a team of threads</p></li>
+<li><p>The following compiler directive creates a parallel region</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel { ... }
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Clauses can be added at the end of the directive</p></li>
+<li><p>Most often used clauses:</p></li>
+<li><p><strong>default(shared)</strong> or <strong>default(none)</strong></p></li>
+<li><p><strong>public(list of variables)</strong></p></li>
+<li><p><strong>private(list of variables)</strong></p></li>
+</ul>
+</div>
+<div class="section" id="hello-world-not-again-please">
+<h2><span class="section-number">5.39. </span>Hello world, not again, please!<a class="headerlink" href="#hello-world-not-again-please" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #include &lt;omp.h&gt;
+    #include &lt;cstdio&gt;
+    int main (int argc, char *argv[])
+    {
+    int th_id, nthreads;
+    #pragma omp parallel private(th_id) shared(nthreads)
+    {
+    th_id = omp_get_thread_num();
+    printf(&quot;Hello World from thread %d\n&quot;, th_id);
+    #pragma omp barrier
+    if ( th_id == 0 ) {
+    nthreads = omp_get_num_threads();
+    printf(&quot;There are %d threads\n&quot;,nthreads);
+    }
+    }
+    return 0;
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="hello-world-yet-another-variant">
+<h2><span class="section-number">5.40. </span>Hello world, yet another variant<a class="headerlink" href="#hello-world-yet-another-variant" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #include &lt;cstdio&gt;
+    #include &lt;omp.h&gt;
+    int main(int argc, char *argv[]) 
+    {
+     omp_set_num_threads(4); 
+    #pragma omp parallel
+     {
+       int id = omp_get_thread_num();
+       int nproc = omp_get_num_threads(); 
+       cout &lt;&lt; &quot;Hello world with id number and processes &quot; &lt;&lt;  id &lt;&lt;  nproc &lt;&lt; endl;
+     } 
+    return 0;
+    }
+</pre></div>
+</div>
+<p>Variables declared outside of the parallel region are shared by all threads
+If a variable like <strong>id</strong> is  declared outside of the</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel, 
+</pre></div>
+</div>
+<p>it would have been shared by various the threads, possibly causing erroneous output</p>
+<ul class="simple">
+<li><p>Why? What would go wrong? Why do we add  possibly?</p></li>
+</ul>
+</div>
+<div class="section" id="important-openmp-library-routines">
+<h2><span class="section-number">5.41. </span>Important OpenMP library routines<a class="headerlink" href="#important-openmp-library-routines" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>int omp get num threads ()</strong>, returns the number of threads inside a parallel region</p></li>
+<li><p><strong>int omp get thread num ()</strong>,  returns the  a thread for each thread inside a parallel region</p></li>
+<li><p><strong>void omp set num threads (int)</strong>, sets the number of threads to be used</p></li>
+<li><p><strong>void omp set nested (int)</strong>,  turns nested parallelism on/off</p></li>
+</ul>
+</div>
+<div class="section" id="private-variables">
+<h2><span class="section-number">5.42. </span>Private variables<a class="headerlink" href="#private-variables" title="Permalink to this headline">¶</a></h2>
+<p>Private clause can be used to make thread- private versions of such variables:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel private(id)
+    {
+     int id = omp_get_thread_num();
+     cout &lt;&lt; &quot;My thread num&quot; &lt;&lt; id &lt;&lt; endl; 
+    }
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>What is their value on entry? Exit?</p></li>
+<li><p>OpenMP provides ways to control that</p></li>
+<li><p>Can use default(none) to require the sharing of each variable to be described</p></li>
+</ul>
+</div>
+<div class="section" id="master-region">
+<h2><span class="section-number">5.43. </span>Master region<a class="headerlink" href="#master-region" title="Permalink to this headline">¶</a></h2>
+<p>It is often useful to have only one thread execute some of the code in a parallel region. I/O statements are a common example</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel 
+    {
+      #pragma omp master
+       {
+          int id = omp_get_thread_num();
+          cout &lt;&lt; &quot;My thread num&quot; &lt;&lt; id &lt;&lt; endl; 
+       } 
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="parallel-for-loop">
+<h2><span class="section-number">5.44. </span>Parallel for loop<a class="headerlink" href="#parallel-for-loop" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Inside a parallel region, the following compiler directive can be used to parallelize a for-loop:</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp for
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Clauses can be added, such as</p>
+<ul>
+<li><p><strong>schedule(static, chunk size)</strong></p></li>
+<li><p><strong>schedule(dynamic, chunk size)</strong></p></li>
+<li><p><strong>schedule(guided, chunk size)</strong> (non-deterministic allocation)</p></li>
+<li><p><strong>schedule(runtime)</strong></p></li>
+<li><p><strong>private(list of variables)</strong></p></li>
+<li><p><strong>reduction(operator:variable)</strong></p></li>
+<li><p><strong>nowait</strong></p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="parallel-computations-and-loops">
+<h2><span class="section-number">5.45. </span>Parallel computations and loops<a class="headerlink" href="#parallel-computations-and-loops" title="Permalink to this headline">¶</a></h2>
+<p>OpenMP provides an easy way to parallelize a loop</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel for
+      for (i=0; i&lt;n; i++) c[i] = a[i];
+</pre></div>
+</div>
+<p>OpenMP handles index variable (no need to declare in for loop or make private)</p>
+<p>Which thread does which values?  Several options.</p>
+</div>
+<div class="section" id="scheduling-of-loop-computations">
+<h2><span class="section-number">5.46. </span>Scheduling of  loop computations<a class="headerlink" href="#scheduling-of-loop-computations" title="Permalink to this headline">¶</a></h2>
+<p>We can let  the OpenMP runtime decide. The decision is about how the loop iterates are scheduled
+and  OpenMP defines three choices of loop scheduling:</p>
+<ol class="simple">
+<li><p>Static: Predefined at compile time. Lowest overhead, predictable</p></li>
+<li><p>Dynamic: Selection made at runtime</p></li>
+<li><p>Guided: Special case of dynamic; attempts to reduce overhead</p></li>
+</ol>
+</div>
+<div class="section" id="example-code-for-loop-scheduling">
+<h2><span class="section-number">5.47. </span>Example code for loop scheduling<a class="headerlink" href="#example-code-for-loop-scheduling" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #include &lt;omp.h&gt;
+    #define CHUNKSIZE 100
+    #define N 1000
+    int main (int argc, char *argv[])
+    {
+    int i, chunk;
+    float a[N], b[N], c[N];
+    for (i=0; i &lt; N; i++) a[i] = b[i] = i * 1.0;
+    chunk = CHUNKSIZE;
+    #pragma omp parallel shared(a,b,c,chunk) private(i)
+    {
+    #pragma omp for schedule(dynamic,chunk)
+    for (i=0; i &lt; N; i++) c[i] = a[i] + b[i];
+    } /* end of parallel region */
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-code-for-loop-scheduling-guided-instead-of-dynamic">
+<h2><span class="section-number">5.48. </span>Example code for loop scheduling, guided instead of dynamic<a class="headerlink" href="#example-code-for-loop-scheduling-guided-instead-of-dynamic" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #include &lt;omp.h&gt;
+    #define CHUNKSIZE 100
+    #define N 1000
+    int main (int argc, char *argv[])
+    {
+    int i, chunk;
+    float a[N], b[N], c[N];
+    for (i=0; i &lt; N; i++) a[i] = b[i] = i * 1.0;
+    chunk = CHUNKSIZE;
+    #pragma omp parallel shared(a,b,c,chunk) private(i)
+    {
+    #pragma omp for schedule(guided,chunk)
+    for (i=0; i &lt; N; i++) c[i] = a[i] + b[i];
+    } /* end of parallel region */
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="more-on-parallel-for-loop">
+<h2><span class="section-number">5.49. </span>More on Parallel for loop<a class="headerlink" href="#more-on-parallel-for-loop" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>The number of loop iterations cannot be non-deterministic; break, return, exit, goto not allowed inside the for-loop</p></li>
+<li><p>The loop index is private to each thread</p></li>
+<li><p>A reduction variable is special</p>
+<ul>
+<li><p>During the for-loop there is a local private copy in each thread</p></li>
+<li><p>At the end of the for-loop, all the local copies are combined together by the reduction operation</p></li>
+</ul>
+</li>
+<li><p>Unless the nowait clause is used, an implicit barrier synchronization will be added at the end by the compiler</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    // #pragma omp parallel and #pragma omp for
+</pre></div>
+</div>
+<p>can be combined into</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel for
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-can-happen-with-this-loop">
+<h2><span class="section-number">5.50. </span>What can happen with this loop?<a class="headerlink" href="#what-can-happen-with-this-loop" title="Permalink to this headline">¶</a></h2>
+<p>What happens with code like this</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel for
+    for (i=0; i&lt;n; i++) sum += a[i]*a[i];
+</pre></div>
+</div>
+<p>All threads can access the <strong>sum</strong> variable, but the addition is not atomic! It is important to avoid race between threads. So-called reductions in OpenMP are thus important for performance and for obtaining correct results.  OpenMP lets us indicate that a variable is used for a reduction with a particular operator. The above code becomes</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    sum = 0.0;
+    #pragma omp parallel for reduction(+:sum)
+    for (i=0; i&lt;n; i++) sum += a[i]*a[i];
+</pre></div>
+</div>
+</div>
+<div class="section" id="inner-product">
+<h2><span class="section-number">5.51. </span>Inner product<a class="headerlink" href="#inner-product" title="Permalink to this headline">¶</a></h2>
+<p>1</p>
+<p>&lt;
+&lt;
+&lt;
+!
+!
+M
+A
+T
+H
+_
+B
+L
+O
+C
+K</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    int i;
+    double sum = 0.;
+    /* allocating and initializing arrays */
+    /* ... */
+    #pragma omp parallel for default(shared) private(i) reduction(+:sum)
+     for (i=0; i&lt;N; i++) sum += a[i]*b[i];
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="different-threads-do-different-tasks">
+<h2><span class="section-number">5.52. </span>Different threads do different tasks<a class="headerlink" href="#different-threads-do-different-tasks" title="Permalink to this headline">¶</a></h2>
+<p>Different threads do different tasks independently, each section is executed by one thread.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel
+    {
+    #pragma omp sections
+    {
+    #pragma omp section
+    funcA ();
+    #pragma omp section
+    funcB ();
+    #pragma omp section
+    funcC ();
+    }
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="single-execution">
+<h2><span class="section-number">5.53. </span>Single execution<a class="headerlink" href="#single-execution" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp single { ... }
+</pre></div>
+</div>
+<p>The code is executed by one thread only, no guarantee which thread</p>
+<p>Can introduce an implicit barrier at the end</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp master { ... }
+</pre></div>
+</div>
+<p>Code executed by the master thread, guaranteed and no implicit barrier at the end.</p>
+</div>
+<div class="section" id="coordination-and-synchronization">
+<h2><span class="section-number">5.54. </span>Coordination and synchronization<a class="headerlink" href="#coordination-and-synchronization" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp barrier
+</pre></div>
+</div>
+<p>Synchronization, must be encountered by all threads in a team (or none)</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp ordered { a block of codes }
+</pre></div>
+</div>
+<p>is another form of synchronization (in sequential order).
+The form</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp critical { a block of codes }
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp atomic { single assignment statement }
+</pre></div>
+</div>
+<p>is  more efficient than</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp critical
+</pre></div>
+</div>
+</div>
+<div class="section" id="data-scope">
+<h2><span class="section-number">5.55. </span>Data scope<a class="headerlink" href="#data-scope" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>OpenMP data scope attribute clauses:</p></li>
+<li><p><strong>shared</strong></p></li>
+<li><p><strong>private</strong></p></li>
+<li><p><strong>firstprivate</strong></p></li>
+<li><p><strong>lastprivate</strong></p></li>
+<li><p><strong>reduction</strong></p></li>
+</ul>
+<p>What are the purposes of these attributes</p>
+<ul class="simple">
+<li><p>define how and which variables are transferred to a parallel region (and back)</p></li>
+<li><p>define which variables are visible to all threads in a parallel region, and which variables are privately allocated to each thread</p></li>
+</ul>
+</div>
+<div class="section" id="some-remarks">
+<h2><span class="section-number">5.56. </span>Some remarks<a class="headerlink" href="#some-remarks" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>When entering a parallel region, the <strong>private</strong> clause ensures each thread having its own new variable instances. The new variables are assumed to be uninitialized.</p></li>
+<li><p>A shared variable exists in only one memory location and all threads can read and write to that address. It is the programmer’s responsibility to ensure that multiple threads properly access a shared variable.</p></li>
+<li><p>The <strong>firstprivate</strong> clause combines the behavior of the private clause with automatic initialization.</p></li>
+<li><p>The <strong>lastprivate</strong> clause combines the behavior of the private clause with a copy back (from the last loop iteration or section) to the original variable outside the parallel region.</p></li>
+</ul>
+</div>
+<div class="section" id="parallelizing-nested-for-loops">
+<h2><span class="section-number">5.57. </span>Parallelizing nested for-loops<a class="headerlink" href="#parallelizing-nested-for-loops" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Serial code</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    for (i=0; i&lt;100; i++)
+        for (j=0; j&lt;100; j++)
+            a[i][j] = b[i][j] + c[i][j];
+        }
+    }
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Parallelization</p></li>
+</ul>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel for private(j)
+    for (i=0; i&lt;100; i++)
+        for (j=0; j&lt;100; j++)
+           a[i][j] = b[i][j] + c[i][j];
+        }
+    }
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Why not parallelize the inner loop? to save overhead of repeated thread forks-joins</p></li>
+<li><p>Why must <strong>j</strong> be private? To avoid race condition among the threads</p></li>
+</ul>
+</div>
+<div class="section" id="nested-parallelism">
+<h2><span class="section-number">5.58. </span>Nested parallelism<a class="headerlink" href="#nested-parallelism" title="Permalink to this headline">¶</a></h2>
+<p>When a thread in a parallel region encounters another parallel construct, it
+may create a new team of threads and become the master of the new
+team.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel num_threads(4)
+    {
+    /* .... */
+    #pragma omp parallel num_threads(2)
+    {
+    //  
+    }
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="parallel-tasks">
+<h2><span class="section-number">5.59. </span>Parallel tasks<a class="headerlink" href="#parallel-tasks" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp task 
+    #pragma omp parallel shared(p_vec) private(i)
+    {
+    #pragma omp single
+    {
+    for (i=0; i&lt;N; i++) {
+      double r = random_number();
+      if (p_vec[i] &gt; r) {
+    #pragma omp task
+       do_work (p_vec[i]);
+</pre></div>
+</div>
+</div>
+<div class="section" id="common-mistakes">
+<h2><span class="section-number">5.60. </span>Common mistakes<a class="headerlink" href="#common-mistakes" title="Permalink to this headline">¶</a></h2>
+<p>Race condition</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    int nthreads;
+    #pragma omp parallel shared(nthreads)
+    {
+    nthreads = omp_get_num_threads();
+    }
+</pre></div>
+</div>
+<p>Deadlock</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel
+    {
+    ...
+    #pragma omp critical
+    {
+    ...
+    #pragma omp barrier
+    }
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="not-all-computations-are-simple">
+<h2><span class="section-number">5.61. </span>Not all computations are simple<a class="headerlink" href="#not-all-computations-are-simple" title="Permalink to this headline">¶</a></h2>
+<p>Not all computations are simple loops where the data can be evenly
+divided among threads without any dependencies between threads</p>
+<p>An example is finding the location and value of the largest element in an array</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    for (i=0; i&lt;n; i++) { 
+       if (x[i] &gt; maxval) {
+          maxval = x[i];
+          maxloc = i; 
+       }
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="not-all-computations-are-simple-competing-threads">
+<h2><span class="section-number">5.62. </span>Not all computations are simple, competing threads<a class="headerlink" href="#not-all-computations-are-simple-competing-threads" title="Permalink to this headline">¶</a></h2>
+<p>All threads are potentially accessing and changing the same values, <strong>maxloc</strong> and <strong>maxval</strong>.</p>
+<ol class="simple">
+<li><p>OpenMP provides several ways to coordinate access to shared values</p></li>
+</ol>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp atomic
+</pre></div>
+</div>
+<ol class="simple">
+<li><p>Only one thread at a time can execute the following statement (not block). We can use the critical option</p></li>
+</ol>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp critical
+</pre></div>
+</div>
+<ol class="simple">
+<li><p>Only one thread at a time can execute the following block</p></li>
+</ol>
+<p>Atomic may be faster than critical but depends on hardware</p>
+</div>
+<div class="section" id="how-to-find-the-max-value-using-openmp">
+<h2><span class="section-number">5.63. </span>How to find the max value using OpenMP<a class="headerlink" href="#how-to-find-the-max-value-using-openmp" title="Permalink to this headline">¶</a></h2>
+<p>Write down the simplest algorithm and look carefully for race conditions. How would you handle them?
+The first step would be to parallelize as</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel for
+     for (i=0; i&lt;n; i++) {
+        if (x[i] &gt; maxval) {
+          maxval = x[i];
+          maxloc = i; 
+        }
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="then-deal-with-the-race-conditions">
+<h2><span class="section-number">5.64. </span>Then deal with the race conditions<a class="headerlink" href="#then-deal-with-the-race-conditions" title="Permalink to this headline">¶</a></h2>
+<p>Write down the simplest algorithm and look carefully for race conditions. How would you handle them?
+The first step would be to parallelize as</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp parallel for
+     for (i=0; i&lt;n; i++) {
+    #pragma omp critical
+      {
+         if (x[i] &gt; maxval) {
+           maxval = x[i];
+           maxloc = i; 
+         }
+      }
+    } 
+</pre></div>
+</div>
+<p>Exercise: write a code which implements this and give an estimate on performance. Perform several runs,
+with a serial code only with and without vectorization and compare the serial code with the one that  uses OpenMP. Run on different archictectures if you can.</p>
+</div>
+<div class="section" id="what-can-slow-down-openmp-performance">
+<h2><span class="section-number">5.65. </span>What can slow down OpenMP performance?<a class="headerlink" href="#what-can-slow-down-openmp-performance" title="Permalink to this headline">¶</a></h2>
+<p>Give it a thought!</p>
+</div>
+<div class="section" id="id3">
+<h2><span class="section-number">5.66. </span>What can slow down OpenMP performance?<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>Performance poor because we insisted on keeping track of the maxval and location during the execution of the loop.</p>
+<ul class="simple">
+<li><p>We do not care about the value during the execution of the loop, just the value at the end.</p></li>
+</ul>
+<p>This is a common source of performance issues, namely the description of the method used to compute a value imposes additional, unnecessary requirements or properties</p>
+<p><strong>Idea: Have each thread find the maxloc in its own data, then combine and use temporary arrays indexed by thread number to hold the values found by each thread</strong></p>
+</div>
+<div class="section" id="find-the-max-location-for-each-thread">
+<h2><span class="section-number">5.67. </span>Find the max location for each thread<a class="headerlink" href="#find-the-max-location-for-each-thread" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    int maxloc[MAX_THREADS], mloc;
+    double maxval[MAX_THREADS], mval; 
+    #pragma omp parallel shared(maxval,maxloc)
+    {
+      int id = omp_get_thread_num(); 
+      maxval[id] = -1.0e30;
+    #pragma omp for
+       for (int i=0; i&lt;n; i++) {
+           if (x[i] &gt; maxval[id]) { 
+               maxloc[id] = i;
+               maxval[id] = x[i]; 
+           }
+        }
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="combine-the-values-from-each-thread">
+<h2><span class="section-number">5.68. </span>Combine the values from each thread<a class="headerlink" href="#combine-the-values-from-each-thread" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    #pragma omp flush (maxloc,maxval)
+    #pragma omp master
+      {
+        int nt = omp_get_num_threads(); 
+        mloc = maxloc[0]; 
+        mval = maxval[0]; 
+        for (int i=1; i&lt;nt; i++) {
+            if (maxval[i] &gt; mval) { 
+               mval = maxval[i]; 
+               mloc = maxloc[i];
+            } 
+         }
+       }
+</pre></div>
+</div>
+<p>Note that we let the master process perform the last operation.</p>
+</div>
+<div class="section" id="matrix-matrix-multiplication">
+<h2><span class="section-number">5.69. </span><a class="reference external" href="https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPvectornorm.cpp">Matrix-matrix multiplication</a><a class="headerlink" href="#matrix-matrix-multiplication" title="Permalink to this headline">¶</a></h2>
+<p>This code computes the norm of a vector using OpenMp</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    //  OpenMP program to compute vector norm by adding two other vectors
+    #include &lt;cstdlib&gt;
+    #include &lt;iostream&gt;
+    #include &lt;cmath&gt;
+    #include &lt;iomanip&gt;
+    #include  &lt;omp.h&gt;
+    # include &lt;ctime&gt;
+    
+    using namespace std; // note use of namespace
+    int main (int argc, char* argv[])
+    {
+      // read in dimension of vector
+      int n = atoi(argv[1]);
+      double *a, *b, *c;
+      int i;
+      int thread_num;
+      double wtime, Norm2, s, angle;
+      cout &lt;&lt; &quot;  Perform addition of two vectors and compute the norm-2.&quot; &lt;&lt; endl;
+      omp_set_num_threads(4);
+      thread_num = omp_get_max_threads ();
+      cout &lt;&lt; &quot;  The number of processors available = &quot; &lt;&lt; omp_get_num_procs () &lt;&lt; endl ;
+      cout &lt;&lt; &quot;  The number of threads available    = &quot; &lt;&lt; thread_num &lt;&lt;  endl;
+      cout &lt;&lt; &quot;  The matrix order n                 = &quot; &lt;&lt; n &lt;&lt; endl;
+    
+      s = 1.0/sqrt( (double) n);
+      wtime = omp_get_wtime ( );
+      // Allocate space for the vectors to be used
+      a = new double [n]; b = new double [n]; c = new double [n];
+      // Define parallel region
+    # pragma omp parallel for default(shared) private (angle, i) reduction(+:Norm2)
+      // Set up values for vectors  a and b
+      for (i = 0; i &lt; n; i++){
+          angle = 2.0*M_PI*i/ (( double ) n);
+          a[i] = s*(sin(angle) + cos(angle));
+          b[i] =  s*sin(2.0*angle);
+          c[i] = 0.0;
+      }
+      // Then perform the vector addition
+      for (i = 0; i &lt; n; i++){
+         c[i] += a[i]+b[i];
+      }
+      // Compute now the norm-2
+      Norm2 = 0.0;
+      for (i = 0; i &lt; n; i++){
+         Norm2  += c[i]*c[i];
+      }
+    // end parallel region
+      wtime = omp_get_wtime ( ) - wtime;
+      cout &lt;&lt; setiosflags(ios::showpoint | ios::uppercase);
+      cout &lt;&lt; setprecision(10) &lt;&lt; setw(20) &lt;&lt; &quot;Time used  for norm-2 computation=&quot; &lt;&lt; wtime  &lt;&lt; endl;
+      cout &lt;&lt; &quot; Norm-2  = &quot; &lt;&lt; Norm2 &lt;&lt; endl;
+      // Free up space
+      delete[] a;
+      delete[] b;
+      delete[] c;
+      return 0;
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2><span class="section-number">5.70. </span><a class="reference external" href="https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPmatrixmatrixmult.cpp">Matrix-matrix multiplication</a><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p>This the matrix-matrix multiplication code with plain c++ memory allocation using OpenMP</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    //  Matrix-matrix multiplication and Frobenius norm of a matrix with OpenMP
+    #include &lt;cstdlib&gt;
+    #include &lt;iostream&gt;
+    #include &lt;cmath&gt;
+    #include &lt;iomanip&gt;
+    #include  &lt;omp.h&gt;
+    # include &lt;ctime&gt;
+    
+    using namespace std; // note use of namespace
+    int main (int argc, char* argv[])
+    {
+      // read in dimension of square matrix
+      int n = atoi(argv[1]);
+      double **A, **B, **C;
+      int i, j, k;
+      int thread_num;
+      double wtime, Fsum, s, angle;
+      cout &lt;&lt; &quot;  Compute matrix product C = A * B and Frobenius norm.&quot; &lt;&lt; endl;
+      omp_set_num_threads(4);
+      thread_num = omp_get_max_threads ();
+      cout &lt;&lt; &quot;  The number of processors available = &quot; &lt;&lt; omp_get_num_procs () &lt;&lt; endl ;
+      cout &lt;&lt; &quot;  The number of threads available    = &quot; &lt;&lt; thread_num &lt;&lt;  endl;
+      cout &lt;&lt; &quot;  The matrix order n                 = &quot; &lt;&lt; n &lt;&lt; endl;
+    
+      s = 1.0/sqrt( (double) n);
+      wtime = omp_get_wtime ( );
+      // Allocate space for the two matrices
+      A = new double*[n]; B = new double*[n]; C = new double*[n];
+      for (i = 0; i &lt; n; i++){
+        A[i] = new double[n];
+        B[i] = new double[n];
+        C[i] = new double[n];
+      }
+      // Define parallel region
+    # pragma omp parallel for default(shared) private (angle, i, j, k) reduction(+:Fsum)
+      // Set up values for matrix A and B and zero matrix C
+      for (i = 0; i &lt; n; i++){
+        for (j = 0; j &lt; n; j++) {
+          angle = 2.0*M_PI*i*j/ (( double ) n);
+          A[i][j] = s * ( sin ( angle ) + cos ( angle ) );
+          B[j][i] =  A[i][j];
+        }
+      }
+      // Then perform the matrix-matrix multiplication
+      for (i = 0; i &lt; n; i++){
+        for (j = 0; j &lt; n; j++) {
+           C[i][j] =  0.0;    
+           for (k = 0; k &lt; n; k++) {
+                C[i][j] += A[i][k]*B[k][j];
+           }
+        }
+      }
+      // Compute now the Frobenius norm
+      Fsum = 0.0;
+      for (i = 0; i &lt; n; i++){
+        for (j = 0; j &lt; n; j++) {
+          Fsum += C[i][j]*C[i][j];
+        }
+      }
+      Fsum = sqrt(Fsum);
+    // end parallel region and letting only one thread perform I/O
+      wtime = omp_get_wtime ( ) - wtime;
+      cout &lt;&lt; setiosflags(ios::showpoint | ios::uppercase);
+      cout &lt;&lt; setprecision(10) &lt;&lt; setw(20) &lt;&lt; &quot;Time used  for matrix-matrix multiplication=&quot; &lt;&lt; wtime  &lt;&lt; endl;
+      cout &lt;&lt; &quot;  Frobenius norm  = &quot; &lt;&lt; Fsum &lt;&lt; endl;
+      // Free up space
+      for (int i = 0; i &lt; n; i++){
+        delete[] A[i];
+        delete[] B[i];
+        delete[] C[i];
+      }
+      delete[] A;
+      delete[] B;
+      delete[] C;
+      return 0;
+    }
+</pre></div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="vectorization.html" title="previous page"><span class="section-number">4. </span>Optimization and Vectorization</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Morten Hjorth-Jensen<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>
