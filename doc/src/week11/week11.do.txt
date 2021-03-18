@@ -1,0 +1,857 @@
+TITLE: Week 12 March 22-26: Parallelization with MPI and OpenMP and discussions of project 1
+AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA
+DATE: today
+
+
+!split
+===== Overview of week 12, March 22-26 =====
+!bblock  Topics
+* Discussion of project 1 and possible alternatives for project 2
+* Wrap up of parallelization discussions
+!eblock
+
+!bblock Teaching Material, videos and written material
+* Background literature: "Using OpenMP by Chapman et al.":"https://mitpress.mit.edu/books/using-openmp" and "Using MPI by Gropp et al.":"https://mitpress.mit.edu/books/using-mpi-third-edition".
+!eblock
+
+
+!split
+===== Alternatives for project 2 =====
+!bblock
+o Fermion VMC, continuation of project 1
+o Deep learning applied to project 1, either neural networks or Boltzmann machines
+o Hartree-Fock theory and time-dependent theories
+o Many-body methods like coupled-cluster theory or other many-body methods
+o Quantum computing and possibly quantum machine learning
+o Suggestions from you
+!eblock
+
+
+
+!split
+=====    What is OpenMP =====
+!bblock
+* OpenMP provides high-level thread programming
+* Multiple cooperating threads are allowed to run simultaneously
+* Threads are created and destroyed dynamically in a fork-join pattern
+  *  An OpenMP program consists of a number of parallel regions
+  *  Between two parallel regions there is only one master thread
+  *  In the beginning of a parallel region, a team of new threads is spawned
+  * The newly spawned threads work simultaneously with the master thread
+  * At the end of a parallel region, the new threads are destroyed
+
+Many good tutorials online and excellent textbook
+o  "Using OpenMP, by B. Chapman, G. Jost, and A. van der Pas":"http://mitpress.mit.edu/books/using-openmp"
+o  Many tutorials online like "OpenMP official site":"http://www.openmp.org"
+
+!eblock
+
+!split
+=====    Getting started, things to remember =====
+!bblock
+*  Remember the header file 
+!bc cppcod
+#include <omp.h>
+!ec
+*  Insert compiler directives in C++ syntax as 
+!bc cppcod
+#pragma omp...
+!ec
+* Compile with for example *c++ -fopenmp code.cpp*
+* Execute
+  * Remember to assign the environment variable _OMP NUM THREADS_
+  * It specifies the total number of threads inside a parallel region, if not otherwise overwritten
+
+!eblock
+
+!split
+===== OpenMP syntax =====
+* Mostly directives
+!bc cppcod
+#pragma omp construct [ clause ...]
+!ec
+*  Some functions and types 
+!bc cppcod
+#include <omp.h>
+!ec
+*  Most apply to a block of code
+ * Specifically, a _structured block_
+ * Enter at top, exit at bottom only, exit(), abort() permitted
+
+
+!split
+===== Different OpenMP styles of parallelism =====
+OpenMP supports several different ways to specify thread parallelism
+
+* General parallel regions: All threads execute the code, roughly as if you made a routine of that region and created a thread to run that code
+* Parallel loops: Special case for loops, simplifies data parallel code
+* Task parallelism, new in OpenMP 3
+* Several ways to manage thread coordination, including Master regions and Locks
+* Memory model for shared data
+
+
+!split
+=====    General code structure  =====
+!bblock
+!bc cppcod
+#include <omp.h>
+main ()
+{
+int var1, var2, var3;
+/* serial code */
+/* ... */
+/* start of a parallel region */
+#pragma omp parallel private(var1, var2) shared(var3)
+{
+/* ... */
+}
+/* more serial code */
+/* ... */
+/* another parallel region */
+#pragma omp parallel
+{
+/* ... */
+}
+}
+!ec
+!eblock
+
+!split
+=====    Parallel region =====
+!bblock
+* A parallel region is a block of code that is executed by a team of threads
+* The following compiler directive creates a parallel region
+!bc cppcod
+#pragma omp parallel { ... }
+!ec
+* Clauses can be added at the end of the directive
+* Most often used clauses:
+ * _default(shared)_ or _default(none)_
+ * _public(list of variables)_
+ * _private(list of variables)_
+
+
+!eblock
+
+!split
+=====    Hello world, not again, please! =====
+!bblock
+!bc cppcod
+#include <omp.h>
+#include <cstdio>
+int main (int argc, char *argv[])
+{
+int th_id, nthreads;
+#pragma omp parallel private(th_id) shared(nthreads)
+{
+th_id = omp_get_thread_num();
+printf("Hello World from thread %d\n", th_id);
+#pragma omp barrier
+if ( th_id == 0 ) {
+nthreads = omp_get_num_threads();
+printf("There are %d threads\n",nthreads);
+}
+}
+return 0;
+}
+!ec
+
+!eblock
+
+
+!split
+=====    Hello world, yet another variant =====
+!bblock
+!bc cppcod
+#include <cstdio>
+#include <omp.h>
+int main(int argc, char *argv[]) 
+{
+ omp_set_num_threads(4); 
+#pragma omp parallel
+ {
+   int id = omp_get_thread_num();
+   int nproc = omp_get_num_threads(); 
+   cout << "Hello world with id number and processes " <<  id <<  nproc << endl;
+ } 
+return 0;
+}
+!ec
+Variables declared outside of the parallel region are shared by all threads
+If a variable like _id_ is  declared outside of the 
+!bc cppcod
+#pragma omp parallel, 
+!ec
+it would have been shared by various the threads, possibly causing erroneous output
+*  Why? What would go wrong? Why do we add  possibly?
+!eblock
+
+!split
+=====    Important OpenMP library routines =====
+!bblock
+
+* _int omp get num threads ()_, returns the number of threads inside a parallel region
+* _int omp get thread num ()_,  returns the  a thread for each thread inside a parallel region
+* _void omp set num threads (int)_, sets the number of threads to be used
+* _void omp set nested (int)_,  turns nested parallelism on/off
+
+!eblock
+
+!split
+===== Private variables =====
+!bblock
+Private clause can be used to make thread- private versions of such variables: 
+!bc cppcod
+#pragma omp parallel private(id)
+{
+ int id = omp_get_thread_num();
+ cout << "My thread num" << id << endl; 
+}
+!ec
+* What is their value on entry? Exit?
+* OpenMP provides ways to control that
+* Can use default(none) to require the sharing of each variable to be described
+
+!eblock
+
+!split
+===== Master region =====
+!bblock
+It is often useful to have only one thread execute some of the code in a parallel region. I/O statements are a common example
+!bc cppcod
+#pragma omp parallel 
+{
+  #pragma omp master
+   {
+      int id = omp_get_thread_num();
+      cout << "My thread num" << id << endl; 
+   } 
+}
+!ec
+
+
+!eblock
+
+!split
+=====    Parallel for loop =====
+!bblock
+*  Inside a parallel region, the following compiler directive can be used to parallelize a for-loop:
+!bc cppcod
+#pragma omp for
+!ec
+* Clauses can be added, such as
+ *  _schedule(static, chunk size)_
+ *  _schedule(dynamic, chunk size)_ 
+ *  _schedule(guided, chunk size)_ (non-deterministic allocation)
+ *  _schedule(runtime)_
+ *  _private(list of variables)_
+ *  _reduction(operator:variable)_
+ *  _nowait_
+
+!eblock
+
+
+!split
+===== Parallel computations and loops =====
+
+!bblock
+OpenMP provides an easy way to parallelize a loop
+!bc cppcod
+#pragma omp parallel for
+  for (i=0; i<n; i++) c[i] = a[i];
+!ec
+OpenMP handles index variable (no need to declare in for loop or make private)
+
+Which thread does which values?  Several options. 
+!eblock
+
+!split
+===== Scheduling of  loop computations =====
+
+!bblock
+We can let  the OpenMP runtime decide. The decision is about how the loop iterates are scheduled
+and  OpenMP defines three choices of loop scheduling:
+o Static: Predefined at compile time. Lowest overhead, predictable
+o Dynamic: Selection made at runtime 
+o Guided: Special case of dynamic; attempts to reduce overhead
+!eblock
+
+!split
+===== Example code for loop scheduling =====
+!bblock
+!bc cppcod
+#include <omp.h>
+#define CHUNKSIZE 100
+#define N 1000
+int main (int argc, char *argv[])
+{
+int i, chunk;
+float a[N], b[N], c[N];
+for (i=0; i < N; i++) a[i] = b[i] = i * 1.0;
+chunk = CHUNKSIZE;
+#pragma omp parallel shared(a,b,c,chunk) private(i)
+{
+#pragma omp for schedule(dynamic,chunk)
+for (i=0; i < N; i++) c[i] = a[i] + b[i];
+} /* end of parallel region */
+}
+!ec
+
+
+!eblock
+
+!split
+===== Example code for loop scheduling, guided instead of dynamic =====
+!bblock
+!bc cppcod
+#include <omp.h>
+#define CHUNKSIZE 100
+#define N 1000
+int main (int argc, char *argv[])
+{
+int i, chunk;
+float a[N], b[N], c[N];
+for (i=0; i < N; i++) a[i] = b[i] = i * 1.0;
+chunk = CHUNKSIZE;
+#pragma omp parallel shared(a,b,c,chunk) private(i)
+{
+#pragma omp for schedule(guided,chunk)
+for (i=0; i < N; i++) c[i] = a[i] + b[i];
+} /* end of parallel region */
+}
+!ec
+
+
+!eblock
+
+
+!split
+=====    More on Parallel for loop =====
+!bblock
+* The number of loop iterations cannot be non-deterministic; break, return, exit, goto not allowed inside the for-loop
+* The loop index is private to each thread
+* A reduction variable is special
+  * During the for-loop there is a local private copy in each thread
+  * At the end of the for-loop, all the local copies are combined together by the reduction operation
+* Unless the nowait clause is used, an implicit barrier synchronization will be added at the end by the compiler
+!bc cppcod
+// #pragma omp parallel and #pragma omp for
+!ec
+can be combined into
+!bc cppcod
+#pragma omp parallel for
+!ec
+!eblock
+
+
+!split
+===== What can happen with this loop? =====
+
+!bblock
+What happens with code like this 
+!bc cppcod
+#pragma omp parallel for
+for (i=0; i<n; i++) sum += a[i]*a[i];
+!ec  
+All threads can access the _sum_ variable, but the addition is not atomic! It is important to avoid race between threads. So-called reductions in OpenMP are thus important for performance and for obtaining correct results.  OpenMP lets us indicate that a variable is used for a reduction with a particular operator. The above code becomes
+!bc cppcod
+sum = 0.0;
+#pragma omp parallel for reduction(+:sum)
+for (i=0; i<n; i++) sum += a[i]*a[i];
+!ec  
+
+
+!eblock
+
+
+!split
+=====    Inner product =====
+!bblock
+!bt
+\[
+\sum_{i=0}^{n-1} a_ib_i
+\]
+!et
+!bc cppcod
+int i;
+double sum = 0.;
+/* allocating and initializing arrays */
+/* ... */
+#pragma omp parallel for default(shared) private(i) reduction(+:sum)
+ for (i=0; i<N; i++) sum += a[i]*b[i];
+}
+!ec
+
+
+!eblock
+
+!split
+===== Different threads do different tasks =====
+!bblock
+
+Different threads do different tasks independently, each section is executed by one thread.
+!bc cppcod
+#pragma omp parallel
+{
+#pragma omp sections
+{
+#pragma omp section
+funcA ();
+#pragma omp section
+funcB ();
+#pragma omp section
+funcC ();
+}
+}
+!ec
+
+!eblock
+
+!split
+=====     Single execution  =====
+!bblock
+!bc cppcod
+#pragma omp single { ... }
+!ec
+The code is executed by one thread only, no guarantee which thread
+
+Can introduce an implicit barrier at the end
+!bc cppcod
+#pragma omp master { ... }
+!ec
+Code executed by the master thread, guaranteed and no implicit barrier at the end.
+!eblock
+
+
+!split
+=====    Coordination and synchronization  =====
+!bblock
+!bc cppcod
+#pragma omp barrier
+!ec 
+Synchronization, must be encountered by all threads in a team (or none)
+!bc cppcod
+#pragma omp ordered { a block of codes }
+!ec
+is another form of synchronization (in sequential order).
+The form
+!bc cppcod
+#pragma omp critical { a block of codes }
+!ec
+and 
+!bc cppcod
+#pragma omp atomic { single assignment statement }
+!ec
+is  more efficient than 
+!bc cppcod
+#pragma omp critical
+!ec
+
+
+!eblock
+
+
+!split
+=====    Data scope  =====
+!bblock
+* OpenMP data scope attribute clauses:
+ * _shared_
+ * _private_
+ * _firstprivate_
+ * _lastprivate_
+ * _reduction_
+
+What are the purposes of these attributes
+* define how and which variables are transferred to a parallel region (and back)
+* define which variables are visible to all threads in a parallel region, and which variables are privately allocated to each thread
+
+
+!eblock
+
+
+!split
+=====    Some remarks  =====
+!bblock
+
+* When entering a parallel region, the _private_ clause ensures each thread having its own new variable instances. The new variables are assumed to be uninitialized.
+* A shared variable exists in only one memory location and all threads can read and write to that address. It is the programmer's responsibility to ensure that multiple threads properly access a shared variable.
+* The _firstprivate_ clause combines the behavior of the private clause with automatic initialization.
+* The _lastprivate_ clause combines the behavior of the private clause with a copy back (from the last loop iteration or section) to the original variable outside the parallel region.
+
+
+!eblock
+
+
+!split
+=====    Parallelizing nested for-loops =====
+!bblock
+
+*  Serial code
+!bc cppcod
+for (i=0; i<100; i++)
+    for (j=0; j<100; j++)
+        a[i][j] = b[i][j] + c[i][j];
+    }
+}
+!ec
+
+* Parallelization
+!bc cppcod
+#pragma omp parallel for private(j)
+for (i=0; i<100; i++)
+    for (j=0; j<100; j++)
+       a[i][j] = b[i][j] + c[i][j];
+    }
+}
+!ec
+
+* Why not parallelize the inner loop? to save overhead of repeated thread forks-joins
+
+* Why must _j_ be private? To avoid race condition among the threads
+
+!eblock
+
+
+!split
+=====    Nested parallelism  =====
+!bblock
+When a thread in a parallel region encounters another parallel construct, it
+may create a new team of threads and become the master of the new
+team.
+!bc cppcod
+#pragma omp parallel num_threads(4)
+{
+/* .... */
+#pragma omp parallel num_threads(2)
+{
+//  
+}
+}
+!ec
+!eblock
+
+
+!split
+=====    Parallel tasks =====
+!bblock
+!bc cppcod
+#pragma omp task 
+#pragma omp parallel shared(p_vec) private(i)
+{
+#pragma omp single
+{
+for (i=0; i<N; i++) {
+  double r = random_number();
+  if (p_vec[i] > r) {
+#pragma omp task
+   do_work (p_vec[i]);
+!ec
+
+!eblock
+
+
+!split
+=====    Common mistakes =====
+!bblock
+Race condition
+!bc cppcod
+int nthreads;
+#pragma omp parallel shared(nthreads)
+{
+nthreads = omp_get_num_threads();
+}
+!ec
+Deadlock
+!bc cppcod
+#pragma omp parallel
+{
+...
+#pragma omp critical
+{
+...
+#pragma omp barrier
+}
+}
+!ec
+!eblock
+
+
+!split 
+===== Not all computations are simple =====
+!bblock
+Not all computations are simple loops where the data can be evenly 
+divided among threads without any dependencies between threads
+
+An example is finding the location and value of the largest element in an array
+!bc cppcod
+for (i=0; i<n; i++) { 
+   if (x[i] > maxval) {
+      maxval = x[i];
+      maxloc = i; 
+   }
+}
+!ec
+!eblock
+
+!split 
+===== Not all computations are simple, competing threads =====
+!bblock
+All threads are potentially accessing and changing the same values, _maxloc_ and _maxval_.
+o OpenMP provides several ways to coordinate access to shared values
+!bc cppcod
+#pragma omp atomic
+!ec
+o Only one thread at a time can execute the following statement (not block). We can use the critical option
+!bc cppcod
+#pragma omp critical
+!ec
+o Only one thread at a time can execute the following block
+
+Atomic may be faster than critical but depends on hardware
+!eblock
+
+!split
+===== How to find the max value using OpenMP =====
+!bblock 
+Write down the simplest algorithm and look carefully for race conditions. How would you handle them? 
+The first step would be to parallelize as 
+!bc cppcod
+#pragma omp parallel for
+ for (i=0; i<n; i++) {
+    if (x[i] > maxval) {
+      maxval = x[i];
+      maxloc = i; 
+    }
+}
+!ec
+!eblock
+
+!split
+===== Then deal with the race conditions  =====
+!bblock 
+Write down the simplest algorithm and look carefully for race conditions. How would you handle them? 
+The first step would be to parallelize as 
+!bc cppcod
+#pragma omp parallel for
+ for (i=0; i<n; i++) {
+#pragma omp critical
+  {
+     if (x[i] > maxval) {
+       maxval = x[i];
+       maxloc = i; 
+     }
+  }
+} 
+!ec
+
+Exercise: write a code which implements this and give an estimate on performance. Perform several runs,
+with a serial code only with and without vectorization and compare the serial code with the one that  uses OpenMP. Run on different archictectures if you can. 
+!eblock
+!split
+===== What can slow down OpenMP performance?   =====
+Give it a thought!
+
+!split
+===== What can slow down OpenMP performance?   =====
+!bblock
+Performance poor because we insisted on keeping track of the maxval and location during the execution of the loop.
+*  We do not care about the value during the execution of the loop, just the value at the end.
+
+This is a common source of performance issues, namely the description of the method used to compute a value imposes additional, unnecessary requirements or properties
+
+_Idea: Have each thread find the maxloc in its own data, then combine and use temporary arrays indexed by thread number to hold the values found by each thread_
+!eblock
+
+!split
+===== Find the max location for each thread =====
+!bblock
+!bc cppcod
+int maxloc[MAX_THREADS], mloc;
+double maxval[MAX_THREADS], mval; 
+#pragma omp parallel shared(maxval,maxloc)
+{
+  int id = omp_get_thread_num(); 
+  maxval[id] = -1.0e30;
+#pragma omp for
+   for (int i=0; i<n; i++) {
+       if (x[i] > maxval[id]) { 
+           maxloc[id] = i;
+           maxval[id] = x[i]; 
+       }
+    }
+}
+!ec
+!eblock
+
+!split
+===== Combine the values from each thread =====
+!bblock
+!bc cppcod
+#pragma omp flush (maxloc,maxval)
+#pragma omp master
+  {
+    int nt = omp_get_num_threads(); 
+    mloc = maxloc[0]; 
+    mval = maxval[0]; 
+    for (int i=1; i<nt; i++) {
+        if (maxval[i] > mval) { 
+           mval = maxval[i]; 
+           mloc = maxloc[i];
+        } 
+     }
+   }
+!ec
+Note that we let the master process perform the last operation.
+!eblock
+!split
+=====  "Matrix-matrix multiplication":"https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPvectornorm.cpp" =====
+This code computes the norm of a vector using OpenMp
+!bc
+//  OpenMP program to compute vector norm by adding two other vectors
+#include <cstdlib>
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include  <omp.h>
+# include <ctime>
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+{
+  // read in dimension of vector
+  int n = atoi(argv[1]);
+  double *a, *b, *c;
+  int i;
+  int thread_num;
+  double wtime, Norm2, s, angle;
+  cout << "  Perform addition of two vectors and compute the norm-2." << endl;
+  omp_set_num_threads(4);
+  thread_num = omp_get_max_threads ();
+  cout << "  The number of processors available = " << omp_get_num_procs () << endl ;
+  cout << "  The number of threads available    = " << thread_num <<  endl;
+  cout << "  The matrix order n                 = " << n << endl;
+
+  s = 1.0/sqrt( (double) n);
+  wtime = omp_get_wtime ( );
+  // Allocate space for the vectors to be used
+  a = new double [n]; b = new double [n]; c = new double [n];
+  // Define parallel region
+# pragma omp parallel for default(shared) private (angle, i) reduction(+:Norm2)
+  // Set up values for vectors  a and b
+  for (i = 0; i < n; i++){
+      angle = 2.0*M_PI*i/ (( double ) n);
+      a[i] = s*(sin(angle) + cos(angle));
+      b[i] =  s*sin(2.0*angle);
+      c[i] = 0.0;
+  }
+  // Then perform the vector addition
+  for (i = 0; i < n; i++){
+     c[i] += a[i]+b[i];
+  }
+  // Compute now the norm-2
+  Norm2 = 0.0;
+  for (i = 0; i < n; i++){
+     Norm2  += c[i]*c[i];
+  }
+// end parallel region
+  wtime = omp_get_wtime ( ) - wtime;
+  cout << setiosflags(ios::showpoint | ios::uppercase);
+  cout << setprecision(10) << setw(20) << "Time used  for norm-2 computation=" << wtime  << endl;
+  cout << " Norm-2  = " << Norm2 << endl;
+  // Free up space
+  delete[] a;
+  delete[] b;
+  delete[] c;
+  return 0;
+}
+!ec
+
+!split
+=====  "Matrix-matrix multiplication":"https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPmatrixmatrixmult.cpp" =====
+This the matrix-matrix multiplication code with plain c++ memory allocation using OpenMP
+
+!bc
+//  Matrix-matrix multiplication and Frobenius norm of a matrix with OpenMP
+#include <cstdlib>
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include  <omp.h>
+# include <ctime>
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+{
+  // read in dimension of square matrix
+  int n = atoi(argv[1]);
+  double **A, **B, **C;
+  int i, j, k;
+  int thread_num;
+  double wtime, Fsum, s, angle;
+  cout << "  Compute matrix product C = A * B and Frobenius norm." << endl;
+  omp_set_num_threads(4);
+  thread_num = omp_get_max_threads ();
+  cout << "  The number of processors available = " << omp_get_num_procs () << endl ;
+  cout << "  The number of threads available    = " << thread_num <<  endl;
+  cout << "  The matrix order n                 = " << n << endl;
+
+  s = 1.0/sqrt( (double) n);
+  wtime = omp_get_wtime ( );
+  // Allocate space for the two matrices
+  A = new double*[n]; B = new double*[n]; C = new double*[n];
+  for (i = 0; i < n; i++){
+    A[i] = new double[n];
+    B[i] = new double[n];
+    C[i] = new double[n];
+  }
+  // Define parallel region
+# pragma omp parallel for default(shared) private (angle, i, j, k) reduction(+:Fsum)
+  // Set up values for matrix A and B and zero matrix C
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++) {
+      angle = 2.0*M_PI*i*j/ (( double ) n);
+      A[i][j] = s * ( sin ( angle ) + cos ( angle ) );
+      B[j][i] =  A[i][j];
+    }
+  }
+  // Then perform the matrix-matrix multiplication
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++) {
+       C[i][j] =  0.0;    
+       for (k = 0; k < n; k++) {
+            C[i][j] += A[i][k]*B[k][j];
+       }
+    }
+  }
+  // Compute now the Frobenius norm
+  Fsum = 0.0;
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++) {
+      Fsum += C[i][j]*C[i][j];
+    }
+  }
+  Fsum = sqrt(Fsum);
+// end parallel region and letting only one thread perform I/O
+  wtime = omp_get_wtime ( ) - wtime;
+  cout << setiosflags(ios::showpoint | ios::uppercase);
+  cout << setprecision(10) << setw(20) << "Time used  for matrix-matrix multiplication=" << wtime  << endl;
+  cout << "  Frobenius norm  = " << Fsum << endl;
+  // Free up space
+  for (int i = 0; i < n; i++){
+    delete[] A[i];
+    delete[] B[i];
+    delete[] C[i];
+  }
+  delete[] A;
+  delete[] B;
+  delete[] C;
+  return 0;
+}
+
+
+!ec
+
+
+
+
+
