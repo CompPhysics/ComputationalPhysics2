@@ -1,0 +1,2429 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5. Boltzmann Machines &#8212; Advanced Topics in Computational Physics</title>
+    
+  <link rel="stylesheet" href="_static/css/index.f658d18f9b420779cfdf24aa0a7e2d77.css">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.e7340bb3dbd8dde6db86f25597f54a1b.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.d3f166471bb80abb5163.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.7d483ff0a819d6edff12ce0b1ead3928.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="1. Quantum Computing" href="basicquantumcomputing.html" />
+    <link rel="prev" title="4. Neural Networks" href="neuralnetworks.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Advanced Topics in Computational Physics</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro.html">
+   Computational Physics 2: computational quantum mechanics
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  About the course
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="schedule.html">
+   Schedule
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="teachers.html">
+   Instructor information
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="textbooks.html">
+   Textbooks and practicalities
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Basic Many-Body Physics
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicmanybody.html">
+   1. Many-body Hamiltonians, basic linear algebra and Second Quantization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hartreefocktheory.html">
+   2. Hartree-Fock methods
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="fcitheory.html">
+   3. Full configuration interaction theory
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="mbpt.html">
+   4. Many-body perturbation theory
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Stochastic Methods
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="vmcdmc.html">
+   1. Variational Monte Carlo methods
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="gradientmethods.html">
+   2. Gradient Methods
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="resamplingmethods.html">
+   3. Resampling Techniques, Bootstrap and Blocking
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Computational Aspects
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="vectorization.html">
+   1. Optimization and Vectorization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="parallelization.html">
+   2. Parallelization with MPI and OpenMPI
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Deep Learning
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="linearregression.html">
+   1. Linear Regression and more Advanced Regression Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="logisticregression.html">
+   2. Logistic Regression
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="supportvectormachines.html">
+   3. Support Vector Machines
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="neuralnetworks.html">
+   4. Neural Networks
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   5. Boltzmann Machines
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Quantum Computing and Quantum Machine Learning
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="basicquantumcomputing.html">
+   1. Quantum Computing
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/boltzmannmachines.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+            <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                    data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                    title="Fullscreen mode"><i
+                        class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i>
+            Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-network">
+   5.1. The network
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#joint-distribution">
+     5.1.1. Joint distribution
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#network-elements-the-energy-function">
+     5.1.2. Network Elements, the energy function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#defining-different-types-of-rbms">
+     5.1.3. Defining different types of RBMs
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#cost-function">
+     5.1.4. Cost function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#optimization-training">
+     5.1.5. Optimization / Training
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#kullback-leibler-relative-entropy">
+     5.1.6. Kullback-Leibler relative entropy
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#setting-up-for-gradient-descent-calculations">
+   5.2. Setting up for gradient descent calculations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rbms-for-the-quantum-many-body-problem">
+   5.3. RBMs for the quantum many body problem
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#representing-the-wave-function">
+   5.4. Representing the wave function
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#choose-the-cost-function">
+   5.5. Choose the cost function
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#mathematical-details">
+     5.5.1. Mathematical details
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#marginal-probability-density-functions">
+     5.5.2. Marginal Probability Density Functions
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#conditional-probability-density-functions">
+     5.5.3. Conditional Probability Density Functions
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#gaussian-binary-restricted-boltzmann-machines">
+     5.5.4. Gaussian-Binary Restricted Boltzmann Machines
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#joint-probability-density-function">
+     5.5.5. Joint Probability Density Function
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id1">
+     5.5.6. Marginal Probability Density Functions
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id2">
+     5.5.7. Conditional Probability Density Functions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#neural-quantum-states">
+   5.6. Neural Quantum States
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#id3">
+     5.6.1. Cost function
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#python-version-for-the-two-non-interacting-particles">
+   5.7. Python version for the two non-interacting particles
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="boltzmann-machines">
+<h1><span class="section-number">5. </span>Boltzmann Machines<a class="headerlink" href="#boltzmann-machines" title="Permalink to this headline">¶</a></h1>
+<p>Why use a generative model rather than the more well known discriminative deep neural networks (DNN)?</p>
+<ul class="simple">
+<li><p>Discriminitave methods have several limitations: They are mainly supervised learning methods, thus requiring labeled data. And there are tasks they cannot accomplish, like drawing new examples from an unknown probability distribution.</p></li>
+<li><p>A generative model can learn to represent and sample from a probability distribution. The core idea is to learn a parametric model of the probability distribution from which the training data was drawn. As an example</p></li>
+</ul>
+<p>a. A model for images could learn to draw new examples of cats and dogs, given a training dataset of images of cats and dogs.</p>
+<p>b. Generate a sample of an ordered or disordered Ising model phase, having been given samples of such phases.</p>
+<p>c. Model the trial function for Monte Carlo calculations</p>
+<ol class="simple">
+<li><p>Both use gradient-descent based learning procedures for minimizing cost functions</p></li>
+<li><p>Energy based models don’t use backpropagation and automatic differentiation for computing gradients, instead turning to Markov Chain Monte Carlo methods.</p></li>
+<li><p>DNNs often have several hidden layers. A restricted Boltzmann machine has only one hidden layer, however several RBMs can be stacked to make up Deep Belief Networks, of which they constitute the building blocks.</p></li>
+</ol>
+<p>History: The RBM was developed by amongst others Geoffrey Hinton, called by some the “Godfather of Deep Learning”, working with the University of Toronto and Google.</p>
+<p>A BM is what we would call an undirected probabilistic graphical model
+with stochastic continuous or discrete units.</p>
+<p>It is interpreted as a stochastic recurrent neural network where the
+state of each unit(neurons/nodes) depends on the units it is connected
+to. The weights in the network represent thus the strength of the
+interaction between various units/nodes.</p>
+<p>It turns into a Hopfield network if we choose deterministic rather
+than stochastic units. In contrast to a Hopfield network, a BM is a
+so-called generative model. It allows us to generate new samples from
+the learned distribution.</p>
+<p>A standard BM network is divided into a set of observable and visible units <span class="math notranslate nohighlight">\(\hat{x}\)</span> and a set of unknown hidden units/nodes <span class="math notranslate nohighlight">\(\hat{h}\)</span>.</p>
+<p>Additionally there can be bias nodes for the hidden and visible layers. These biases are normally set to <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>BMs are stackable, meaning they cwe can train a BM which serves as input to another BM. We can construct deep networks for learning complex PDFs. The layers can be trained one after another, a feature which makes them popular in deep learning</p>
+<p>However, they are often hard to train. This leads to the introduction of so-called restricted BMs, or RBMS.
+Here we take away all lateral connections between nodes in the visible layer as well as connections between nodes in the hidden layer. The network is illustrated in the figure below.</p>
+<!-- dom:FIGURE: [figures/RBM.png, width=800 frac=1.0] -->
+<!-- begin figure -->
+<p><img src="figures/RBM.png" width=800><p style="font-size: 0.9em"><i>Figure 1: </i></p><!-- end figure --></p>
+<div class="section" id="the-network">
+<h2><span class="section-number">5.1. </span>The network<a class="headerlink" href="#the-network" title="Permalink to this headline">¶</a></h2>
+<p><strong>The network layers</strong>:</p>
+<ol class="simple">
+<li><p>A function <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> that represents the visible layer, a vector of <span class="math notranslate nohighlight">\(M\)</span> elements (nodes). This layer represents both what the RBM might be given as training input, and what we want it to be able to reconstruct. This might for example be the pixels of an image, the spin values of the Ising model, or coefficients representing speech.</p></li>
+<li><p>The function <span class="math notranslate nohighlight">\(\mathbf{h}\)</span> represents the hidden, or latent, layer. A vector of <span class="math notranslate nohighlight">\(N\)</span> elements (nodes). Also called “feature detectors”.</p></li>
+</ol>
+<p>The goal of the hidden layer is to increase the model’s expressive power. We encode complex interactions between visible variables by introducing additional, hidden variables that interact with visible degrees of freedom in a simple manner, yet still reproduce the complex correlations between visible degrees in the data once marginalized over (integrated out).</p>
+<p>Examples of this trick being employed in physics:</p>
+<ol class="simple">
+<li><p>The Hubbard-Stratonovich transformation</p></li>
+<li><p>The introduction of ghost fields in gauge theory</p></li>
+<li><p>Shadow wave functions in Quantum Monte Carlo simulations</p></li>
+</ol>
+<p><strong>The network parameters, to be optimized/learned</strong>:</p>
+<ol class="simple">
+<li><p><span class="math notranslate nohighlight">\(\mathbf{a}\)</span> represents the visible bias, a vector of same length as <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mathbf{b}\)</span> represents the hidden bias, a vector of same lenght as <span class="math notranslate nohighlight">\(\mathbf{h}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(W\)</span> represents the interaction weights, a matrix of size <span class="math notranslate nohighlight">\(M\times N\)</span>.</p></li>
+</ol>
+<div class="section" id="joint-distribution">
+<h3><span class="section-number">5.1.1. </span>Joint distribution<a class="headerlink" href="#joint-distribution" title="Permalink to this headline">¶</a></h3>
+<p>The restricted Boltzmann machine is described by a Bolztmann distribution</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto1"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	P_{rbm}(\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})},
+\label{_auto1} \tag{1}
+\end{equation}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Z\)</span> is the normalization constant or partition function, defined as</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto2"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	Z = \int \int e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})} d\mathbf{x} d\mathbf{h}.
+\label{_auto2} \tag{2}
+\end{equation}
+\]</div>
+<p>It is common to ignore <span class="math notranslate nohighlight">\(T_0\)</span> by setting it to one.</p>
+</div>
+<div class="section" id="network-elements-the-energy-function">
+<h3><span class="section-number">5.1.2. </span>Network Elements, the energy function<a class="headerlink" href="#network-elements-the-energy-function" title="Permalink to this headline">¶</a></h3>
+<p>The function <span class="math notranslate nohighlight">\(E(\mathbf{x},\mathbf{h})\)</span> gives the <strong>energy</strong> of a
+configuration (pair of vectors) <span class="math notranslate nohighlight">\((\mathbf{x}, \mathbf{h})\)</span>. The lower
+the energy of a configuration, the higher the probability of it. This
+function also depends on the parameters <span class="math notranslate nohighlight">\(\mathbf{a}\)</span>, <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> and
+<span class="math notranslate nohighlight">\(W\)</span>. Thus, when we adjust them during the learning procedure, we are
+adjusting the energy function to best fit our problem.</p>
+<p>An expression for the energy function is</p>
+<div class="math notranslate nohighlight">
+\[
+E(\hat{x},\hat{h}) = -\sum_{ia}^{NA}b_i^a \alpha_i^a(x_i)-\sum_{jd}^{MD}c_j^d \beta_j^d(h_j)-\sum_{ijad}^{NAMD}b_i^a \alpha_i^a(x_i)c_j^d \beta_j^d(h_j)w_{ij}^{ad}.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\beta_j^d(h_j)\)</span> and <span class="math notranslate nohighlight">\(\alpha_i^a(x_j)\)</span> are so-called transfer functions that map a given input value to a desired feature value. The labels <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(d\)</span> denote that there can be multiple transfer functions per variable. The first sum depends only on the visible units. The second on the hidden ones. <strong>Note</strong> that there is no connection between nodes in a layer.</p>
+<p>The quantities <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(c\)</span> can be interpreted as the visible and hidden biases, respectively.</p>
+<p>The connection between the nodes in the two layers is given by the weights <span class="math notranslate nohighlight">\(w_{ij}\)</span>.</p>
+</div>
+<div class="section" id="defining-different-types-of-rbms">
+<h3><span class="section-number">5.1.3. </span>Defining different types of RBMs<a class="headerlink" href="#defining-different-types-of-rbms" title="Permalink to this headline">¶</a></h3>
+<p>There are different variants of RBMs, and the differences lie in the types of visible and hidden units we choose as well as in the implementation of the energy function <span class="math notranslate nohighlight">\(E(\mathbf{x},\mathbf{h})\)</span>.</p>
+<p><strong>Binary-Binary RBM:</strong></p>
+<p>RBMs were first developed using binary units in both the visible and hidden layer. The corresponding energy function is defined as follows:</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto3"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	E(\mathbf{x}, \mathbf{h}) = - \sum_i^M x_i a_i- \sum_j^N b_j h_j - \sum_{i,j}^{M,N} x_i w_{ij} h_j,
+\label{_auto3} \tag{3}
+\end{equation}
+\]</div>
+<p>where the binary values taken on by the nodes are most commonly 0 and 1.</p>
+<p><strong>Gaussian-Binary RBM:</strong></p>
+<p>Another varient is the RBM where the visible units are Gaussian while the hidden units remain binary:</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto4"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	E(\mathbf{x}, \mathbf{h}) = \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2} - \sum_j^N b_j h_j - \sum_{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2}. 
+\label{_auto4} \tag{4}
+\end{equation}
+\]</div>
+<ol class="simple">
+<li><p>RBMs are Useful when we model continuous data (i.e., we wish <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> to be continuous)</p></li>
+<li><p>Requires a smaller learning rate, since there’s no upper bound to the value a component might take in the reconstruction</p></li>
+</ol>
+<p>Other types of units include:</p>
+<ol class="simple">
+<li><p>Softmax and multinomial units</p></li>
+<li><p>Gaussian visible and hidden units</p></li>
+<li><p>Binomial units</p></li>
+<li><p>Rectified linear units</p></li>
+</ol>
+</div>
+<div class="section" id="cost-function">
+<h3><span class="section-number">5.1.4. </span>Cost function<a class="headerlink" href="#cost-function" title="Permalink to this headline">¶</a></h3>
+<p>When working with a training dataset, the most common training approach is maximizing the log-likelihood of the training data. The log likelihood characterizes the log-probability of generating the observed data using our generative model. Using this method our cost function is chosen as the negative log-likelihood. The learning then consists of trying to find parameters that maximize the probability of the dataset, and is known as Maximum Likelihood Estimation (MLE).
+Denoting the parameters as <span class="math notranslate nohighlight">\(\boldsymbol{\theta} = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{MN}\)</span>, the log-likelihood is given by</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto5"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\mathcal{L}(\{ \theta_i \}) = \langle \text{log} P_\theta(\boldsymbol{x}) \rangle_{data} 
+\label{_auto5} \tag{5}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto6"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= - \langle E(\boldsymbol{x}; \{ \theta_i\}) \rangle_{data} - \text{log} Z(\{ \theta_i\}),
+\label{_auto6} \tag{6}
+\end{equation}
+\]</div>
+<p>where we used that the normalization constant does not depend on the data, <span class="math notranslate nohighlight">\(\langle \text{log} Z(\{ \theta_i\}) \rangle = \text{log} Z(\{ \theta_i\})\)</span>
+Our cost function is the negative log-likelihood, <span class="math notranslate nohighlight">\(\mathcal{C}(\{ \theta_i \}) = - \mathcal{L}(\{ \theta_i \})\)</span></p>
+</div>
+<div class="section" id="optimization-training">
+<h3><span class="section-number">5.1.5. </span>Optimization / Training<a class="headerlink" href="#optimization-training" title="Permalink to this headline">¶</a></h3>
+<p>The training procedure of choice often is Stochastic Gradient Descent (SGD). It consists of a series of iterations where we update the parameters according to the equation</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto7"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\boldsymbol{\theta}_{k+1} = \boldsymbol{\theta}_k - \eta \nabla \mathcal{C} (\boldsymbol{\theta}_k)
+\label{_auto7} \tag{7}
+\end{equation}
+\]</div>
+<p>at each <span class="math notranslate nohighlight">\(k\)</span>-th iteration. There are a range of variants of the algorithm which aim at making the learning rate <span class="math notranslate nohighlight">\(\eta\)</span> more adaptive so the method might be more efficient while remaining stable.</p>
+<p>We now need the gradient of the cost function in order to minimize it. We find that</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto8"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\frac{\partial \mathcal{C}(\{ \theta_i\})}{\partial \theta_i}
+	= \langle \frac{\partial E(\boldsymbol{x}; \theta_i)}{\partial \theta_i} \rangle_{data}
+	+ \frac{\partial \text{log} Z(\{ \theta_i\})}{\partial \theta_i} 
+\label{_auto8} \tag{8}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto9"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \langle O_i(\boldsymbol{x}) \rangle_{data} - \langle O_i(\boldsymbol{x}) \rangle_{model},
+\label{_auto9} \tag{9}
+\end{equation}
+\]</div>
+<p>where in order to simplify notation we defined the “operator”</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto10"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	O_i(\boldsymbol{x}) = \frac{\partial E(\boldsymbol{x}; \theta_i)}{\partial \theta_i}, 
+\label{_auto10} \tag{10}
+\end{equation}
+\]</div>
+<p>and used the statistical mechanics relationship between expectation values and the log-partition function:</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto11"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\langle O_i(\boldsymbol{x}) \rangle_{model} = \text{Tr} P_\theta(\boldsymbol{x})O_i(\boldsymbol{x}) = - \frac{\partial \text{log} Z(\{ \theta_i\})}{\partial \theta_i}.
+\label{_auto11} \tag{11}
+\end{equation}
+\]</div>
+<p>The data-dependent term in the gradient is known as the positive phase
+of the gradient, while the model-dependent term is known as the
+negative phase of the gradient. The aim of the training is to lower
+the energy of configurations that are near observed data points
+(increasing their probability), and raising the energy of
+configurations that are far from observed data points (decreasing
+their probability).</p>
+<p>The gradient of the negative log-likelihood cost function of a Binary-Binary RBM is then</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto12"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial w_{ij}} = \langle x_i h_j \rangle_{data} - \langle x_i h_j \rangle_{model} 
+\label{_auto12} \tag{12}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto13"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial a_{ij}} = \langle x_i \rangle_{data} - \langle x_i \rangle_{model} 
+\label{_auto13} \tag{13}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto14"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial b_{ij}} = \langle h_i \rangle_{data} - \langle h_i \rangle_{model}. 
+\label{_auto14} \tag{14}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto15"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+\label{_auto15} \tag{15}
+\end{equation}
+\]</div>
+<p>To get the expectation values with respect to the <em>data</em>, we set the visible units to each of the observed samples in the training data, then update the hidden units according to the conditional probability found before. We then average over all samples in the training data to calculate expectation values with respect to the data.</p>
+</div>
+<div class="section" id="kullback-leibler-relative-entropy">
+<h3><span class="section-number">5.1.6. </span>Kullback-Leibler relative entropy<a class="headerlink" href="#kullback-leibler-relative-entropy" title="Permalink to this headline">¶</a></h3>
+<p>When the goal of the training is to approximate a probability
+distribution, as it is in generative modeling, another relevant
+measure is the <strong>Kullback-Leibler divergence</strong>, also known as the
+relative entropy or Shannon entropy. It is a non-symmetric measure of the
+dissimilarity between two probability density functions <span class="math notranslate nohighlight">\(p\)</span> and
+<span class="math notranslate nohighlight">\(q\)</span>. If <span class="math notranslate nohighlight">\(p\)</span> is the unkown probability which we approximate with <span class="math notranslate nohighlight">\(q\)</span>,
+we can measure the difference by</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto16"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\text{KL}(p||q) = \int_{-\infty}^{\infty} p (\boldsymbol{x}) \log \frac{p(\boldsymbol{x})}{q(\boldsymbol{x})}  d\boldsymbol{x}.
+\label{_auto16} \tag{16}
+\end{equation}
+\]</div>
+<p>Thus, the Kullback-Leibler divergence between the distribution of the
+training data <span class="math notranslate nohighlight">\(f(\boldsymbol{x})\)</span> and the model distribution <span class="math notranslate nohighlight">\(p(\boldsymbol{x}|
+\boldsymbol{\theta})\)</span> is</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto17"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\text{KL} (f(\boldsymbol{x})|| p(\boldsymbol{x}| \boldsymbol{\theta})) = \int_{-\infty}^{\infty}
+	f (\boldsymbol{x}) \log \frac{f(\boldsymbol{x})}{p(\boldsymbol{x}| \boldsymbol{\theta})} d\boldsymbol{x} 
+\label{_auto17} \tag{17}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto18"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \int_{-\infty}^{\infty} f(\boldsymbol{x}) \log f(\boldsymbol{x}) d\boldsymbol{x} - \int_{-\infty}^{\infty} f(\boldsymbol{x}) \log
+	p(\boldsymbol{x}| \boldsymbol{\theta}) d\boldsymbol{x} 
+\label{_auto18} \tag{18}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto19"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	%= \mathbb{E}_{f(\boldsymbol{x})} (\log f(\boldsymbol{x})) - \mathbb{E}_{f(\boldsymbol{x})} (\log p(\boldsymbol{x}| \boldsymbol{\theta}))
+	= \langle \log f(\boldsymbol{x}) \rangle_{f(\boldsymbol{x})} - \langle \log p(\boldsymbol{x}| \boldsymbol{\theta}) \rangle_{f(\boldsymbol{x})} 
+\label{_auto19} \tag{19}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto20"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \langle \log f(\boldsymbol{x}) \rangle_{data} + \langle E(\boldsymbol{x}) \rangle_{data} + \log Z 
+\label{_auto20} \tag{20}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto21"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \langle \log f(\boldsymbol{x}) \rangle_{data} + \mathcal{C}_{LL} .
+\label{_auto21} \tag{21}
+\end{equation}
+\]</div>
+<p>The first term is constant with respect to <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> since <span class="math notranslate nohighlight">\(f(\boldsymbol{x})\)</span> is independent of <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span>. Thus the Kullback-Leibler Divergence is minimal when the second term is minimal. The second term is the log-likelihood cost function, hence minimizing the Kullback-Leibler divergence is equivalent to maximizing the log-likelihood.</p>
+<p>To further understand generative models it is useful to study the
+gradient of the cost function which is needed in order to minimize it
+using methods like stochastic gradient descent.</p>
+<p>The partition function is the generating function of
+expectation values, in particular there are mathematical relationships
+between expectation values and the log-partition function. In this
+case we have</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto22"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\langle \frac{ \partial E(\boldsymbol{x}; \theta_i) } { \partial \theta_i} \rangle_{model}
+	= \int p(\boldsymbol{x}| \boldsymbol{\theta}) \frac{ \partial E(\boldsymbol{x}; \theta_i) } { \partial \theta_i} d\boldsymbol{x} 
+	= -\frac{\partial \log Z(\theta_i)}{ \partial  \theta_i} .
+\label{_auto22} \tag{22}
+\end{equation}
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\langle \cdot \rangle_{model}\)</span> is the expectation value over the model probability distribution <span class="math notranslate nohighlight">\(p(\boldsymbol{x}| \boldsymbol{\theta})\)</span>.</p>
+</div>
+</div>
+<div class="section" id="setting-up-for-gradient-descent-calculations">
+<h2><span class="section-number">5.2. </span>Setting up for gradient descent calculations<a class="headerlink" href="#setting-up-for-gradient-descent-calculations" title="Permalink to this headline">¶</a></h2>
+<p>Using the previous relationship we can express the gradient of the cost function as</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto23"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\frac{\partial \mathcal{C}_{LL}}{\partial \theta_i}
+	= \langle \frac{ \partial E(\boldsymbol{x}; \theta_i) } { \partial \theta_i} \rangle_{data} + \frac{\partial \log Z(\theta_i)}{ \partial  \theta_i} 
+\label{_auto23} \tag{23}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto24"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \langle \frac{ \partial E(\boldsymbol{x}; \theta_i) } { \partial \theta_i} \rangle_{data} - \langle \frac{ \partial E(\boldsymbol{x}; \theta_i) } { \partial \theta_i} \rangle_{model} 
+\label{_auto24} \tag{24}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto25"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	%= \langle O_i(\boldsymbol{x}) \rangle_{data} - \langle O_i(\boldsymbol{x}) \rangle_{model}
+\label{_auto25} \tag{25}
+\end{equation}
+\]</div>
+<p>This expression shows that the gradient of the log-likelihood cost
+function is a <strong>difference of moments</strong>, with one calculated from
+the data and one calculated from the model. The data-dependent term is
+called the <strong>positive phase</strong> and the model-dependent term is
+called the <strong>negative phase</strong> of the gradient. We see now that
+minimizing the cost function results in lowering the energy of
+configurations <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> near points in the training data and
+increasing the energy of configurations not observed in the training
+data. That means we increase the model’s probability of configurations
+similar to those in the training data.</p>
+<p>The gradient of the cost function also demonstrates why gradients of
+unsupervised, generative models must be computed differently from for
+those of for example FNNs. While the data-dependent expectation value
+is easily calculated based on the samples <span class="math notranslate nohighlight">\(\boldsymbol{x}_i\)</span> in the training
+data, we must sample from the model in order to generate samples from
+which to caclulate the model-dependent term. We sample from the model
+by using MCMC-based methods. We can not sample from the model directly
+because the partition function <span class="math notranslate nohighlight">\(Z\)</span> is generally intractable.</p>
+<p>As in supervised machine learning problems, the goal is also here to
+perform well on <strong>unseen</strong> data, that is to have good
+generalization from the training data. The distribution <span class="math notranslate nohighlight">\(f(x)\)</span> we
+approximate is not the <strong>true</strong> distribution we wish to estimate,
+it is limited to the training data. Hence, in unsupervised training as
+well it is important to prevent overfitting to the training data. Thus
+it is common to add regularizers to the cost function in the same
+manner as we discussed for say linear regression.</p>
+</div>
+<div class="section" id="rbms-for-the-quantum-many-body-problem">
+<h2><span class="section-number">5.3. </span>RBMs for the quantum many body problem<a class="headerlink" href="#rbms-for-the-quantum-many-body-problem" title="Permalink to this headline">¶</a></h2>
+<p>The idea of applying RBMs to quantum many body problems was presented by G. Carleo and M. Troyer, working with ETH Zurich and Microsoft Research.</p>
+<p>Some of their motivation included</p>
+<ul class="simple">
+<li><p>The wave function <span class="math notranslate nohighlight">\(\Psi\)</span> is a monolithic mathematical quantity that contains all the information on a quantum state, be it a single particle or a complex molecule. In principle, an exponential amount of information is needed to fully encode a generic many-body quantum state.</p></li>
+<li><p>There are still interesting open problems, including fundamental questions ranging from the dynamical properties of high-dimensional systems to the exact ground-state properties of strongly interacting fermions.</p></li>
+<li><p>The difficulty lies in finding a general strategy to reduce the exponential complexity of the full many-body wave function down to its most essential features. That is</p></li>
+</ul>
+<p>a. Dimensional reduction</p>
+<p>b. Feature extraction</p>
+<ul class="simple">
+<li><p>Among the most successful techniques to attack these challenges, artifical neural networks play a prominent role.</p></li>
+<li><p>Want to understand whether an artifical neural network may adapt to describe a quantum system.</p></li>
+</ul>
+<p>Carleo and Troyer applied the RBM to the quantum mechanical spin lattice systems of the Ising model and Heisenberg model, with encouraging results. Our goal is to test the method on systems of moving particles. For the spin lattice systems it was natural to use a binary-binary RBM, with the nodes taking values of 1 and -1. For moving particles, on the other hand, we want the visible nodes to be continuous, representing position coordinates. Thus, we start by choosing a Gaussian-binary RBM, where the visible nodes are continuous and hidden nodes take on values of 0 or 1. If eventually we would like the hidden nodes to be continuous as well the rectified linear units seem like the most relevant choice.</p>
+</div>
+<div class="section" id="representing-the-wave-function">
+<h2><span class="section-number">5.4. </span>Representing the wave function<a class="headerlink" href="#representing-the-wave-function" title="Permalink to this headline">¶</a></h2>
+<p>The wavefunction should be a probability amplitude depending on
+<span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span>. The RBM model is given by the joint distribution of
+<span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span></p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto26"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+        F_{rbm}(\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})}.
+\label{_auto26} \tag{26}
+\end{equation}
+\]</div>
+<p>To find the marginal distribution of <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> we set:</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto27"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+        F_{rbm}(\mathbf{x}) = \sum_\mathbf{h} F_{rbm}(\mathbf{x}, \mathbf{h}) 
+\label{_auto27} \tag{27}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto28"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+                                = \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}.
+\label{_auto28} \tag{28}
+\end{equation}
+\]</div>
+<p>Now this is what we use to represent the wave function, calling it a neural-network quantum state (NQS)</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto29"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+        \Psi (\mathbf{X}) = F_{rbm}(\mathbf{x}) 
+\label{_auto29} \tag{29}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto30"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+        = \frac{1}{Z}\sum_{\boldsymbol{h}} e^{-E(\mathbf{x}, \mathbf{h})} 
+\label{_auto30} \tag{30}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto31"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+        = \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_\
+{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma^2}} 
+\label{_auto31} \tag{31}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto32"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+        = \frac{1}{Z} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{x\
+_i w_{ij}}{\sigma^2}}). 
+\label{_auto32} \tag{32}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto33"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+\label{_auto33} \tag{33}
+\end{equation}
+\]</div>
+</div>
+<div class="section" id="choose-the-cost-function">
+<h2><span class="section-number">5.5. </span>Choose the cost function<a class="headerlink" href="#choose-the-cost-function" title="Permalink to this headline">¶</a></h2>
+<p>Now we don’t necessarily have training data (unless we generate it by using some other method). However, what we do have is the variational principle which allows us to obtain the ground state wave function by minimizing the expectation value of the energy of a trial wavefunction (corresponding to the untrained NQS). Similarly to the traditional variational Monte Carlo method then, it is the local energy we wish to minimize. The gradient to use for the stochastic gradient descent procedure is</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto34"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	C_i = \frac{\partial \langle E_L \rangle}{\partial \theta_i}
+	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle ),
+\label{_auto34} \tag{34}
+\end{equation}
+\]</div>
+<p>where the local energy is given by</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto35"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	E_L = \frac{1}{\Psi} \hat{\mathbf{H}} \Psi.
+\label{_auto35} \tag{35}
+\end{equation}
+\]</div>
+<div class="section" id="mathematical-details">
+<h3><span class="section-number">5.5.1. </span>Mathematical details<a class="headerlink" href="#mathematical-details" title="Permalink to this headline">¶</a></h3>
+<p>Because we are restricted to potential functions which are positive it
+is convenient to express them as exponentials, so that</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto36"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\phi_C (\boldsymbol{x}_C) = e^{-E_C(\boldsymbol{x}_C)}
+\label{_auto36} \tag{36}
+\end{equation}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(E(\boldsymbol{x}_C)\)</span> is called an <em>energy function</em>, and the
+exponential representation is the <em>Boltzmann distribution</em>. The
+joint distribution is defined as the product of potentials.</p>
+<p>The joint distribution of the random variables is then</p>
+<div class="math notranslate nohighlight">
+\[
+p(\boldsymbol{x}) = \frac{1}{Z} \prod_C \phi_C (\boldsymbol{x}_C) \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z} \prod_C e^{-E_C(\boldsymbol{x}_C)} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z} e^{-\sum_C E_C(\boldsymbol{x}_C)} \nonumber
+\]</div>
+<p>4
+0</p>
+<p>&lt;
+&lt;
+&lt;
+!
+!
+M
+A
+T
+H
+_
+B
+L
+O
+C
+K</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto38"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	p_{BM}(\boldsymbol{x}, \boldsymbol{h}) = \frac{1}{Z_{BM}} e^{-\frac{1}{T}E_{BM}(\boldsymbol{x}, \boldsymbol{h})} ,
+\label{_auto38} \tag{38}
+\end{equation}
+\]</div>
+<p>with the partition function</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto39"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	Z_{BM} = \int \int e^{-\frac{1}{T} E_{BM}(\tilde{\boldsymbol{x}}, \tilde{\boldsymbol{h}})} d\tilde{\boldsymbol{x}} d\tilde{\boldsymbol{h}} .
+\label{_auto39} \tag{39}
+\end{equation}
+\]</div>
+<p><span class="math notranslate nohighlight">\(T\)</span> is a physics-inspired parameter named temperature and will be assumed to be 1 unless otherwise stated. The energy function of the Boltzmann machine determines the interactions between the nodes and is defined</p>
+<div class="math notranslate nohighlight">
+\[
+E_{BM}(\boldsymbol{x}, \boldsymbol{h}) = - \sum_{i, k}^{M, K} a_i^k \alpha_i^k (x_i)
+	- \sum_{j, l}^{N, L} b_j^l \beta_j^l (h_j) 
+	- \sum_{i,j,k,l}^{M,N,K,L} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j) \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto40"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	- \sum_{i, m=i+1, k}^{M, M, K} \alpha_i^k (x_i) v_{im}^k \alpha_m^k (x_m)
+	- \sum_{j,n=j+1,l}^{N,N,L} \beta_j^l (h_j) u_{jn}^l \beta_n^l (h_n).
+\label{_auto40} \tag{40}
+\end{equation}
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\alpha_i^k (x_i)\)</span> and <span class="math notranslate nohighlight">\(\beta_j^l (h_j)\)</span> are one-dimensional
+transfer functions or mappings from the given input value to the
+desired feature value. They can be arbitrary functions of the input
+variables and are independent of the parameterization (parameters
+referring to weight and biases), meaning they are not affected by
+training of the model. The indices <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(l\)</span> indicate that there can
+be multiple transfer functions per variable.  Furthermore, <span class="math notranslate nohighlight">\(a_i^k\)</span> and
+<span class="math notranslate nohighlight">\(b_j^l\)</span> are the visible and hidden bias. <span class="math notranslate nohighlight">\(w_{ij}^{kl}\)</span> are weights of
+the \textbf{inter-layer} connection terms which connect visible and
+hidden units. <span class="math notranslate nohighlight">\( v_{im}^k\)</span> and <span class="math notranslate nohighlight">\(u_{jn}^l\)</span> are weights of the
+\textbf{intra-layer} connection terms which connect the visible units
+to each other and the hidden units to each other, respectively.</p>
+<p>We remove the intra-layer connections by setting <span class="math notranslate nohighlight">\(v_{im}\)</span> and <span class="math notranslate nohighlight">\(u_{jn}\)</span>
+to zero. The expression for the energy of the RBM is then</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto41"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	E_{RBM}(\boldsymbol{x}, \boldsymbol{h}) = - \sum_{i, k}^{M, K} a_i^k \alpha_i^k (x_i)
+	- \sum_{j, l}^{N, L} b_j^l \beta_j^l (h_j) 
+	- \sum_{i,j,k,l}^{M,N,K,L} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j). 
+\label{_auto41} \tag{41}
+\end{equation}
+\]</div>
+<p>resulting in</p>
+<div class="math notranslate nohighlight">
+\[
+P_{RBM} (\boldsymbol{x}) = \int P_{RBM} (\boldsymbol{x}, \tilde{\boldsymbol{h}})  d \tilde{\boldsymbol{h}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\boldsymbol{x}, \tilde{\boldsymbol{h}}) } d\tilde{\boldsymbol{h}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{RBM}} \int e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)
+	+ \sum_{j, l} b_j^l \beta_j^l (\tilde{h}_j) 
+	+ \sum_{i,j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} 
+	d\tilde{\boldsymbol{h}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\int \prod_j^N e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) 
+	+ \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} d\tilde{\boldsymbol{h}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\biggl( \int e^{\sum_l b_1^l \beta_1^l (\tilde{h}_1) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i1}^{kl} \beta_1^l (\tilde{h}_1)} d \tilde{h}_1 \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\times \int e^{\sum_l b_2^l \beta_2^l (\tilde{h}_2) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i2}^{kl} \beta_2^l (\tilde{h}_2)} d \tilde{h}_2 \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\times ... \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\times \int e^{\sum_l b_N^l \beta_N^l (\tilde{h}_N) + \sum_{i,k,l} \alpha_i^k (x_i) w_{iN}^{kl} \beta_N^l (\tilde{h}_N)} d \tilde{h}_N \biggr) \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto42"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j
+\label{_auto42} \tag{42}
+\end{equation}
+\]</div>
+<p>Similarly</p>
+<div class="math notranslate nohighlight">
+\[
+P_{RBM} (\boldsymbol{h}) = \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\tilde{\boldsymbol{x}}, \boldsymbol{h})} d\tilde{\boldsymbol{x}} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto43"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z_{RBM}} e^{\sum_{j, l} b_j^l \beta_j^l (h_j)}
+	\prod_i^M \int e^{\sum_k a_i^k \alpha_i^k (\tilde{x}_i)
+	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} d\tilde{x}_i
+\label{_auto43} \tag{43}
+\end{equation}
+\]</div>
+<p>Using Bayes theorem</p>
+<div class="math notranslate nohighlight">
+\[
+P_{RBM} (\boldsymbol{h}|\boldsymbol{x}) = \frac{P_{RBM} (\boldsymbol{x}, \boldsymbol{h})}{P_{RBM} (\boldsymbol{x})} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{\frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)
+	+ \sum_{j, l} b_j^l \beta_j^l (h_j) 
+	+ \sum_{i,j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)}}
+	{\frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto44"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \prod_j^N \frac{e^{\sum_l b_j^l \beta_j^l (h_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)} }
+	{\int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j}
+\label{_auto44} \tag{44}
+\end{equation}
+\]</div>
+<p>Similarly</p>
+<div class="math notranslate nohighlight">
+\[
+P_{RBM} (\boldsymbol{x}|\boldsymbol{h}) =  \frac{P_{RBM} (\boldsymbol{x}, \boldsymbol{h})}{P_{RBM} (\boldsymbol{h})} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto45"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \prod_i^M \frac{e^{\sum_k a_i^k \alpha_i^k (x_i)
+	+ \sum_{j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)}}
+	{\int e^{\sum_k a_i^k \alpha_i^k (\tilde{x}_i)
+	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} d\tilde{x}_i}
+\label{_auto45} \tag{45}
+\end{equation}
+\]</div>
+<p>The original RBM had binary visible and hidden nodes. They were
+showned to be universal approximators of discrete distributions.
+It was also shown that adding hidden units yields
+strictly improved modelling power. The common choice of binary values
+are 0 and 1. However, in some physics applications, -1 and 1 might be
+a more natural choice. We will here use 0 and 1.</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto46"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	E_{BB}(\boldsymbol{x}, \mathbf{h}) = - \sum_i^M x_i a_i- \sum_j^N b_j h_j - \sum_{i,j}^{M,N} x_i w_{ij} h_j.
+\label{_auto46} \tag{46}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto47"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	p_{BB}(\boldsymbol{x}, \boldsymbol{h}) = \frac{1}{Z_{BB}} e^{\sum_i^M a_i x_i + \sum_j^N b_j h_j + \sum_{ij}^{M,N} x_i w_{ij} h_j} 
+\label{_auto47} \tag{47}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto48"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z_{BB}} e^{\boldsymbol{x}^T \boldsymbol{a} + \boldsymbol{b}^T \boldsymbol{h} + \boldsymbol{x}^T \boldsymbol{W} \boldsymbol{h}}
+\label{_auto48} \tag{48}
+\end{equation}
+\]</div>
+<p>with the partition function</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto49"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	Z_{BB} = \sum_{\boldsymbol{x}, \boldsymbol{h}} e^{\boldsymbol{x}^T \boldsymbol{a} + \boldsymbol{b}^T \boldsymbol{h} + \boldsymbol{x}^T \boldsymbol{W} \boldsymbol{h}} .
+\label{_auto49} \tag{49}
+\end{equation}
+\]</div>
+</div>
+<div class="section" id="marginal-probability-density-functions">
+<h3><span class="section-number">5.5.2. </span>Marginal Probability Density Functions<a class="headerlink" href="#marginal-probability-density-functions" title="Permalink to this headline">¶</a></h3>
+<p>In order to find the probability of any configuration of the visible units we derive the marginal probability density function.</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto50"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	p_{BB} (\boldsymbol{x}) = \sum_{\boldsymbol{h}} p_{BB} (\boldsymbol{x}, \boldsymbol{h}) 
+\label{_auto50} \tag{50}
+\end{equation}
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{BB}} \sum_{\boldsymbol{h}} e^{\boldsymbol{x}^T \boldsymbol{a} + \boldsymbol{b}^T \boldsymbol{h} + \boldsymbol{x}^T \boldsymbol{W} \boldsymbol{h}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{BB}} e^{\boldsymbol{x}^T \boldsymbol{a}} \sum_{\boldsymbol{h}} e^{\sum_j^N (b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j})h_j} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{BB}} e^{\boldsymbol{x}^T \boldsymbol{a}} \sum_{\boldsymbol{h}} \prod_j^N e^{ (b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j})h_j} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{BB}} e^{\boldsymbol{x}^T \boldsymbol{a}} \bigg ( \sum_{h_1} e^{(b_1 + \boldsymbol{x}^T \boldsymbol{w}_{\ast 1})h_1}
+	\times \sum_{h_2} e^{(b_2 + \boldsymbol{x}^T \boldsymbol{w}_{\ast 2})h_2} \times \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+... \times \sum_{h_2} e^{(b_N + \boldsymbol{x}^T \boldsymbol{w}_{\ast N})h_N} \bigg ) \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{BB}} e^{\boldsymbol{x}^T \boldsymbol{a}} \prod_j^N \sum_{h_j} e^{(b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j}) h_j} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto51"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z_{BB}} e^{\boldsymbol{x}^T \boldsymbol{a}} \prod_j^N (1 + e^{b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j}}) .
+\label{_auto51} \tag{51}
+\end{equation}
+\]</div>
+<p>A similar derivation yields the marginal probability of the hidden units</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto52"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	p_{BB} (\boldsymbol{h}) = \frac{1}{Z_{BB}} e^{\boldsymbol{b}^T \boldsymbol{h}} \prod_i^M (1 + e^{a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h}}) .
+\label{_auto52} \tag{52}
+\end{equation}
+\]</div>
+</div>
+<div class="section" id="conditional-probability-density-functions">
+<h3><span class="section-number">5.5.3. </span>Conditional Probability Density Functions<a class="headerlink" href="#conditional-probability-density-functions" title="Permalink to this headline">¶</a></h3>
+<p>We derive the probability of the hidden units given the visible units using Bayes’ rule</p>
+<div class="math notranslate nohighlight">
+\[
+p_{BB} (\boldsymbol{h}|\boldsymbol{x}) = \frac{p_{BB} (\boldsymbol{x}, \boldsymbol{h})}{p_{BB} (\boldsymbol{x})} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{ \frac{1}{Z_{BB}}  e^{\boldsymbol{x}^T \boldsymbol{a} + \boldsymbol{b}^T \boldsymbol{h} + \boldsymbol{x}^T \boldsymbol{W} \boldsymbol{h}} }
+	        {\frac{1}{Z_{BB}} e^{\boldsymbol{x}^T \boldsymbol{a}} \prod_j^N (1 + e^{b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j}})} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{  e^{\boldsymbol{x}^T \boldsymbol{a}} e^{ \sum_j^N (b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j} ) h_j} }
+	        { e^{\boldsymbol{x}^T \boldsymbol{a}} \prod_j^N (1 + e^{b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j}})} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \prod_j^N \frac{ e^{(b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j} ) h_j}  }
+	{1 + e^{b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j}}} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto53"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \prod_j^N p_{BB} (h_j| \boldsymbol{x}) .
+\label{_auto53} \tag{53}
+\end{equation}
+\]</div>
+<p>From this we find the probability of a hidden unit being “on” or “off”:</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto54"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	p_{BB} (h_j=1 | \boldsymbol{x}) =   \frac{ e^{(b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j} ) h_j}  }
+	{1 + e^{b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j}}} 
+\label{_auto54} \tag{54}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto55"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	=  \frac{ e^{(b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j} )}  }
+	{1 + e^{b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j}}} 
+\label{_auto55} \tag{55}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto56"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	=  \frac{ 1 }{1 + e^{-(b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j})} } ,
+\label{_auto56} \tag{56}
+\end{equation}
+\]</div>
+<p>and</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto57"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	p_{BB} (h_j=0 | \boldsymbol{x}) =\frac{ 1 }{1 + e^{b_j + \boldsymbol{x}^T \boldsymbol{w}_{\ast j}} } .
+\label{_auto57} \tag{57}
+\end{equation}
+\]</div>
+<p>Similarly we have that the conditional probability of the visible units given the hidden are</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto58"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	p_{BB} (\boldsymbol{x}|\boldsymbol{h}) = \prod_i^M \frac{ e^{ (a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h}) x_i} }{ 1 + e^{a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h}} } 
+\label{_auto58} \tag{58}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto59"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \prod_i^M p_{BB} (x_i | \boldsymbol{h}) .
+\label{_auto59} \tag{59}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto60"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	p_{BB} (x_i=1 | \boldsymbol{h}) = \frac{1}{1 + e^{-(a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h} )}} 
+\label{_auto60} \tag{60}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto61"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	p_{BB} (x_i=0 | \boldsymbol{h}) = \frac{1}{1 + e^{a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h} }} .
+\label{_auto61} \tag{61}
+\end{equation}
+\]</div>
+</div>
+<div class="section" id="gaussian-binary-restricted-boltzmann-machines">
+<h3><span class="section-number">5.5.4. </span>Gaussian-Binary Restricted Boltzmann Machines<a class="headerlink" href="#gaussian-binary-restricted-boltzmann-machines" title="Permalink to this headline">¶</a></h3>
+<p>Inserting into the expression for <span class="math notranslate nohighlight">\(E_{RBM}(\boldsymbol{x},\boldsymbol{h})\)</span> in equation  results in the energy</p>
+<div class="math notranslate nohighlight">
+\[
+E_{GB}(\boldsymbol{x}, \boldsymbol{h}) = \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2}
+	- \sum_j^N b_j h_j 
+	-\sum_{ij}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto62"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \vert\vert\frac{\boldsymbol{x} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2 - \boldsymbol{b}^T \boldsymbol{h} 
+	- (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{W}\boldsymbol{h} . 
+\label{_auto62} \tag{62}
+\end{equation}
+\]</div>
+</div>
+<div class="section" id="joint-probability-density-function">
+<h3><span class="section-number">5.5.5. </span>Joint Probability Density Function<a class="headerlink" href="#joint-probability-density-function" title="Permalink to this headline">¶</a></h3>
+<div class="math notranslate nohighlight">
+\[
+p_{GB} (\boldsymbol{x}, \boldsymbol{h}) = \frac{1}{Z_{GB}} e^{-\vert\vert\frac{\boldsymbol{x} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2 + \boldsymbol{b}^T \boldsymbol{h} 
+	+ (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{W}\boldsymbol{h}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} e^{- \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2}
+	+ \sum_j^N b_j h_j 
+	+\sum_{ij}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2}} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto63"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z_{GB}} \prod_{ij}^{M,N} e^{-\frac{(x_i - a_i)^2}{2\sigma_i^2}
+	+ b_j h_j 
+	+\frac{x_i w_{ij} h_j}{\sigma_i^2}} ,
+\label{_auto63} \tag{63}
+\end{equation}
+\]</div>
+<p>with the partition function given by</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto64"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	Z_{GB} = \int \sum_{\tilde{\boldsymbol{h}}}^{\tilde{\boldsymbol{H}}} e^{-\vert\vert\frac{\tilde{\boldsymbol{x}} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2 + \boldsymbol{b}^T \tilde{\boldsymbol{h}} 
+	+ (\frac{\tilde{\boldsymbol{x}}}{\boldsymbol{\sigma}^2})^T \boldsymbol{W}\tilde{\boldsymbol{h}}} d\tilde{\boldsymbol{x}} .
+\label{_auto64} \tag{64}
+\end{equation}
+\]</div>
+</div>
+<div class="section" id="id1">
+<h3><span class="section-number">5.5.6. </span>Marginal Probability Density Functions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>We proceed to find the marginal probability densitites of the
+Gaussian-binary RBM. We first marginalize over the binary hidden units
+to find <span class="math notranslate nohighlight">\(p_{GB} (\boldsymbol{x})\)</span></p>
+<div class="math notranslate nohighlight">
+\[
+p_{GB} (\boldsymbol{x}) = \sum_{\tilde{\boldsymbol{h}}}^{\tilde{\boldsymbol{H}}} p_{GB} (\boldsymbol{x}, \tilde{\boldsymbol{h}}) \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} \sum_{\tilde{\boldsymbol{h}}}^{\tilde{\boldsymbol{H}}} 
+	e^{-\vert\vert\frac{\boldsymbol{x} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2 + \boldsymbol{b}^T \tilde{\boldsymbol{h}} 
+	+ (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{W}\tilde{\boldsymbol{h}}} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto65"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z_{GB}} e^{-\vert\vert\frac{\boldsymbol{x} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2}
+	\prod_j^N (1 + e^{b_j + (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{w}_{\ast j}} ) .
+\label{_auto65} \tag{65}
+\end{equation}
+\]</div>
+<p>We next marginalize over the visible units. This is the first time we
+marginalize over continuous values. We rewrite the exponential factor
+dependent on <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> as a Gaussian function before we integrate in
+the last step.</p>
+<div class="math notranslate nohighlight">
+\[
+p_{GB} (\boldsymbol{h}) = \int p_{GB} (\tilde{\boldsymbol{x}}, \boldsymbol{h}) d\tilde{\boldsymbol{x}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} \int e^{-\vert\vert\frac{\tilde{\boldsymbol{x}} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2 + \boldsymbol{b}^T \boldsymbol{h} 
+	+ (\frac{\tilde{\boldsymbol{x}}}{\boldsymbol{\sigma}^2})^T \boldsymbol{W}\boldsymbol{h}} d\tilde{\boldsymbol{x}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h} } \int \prod_i^M
+	e^{- \frac{(\tilde{x}_i - a_i)^2}{2\sigma_i^2} + \frac{\tilde{x}_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h}}{\sigma_i^2} } d\tilde{\boldsymbol{x}} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h} }
+	\biggl( \int e^{- \frac{(\tilde{x}_1 - a_1)^2}{2\sigma_1^2} + \frac{\tilde{x}_1 \boldsymbol{w}_{1\ast}^T \boldsymbol{h}}{\sigma_1^2} } d\tilde{x}_1 \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\times \int e^{- \frac{(\tilde{x}_2 - a_2)^2}{2\sigma_2^2} + \frac{\tilde{x}_2 \boldsymbol{w}_{2\ast}^T \boldsymbol{h}}{\sigma_2^2} } d\tilde{x}_2 \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\times ... \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+\times \int e^{- \frac{(\tilde{x}_M - a_M)^2}{2\sigma_M^2} + \frac{\tilde{x}_M \boldsymbol{w}_{M\ast}^T \boldsymbol{h}}{\sigma_M^2} } d\tilde{x}_M \biggr) \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h}} \prod_i^M
+	\int e^{- \frac{(\tilde{x}_i - a_i)^2 - 2\tilde{x}_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h}}{2\sigma_i^2} } d\tilde{x}_i \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h}} \prod_i^M
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \tilde{x}_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h}) + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h}} \prod_i^M
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h}) + (a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2 - (a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h}} \prod_i^M
+	\int e^{- \frac{(\tilde{x}_i - (a_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h}))^2 - a_i^2 -2a_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h} - (\boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h}} \prod_i^M
+	e^{\frac{2a_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h} +(\boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2 }{2\sigma_i^2}}
+	\int e^{- \frac{(\tilde{x}_i - a_i - \boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2}{2\sigma_i^2}}
+	d\tilde{x}_i \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto66"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h}} \prod_i^M
+	\sqrt{2\pi \sigma_i^2}
+	e^{\frac{2a_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h} +(\boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2 }{2\sigma_i^2}} .
+\label{_auto66} \tag{66}
+\end{equation}
+\]</div>
+</div>
+<div class="section" id="id2">
+<h3><span class="section-number">5.5.7. </span>Conditional Probability Density Functions<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>We finish by deriving the conditional probabilities.</p>
+<div class="math notranslate nohighlight">
+\[
+p_{GB} (\boldsymbol{h}| \boldsymbol{x}) = \frac{p_{GB} (\boldsymbol{x}, \boldsymbol{h})}{p_{GB} (\boldsymbol{x})} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\boldsymbol{x} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2 + \boldsymbol{b}^T \boldsymbol{h} 
+	+ (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{W}\boldsymbol{h}}}
+	{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\boldsymbol{x} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2}
+	\prod_j^N (1 + e^{b_j + (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{w}_{\ast j}} ) }
+	\nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \prod_j^N \frac{e^{(b_j + (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{w}_{\ast j})h_j } }
+	{1 + e^{b_j + (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{w}_{\ast j}}} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto67"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \prod_j^N p_{GB} (h_j|\boldsymbol{x}).
+\label{_auto67} \tag{67}
+\end{equation}
+\]</div>
+<p>The conditional probability of a binary hidden unit <span class="math notranslate nohighlight">\(h_j\)</span> being on or off again takes the form of a sigmoid function</p>
+<div class="math notranslate nohighlight">
+\[
+p_{GB} (h_j =1 | \boldsymbol{x}) = \frac{e^{b_j + (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{w}_{\ast j} } }
+	{1 + e^{b_j + (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{w}_{\ast j}}} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto68"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{1 + e^{-b_j - (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{w}_{\ast j}}} 
+\label{_auto68} \tag{68}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto69"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	p_{GB} (h_j =0 | \boldsymbol{x}) =
+	\frac{1}{1 + e^{b_j +(\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{w}_{\ast j}}} .
+\label{_auto69} \tag{69}
+\end{equation}
+\]</div>
+<p>The conditional probability of the continuous <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> now has another form, however.</p>
+<div class="math notranslate nohighlight">
+\[
+p_{GB} (\boldsymbol{x}|\boldsymbol{h})
+	= \frac{p_{GB} (\boldsymbol{x}, \boldsymbol{h})}{p_{GB} (\boldsymbol{h})} \nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \frac{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\boldsymbol{x} -\boldsymbol{a}}{2\boldsymbol{\sigma}}\vert\vert^2 + \boldsymbol{b}^T \boldsymbol{h} 
+	+ (\frac{\boldsymbol{x}}{\boldsymbol{\sigma}^2})^T \boldsymbol{W}\boldsymbol{h}}}
+	{\frac{1}{Z_{GB}} e^{\boldsymbol{b}^T \boldsymbol{h}} \prod_i^M
+	\sqrt{2\pi \sigma_i^2}
+	e^{\frac{2a_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h} +(\boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2 }{2\sigma_i^2}}}
+	\nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	\frac{e^{- \frac{(x_i - a_i)^2}{2\sigma_i^2} + \frac{x_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h}}{2\sigma_i^2} }}
+	{e^{\frac{2a_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h} +(\boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2 }{2\sigma_i^2}}}
+	\nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	\frac{e^{-\frac{x_i^2 - 2a_i x_i + a_i^2 - 2x_i \boldsymbol{w}_{i\ast}^T\boldsymbol{h} }{2\sigma_i^2} } }
+	{e^{\frac{2a_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h} +(\boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2 }{2\sigma_i^2}}}
+	\nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	e^{- \frac{x_i^2 - 2a_i x_i + a_i^2 - 2x_i \boldsymbol{w}_{i\ast}^T\boldsymbol{h}
+	+ 2a_i \boldsymbol{w}_{i\ast}^T \boldsymbol{h} +(\boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2}
+	{2\sigma_i^2} }
+	\nonumber
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+= \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	e^{ - \frac{(x_i - b_i - \boldsymbol{w}_{i\ast}^T \boldsymbol{h})^2}{2\sigma_i^2}} \nonumber
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto70"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \prod_i^M \mathcal{N}
+	(x_i | b_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h}, \sigma_i^2) 
+\label{_auto70} \tag{70}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto71"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\Rightarrow p_{GB} (x_i|\boldsymbol{h}) = \mathcal{N}
+	(x_i | b_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h}, \sigma_i^2) .
+\label{_auto71} \tag{71}
+\end{equation}
+\]</div>
+<p>The form of these conditional probabilities explains the name
+“Gaussian” and the form of the Gaussian-binary energy function. We see
+that the conditional probability of <span class="math notranslate nohighlight">\(x_i\)</span> given <span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span> is a normal
+distribution with mean <span class="math notranslate nohighlight">\(b_i + \boldsymbol{w}_{i\ast}^T \boldsymbol{h}\)</span> and variance
+<span class="math notranslate nohighlight">\(\sigma_i^2\)</span>.</p>
+</div>
+</div>
+<div class="section" id="neural-quantum-states">
+<h2><span class="section-number">5.6. </span>Neural Quantum States<a class="headerlink" href="#neural-quantum-states" title="Permalink to this headline">¶</a></h2>
+<p>The wavefunction should be a probability amplitude depending on <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span>. The RBM model is given by the joint distribution of <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{h}\)</span></p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto72"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	F_{rbm}(\boldsymbol{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\boldsymbol{x},\mathbf{h})}
+\label{_auto72} \tag{72}
+\end{equation}
+\]</div>
+<p>To find the marginal distribution of <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> we set:</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto73"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	F_{rbm}(\mathbf{x}) = \sum_\mathbf{h} F_{rbm}(\mathbf{x}, \mathbf{h}) 
+\label{_auto73} \tag{73}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto74"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+				= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}
+\label{_auto74} \tag{74}
+\end{equation}
+\]</div>
+<p>Now this is what we use to represent the wave function, calling it a neural-network quantum state (NQS)</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto75"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\Psi (\mathbf{X}) = F_{rbm}(\mathbf{x}) 
+\label{_auto75} \tag{75}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto76"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z}\sum_{\boldsymbol{h}} e^{-E(\mathbf{x}, \mathbf{h})} 
+\label{_auto76} \tag{76}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto77"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma^2}} 
+\label{_auto77} \tag{77}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto78"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{Z} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{x_i w_{ij}}{\sigma^2}}) 
+\label{_auto78} \tag{78}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto79"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+\label{_auto79} \tag{79}
+\end{equation}
+\]</div>
+<p>The above wavefunction is the most general one because it allows for
+complex valued wavefunctions. However it fundamentally changes the
+probabilistic foundation of the RBM, because what is usually a
+probability in the RBM framework is now a an amplitude. This means
+that a lot of the theoretical framework usually used to interpret the
+model, i.e. graphical models, conditional probabilities, and Markov
+random fields, breaks down. If we assume the wavefunction to be
+postive definite, however, we can use the RBM to represent the squared
+wavefunction, and thereby a probability. This also makes it possible
+to sample from the model using Gibbs sampling, because we can obtain
+the conditional probabilities.</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto80"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	|\Psi (\mathbf{X})|^2 = F_{rbm}(\mathbf{X}) 
+\label{_auto80} \tag{80}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto81"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\Rightarrow \Psi (\mathbf{X}) = \sqrt{F_{rbm}(\mathbf{X})} 
+\label{_auto81} \tag{81}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto82"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{\sqrt{Z}}\sqrt{\sum_{\{h_j\}} e^{-E(\mathbf{X}, \mathbf{h})}} 
+\label{_auto82} \tag{82}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto83"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{\sqrt{Z}} \sqrt{\sum_{\{h_j\}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{X_i w_{ij} h_j}{\sigma^2}} }
+\label{_auto83} \tag{83}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto84"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \sqrt{\sum_{\{h_j\}} \prod_j^N e^{b_j h_j + \sum_i^M \frac{X_i w_{ij} h_j}{\sigma^2}}} 
+\label{_auto84} \tag{84}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto85"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \sqrt{\prod_j^N \sum_{h_j}  e^{b_j h_j + \sum_i^M \frac{X_i w_{ij} h_j}{\sigma^2}}} 
+\label{_auto85} \tag{85}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto86"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \prod_j^N \sqrt{e^0 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}} 
+\label{_auto86} \tag{86}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto87"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \prod_j^N \sqrt{1 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}} 
+\label{_auto87} \tag{87}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto88"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+\label{_auto88} \tag{88}
+\end{equation}
+\]</div>
+<div class="section" id="id3">
+<h3><span class="section-number">5.6.1. </span>Cost function<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>This is where we deviate from what is common in machine
+learning. Rather than defining a cost function based on some dataset,
+our cost function is the energy of the quantum mechanical system. From
+the variational principle we know that minizing this energy should
+lead to the ground state wavefunction. As stated previously the local
+energy is given by</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto89"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	E_L = \frac{1}{\Psi} \hat{\mathbf{H}} \Psi,
+\label{_auto89} \tag{89}
+\end{equation}
+\]</div>
+<p>and the gradient is</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto90"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	G_i = \frac{\partial \langle E_L \rangle}{\partial \alpha_i}
+	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} \rangle ),
+\label{_auto90} \tag{90}
+\end{equation}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha_i = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{MN}\)</span>.</p>
+<p>We use that <span class="math notranslate nohighlight">\(\frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} 
+	= \frac{\partial \ln{\Psi}}{\partial \alpha_i}\)</span>,
+and find</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto91"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\ln{\Psi({\mathbf{X}})} = -\ln{Z} - \sum_m^M \frac{(X_m - a_m)^2}{2\sigma^2}
+	+ \sum_n^N \ln({1 + e^{b_n + \sum_i^M \frac{X_i w_{in}}{\sigma^2}})}.
+\label{_auto91} \tag{91}
+\end{equation}
+\]</div>
+<p>This gives</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto92"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\frac{\partial }{\partial a_m} \ln\Psi
+	= 	\frac{1}{\sigma^2} (X_m - a_m) 
+\label{_auto92} \tag{92}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto93"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\frac{\partial }{\partial b_n} \ln\Psi
+	=
+	\frac{1}{e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1} 
+\label{_auto93} \tag{93}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto94"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\frac{\partial }{\partial w_{mn}} \ln\Psi
+	= \frac{X_m}{\sigma^2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)}.
+\label{_auto94} \tag{94}
+\end{equation}
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(\Psi = \sqrt{F_{rbm}}\)</span> we have</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto95"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\ln{\Psi({\mathbf{X}})} = -\frac{1}{2}\ln{Z} - \sum_m^M \frac{(X_m - a_m)^2}{4\sigma^2}
+	+ \frac{1}{2}\sum_n^N \ln({1 + e^{b_n + \sum_i^M \frac{X_i w_{in}}{\sigma^2}})},
+\label{_auto95} \tag{95}
+\end{equation}
+\]</div>
+<p>which results in</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto96"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\frac{\partial }{\partial a_m} \ln\Psi
+	= 	\frac{1}{2\sigma^2} (X_m - a_m) 
+\label{_auto96} \tag{96}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto97"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\frac{\partial }{\partial b_n} \ln\Psi
+	=
+	\frac{1}{2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)} 
+\label{_auto97} \tag{97}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto98"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\frac{\partial }{\partial w_{mn}} \ln\Psi
+	= \frac{X_m}{2\sigma^2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)}.
+\label{_auto98} \tag{98}
+\end{equation}
+\]</div>
+<p>Let us assume again that our Hamiltonian is</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto99"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\hat{\mathbf{H}} = \sum_p^P (-\frac{1}{2}\nabla_p^2 + \frac{1}{2}\omega^2 r_p^2 ) + \sum_{p&lt;q} \frac{1}{r_{pq}},
+\label{_auto99} \tag{99}
+\end{equation}
+\]</div>
+<p>where the first summation term represents the standard harmonic
+oscillator part and the latter the repulsive interaction between two
+electrons. Natural units (<span class="math notranslate nohighlight">\(\hbar=c=e=m_e=1\)</span>) are used, and <span class="math notranslate nohighlight">\(P\)</span> is the
+number of particles. This gives us the following expression for the
+local energy (<span class="math notranslate nohighlight">\(D\)</span> being the number of dimensions)</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto100"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	E_L = \frac{1}{\Psi} \mathbf{H} \Psi 
+\label{_auto100} \tag{100}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto101"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{\Psi} (\sum_p^P (-\frac{1}{2}\nabla_p^2 + \frac{1}{2}\omega^2 r_p^2 ) + \sum_{p&lt;q} \frac{1}{r_{pq}}) \Psi 
+\label{_auto101} \tag{101}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto102"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= -\frac{1}{2}\frac{1}{\Psi} \sum_p^P \nabla_p^2 \Psi 
+	+ \frac{1}{2}\omega^2 \sum_p^P  r_p^2  + \sum_{p&lt;q} \frac{1}{r_{pq}} 
+\label{_auto102} \tag{102}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto103"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= -\frac{1}{2}\frac{1}{\Psi} \sum_p^P \sum_d^D \frac{\partial^2 \Psi}{\partial x_{pd}^2} + \frac{1}{2}\omega^2 \sum_p^P  r_p^2  + \sum_{p&lt;q} \frac{1}{r_{pq}} 
+\label{_auto103} \tag{103}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto104"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	= \frac{1}{2} \sum_p^P \sum_d^D (-(\frac{\partial}{\partial x_{pd}} \ln\Psi)^2 -\frac{\partial^2}{\partial x_{pd}^2} \ln\Psi + \omega^2 x_{pd}^2)  + \sum_{p&lt;q} \frac{1}{r_{pq}}. 
+\label{_auto104} \tag{104}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto105"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+\label{_auto105} \tag{105}
+\end{equation}
+\]</div>
+<p>Letting each visible node in the Boltzmann machine
+represent one coordinate of one particle, we obtain</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto106"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	E_L =
+	\frac{1}{2} \sum_m^M (-(\frac{\partial}{\partial v_m} \ln\Psi)^2 -\frac{\partial^2}{\partial v_m^2} \ln\Psi + \omega^2 v_m^2)  + \sum_{p&lt;q} \frac{1}{r_{pq}},
+\label{_auto106} \tag{106}
+\end{equation}
+\]</div>
+<p>where we have that</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto107"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\frac{\partial}{\partial x_m} \ln\Psi
+	= - \frac{1}{\sigma^2}(x_m - a_m) + \frac{1}{\sigma^2} \sum_n^N \frac{w_{mn}}{e^{-b_n - \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1} 
+\label{_auto107} \tag{107}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto108"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\frac{\partial^2}{\partial x_m^2} \ln\Psi
+	= - \frac{1}{\sigma^2} + \frac{1}{\sigma^4}\sum_n^N \omega_{mn}^2 \frac{e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}}}{(e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1)^2}.
+\label{_auto108} \tag{108}
+\end{equation}
+\]</div>
+<p>We now have all the expressions neeeded to calculate the gradient of
+the expected local energy with respect to the RBM parameters
+<span class="math notranslate nohighlight">\(\frac{\partial \langle E_L \rangle}{\partial \alpha_i}\)</span>.</p>
+<p>If we use <span class="math notranslate nohighlight">\(\Psi = \sqrt{F_{rbm}}\)</span> we obtain</p>
+<!-- Equation labels as ordinary links -->
+<div id="_auto109"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation}
+	\frac{\partial}{\partial x_m} \ln\Psi
+	= - \frac{1}{2\sigma^2}(x_m - a_m) + \frac{1}{2\sigma^2} \sum_n^N
+ 	\frac{w_{mn}}{e^{-b_n-\frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1}
+	
+\label{_auto109} \tag{109}
+\end{equation}
+\]</div>
+<!-- Equation labels as ordinary links -->
+<div id="_auto110"></div>
+<div class="math notranslate nohighlight">
+\[
+\begin{equation} 
+	\frac{\partial^2}{\partial x_m^2} \ln\Psi
+	= - \frac{1}{2\sigma^2} + \frac{1}{2\sigma^4}\sum_n^N \omega_{mn}^2 \frac{e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}}}{(e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1)^2}.
+\label{_auto110} \tag{110}
+\end{equation}
+\]</div>
+<p>The difference between this equation and the previous one is that we multiply by a factor <span class="math notranslate nohighlight">\(1/2\)</span>.</p>
+</div>
+</div>
+<div class="section" id="python-version-for-the-two-non-interacting-particles">
+<h2><span class="section-number">5.7. </span>Python version for the two non-interacting particles<a class="headerlink" href="#python-version-for-the-two-non-interacting-particles" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="c1"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<span class="c1"># Using gaussian rng for new positions and Metropolis- Hastings </span>
+<span class="c1"># Added restricted boltzmann machine method for dealing with the wavefunction</span>
+<span class="c1"># RBM code based heavily off of:</span>
+<span class="c1"># https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/BoltzmannMachines/MLcpp/src/CppCode/ob</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">exp</span><span class="p">,</span> <span class="n">sqrt</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">random</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">normalvariate</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">LinearLocator</span><span class="p">,</span> <span class="n">FormatStrFormatter</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+
+<span class="c1"># Trial wave function for the 2-electron quantum dot in two dims</span>
+<span class="k">def</span> <span class="nf">WaveFunction</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+    <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span>
+    <span class="n">sig2</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">Psi1</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">Psi2</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Qfac</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">iq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberParticles</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Dimension</span><span class="p">):</span>
+            <span class="n">Psi1</span> <span class="o">+=</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">iq</span><span class="p">,</span><span class="n">ix</span><span class="p">]</span><span class="o">-</span><span class="n">a</span><span class="p">[</span><span class="n">iq</span><span class="p">,</span><span class="n">ix</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+            
+    <span class="k">for</span> <span class="n">ih</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberHidden</span><span class="p">):</span>
+        <span class="n">Psi2</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">ih</span><span class="p">]))</span>
+        
+    <span class="n">Psi1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">Psi1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sig2</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">Psi1</span><span class="o">*</span><span class="n">Psi2</span>
+
+<span class="c1"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
+<span class="k">def</span> <span class="nf">LocalEnergy</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+    <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span>
+    <span class="n">sig2</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">locenergy</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Qfac</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">iq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberParticles</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Dimension</span><span class="p">):</span>
+            <span class="n">sum1</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">sum2</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">ih</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberHidden</span><span class="p">):</span>
+                <span class="n">sum1</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="n">iq</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">ih</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">Q</span><span class="p">[</span><span class="n">ih</span><span class="p">]))</span>
+                <span class="n">sum2</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[</span><span class="n">iq</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">ih</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">ih</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="n">ih</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span>
+    
+            <span class="n">dlnpsi1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">iq</span><span class="p">,</span><span class="n">ix</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="n">iq</span><span class="p">,</span><span class="n">ix</span><span class="p">])</span> <span class="o">/</span><span class="n">sig2</span> <span class="o">+</span> <span class="n">sum1</span><span class="o">/</span><span class="n">sig2</span>
+            <span class="n">dlnpsi2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">sig2</span> <span class="o">+</span> <span class="n">sum2</span><span class="o">/</span><span class="n">sig2</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">locenergy</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="n">dlnpsi1</span><span class="o">*</span><span class="n">dlnpsi1</span> <span class="o">-</span> <span class="n">dlnpsi2</span> <span class="o">+</span> <span class="n">r</span><span class="p">[</span><span class="n">iq</span><span class="p">,</span><span class="n">ix</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            
+    <span class="k">if</span><span class="p">(</span><span class="n">interaction</span><span class="o">==</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">iq1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberParticles</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">iq2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iq1</span><span class="p">):</span>
+                <span class="n">distance</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Dimension</span><span class="p">):</span>
+                    <span class="n">distance</span> <span class="o">+=</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">iq1</span><span class="p">,</span><span class="n">ix</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="n">iq2</span><span class="p">,</span><span class="n">ix</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+                    
+                <span class="n">locenergy</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="n">sqrt</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+                
+    <span class="k">return</span> <span class="n">locenergy</span>
+
+<span class="c1"># Derivate of wave function ansatz as function of variational parameters</span>
+<span class="k">def</span> <span class="nf">DerivativeWFansatz</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+    
+    <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span>
+    <span class="n">sig2</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+    
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Qfac</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+    
+    <span class="n">WfDer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">3</span><span class="p">,),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+    <span class="n">WfDer</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">w</span><span class="p">)]</span>
+    
+    <span class="n">WfDer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="n">sig2</span>
+    <span class="n">WfDer</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">Q</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">ih</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberHidden</span><span class="p">):</span>
+        <span class="n">WfDer</span><span class="p">[</span><span class="mi">2</span><span class="p">][:,:,</span><span class="n">ih</span><span class="p">]</span> <span class="o">=</span> <span class="n">w</span><span class="p">[:,:,</span><span class="n">ih</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">sig2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">Q</span><span class="p">[</span><span class="n">ih</span><span class="p">])))</span>
+            
+    <span class="k">return</span>  <span class="n">WfDer</span>
+
+<span class="c1"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
+<span class="k">def</span> <span class="nf">QuantumForce</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+
+    <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span>
+    <span class="n">sig2</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+    
+    <span class="n">qforce</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NumberParticles</span><span class="p">,</span><span class="n">Dimension</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="n">sum1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NumberParticles</span><span class="p">,</span><span class="n">Dimension</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Qfac</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">ih</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberHidden</span><span class="p">):</span>
+        <span class="n">sum1</span> <span class="o">+=</span> <span class="n">w</span><span class="p">[:,:,</span><span class="n">ih</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">Q</span><span class="p">[</span><span class="n">ih</span><span class="p">]))</span>
+    
+    <span class="n">qforce</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">r</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="n">sig2</span> <span class="o">+</span> <span class="n">sum1</span><span class="o">/</span><span class="n">sig2</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">qforce</span>
+    
+<span class="k">def</span> <span class="nf">Qfac</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NumberHidden</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NumberHidden</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">ih</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberHidden</span><span class="p">):</span>
+        <span class="n">temp</span><span class="p">[</span><span class="n">ih</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">w</span><span class="p">[:,:,</span><span class="n">ih</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">temp</span>
+    
+    <span class="k">return</span> <span class="n">Q</span>
+    
+<span class="c1"># Computing the derivative of the energy and the energy </span>
+<span class="k">def</span> <span class="nf">EnergyMinimization</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+
+    <span class="n">NumberMCcycles</span><span class="o">=</span> <span class="mi">10000</span>
+    <span class="c1"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">TimeStep</span> <span class="o">=</span> <span class="mf">0.05</span>
+    <span class="c1"># positions</span>
+    <span class="n">PositionOld</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NumberParticles</span><span class="p">,</span><span class="n">Dimension</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="n">PositionNew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NumberParticles</span><span class="p">,</span><span class="n">Dimension</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="c1"># Quantum force</span>
+    <span class="n">QuantumForceOld</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NumberParticles</span><span class="p">,</span><span class="n">Dimension</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="n">QuantumForceNew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NumberParticles</span><span class="p">,</span><span class="n">Dimension</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+
+    <span class="c1"># seed for rng generator </span>
+    <span class="n">seed</span><span class="p">()</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">DeltaE</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">EnergyDer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">3</span><span class="p">,),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+    <span class="n">DeltaPsi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">3</span><span class="p">,),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+    <span class="n">DerivativePsiE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">3</span><span class="p">,),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+    <span class="n">EnergyDer</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">w</span><span class="p">)]</span>
+    <span class="n">DeltaPsi</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">w</span><span class="p">)]</span>
+    <span class="n">DerivativePsiE</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">w</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span> <span class="n">EnergyDer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span> <span class="n">DeltaPsi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span> <span class="n">DerivativePsiE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+    
+    <span class="c1">#Initial position</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberParticles</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Dimension</span><span class="p">):</span>
+            <span class="n">PositionOld</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">normalvariate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="n">TimeStep</span><span class="p">)</span>
+    <span class="n">wfold</span> <span class="o">=</span> <span class="n">WaveFunction</span><span class="p">(</span><span class="n">PositionOld</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">QuantumForceOld</span> <span class="o">=</span> <span class="n">QuantumForce</span><span class="p">(</span><span class="n">PositionOld</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="c1">#Loop over MC MCcycles</span>
+    <span class="k">for</span> <span class="n">MCcycle</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberMCcycles</span><span class="p">):</span>
+        <span class="c1">#Trial position moving one particle at the time</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NumberParticles</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Dimension</span><span class="p">):</span>
+                <span class="n">PositionNew</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">PositionOld</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">+</span><span class="n">normalvariate</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="n">TimeStep</span><span class="p">)</span><span class="o">+</span>\
+                                       <span class="n">QuantumForceOld</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">TimeStep</span><span class="o">*</span><span class="n">D</span>
+            <span class="n">wfnew</span> <span class="o">=</span> <span class="n">WaveFunction</span><span class="p">(</span><span class="n">PositionNew</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+            <span class="n">QuantumForceNew</span> <span class="o">=</span> <span class="n">QuantumForce</span><span class="p">(</span><span class="n">PositionNew</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+            
+            <span class="n">GreensFunction</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Dimension</span><span class="p">):</span>
+                <span class="n">GreensFunction</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">QuantumForceOld</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">+</span><span class="n">QuantumForceNew</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span><span class="o">*</span>\
+                                      <span class="p">(</span><span class="n">D</span><span class="o">*</span><span class="n">TimeStep</span><span class="o">*</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">QuantumForceOld</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">-</span><span class="n">QuantumForceNew</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span><span class="o">-</span>\
+                                      <span class="n">PositionNew</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">+</span><span class="n">PositionOld</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">])</span>
+      
+            <span class="n">GreensFunction</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="n">GreensFunction</span><span class="p">)</span>
+            <span class="n">ProbabilityRatio</span> <span class="o">=</span> <span class="n">GreensFunction</span><span class="o">*</span><span class="n">wfnew</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">wfold</span><span class="o">**</span><span class="mi">2</span>
+            <span class="c1">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span class="k">if</span> <span class="n">random</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">ProbabilityRatio</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Dimension</span><span class="p">):</span>
+                    <span class="n">PositionOld</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">PositionNew</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
+                    <span class="n">QuantumForceOld</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">QuantumForceNew</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">wfold</span> <span class="o">=</span> <span class="n">wfnew</span>
+        <span class="c1">#print(&quot;wf new:        &quot;, wfnew)</span>
+        <span class="c1">#print(&quot;force on 1 new:&quot;, QuantumForceNew[0,:])</span>
+        <span class="c1">#print(&quot;pos of 1 new:  &quot;, PositionNew[0,:])</span>
+        <span class="c1">#print(&quot;force on 2 new:&quot;, QuantumForceNew[1,:])</span>
+        <span class="c1">#print(&quot;pos of 2 new:  &quot;, PositionNew[1,:])</span>
+        <span class="n">DeltaE</span> <span class="o">=</span> <span class="n">LocalEnergy</span><span class="p">(</span><span class="n">PositionOld</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+        <span class="n">DerPsi</span> <span class="o">=</span> <span class="n">DerivativeWFansatz</span><span class="p">(</span><span class="n">PositionOld</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+        
+        <span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">DerPsi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">DerPsi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">DerPsi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        
+        <span class="n">energy</span> <span class="o">+=</span> <span class="n">DeltaE</span>
+
+        <span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">DerPsi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">DeltaE</span>
+        <span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">DerPsi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">DeltaE</span>
+        <span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">DerPsi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">DeltaE</span>
+            
+    <span class="c1"># We calculate mean values</span>
+    <span class="n">energy</span> <span class="o">/=</span> <span class="n">NumberMCcycles</span>
+    <span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/=</span> <span class="n">NumberMCcycles</span>
+    <span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">NumberMCcycles</span>
+    <span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="n">NumberMCcycles</span>
+    <span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/=</span> <span class="n">NumberMCcycles</span>
+    <span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">NumberMCcycles</span>
+    <span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/=</span> <span class="n">NumberMCcycles</span>
+    <span class="n">EnergyDer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">energy</span><span class="p">)</span>
+    <span class="n">EnergyDer</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">energy</span><span class="p">)</span>
+    <span class="n">EnergyDer</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">DerivativePsiE</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">DeltaPsi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">energy</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">energy</span><span class="p">,</span> <span class="n">EnergyDer</span>
+
+
+<span class="c1">#Here starts the main program with variable declarations</span>
+<span class="n">NumberParticles</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">Dimension</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">NumberHidden</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">interaction</span><span class="o">=</span><span class="kc">False</span>
+
+<span class="c1"># guess for parameters</span>
+<span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">NumberParticles</span><span class="p">,</span><span class="n">Dimension</span><span class="p">))</span>
+<span class="n">b</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">NumberHidden</span><span class="p">))</span>
+<span class="n">w</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">NumberParticles</span><span class="p">,</span><span class="n">Dimension</span><span class="p">,</span><span class="n">NumberHidden</span><span class="p">))</span>
+<span class="c1"># Set up iteration using stochastic gradient method</span>
+<span class="n">Energy</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">EDerivative</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">3</span><span class="p">,),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+<span class="n">EDerivative</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">w</span><span class="p">)]</span>
+<span class="c1"># Learning rate eta, max iterations, need to change to adaptive learning rate</span>
+<span class="n">eta</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">MaxIterations</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="nb">iter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;raise&#39;</span><span class="p">)</span>
+<span class="n">Energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">MaxIterations</span><span class="p">)</span>
+<span class="n">EnergyDerivatives1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">MaxIterations</span><span class="p">)</span>
+<span class="n">EnergyDerivatives2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">MaxIterations</span><span class="p">)</span>
+
+<span class="k">while</span> <span class="nb">iter</span> <span class="o">&lt;</span> <span class="n">MaxIterations</span><span class="p">:</span>
+    <span class="n">Energy</span><span class="p">,</span> <span class="n">EDerivative</span> <span class="o">=</span> <span class="n">EnergyMinimization</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">agradient</span> <span class="o">=</span> <span class="n">EDerivative</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bgradient</span> <span class="o">=</span> <span class="n">EDerivative</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">wgradient</span> <span class="o">=</span> <span class="n">EDerivative</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">a</span> <span class="o">-=</span> <span class="n">eta</span><span class="o">*</span><span class="n">agradient</span>
+    <span class="n">b</span> <span class="o">-=</span> <span class="n">eta</span><span class="o">*</span><span class="n">bgradient</span> 
+    <span class="n">w</span> <span class="o">-=</span> <span class="n">eta</span><span class="o">*</span><span class="n">wgradient</span> 
+    <span class="n">Energies</span><span class="p">[</span><span class="nb">iter</span><span class="p">]</span> <span class="o">=</span> <span class="n">Energy</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Energy:&quot;</span><span class="p">,</span><span class="n">Energy</span><span class="p">)</span>
+    <span class="c1">#EnergyDerivatives1[iter] = EDerivative[0] </span>
+    <span class="c1">#EnergyDerivatives2[iter] = EDerivative[1]</span>
+    <span class="c1">#EnergyDerivatives3[iter] = EDerivative[2] </span>
+
+
+    <span class="nb">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1">#nice printout with Pandas</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;max_columns&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span><span class="p">{</span><span class="s1">&#39;Energy&#39;</span><span class="p">:</span><span class="n">Energies</span><span class="p">}</span><span class="c1">#,&#39;A Derivative&#39;:EnergyDerivatives1,&#39;B Derivative&#39;:EnergyDerivatives2,&#39;Weights Derivative&#39;:EnergyDerivatives3}</span>
+
+<span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 1.9999885052443325
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 2.000067576230987
+Energy:
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 1.9998732977676212
+Energy: 1.9999742070934947
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 2.0000430390625112
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 1.9999655461564916
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 2.000008983435006
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 1.9999020489315549
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 1.9999413837901778
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 1.999920707337129
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 2.00016560992567
+Energy: 1.9999510390807886
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 2.000019047764014
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Energy: 2.000014010699939
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="neuralnetworks.html" title="previous page"><span class="section-number">4. </span>Neural Networks</a>
+    <a class='right-next' id="next-link" href="basicquantumcomputing.html" title="next page"><span class="section-number">1. </span>Quantum Computing</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Morten Hjorth-Jensen<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="_static/js/index.d3f166471bb80abb5163.js"></script>
+
+
+    
+  </body>
+</html>

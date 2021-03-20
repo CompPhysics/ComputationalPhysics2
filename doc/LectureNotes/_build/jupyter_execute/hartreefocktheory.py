@@ -1322,7 +1322,7 @@ The splitting between the $0p_{3/2}^{\nu}$ and the $0p_{1/2}^{\nu}$ state is 4.8
 <!-- --- end exercise --- -->
 
 
-# Hartree-Fock in second quantization and stability of HF solution
+## Hartree-Fock in second quantization and stability of HF solution
 
 We wish now to derive the Hartree-Fock equations using our second-quantized formalism and study the stability of the equations. 
 Our ansatz for the ground state of the system is approximated as (this is our representation of a Slater determinant in second quantization)

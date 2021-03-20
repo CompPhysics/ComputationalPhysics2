@@ -632,7 +632,7 @@ $$
 \end{equation}
 $$
 
-# Definitions and Second quantization
+## Second quantization
 
 We introduce the time-independent  operators
 $a_\alpha^{\dagger}$ and $a_\alpha$   which create and annihilate, respectively, a particle 
@@ -1070,7 +1070,7 @@ $$
 \{a_\alpha^{\dagger},a_\beta \} = \delta_{\alpha\beta}.
 $$
 
-# One-body operators in second quantization
+## One-body operators in second quantization
 
 A very useful operator is the so-called number-operator.  Most physics cases  we will
 study in this text conserve the total number of particles.  The number operator is therefore
@@ -1374,7 +1374,7 @@ $$
 \end{equation}
 $$
 
-# Two-body operators in second quantization
+## Two-body operators in second quantization
 
 Let us now derive the expression for our two-body interaction part, which also conserves the number of particles.
 We can proceed in exactly the same way as for the one-body operator. In the coordinate representation our
@@ -1773,7 +1773,7 @@ This is the form we will use in the rest of these lectures, assuming that we wor
 
 
 
-# Particle-hole formalism
+## Particle-hole formalism
 
 Second quantization is a useful and elegant formalism  for constructing many-body  states and 
 quantum mechanical operators. One can express and translate many physical processes
@@ -2195,7 +2195,7 @@ from hole-hole correlations.
 
 
 
-# Summarizing and defining a normal-ordered Hamiltonian
+## Summarizing and defining a normal-ordered Hamiltonian
 
 $$
 \Phi_{AS}(\alpha_1, \dots, \alpha_A; x_1, \dots x_A)=
@@ -2327,470 +2327,7 @@ $$
 \end{equation}
 $$
 
-# Hartree-Fock in second quantization and stability of HF solution
-
-We wish now to derive the Hartree-Fock equations using our second-quantized formalism and study the stability of the equations. 
-Our ansatz for the ground state of the system is approximated as (this is our representation of a Slater determinant in second quantization)
-
-$$
-|\Phi_0\rangle = |c\rangle = a^{\dagger}_i a^{\dagger}_j \dots a^{\dagger}_l|0\rangle.
-$$
-
-We wish to determine $\hat{u}^{HF}$ so that 
-$E_0^{HF}= \langle c|\hat{H}| c\rangle$ becomes a local minimum. 
-
-In our analysis here we will need Thouless' theorem, which states that
-an arbitrary Slater determinant $|c'\rangle$ which is not orthogonal to a determinant
-$| c\rangle ={\displaystyle\prod_{i=1}^{n}}
-a_{\alpha_{i}}^{\dagger}|0\rangle$, can be written as
-
-$$
-|c'\rangle=exp\left\{\sum_{a>F}\sum_{i\le F}C_{ai}a_{a}^{\dagger}a_{i}\right\}| c\rangle
-$$
-
-Let us give a simple proof of Thouless' theorem. The theorem states that we can make a linear combination av particle-hole excitations  with respect to a given reference state $\vert c\rangle$. With this linear combination, we can make a new Slater determinant $\vert c'\rangle $ which is not orthogonal to 
-$\vert c\rangle$, that is
-
-$$
-\langle c|c'\rangle \ne 0.
-$$
-
-To show this we need some intermediate steps. The exponential product of two operators  $\exp{\hat{A}}\times\exp{\hat{B}}$ is equal to $\exp{(\hat{A}+\hat{B})}$ only if the two operators commute, that is
-
-$$
-[\hat{A},\hat{B}] = 0.
-$$
-
-## Thouless' theorem
-
-
-If the operators do not commute, we need to resort to the [Baker-Campbell-Hauersdorf](http://www.encyclopediaofmath.org/index.php/Campbell%E2%80%93Hausdorff_formula). This relation states that
-
-$$
-\exp{\hat{C}}=\exp{\hat{A}}\exp{\hat{B}},
-$$
-
-with
-
-$$
-\hat{C}=\hat{A}+\hat{B}+\frac{1}{2}[\hat{A},\hat{B}]+\frac{1}{12}[[\hat{A},\hat{B}],\hat{B}]-\frac{1}{12}[[\hat{A},\hat{B}],\hat{A}]+\dots
-$$
-
-From these relations, we note that 
-in our expression  for $|c'\rangle$ we have commutators of the type
-
-$$
-[a_{a}^{\dagger}a_{i},a_{b}^{\dagger}a_{j}],
-$$
-
-and it is easy to convince oneself that these commutators, or higher powers thereof, are all zero. This means that we can write out our new representation of a Slater determinant as
-
-$$
-|c'\rangle=exp\left\{\sum_{a>F}\sum_{i\le F}C_{ai}a_{a}^{\dagger}a_{i}\right\}| c\rangle=\prod_{i}\left\{1+\sum_{a>F}C_{ai}a_{a}^{\dagger}a_{i}+\left(\sum_{a>F}C_{ai}a_{a}^{\dagger}a_{i}\right)^2+\dots\right\}| c\rangle
-$$
-
-We note that
-
-$$
-\prod_{i}\sum_{a>F}C_{ai}a_{a}^{\dagger}a_{i}\sum_{b>F}C_{bi}a_{b}^{\dagger}a_{i}| c\rangle =0,
-$$
-
-and all higher-order powers of these combinations of creation and annihilation operators disappear 
-due to the fact that $(a_i)^n| c\rangle =0$ when $n > 1$. This allows us to rewrite the expression for $|c'\rangle $ as
-
-$$
-|c'\rangle=\prod_{i}\left\{1+\sum_{a>F}C_{ai}a_{a}^{\dagger}a_{i}\right\}| c\rangle,
-$$
-
-which we can rewrite as
-
-$$
-|c'\rangle=\prod_{i}\left\{1+\sum_{a>F}C_{ai}a_{a}^{\dagger}a_{i}\right\}| a^{\dagger}_{i_1} a^{\dagger}_{i_2} \dots a^{\dagger}_{i_n}|0\rangle.
-$$
-
-The last equation can be written as
-
-<!-- Equation labels as ordinary links -->
-<div id="_auto4"></div>
-
-$$
-\begin{equation}
-|c'\rangle=\prod_{i}\left\{1+\sum_{a>F}C_{ai}a_{a}^{\dagger}a_{i}\right\}| a^{\dagger}_{i_1} a^{\dagger}_{i_2} \dots a^{\dagger}_{i_n}|0\rangle=\left(1+\sum_{a>F}C_{ai_1}a_{a}^{\dagger}a_{i_1}\right)a^{\dagger}_{i_1} 
-\label{_auto4} \tag{99}
-\end{equation}
-$$
-
-<!-- Equation labels as ordinary links -->
-<div id="_auto5"></div>
-
-$$
-\begin{equation} 
- \times\left(1+\sum_{a>F}C_{ai_2}a_{a}^{\dagger}a_{i_2}\right)a^{\dagger}_{i_2} \dots |0\rangle=\prod_{i}\left(a^{\dagger}_{i}+\sum_{a>F}C_{ai}a_{a}^{\dagger}\right)|0\rangle.
-\label{_auto5} \tag{100}
-\end{equation}
-$$
-
-## New operators
-
-
-If we define a new creation operator
-
-<!-- Equation labels as ordinary links -->
-<div id="eq:newb"></div>
-
-$$
-\begin{equation}
-b^{\dagger}_{i}=a^{\dagger}_{i}+\sum_{a>F}C_{ai}a_{a}^{\dagger}, \label{eq:newb} \tag{101}
-\end{equation}
-$$
-
-we have
-
-$$
-|c'\rangle=\prod_{i}b^{\dagger}_{i}|0\rangle=\prod_{i}\left(a^{\dagger}_{i}+\sum_{a>F}C_{ai}a_{a}^{\dagger}\right)|0\rangle,
-$$
-
-meaning that the new representation of the Slater determinant in second quantization, $|c'\rangle$, looks like our previous ones. However, this representation is not general enough since we have a restriction on the sum over single-particle states in Eq. ([101](#eq:newb)). The single-particle states have all to be above the Fermi level.
-The question then is whether we can construct a general representation of a Slater determinant with a creation operator
-
-$$
-\tilde{b}^{\dagger}_{i}=\sum_{p}f_{ip}a_{p}^{\dagger},
-$$
-
-where $f_{ip}$ is a matrix element of a unitary matrix which transforms our creation and annihilation operators
-$a^{\dagger}$ and $a$ to $\tilde{b}^{\dagger}$ and $\tilde{b}$. These new operators define a new representation of a Slater determinant as
-
-$$
-|\tilde{c}\rangle=\prod_{i}\tilde{b}^{\dagger}_{i}|0\rangle.
-$$
-
-## Showing that $|\tilde{c}\rangle= |c'\rangle$
-
-
-
-We need to show that $|\tilde{c}\rangle= |c'\rangle$. We need also to assume that the new state
-is not orthogonal to $|c\rangle$, that is $\langle c| \tilde{c}\rangle \ne 0$. From this it follows that
-
-$$
-\langle c| \tilde{c}\rangle=\langle 0| a_{i_n}\dots a_{i_1}\left(\sum_{p=i_1}^{i_n}f_{i_1p}a_{p}^{\dagger} \right)\left(\sum_{q=i_1}^{i_n}f_{i_2q}a_{q}^{\dagger} \right)\dots \left(\sum_{t=i_1}^{i_n}f_{i_nt}a_{t}^{\dagger} \right)|0\rangle,
-$$
-
-which is nothing but the determinant $det(f_{ip})$ which we can, using the intermediate normalization condition, 
-normalize to one, that is
-
-$$
-det(f_{ip})=1,
-$$
-
-meaning that $f$ has an inverse defined as (since we are dealing with orthogonal, and in our case unitary as well, transformations)
-
-$$
-\sum_{k} f_{ik}f^{-1}_{kj} = \delta_{ij},
-$$
-
-and
-
-$$
-\sum_{j} f^{-1}_{ij}f_{jk} = \delta_{ik}.
-$$
-
-Using these relations we can then define the linear combination of creation (and annihilation as well) 
-operators as
-
-$$
-\sum_{i}f^{-1}_{ki}\tilde{b}^{\dagger}_{i}=\sum_{i}f^{-1}_{ki}\sum_{p=i_1}^{\infty}f_{ip}a_{p}^{\dagger}=a_{k}^{\dagger}+\sum_{i}\sum_{p=i_{n+1}}^{\infty}f^{-1}_{ki}f_{ip}a_{p}^{\dagger}.
-$$
-
-Defining
-
-$$
-c_{kp}=\sum_{i \le F}f^{-1}_{ki}f_{ip},
-$$
-
-we can redefine
-
-$$
-a_{k}^{\dagger}+\sum_{i}\sum_{p=i_{n+1}}^{\infty}f^{-1}_{ki}f_{ip}a_{p}^{\dagger}=a_{k}^{\dagger}+\sum_{p=i_{n+1}}^{\infty}c_{kp}a_{p}^{\dagger}=b_k^{\dagger},
-$$
-
-our starting point. We have shown that our general representation of a Slater determinant
-
-$$
-|\tilde{c}\rangle=\prod_{i}\tilde{b}^{\dagger}_{i}|0\rangle=|c'\rangle=\prod_{i}b^{\dagger}_{i}|0\rangle,
-$$
-
-with
-
-$$
-b_k^{\dagger}=a_{k}^{\dagger}+\sum_{p=i_{n+1}}^{\infty}c_{kp}a_{p}^{\dagger}.
-$$
-
-This means that we can actually write an ansatz for the ground state of the system as a linear combination of
-terms which contain the ansatz itself $|c\rangle$ with  an admixture from an infinity of one-particle-one-hole states. The latter has important consequences when we wish to interpret the Hartree-Fock equations and their stability. We can rewrite the new representation as
-
-$$
-|c'\rangle = |c\rangle+|\delta c\rangle,
-$$
-
-where $|\delta c\rangle$ can now be interpreted as a small variation. If we approximate this term with 
-contributions from one-particle-one-hole (*1p-1h*) states only, we arrive at
-
-$$
-|c'\rangle = \left(1+\sum_{ai}\delta C_{ai}a_{a}^{\dagger}a_i\right)|c\rangle.
-$$
-
-In our derivation of the Hartree-Fock equations we have shown that
-
-$$
-\langle \delta c| \hat{H} | c\rangle =0,
-$$
-
-which means that we have to satisfy
-
-$$
-\langle c|\sum_{ai}\delta C_{ai}\left\{a_{a}^{\dagger}a_i\right\} \hat{H} | c\rangle =0.
-$$
-
-With this as a background, we are now ready to study the stability of the Hartree-Fock equations.
-
-
-
-## Hartree-Fock in second quantization and stability of HF solution
-
-The variational condition for deriving the Hartree-Fock equations guarantees only that the expectation value $\langle c | \hat{H} | c \rangle$ has an extreme value, not necessarily a minimum. To figure out whether the extreme value we have found  is a minimum, we can use second quantization to analyze our results and find a criterion 
-for the above expectation value to a local minimum. We will use Thouless' theorem and show that
-
-$$
-\frac{\langle c' |\hat{H} | c'\rangle}{\langle c' |c'\rangle} \ge \langle c |\hat{H} | c\rangle= E_0,
-$$
-
-with
-
-$$
-{|c'\rangle} = {|c\rangle + |\delta c\rangle}.
-$$
-
-Using Thouless' theorem we can write out $|c'\rangle$ as
-
-<!-- Equation labels as ordinary links -->
-<div id="_auto6"></div>
-
-$$
-\begin{equation}
- {|c'\rangle}=\exp\left\{\sum_{a > F}\sum_{i \le F}\delta C_{ai}a_{a}^{\dagger}a_{i}\right\}| c\rangle
-\label{_auto6} \tag{102}
-\end{equation}
-$$
-
-<!-- Equation labels as ordinary links -->
-<div id="_auto7"></div>
-
-$$
-\begin{equation}  
-=\left\{1+\sum_{a > F}\sum_{i \le F}\delta C_{ai}a_{a}^{\dagger}
-a_{i}+\frac{1}{2!}\sum_{ab > F}\sum_{ij \le F}\delta C_{ai}\delta C_{bj}a_{a}^{\dagger}a_{i}a_{b}^{\dagger}a_{j}+\dots\right\}
-\label{_auto7} \tag{103}
-\end{equation}
-$$
-
-where the amplitudes $\delta C$ are small.
-
-
-The norm of $|c'\rangle$ is given by (using the intermediate normalization condition $\langle c' |c\rangle=1$)
-
-$$
-\langle c' | c'\rangle = 1+\sum_{a>F}
-\sum_{i\le F}|\delta C_{ai}|^2+O(\delta C_{ai}^3).
-$$
-
-The expectation value for the energy is now given by (using the Hartree-Fock condition)
-
-2
-5
-1
- 
-<
-<
-<
-!
-!
-M
-A
-T
-H
-_
-B
-L
-O
-C
-K
-
-$$
-\frac{1}{2!}\sum_{ab>F}
-\sum_{ij\le F}\delta C_{ai}\delta C_{bj}\langle c |\hat{H}a_{a}^{\dagger}a_{i}a_{b}^{\dagger}a_{j}|c\rangle+\frac{1}{2!}\sum_{ab>F}
-\sum_{ij\le F}\delta C_{ai}^*\delta C_{bj}^*\langle c|a_{j}^{\dagger}a_{b}a_{i}^{\dagger}a_{a}\hat{H}|c\rangle
-+\dots
-$$
-
-We have already calculated the second term on the right-hand side of the previous equation
-
-<!-- Equation labels as ordinary links -->
-<div id="_auto8"></div>
-
-$$
-\begin{equation}
-\langle c | \left(\{a^\dagger_i a_a\} \hat{H} \{a^\dagger_b a_j\} \right) | c\rangle=\sum_{pq} \sum_{ijab}\delta C_{ai}^*\delta C_{bj} \langle p|\hat{h}_0 |q\rangle 
-            \langle c | \left(\{a^{\dagger}_i a_a\}\{a^{\dagger}_pa_q\} 
-             \{a^{\dagger}_b a_j\} \right)| c\rangle
-\label{_auto8} \tag{104}
-\end{equation}
-$$
-
-<!-- Equation labels as ordinary links -->
-<div id="_auto9"></div>
-
-$$
-\begin{equation} 
- +\frac{1}{4} \sum_{pqrs} \sum_{ijab}\delta C_{ai}^*\delta C_{bj} \langle pq| \hat{v}|rs\rangle 
-            \langle c | \left(\{a^\dagger_i a_a\}\{a^{\dagger}_p a^{\dagger}_q a_s  a_r\} \{a^{\dagger}_b a_j\} \right)| c\rangle ,
-\label{_auto9} \tag{105}
-\end{equation}
-$$
-
-resulting in
-
-$$
-E_0\sum_{ai}|\delta C_{ai}|^2+\sum_{ai}|\delta C_{ai}|^2(\varepsilon_a-\varepsilon_i)-\sum_{ijab} \langle aj|\hat{v}| bi\rangle \delta C_{ai}^*\delta C_{bj}.
-$$
-
-$$
-\frac{1}{2!}\langle c |\left(\{a^\dagger_j a_b\} \{a^\dagger_i a_a\} \hat{V}_N  \right) | c\rangle  = 
-\frac{1}{2!}\langle c |\left( \hat{V}_N \{a^\dagger_a a_i\} \{a^\dagger_b a_j\} \right)^{\dagger} | c\rangle
-$$
-
-which is nothing but
-
-$$
-\frac{1}{2!}\langle c |  \left( \hat{V}_N \{a^\dagger_a a_i\} \{a^\dagger_b a_j\} \right) | c\rangle^*
-=\frac{1}{2} \sum_{ijab} (\langle ij|\hat{v}|ab\rangle)^*\delta C_{ai}^*\delta C_{bj}^*
-$$
-
-or
-
-$$
-\frac{1}{2} \sum_{ijab} (\langle ab|\hat{v}|ij\rangle)\delta C_{ai}^*\delta C_{bj}^*
-$$
-
-where we have used the relation
-
-$$
-\langle a |\hat{A} | b\rangle =  (\langle b |\hat{A}^{\dagger} | a\rangle)^*
-$$
-
-due to the hermiticity of $\hat{H}$ and $\hat{V}$.
-
-
-We define two matrix elements
-
-$$
-A_{ai,bj}=-\langle aj|\hat{v} bi\rangle
-$$
-
-and
-
-$$
-B_{ai,bj}=\langle ab|\hat{v}|ij\rangle
-$$
-
-both being anti-symmetrized.
-
-
-
-With these definitions we write out the energy as
-
-<!-- Equation labels as ordinary links -->
-<div id="_auto10"></div>
-
-$$
-\begin{equation}
-\langle c'|H|c'\rangle = \left(1+\sum_{ai}|\delta C_{ai}|^2\right)\langle c |H|c\rangle+\sum_{ai}|\delta C_{ai}|^2(\varepsilon_a^{HF}-\varepsilon_i^{HF})+\sum_{ijab}A_{ai,bj}\delta C_{ai}^*\delta C_{bj}+
-\label{_auto10} \tag{106}
-\end{equation}
-$$
-
-<!-- Equation labels as ordinary links -->
-<div id="_auto11"></div>
-
-$$
-\begin{equation} 
-\frac{1}{2} \sum_{ijab} B_{ai,bj}^*\delta C_{ai}\delta C_{bj}+\frac{1}{2} \sum_{ijab} B_{ai,bj}\delta C_{ai}^*\delta C_{bj}^*
-+O(\delta C_{ai}^3),
-\label{_auto11} \tag{107}
-\end{equation}
-$$
-
-which can be rewritten as
-
-$$
-\langle c'|H|c'\rangle = \left(1+\sum_{ai}|\delta C_{ai}|^2\right)\langle c |H|c\rangle+\Delta E+O(\delta C_{ai}^3),
-$$
-
-and skipping higher-order terms we arrived
-
-$$
-\frac{\langle c' |\hat{H} | c'\rangle}{\langle c' |c'\rangle} =E_0+\frac{\Delta E}{\left(1+\sum_{ai}|\delta C_{ai}|^2\right)}.
-$$
-
-We have defined
-
-$$
-\Delta E = \frac{1}{2} \langle \chi | \hat{M}| \chi \rangle
-$$
-
-with the vectors
-
-$$
-\chi = \left[ \delta C\hspace{0.2cm} \delta C^*\right]^T
-$$
-
-and the matrix
-
-$$
-\hat{M}=\left(\begin{array}{cc} \Delta + A & B \\ B^* & \Delta + A^*\end{array}\right),
-$$
-
-with $\Delta_{ai,bj} = (\varepsilon_a-\varepsilon_i)\delta_{ab}\delta_{ij}$.
-
-
-
-The condition
-
-$$
-\Delta E = \frac{1}{2} \langle \chi | \hat{M}| \chi \rangle \ge 0
-$$
-
-for an arbitrary  vector
-
-$$
-\chi = \left[ \delta C\hspace{0.2cm} \delta C^*\right]^T
-$$
-
-means that all eigenvalues of the matrix have to be larger than or equal zero. 
-A necessary (but no sufficient) condition is that the matrix elements (for all $ai$ )
-
-$$
-(\varepsilon_a-\varepsilon_i)\delta_{ab}\delta_{ij}+A_{ai,bj} \ge 0.
-$$
-
-This equation can be used as a first test of the stability of the Hartree-Fock equation.
-
-
-
-
-
-
-
-# Operators in second quantization
+## Operators in second quantization
 
 In the build-up of a shell-model or FCI code that is meant to tackle large dimensionalities
 is the action of the Hamiltonian $\hat{H}$ on a
@@ -3052,8 +2589,8 @@ $$
 with
 
 2
-9
-7
+4
+1
  
 <
 <
@@ -3072,8 +2609,8 @@ C
 K
 
 2
-9
-8
+4
+2
  
 <
 <
@@ -3092,8 +2629,8 @@ C
 K
 
 2
-9
-9
+4
+3
  
 <
 <
