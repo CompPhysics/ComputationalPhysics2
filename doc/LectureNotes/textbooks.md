@@ -1,5 +1,13 @@
 # Textbooks and practicalities
 
+
+## Textbooks
+
+_Recommended textbooks_: Lecture Notes by Morten Hjorth-Jensen and Bernd A. Berg, Markov Chain Monte Carlo Simulations and their Statistical Analysis, World Scientific, 2004, chapters 1, 2
+
+
+## Practicalities
+
 Course participants are expected to have their own laptops/PCs. We use _Git_ as version control software and the usage of providers like _GitHub_, _GitLab_ or similar are strongly recommended.
 
 We will make extensive use of Python and C++ as programming languages.
@@ -70,9 +78,44 @@ Here we list several useful Python libraries we strongly recommend (if you use a
 * _Autodiff_: https://autodiff.github.io/ autodiff is a C++17 library that uses modern and advanced programming techniques to enable automatic computation of derivatives in an efficient and easy way.
 * _Optmilib_: https://www.kthohr.com/optimlib.html OptimLib is a lightweight C++ library of numerical optimization methods for nonlinear functions.
 
-## Textbooks
 
-_Recommended textbooks_: Lecture Notes by Morten Hjorth-Jensen and Bernd A. Berg, Markov Chain Monte Carlo Simulations and their Statistical Analysis, World Scientific, 2004, chapters 1, 2
+
+### How do I run MPI/OpneMP on a PC/Laptop? MPI  =====
+To install MPI is rather easy on hardware running unix/linux as operating systems, follow simply the instructions from the "OpenMPI website":"https://www.open-mpi.org/". See also subsequent slides.
+When you have made sure you have installed MPI on your PC/laptop, 
+- Compile with mpicxx/mpic++ or mpif90
+  Compile and link
+  mpic++ -O3 -o nameofprog.x nameofprog.cpp
+  run code with for example 8 processes using mpirun/mpiexec
+  mpiexec -n 8 ./nameofprog.x
+
+If you wish to install MPI and OpenMP 
+on your laptop/PC, we recommend the following:
+
+
+- For OpenMP, the compile option _-fopenmp_ is included automatically in recent versions of the C++ compiler and Fortran compilers. For users of different Linux distributions, simply use the available C++ or Fortran compilers and add the above compiler instructions, see also code examples below.
+- For OS X users however, install _libomp_
+  brew install libomp
+and compile and link as
+c++ -o <name executable> <name program.cpp>  -lomp
+
+For linux/ubuntu users, you need to install two packages (alternatively use the synaptic package manager)
+  sudo apt-get install libopenmpi-dev
+  sudo apt-get install openmpi-bin
+
+For OS X users, install brew (after having installed xcode and gcc, needed for the 
+gfortran compiler of openmpi) and then install with brew
+
+   brew install openmpi
+
+When running an executable (code.x), run as
+
+  mpirun -n 10 ./code.x
+
+where we indicate that we want  the number of processes to be 10.
+
+
+
 
 ## Face coverings. 
 As of now this is not required, but the situation may change. If face covering will be required during the semester, we will fill in more details. 
@@ -101,3 +144,9 @@ Those who come to UiO facilities must commit to the personal responsibility nece
 
 ## Additional information
 See https://www.uio.no/om/hms/korona/index.html and https://www.uio.no/om/hms/korona/retningslinjer/veileder-smittevern.html. For English version, click on the relevant link.
+
+
+
+
+
+
