@@ -1,0 +1,362 @@
+<!--
+Automatically generated HTML file from DocOnce source
+(https://github.com/doconce/doconce/)
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Project 2, Quantum Machine Learning. Deadline June 1, Spring 2021">
+
+<title>Project 2, Quantum Machine Learning. Deadline June 1, Spring 2021</title>
+
+
+<style type="text/css">
+/* bloodish style */
+
+body {
+  font-family: Helvetica, Verdana, Arial, Sans-serif;
+  color: #404040;
+  background: #ffffff;
+}
+h1 { font-size: 1.8em;  color: #8A0808; }
+h2 { font-size: 1.6em;  color: #8A0808; }
+h3 { font-size: 1.4em;  color: #8A0808; }
+h4 { color: #8A0808; }
+a { color: #8A0808; text-decoration:none; }
+tt { font-family: "Courier New", Courier; }
+/* pre style removed because it will interfer with pygments */
+p { text-indent: 0px; }
+hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+p.caption { width: 80%; font-style: normal; text-align: left; }
+hr.figure { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+
+div { text-align: justify; text-justify: inter-word; }
+</style>
+
+
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [('Introduction', 2, None, 'introduction'),
+              ('Project 2 a): Encoding the Data Into a Quantum State',
+               3,
+               None,
+               'project-2-a-encoding-the-data-into-a-quantum-state'),
+              ('Project 2 b): Processing the Encoded Data with Parameterized '
+               'Gates',
+               3,
+               None,
+               'project-2-b-processing-the-encoded-data-with-parameterized-gates'),
+              ('Project 2c):Measuring the Quantum State and Making Inference',
+               3,
+               None,
+               'project-2c-measuring-the-quantum-state-and-making-inference'),
+              ('Project 2d): Putting it all together',
+               3,
+               None,
+               'project-2d-putting-it-all-together'),
+              ('Project 2e): Parameter Shift-Rule and Calculating the '
+               'Analytical Gradient',
+               3,
+               None,
+               'project-2e-parameter-shift-rule-and-calculating-the-analytical-gradient'),
+              ('Project 2f): Adding Variations on the Data Encoding and Ansatz',
+               3,
+               None,
+               'project-2f-adding-variations-on-the-data-encoding-and-ansatz'),
+              ('Introduction to numerical projects',
+               2,
+               None,
+               'introduction-to-numerical-projects'),
+              ('Format for electronic delivery of report and programs',
+               2,
+               None,
+               'format-for-electronic-delivery-of-report-and-programs')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "AMS"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+    
+<!-- ------------------- main content ---------------------- -->
+
+
+
+<center><h1>Project 2, Quantum Machine Learning. Deadline June 1, Spring 2021</h1></center>  <!-- document title -->
+
+<p>
+<!-- author(s): <a href="http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html" target="_blank">Computational Physics II FYS4411/FYS9411</a> -->
+
+<center>
+<b><a href="http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html" target="_blank">Computational Physics II FYS4411/FYS9411</a></b> 
+</center>
+
+<p>
+<!-- institution -->
+
+<center><b>Department of Physics, University of Oslo, Norway</b></center>
+<br>
+<p>
+<center><h4>Apr 8, 2021</h4></center> <!-- date -->
+<br>
+
+<h2 id="introduction">Introduction </h2>
+
+<p>
+For this project, you will perform quantum machine learning on the Scikit learn breast cancer data set. The data can be obtained the following way
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">sklearn.datasets</span> <span style="color: #008000; font-weight: bold">import</span> load_breast_cancer
+
+data <span style="color: #666666">=</span> load_breast_cancer()
+x <span style="color: #666666">=</span> data<span style="color: #666666">.</span>data <span style="color: #408080; font-style: italic">#features</span>
+y <span style="color: #666666">=</span> data<span style="color: #666666">.</span>target <span style="color: #408080; font-style: italic">#targets</span>
+</pre></div>
+<p>
+\( x \) is the feature matrix and \( y \) are the targets.
+
+<h3 id="project-2-a-encoding-the-data-into-a-quantum-state">Project 2 a): Encoding the Data Into a Quantum State </h3>
+
+<p>
+For this task you will consider a simple way of encoding a randomly generated data set sample into a quantum state:
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">qiskit</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">qk</span>
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
+np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>seed(<span style="color: #666666">42</span>)
+
+p <span style="color: #666666">=</span> <span style="color: #666666">2</span> <span style="color: #408080; font-style: italic">#number of features</span>
+data_register <span style="color: #666666">=</span> qk<span style="color: #666666">.</span>QuantumRegister(p)
+classical_register <span style="color: #666666">=</span> qk<span style="color: #666666">.</span>ClassicalRegister(<span style="color: #666666">1</span>)
+
+circuit <span style="color: #666666">=</span> qk<span style="color: #666666">.</span>QuantumCircuit(data_register, classical_register) 
+
+sample <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>uniform(size<span style="color: #666666">=</span>p)
+target <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>uniform(size<span style="color: #666666">=1</span>)
+
+<span style="color: #008000; font-weight: bold">for</span> feature_idx <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(p):
+    circuit<span style="color: #666666">.</span>ry(<span style="color: #666666">2*</span>np<span style="color: #666666">.</span>pi<span style="color: #666666">*</span>sample[feature_idx],data_register[feature_idx])
+
+<span style="color: #008000">print</span>(circuit)
+</pre></div>
+<p>
+The above code shows how a randomly generated data sample of \( p=2 \)
+features are encoded into a quantum state on two qubits utilizing
+Qiskit. Each feature is encoded into a respective qubit utilizing a
+\( R_y(\theta) \) gate. The features are scaled with \( 2\pi \) to represent
+rotation angles (the \( R_y(\theta) \) gate performs a rotation). The
+classical register will be used later for storing the measured value
+of the circuit.  print(circuit) can be utilized at any point to see
+what the circuit looks like.
+
+<p>
+Your task is to get familiar with the functionality utilized in the
+above example and implement your own function to encode \( p \) of the
+first features in the breast cancer data set to a quantum state.
+
+<h3 id="project-2-b-processing-the-encoded-data-with-parameterized-gates">Project 2 b): Processing the Encoded Data with Parameterized Gates </h3>
+
+<p>
+After the quantum state has been encoded with the information of a data set sample, one needs extend the circuit with operations that process the state in a way that allows us to infer the target data. This can be done by introducing quantum gates that are dependant on learnable parameters \( \boldsymbol{\theta} \). We will do this in a similar fashion as for the encoding of the features:
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>n_params <span style="color: #666666">=</span> <span style="color: #666666">4</span>
+theta <span style="color: #666666">=</span> <span style="color: #666666">2*</span>np<span style="color: #666666">.</span>pi<span style="color: #666666">*</span>np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>uniform(size<span style="color: #666666">=</span>n_params)
+
+circuit<span style="color: #666666">.</span>rx(theta[<span style="color: #666666">0</span>],data_register[<span style="color: #666666">0</span>])
+circuit<span style="color: #666666">.</span>ry(theta[<span style="color: #666666">1</span>],data_register[<span style="color: #666666">1</span>])
+circuit<span style="color: #666666">.</span>cx(data_register[<span style="color: #666666">0</span>],data_register[<span style="color: #666666">1</span>])
+circuit<span style="color: #666666">.</span>ry(theta[<span style="color: #666666">2</span>],data_register[<span style="color: #666666">0</span>])
+circuit<span style="color: #666666">.</span>rx(theta[<span style="color: #666666">3</span>],data_register[<span style="color: #666666">1</span>])
+
+<span style="color: #008000">print</span>(circuit)
+</pre></div>
+<p>
+The above parameterization of the quantum state is what we will refer
+to as the 'ansatz'. Your task is again to familiarize yourself with
+the functionality utilized in the above example and implement your own
+ansatz to be utilized together with the \( p \) first features of the
+breast cancer data set. The number of learnable parameters 'theta'
+should be arbitrary.
+
+<h3 id="project-2c-measuring-the-quantum-state-and-making-inference">Project 2c):Measuring the Quantum State and Making Inference </h3>
+
+<p>
+The next step is to generate a prediction from our quantum machine learning model. This is done by performing a measurement on the quantum state:
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>circuit<span style="color: #666666">.</span>measure(data_register[<span style="color: #666666">-1</span>],classical_register[<span style="color: #666666">0</span>])
+shots<span style="color: #666666">=1000</span>
+
+job <span style="color: #666666">=</span> qk<span style="color: #666666">.</span>execute(circuit,
+                backend<span style="color: #666666">=</span>qk<span style="color: #666666">.</span>Aer<span style="color: #666666">.</span>get_backend(<span style="color: #BA2121">&#39;qasm_simulator&#39;</span>),
+                shots<span style="color: #666666">=</span>shots,
+                seed_simulator<span style="color: #666666">=42</span>
+                )
+results <span style="color: #666666">=</span> job<span style="color: #666666">.</span>result()
+results <span style="color: #666666">=</span> results<span style="color: #666666">.</span>get_counts(circuit)
+
+prediction <span style="color: #666666">=</span> <span style="color: #666666">0</span>
+<span style="color: #008000; font-weight: bold">for</span> key,value <span style="color: #AA22FF; font-weight: bold">in</span> results<span style="color: #666666">.</span>items():
+    <span style="color: #008000; font-weight: bold">if</span> key <span style="color: #666666">==</span> <span style="color: #BA2121">&#39;1&#39;</span>:
+        prediction <span style="color: #666666">+=</span> value
+prediction<span style="color: #666666">/=</span>shots
+<span style="color: #008000">print</span>(<span style="color: #BA2121">&#39;Prediction:&#39;</span>,prediction,<span style="color: #BA2121">&#39;Target:&#39;</span>,target[<span style="color: #666666">0</span>])
+</pre></div>
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>    Prediction: <span style="color: #666666">0.285</span> Target: <span style="color: #666666">0.7319939418114051</span>
+</pre></div>
+<p>
+In the above example, we are first applying a measurement operation on
+the final qubit in the circuit, and we are interpreting our prediction
+as the probability that this qubit is in the \( \ket{1} \) state. Make
+sure all the steps in the example are understood.
+
+<p>
+Implement your own function that generates a prediction by measuring one of the qubits.
+
+<h3 id="project-2d-putting-it-all-together">Project 2d): Putting it all together </h3>
+
+<p>
+Now it is time to put together all of the above steps. Ideally, you
+should make a class or a function that given a feature matrix of \( n \)
+samples and an arbitrary number of model parameters, returns a vector
+of \( n \) outputs. For example:
+
+<p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>n <span style="color: #666666">=</span> <span style="color: #666666">100</span> <span style="color: #408080; font-style: italic">#number of samples</span>
+p <span style="color: #666666">=</span> <span style="color: #666666">10</span> <span style="color: #408080; font-style: italic">#number of features</span>
+theta <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>uniform(size<span style="color: #666666">=20</span>) <span style="color: #408080; font-style: italic">#array of model parameters</span>
+X <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>uniform(size<span style="color: #666666">=</span>(n,p)) <span style="color: #408080; font-style: italic">#design matrix</span>
+y_pred <span style="color: #666666">=</span> model(X,theta) <span style="color: #408080; font-style: italic">#prediction, shape (n)</span>
+</pre></div>
+<p>
+We will now deal with how to train the model:
+
+<h3 id="project-2e-parameter-shift-rule-and-calculating-the-analytical-gradient">Project 2e): Parameter Shift-Rule and Calculating the Analytical Gradient </h3>
+
+<p>
+Since the model with random initial parameters is no good for
+inference, we need to optimize the parameters in order to yield good
+results, as is the usual with machine learning.
+
+<p>
+Since we are dealing with classification, we will use cross-entropy as the loss function
+
+$$
+\begin{equation*}
+    L = -\sum_{i=1}^{n}{y_i \ln{f(x_i;\boldsymbol{\theta})}},
+\end{equation*}
+$$
+
+<p>
+where \( y_i \) are the target labels, and
+\( f(\boldsymbol{x}_i;\boldsymbol{\theta}) \) is the output of our model
+for a given sample \( \boldsymbol{x}_i \) and parameterization
+\( \boldsymbol{\theta}) \). We calculate the gradiant by taking the
+derivative of the loss with respect to the parameters
+
+$$
+\begin{equation*}
+    \frac{\partial}{\partial \boldsymbol{\theta}_k}L = \sum_{i=1}^{n}{\frac{f_i - y_i}{f_i(1 - f_i)}} \frac{\partial}{\partial \boldsymbol{\theta}_k}f_i,
+\end{equation*}
+$$
+
+<p>
+where \( f_i = f(x_i;\boldsymbol{\theta}) \) for clarity. The only term we do not know how to calculate is \( \frac{\partial}{\partial \boldsymbol{\theta}_k}f(x_i;\boldsymbol{\theta}) \), but it turns out there is a simple trick to do this, the so-called parameter shift-rule \<a href="#ParameterShift">[1]</a>. To calculate the derivative of the model output, we need to evaluate the model twice with the respective parameter shifted by a value \( \frac{\pi}{2} \) up and down. The two resulting outputs are then put together to yield the derivative
+
+$$
+\begin{equation*}
+    \frac{\partial f(x_i; \theta_1, \theta_2, \dots, \theta_k)}{\partial \theta_j}  = \frac{f(x_i; \theta_1, \theta_2, \dots, \theta_j + \pi /2, \dots, \theta_k) -f(x_i; \theta_1, \theta_2, \dots, \theta_j - \pi /2, \dots, \theta_k)}{2}
+\end{equation*}
+$$
+
+<p>
+Train your model by utilizing the Parameter Shift-Rule and some
+gradient descent algorithm. Compare your results with for example
+logistic regression.
+
+<h3 id="project-2f-adding-variations-on-the-data-encoding-and-ansatz">Project 2f): Adding Variations on the Data Encoding and Ansatz </h3>
+
+Change the gates utilized for the encoding of the data samples and also make changes to the parameterized ansatz. Train these new models on the breast cancer data set. How do they compare?
+
+<h2 id="introduction-to-numerical-projects">Introduction to numerical projects </h2>
+
+<p>
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+
+<ul>
+  <li> Give a short description of the nature of the problem and the eventual  numerical methods you have used.</li>
+  <li> Describe the algorithm you have used and/or developed. Here you may find it convenient to use pseudocoding. In many cases you can describe the algorithm in the program itself.</li>
+  <li> Include the source code of your program. Comment your program properly.</li>
+  <li> If possible, try to find analytic solutions, or known limits in order to test your program when developing the code.</li>
+  <li> Include your results either in figure form or in a table. Remember to        label your results. All tables and figures should have relevant captions        and labels on the axes.</li>
+  <li> Try to evaluate the reliabilty and numerical stability/precision of your results. If possible, include a qualitative and/or quantitative discussion of the numerical stability, eventual loss of precision etc.</li>
+  <li> Try to give an interpretation of you results in your answers to  the problems.</li>
+  <li> Critique: if possible include your comments and reflections about the  exercise, whether you felt you learnt something, ideas for improvements and  other thoughts you've made when solving the exercise. We wish to keep this course at the interactive level and your comments can help us improve it.</li>
+  <li> Try to establish a practice where you log your work at the  computerlab. You may find such a logbook very handy at later stages in your work, especially when you don't properly remember  what a previous test version  of your program did. Here you could also record  the time spent on solving the exercise, various algorithms you may have tested or other topics which you feel worthy of mentioning.</li>
+</ul>
+
+<h2 id="format-for-electronic-delivery-of-report-and-programs">Format for electronic delivery of report and programs </h2>
+
+<p>
+The preferred format for the report is a PDF file. You can also use DOC or postscript formats or as an ipython notebook file.  As programming language we prefer that you choose between C/C++, Fortran2008 or Python. The following prescription should be followed when preparing the report:
+
+<ul>
+  <li> Use canvas to hand in your projects, log in  at  <a href="http://canvas.uio.no" target="_blank"><tt>http://canvas.uio.no</tt></a> with your normal UiO username and password.</li>
+  <li> Upload <b>only</b> the report file!  For the source code file(s) you have developed please provide us with your link to your github domain.  The report file should include all of your discussions and a list of the codes you have developed.  The full version of the codes should be in your github repository.</li>
+  <li> In your github repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.</li>
+  <li> Still in your github make a folder where you place your codes.</li> 
+  <li> In this and all later projects, you should include tests (for example unit tests) of your code(s).</li>
+  <li> Comments  from us on your projects, approval or not, corrections to be made  etc can be found under your Devilry domain and are only visible to you and the teachers of the course.</li>
+</ul>
+
+Finally, 
+we encourage you to work two and two together. Optimal working groups consist of 
+2-3 students. You can then hand in a common report.
+
+<p>
+
+<!-- ------------------- end of main content --------------- -->
+
+
+<center style="font-size:80%">
+<!-- copyright --> &copy; 1999-2021, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license
+</center>
+
+
+</body>
+</html>
+    
+
