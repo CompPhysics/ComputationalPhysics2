@@ -155,7 +155,7 @@ Project 2, Quantum Machine Learning. Deadline June 1, Spring 2021
 
 % --- begin date ---
 \begin{center}
-Apr 8, 2021
+Apr 13, 2021
 \end{center}
 % --- end date ---
 
@@ -164,15 +164,18 @@ Apr 8, 2021
 
 \subsection{Introduction}
 
-For this project, you will perform quantum machine learning on the Scikit learn breast cancer data set. The data can be obtained the following way
+For this project, you will perform quantum machine learning on the two first targets of Scikit learn iris data set. The data can be obtained the following way
 
 \bpycod
-from sklearn.datasets import load_breast_cancer
+from sklearn import datasets
+import numpy as np
+iris = datasets.load_iris()
+x = iris.data  
+y = iris.target
+idx = np.where(y < 2) # we only take the first two targets.
 
-data = load_breast_cancer()
-x = data.data #features
-y = data.target #targets
-
+x = x[idx,:]
+y = y[idx]
 \epycod
 $x$ is the feature matrix and $y$ are the targets.
 
@@ -194,7 +197,8 @@ sample = np.random.uniform(size=p)
 target = np.random.uniform(size=1)
 
 for feature_idx in range(p):
-    circuit.ry(2*np.pi*sample[feature_idx],data_register[feature_idx])
+    circuit.h(data_register[feature_idx])
+    circuit.rz(2*np.pi*sample[feature_idx],data_register[feature_idx])
 
 print(circuit)
 \epycod
@@ -211,8 +215,8 @@ what the circuit looks like.
 
 
 Your task is to get familiar with the functionality utilized in the
-above example and implement your own function to encode $p$ of the
-first features in the breast cancer data set to a quantum state.
+above example and implement your own function to encode the
+features of the iris data set to a quantum state.
 
 
 \paragraph{Project 2 b): Processing the Encoded Data with Parameterized Gates.}
@@ -222,11 +226,15 @@ After the quantum state has been encoded with the information of a data set samp
 n_params = 4
 theta = 2*np.pi*np.random.uniform(size=n_params)
 
-circuit.rx(theta[0],data_register[0])
-circuit.ry(theta[1],data_register[1])
-circuit.cx(data_register[0],data_register[1])
-circuit.ry(theta[2],data_register[0])
-circuit.rx(theta[3],data_register[1])
+circuit.ry(theta[0], data_register[0])
+circuit.ry(theta[1], data_register[1])
+
+circuit.cx(data_register[0], data_register[1])
+
+circuit.ry(theta[2], data_register[0])
+circuit.ry(theta[3], data_register[1])
+
+circuit.cx(data_register[0], data_register[1])
 
 print(circuit)
 \epycod
@@ -234,8 +242,8 @@ print(circuit)
 The above parameterization of the quantum state is what we will refer
 to as the 'ansatz'. Your task is again to familiarize yourself with
 the functionality utilized in the above example and implement your own
-ansatz to be utilized together with the $p$ first features of the
-breast cancer data set. The number of learnable parameters 'theta'
+ansatz to be utilized together with the features of the
+iris data set. The number of learnable parameters 'theta'
 should be arbitrary.
 
 
@@ -283,7 +291,7 @@ of $n$ outputs. For example:
 
 \bpycod
 n = 100 #number of samples
-p = 10 #number of features
+p = 4 #number of features
 theta = np.random.uniform(size=20) #array of model parameters
 X = np.random.uniform(size=(n,p)) #design matrix
 y_pred = model(X,theta) #prediction, shape (n)
@@ -326,10 +334,19 @@ Train your model by utilizing the Parameter Shift-Rule and some
 gradient descent algorithm. Compare your results with for example
 logistic regression.
 
+Regular gradient descent does the job, but it is often outperformed by momentum based optimizers like Adam.
+
 
 \paragraph{Project 2f): Adding Variations on the Data Encoding and Ansatz.}
-Change the gates utilized for the encoding of the data samples and also make changes to the parameterized ansatz. Train these new models on the breast cancer data set. How do they compare?
+Change/add more gates to the encoder and the parameterized ansatz to produce a more complex model (See for example figure 4 and figure 5 in \href{{https://arxiv.org/abs/2011.00027}}{\nolinkurl{https://arxiv.org/abs/2011.00027}} for inspiration). Train these new models on the iris data set. How do they compare? As a more challenging problem, you may train on the first few features of the Breast Cancer Data as well to see how the more powerful model performs.
 
+\bpycod
+from sklearn.datasets import load_breast_cancer
+
+data = load_breast_cancer()
+x = data.data #features
+y = data.target #targets
+\epycod
 
 
 
@@ -382,20 +399,7 @@ The preferred format for the report is a PDF file. You can also use DOC or posts
 \noindent
 Finally, 
 we encourage you to work two and two together. Optimal working groups consist of 
-2-3 students. You can then hand in a common report. 
-
-
-
-
-
-
-
-
-
-
-
-
-
+2-3 students. You can then hand in a common report.
 
 % ------------------- end of main content ---------------
 
