@@ -134,13 +134,43 @@ Apr 13, 2021
 
 \subsection*{Introduction}
 
+Why do people care about "Quantum Machine Learning", or "Quantum Computing" in general? A common observation that motivates quantum computing,
+although it does not tell the whole story, is the striking fact than quantum information of a quantum system is in a sense
+larger than the classical information of a comparable classical system. In the case of
+bits and qubits, $n$ classical bits allows you to store the value of $n$ boolean variables $a \in [0,1]$,
+whereas you need $2^n$ amplitudes $\alpha \in \mathbb{C}$ to describe the state of $n$ quantum bits, or qubits.
+In other words, the (Hilbert )space in which the qubits live in exponentially bigger than that of the classical
+counterpart. In the context of parameterized quantum circuits, one may prepare a state in the exponentially
+large Hilbert space by applying some simple quantum operations to a set qubits that are all initialized in the zero-state.
+
+(Figure to come)
+
+By varying $\theta_i \in [0, 2\pi]$, one can attain different states. A crucial thing to note is that we are not
+able to prepare an arbitrary state using this ansatz as it much too constrained and simple: The exponentially large
+space is not available to us. One might try to remedy this by introducing a more complex ansatz:
+
+(Figure to come)
+
+We now have an ansatz whose number of operations scales polynomially in the number of qubits(in this case quadratic), and the
+added complexity enables us to reach a greater part of Hilbert space. Still, it is only a polynomially large part of it, which
+is vanishingly small compared to its full size. To have access to the whole space, one would in fact need to perform exponentially
+many operations, which is practically intractable to do (Nielsen, 4.5.4).
+
+Does this mean that the supposed power of quantum computation is practically inaccessible to us? No. Even though we
+only reach a very small part of Hilbert space using "cheap" ansatzes, the states we do reach might be very useful
+for solving a particular problem. Moreover, these states might be classically intractable to compute (source to come),
+meaning the information they represent is not practical to determine using classical computers. They are however efficiently
+prepared using quantum computers, as the number of quantum operations needed to be applied is by construction only polynomial.
+
+How can one leverage this in a machine learning setting? A common approach is to use variants of the previous ansatzes to encode features to qubits by performing rotations, thus embedding the data in a high dimensional quantum state. Subsequent parameterized operations on the qubits then applies powerful transformations to the embedded data in a high dimensional space. Such methods are often described as quantum kernel methods, because of their similarity to classical kernel methods in machine learning.
+
 For this project, you will perform quantum machine learning on the two first targets of Scikit learn iris data set. The data can be obtained the following way
 
 \begin{print}
 from sklearn import datasets
 import numpy as np
 iris = datasets.load_iris()
-x = iris.data  
+x = iris.data
 y = iris.target
 idx = np.where(y < 2) # we only take the first two targets.
 
@@ -161,7 +191,7 @@ p = 2 #number of features
 data_register = qk.QuantumRegister(p)
 classical_register = qk.ClassicalRegister(1)
 
-circuit = qk.QuantumCircuit(data_register, classical_register) 
+circuit = qk.QuantumCircuit(data_register, classical_register)
 
 sample = np.random.uniform(size=p)
 target = np.random.uniform(size=1)
@@ -359,7 +389,7 @@ The preferred format for the report is a PDF file. You can also use DOC or posts
 
   \item In your github repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.
 
-  \item Still in your github make a folder where you place your codes. 
+  \item Still in your github make a folder where you place your codes.
 
   \item In this and all later projects, you should include tests (for example unit tests) of your code(s).
 
@@ -367,8 +397,8 @@ The preferred format for the report is a PDF file. You can also use DOC or posts
 \end{itemize}
 
 \noindent
-Finally, 
-we encourage you to work two and two together. Optimal working groups consist of 
+Finally,
+we encourage you to work two and two together. Optimal working groups consist of
 2-3 students. You can then hand in a common report.
 
 % ------------------- end of main content ---------------

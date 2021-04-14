@@ -162,6 +162,43 @@ MathJax.Hub.Config({
 <h2 id="introduction" class="anchor">Introduction </h2>
 
 <p>
+Why do people care about "Quantum Machine Learning", or "Quantum Computing" in general? A common observation that motivates quantum computing,
+although it does not tell the whole story, is the striking fact than quantum information of a quantum system is in a sense
+larger than the classical information of a comparable classical system. In the case of
+bits and qubits, \( n \) classical bits allows you to store the value of \( n \) boolean variables \( a \in [0,1] \),
+whereas you need \( 2^n \) amplitudes \( \alpha \in \mathbb{C} \) to describe the state of \( n \) quantum bits, or qubits.
+In other words, the (Hilbert )space in which the qubits live in exponentially bigger than that of the classical
+counterpart. In the context of parameterized quantum circuits, one may prepare a state in the exponentially
+large Hilbert space by applying some simple quantum operations to a set qubits that are all initialized in the zero-state.
+
+<p>
+(Figure to come)
+
+<p>
+By varying \( \theta_i \in [0, 2\pi] \), one can attain different states. A crucial thing to note is that we are not
+able to prepare an arbitrary state using this ansatz as it much too constrained and simple: The exponentially large
+space is not available to us. One might try to remedy this by introducing a more complex ansatz:
+
+<p>
+(Figure to come)
+
+<p>
+We now have an ansatz whose number of operations scales polynomially in the number of qubits(in this case quadratic), and the
+added complexity enables us to reach a greater part of Hilbert space. Still, it is only a polynomially large part of it, which
+is vanishingly small compared to its full size. To have access to the whole space, one would in fact need to perform exponentially
+many operations, which is practically intractable to do (Nielsen, 4.5.4).
+
+<p>
+Does this mean that the supposed power of quantum computation is practically inaccessible to us? No. Even though we
+only reach a very small part of Hilbert space using "cheap" ansatzes, the states we do reach might be very useful
+for solving a particular problem. Moreover, these states might be classically intractable to compute (source to come),
+meaning the information they represent is not practical to determine using classical computers. They are however efficiently
+prepared using quantum computers, as the number of quantum operations needed to be applied is by construction only polynomial.
+
+<p>
+How can one leverage this in a machine learning setting? A common approach is to use variants of the previous ansatzes to encode features to qubits by performing rotations, thus embedding the data in a high dimensional quantum state. Subsequent parameterized operations on the qubits then applies powerful transformations to the embedded data in a high dimensional space. Such methods are often described as quantum kernel methods, because of their similarity to classical kernel methods in machine learning.
+
+<p>
 For this project, you will perform quantum machine learning on the two first targets of Scikit learn iris data set. The data can be obtained the following way
 
 <p>
@@ -170,7 +207,7 @@ For this project, you will perform quantum machine learning on the two first tar
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">sklearn</span> <span style="color: #008000; font-weight: bold">import</span> datasets
 <span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
 iris <span style="color: #666666">=</span> datasets<span style="color: #666666">.</span>load_iris()
-x <span style="color: #666666">=</span> iris<span style="color: #666666">.</span>data  
+x <span style="color: #666666">=</span> iris<span style="color: #666666">.</span>data
 y <span style="color: #666666">=</span> iris<span style="color: #666666">.</span>target
 idx <span style="color: #666666">=</span> np<span style="color: #666666">.</span>where(y <span style="color: #666666">&lt;</span> <span style="color: #666666">2</span>) <span style="color: #408080; font-style: italic"># we only take the first two targets.</span>
 
@@ -196,7 +233,7 @@ p <span style="color: #666666">=</span> <span style="color: #666666">2</span> <s
 data_register <span style="color: #666666">=</span> qk<span style="color: #666666">.</span>QuantumRegister(p)
 classical_register <span style="color: #666666">=</span> qk<span style="color: #666666">.</span>ClassicalRegister(<span style="color: #666666">1</span>)
 
-circuit <span style="color: #666666">=</span> qk<span style="color: #666666">.</span>QuantumCircuit(data_register, classical_register) 
+circuit <span style="color: #666666">=</span> qk<span style="color: #666666">.</span>QuantumCircuit(data_register, classical_register)
 
 sample <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>uniform(size<span style="color: #666666">=</span>p)
 target <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>uniform(size<span style="color: #666666">=1</span>)
@@ -400,13 +437,13 @@ The preferred format for the report is a PDF file. You can also use DOC or posts
   <li> Use canvas to hand in your projects, log in  at  <a href="http://canvas.uio.no" target="_self"><tt>http://canvas.uio.no</tt></a> with your normal UiO username and password.</li>
   <li> Upload <b>only</b> the report file!  For the source code file(s) you have developed please provide us with your link to your github domain.  The report file should include all of your discussions and a list of the codes you have developed.  The full version of the codes should be in your github repository.</li>
   <li> In your github repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.</li>
-  <li> Still in your github make a folder where you place your codes.</li> 
+  <li> Still in your github make a folder where you place your codes.</li>
   <li> In this and all later projects, you should include tests (for example unit tests) of your code(s).</li>
   <li> Comments  from us on your projects, approval or not, corrections to be made  etc can be found under your Devilry domain and are only visible to you and the teachers of the course.</li>
 </ul>
 
-Finally, 
-we encourage you to work two and two together. Optimal working groups consist of 
+Finally,
+we encourage you to work two and two together. Optimal working groups consist of
 2-3 students. You can then hand in a common report.
 
 <!-- ------------------- end of main content --------------- -->
