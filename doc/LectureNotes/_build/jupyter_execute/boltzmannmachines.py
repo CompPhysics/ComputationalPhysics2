@@ -124,21 +124,11 @@ function also depends on the parameters $\mathbf{a}$, $\mathbf{b}$ and
 $W$. Thus, when we adjust them during the learning procedure, we are
 adjusting the energy function to best fit our problem.
 
-An expression for the energy function is
 
-$$
-E(\hat{x},\hat{h}) = -\sum_{ia}^{NA}b_i^a \alpha_i^a(x_i)-\sum_{jd}^{MD}c_j^d \beta_j^d(h_j)-\sum_{ijad}^{NAMD}b_i^a \alpha_i^a(x_i)c_j^d \beta_j^d(h_j)w_{ij}^{ad}.
-$$
-
-Here $\beta_j^d(h_j)$ and $\alpha_i^a(x_j)$ are so-called transfer functions that map a given input value to a desired feature value. The labels $a$ and $d$ denote that there can be multiple transfer functions per variable. The first sum depends only on the visible units. The second on the hidden ones. **Note** that there is no connection between nodes in a layer.
-
-The quantities $b$ and $c$ can be interpreted as the visible and hidden biases, respectively.
-
-The connection between the nodes in the two layers is given by the weights $w_{ij}$. 
 
 ### Defining different types of RBMs
 
-There are different variants of RBMs, and the differences lie in the types of visible and hidden units we choose as well as in the implementation of the energy function $E(\mathbf{x},\mathbf{h})$. 
+There are different variants of RBMs, and the differences lie in the types of visible and hidden units we choose as well as in the implementation of the energy function $E(\mathbf{x},\mathbf{h})$. The connection between the nodes in the two layers is given by the weights $w_{ij}$. 
 
 **Binary-Binary RBM:**
 
@@ -679,8 +669,8 @@ $$
 = \frac{1}{Z} e^{-\sum_C E_C(\boldsymbol{x}_C)} \nonumber
 $$
 
-4
-0
+3
+9
  
 <
 <
