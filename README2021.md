@@ -24,9 +24,10 @@ The aim of this course is to present applications of, through various
 computational projects, some of the most widely used many-body methods
 with pertinent algorithms and high-performance computing topics such
 as advanced parallelization techniques and object
-orientation. Furthermore, Machine Learning and quantum
-computing may be presented if of interest. 
-The methods and algorithms that will be studied
+orientation. Furthermore, elements of Machine Learning and quantum
+computing may be presented if of interest. In particular we will here
+employ deep learning techniques based on neural networks and so-called
+Boltzmann machines.  The methods and algorithms that will be studied
 may vary from year to year depending on the interests of the
 participants, but the main focus will be on systems from computational
 material science, solid-state physics, atomic and molecular physics,
@@ -44,21 +45,9 @@ studied.
 
 ## Learning outcomes
 
-The course introduces a variety of central algorithms and methods for
-professional studies of quantum mechanical systems, with relevance for
-several problems in physics, materials science and quantum
-chemistry. The course is project based and through the various
-projects, normally two, the participants will be exposed to
-fundamental research problems in these fields, with the aim to
-reproduce state of the art scientific results. The students will learn
-to develop and structure large codes for studying these systems, get
-aquainted with supercomputing facilities and learn to handle large
-scientific projects. A good scientific and ethical conduct is
-emphasized throughout the course.
+The course introduces a variety of central algorithms and methods for professional studies of quantum mechanical systems, with relevance for several problems in physics, materials science and quantum chemistry. The course is project based and through the various projects, normally two, the participants will be exposed to fundamental research problems in these fields, with the aim to reproduce state of the art scientific results. The students will learn to develop and structure large codes for studying these systems, get aquainted with supercomputing facilities and learn to handle large scientific projects. A good scientific and ethical conduct is emphasized throughout the course.
 
-The course is also a continuation of FYS3150 – Computational Physics,
-and it will give a further treatment of several of the numerical
-methods given there.
+The course is also a continuation of FYS3150 – Computational Physics, and it will give a further treatment of several of the numerical methods given there.
 
 
 ## Prerequisites
@@ -77,30 +66,29 @@ We recommend also that you have some background in quantum mechanics, typically 
 
 ## The course has two central parts
 
-Computational aspects play a central role and you are expected to work
-on numerical examples and projects which illustrate the theory and
-varous algorithms discussed during the lectures. We recommend strongly
-to form small project groups of 2-3 participants, if possible.
+Computational aspects play a central role and you are
+expected to work on numerical examples and projects which illustrate
+the theory and varous algorithms discussed during the lectures. We recommend strongly to form small project groups of 2-3 participants, if possible. 
 
 ## Instructor information
 * _Name_: Morten Hjorth-Jensen
 * _Email_: morten.hjorth-jensen@fys.uio.no
 * _Phone_: +47-48257387
 * _Office_: Department of Physics, University of Oslo, Eastern wing, room FØ470 
-* _Office hours_: *Anytime*! 
+* _Office hours_: *Anytime*! For the  spring Semester 2021 (SS21), as a rule of thumb office hours are planned via computer or telephone. Individual or group office hours will be performed via zoom. Feel free to send an email for planning. In person meetings may also be possible if allowed by the University of Oslo's COVID-19 instructions (see below for links).
 
 
-##  Teaching Assistants Spring Semester 2022
+##  Teaching Assistants Spring Semester 21
 * _Name_:  Øyvind Sigmundson Schøyen, 
 * _Email_: oyvinssc@student.matnat.uio.no 	 
 * _Office_: Department of Physics, University of Oslo, Eastern wing, room FØ452
-* _Office hours_: TBA
+* _Office hours_: For the  spring Semester 2021 (SS21), as a rule of thumb office hours are planned via computer or telephone. Individual or group office hours will be performed via zoom. Feel free to send an email for planning. In person meetings may also be possible if allowed by the University of Oslo's COVID-19 instructions (see below for links).
 
 ## Practicalities
-This course will be delivered in a hybrid mode, with online and on site lectures and on site and online laboratory sessions. The first week (January 17-21) is fully digital and the computer lab and the lectures will be done via zoom. 
+This course will be delivered in a hybrid mode, with online and on site lectures and on site and online laboratory sessions. The first week (January 11-15) is fully digital and the computer lab and the lectures will be done via zoom. 
 
-1. Two lectures per week, spring semester, 10 ECTS. The lectures are presented in a hybrid mode. The lectures will be recorded and linked to this site and the official University of Oslo website for the course;
-2. Thre hours of laboratory sessions for work on computational projects and exercises. There will  also be fully digital laboratory sessions for those who cannot attend in person;
+1. Two lectures per week, spring semester, 10 ECTS. The lectures will be fully online. The lectures will be recorded and linked to this site and the official University of Oslo website for the course;
+2. Thre hours of laboratory sessions for work on computational projects and exercises for each group. Due to social distancing, at most 15 participants can attend. There will  also be fully digital laboratory sessions for those who cannot attend;
 3. Two projects which are graded and count 1/2 each of the final grade;
 4. The course is offered as a FYS4411 (Master of Science level) and a FYS9411 (PhD level) course;
 5. Videos of teaching material are available via the links at https://www.uio.no/studier/emner/matnat/fys/FYS4411/v21/timeplan/index.html#FOR;
@@ -194,3 +182,30 @@ Here we list several useful Python libraries we strongly recommend (if you use a
 
 _Recommended textbooks_: Lecture Notes by Morten Hjorth-Jensen and Bernd A. Berg, Markov Chain Monte Carlo Simulations and their Statistical Analysis, World Scientific, 2004, chapters 1, 2
 
+## Face coverings. 
+As of now this is not required, but the situation may change. If face covering will be required during the semester, we will fill in more details. 
+
+## Physical distancing 
+We will be practicing physical distancing in the classroom dedicated to the lab sessions. Thus, everybody should maintain at least one meter distance between themselves and others (excluding those with whom they live). This applies to all aspects of the classroom setting, including seating arrangements, informal conversations, and dialogue between teachers and students.
+
+
+## Personal Hygiene
+All participants attending the laboratory sessions must maintain proper hygiene and health practices, including:
+* frequently wash with soap and water or, if soap is unavailable, using hand sanitizer with at least 60% alcohol;
+* Routinely cleaning and sanitizing living spaces and/or workspace;
+* Using the bend of the elbow or shoulder to shield a cough or sneeze;
+* Refraining from shaking hands;
+
+## Adherence to Signage and Instructions 
+Course participants  will (a) look for instructional signs posted by UiO or public health authorities, (b) observe instructions from UiO or public health authorities that are emailed to my “uio.no” account, and (c) follow those instructions.
+The relevant links are https://www.uio.no/om/hms/korona/index.html and https://www.uio.no/om/hms/korona/retningslinjer/veileder-smittevern.html
+
+## Self-Monitoring
+Students will self-monitor for flu-like symptoms (for example, cough, shortness of breath, difficulty breathing, fever, sore throat or loss of taste or smell). If a student experiences any flu-like symptoms, they will stay home and contact a health care provider to determine what steps should be taken.
+## Exposure to COVID-19 
+If a student is exposed to someone who is ill or has tested positive for the COVID-19 virus, they will stay home, contact a health care provider and follow all public health recommendations. You may also contact the study administration of the department where you are registered as student. 
+## Compliance and reporting 
+Those who come to UiO facilities must commit to the personal responsibility necessary for us to remain as safe as possible, including following the specific guidelines outlined in this syllabus and provided by UiO more broadly (see links below here). 
+
+## Additional information
+See https://www.uio.no/om/hms/korona/index.html and https://www.uio.no/om/hms/korona/retningslinjer/veileder-smittevern.html. For English version, click on the relevant link.
