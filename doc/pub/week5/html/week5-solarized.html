@@ -1,21 +1,18 @@
 <!--
-Automatically generated HTML file from DocOnce source
+HTML file automatically generated from DocOnce source
 (https://github.com/doconce/doconce/)
+doconce format html week5.do.txt --pygments_html_style=perldoc --html_style=solarized3 --html_links_in_new_window --html_output=week5-solarized --no_mako
 -->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 6 February 8-12: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods">
-
-<title>Week 6 February 8-12: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods</title>
-
-
+<meta name="description" content="Week 7 February 14-18: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods">
+<title>Week 7 February 14-18: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods</title>
 <link href="https://cdn.rawgit.com/doconce/doconce/master/bundled/html_styles/style_solarized_box/css/solarized_light_code.css" rel="stylesheet" type="text/css" title="light"/>
 <script src="https://cdn.rawgit.com/doconce/doconce/master/bundled/html_styles/style_solarized_box/js/highlight.pack.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
-
 <link href="https://thomasf.github.io/solarized-css/solarized-light.min.css" rel="stylesheet">
 <style type="text/css">
 h1 {color: #b58900;}  /* yellow */
@@ -52,19 +49,24 @@ pre {
 .alert-summary  { background-image:url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_summary.png); }
 .alert-warning { background-image: url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_warning.png); }
 .alert-question {background-image:url(https://cdn.rawgit.com/doconce/doconce/master/bundled/html_images/small_yellow_question.png); }
-
 div { text-align: justify; text-justify: inter-word; }
+.tab {
+  padding-left: 1.5em;
+}
+div.toc p,a {
+  line-height: 1.3;
+  margin-top: 1.1;
+  margin-bottom: 1.1;
+}
 </style>
-
-
 </head>
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [('Overview of week 6, February 8-12',
+ 'sections': [('Overview of week 7, February 14-18',
                2,
                None,
-               'overview-of-week-6-february-8-12'),
+               'overview-of-week-7-february-14-18'),
               ('Motivation', 2, None, 'motivation'),
               ('Simple example and demonstration',
                2,
@@ -118,38 +120,33 @@ MathJax.Hub.Config({
 </script>
 
 
-
-    
 <!-- ------------------- main content ---------------------- -->
+<center>
+<h1>Week 7 February 14-18: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods</h1>
+</center>  <!-- document title -->
 
-
-
-<center><h1>Week 6 February 8-12: Finalization of importance sampling, start Gradient methods, steepest descent and Conjugate Gradient Methods</h1></center>  <!-- document title -->
-
-<p>
 <!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
-
 <center>
 <b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> [1, 2]
 </center>
-
-<p>
 <!-- institution(s) -->
+<center>
+[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b>
+</center>
+<center>
+[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b>
+</center>
+<br>
+<center>
+<h4>Jan 19, 2022</h4>
+</center> <!-- date -->
+<br>
 
-<center>[1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b></center>
-<center>[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b></center>
-<br>
-<p>
-<center><h4>Feb 17, 2021</h4></center> <!-- date -->
-<br>
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<h2 id="overview-of-week-6-february-8-12">Overview of week 6, February 8-12 </h2>
+<h2 id="overview-of-week-7-february-14-18">Overview of week 7, February 14-18 </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Topics</b>
 <p>
-
 <ul>
 <li> Finalize discussion on importance sampling and Fokker-Planck and Langevin equations</li>
 <li> Gradient Descent methods, Steepest Descent</li>
@@ -158,11 +155,9 @@ MathJax.Hub.Config({
 </div>
 
 
-<p>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Teaching Material, videos and written material</b>
 <p>
-
 <ul>
 <li> On importance sampling, see notes from last week at <a href="http://compphysics.github.io/ComputationalPhysics2/doc/pub/week4/html/week4-reveal.html" target="_blank"><tt>http://compphysics.github.io/ComputationalPhysics2/doc/pub/week4/html/week4-reveal.html</tt></a></li>
 <li> These lecture notes</li>
@@ -171,228 +166,216 @@ MathJax.Hub.Config({
 </div>
 
 
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
 <h2 id="motivation">Motivation  </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
-Our aim with this part of the project is to be able to
-
+<p>Our aim with this part of the project is to be able to</p>
 <ul>
 <li> find an optimal value for the variational parameters using only some few Monte Carlo cycles</li>
 <li> use these optimal values for the variational parameters to perform a large-scale Monte Carlo calculation</li>
 </ul>
-
-To achieve this will look at methods like <em>Steepest descent</em> and the <em>conjugate gradient method</em>. Both these methods allow us to find
+<p>To achieve this will look at methods like <em>Steepest descent</em> and the <em>conjugate gradient method</em>. Both these methods allow us to find
 the minima of a multivariable  function like our energy (function of several variational parameters). 
 Alternatively, you can always use Newton's method. In particular, since we will normally have one variational parameter,
 Newton's method can be easily used in finding the minimum of the local energy.
-
-
+</p>
 </div>
 
 
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
 <h2 id="simple-example-and-demonstration">Simple example and demonstration </h2>
 
-<p>
-Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
+<p>Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
 For the harmonic oscillator in one-dimension we have a  trial wave function and probability
+</p>
 $$
 \psi_T(x;\alpha) = \exp{-(\frac{1}{2}\alpha^2x^2)},
 $$
 
-which results in a local energy 
+<p>which results in a local energy </p>
 $$
 \frac{1}{2}\left(\alpha^2+x^2(1-\alpha^4)\right).
 $$
 
-We can compare our numerically calculated energies with the exact energy as function of \( \alpha \)
+<p>We can compare our numerically calculated energies with the exact energy as function of \( \alpha \)</p>
 $$
 \overline{E}[\alpha] = \frac{1}{4}\left(\alpha^2+\frac{1}{\alpha^2}\right).
 $$
 
-<p>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="simple-example-and-demonstration">Simple example and demonstration </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
-The derivative of the energy with respect to \( \alpha \) gives
+<p>The derivative of the energy with respect to \( \alpha \) gives</p>
 $$
 \begin{equation*}
 \frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \frac{1}{2}\alpha-\frac{1}{2\alpha^3}
 \end{equation*}
 $$
 
-and a second derivative which is always positive (meaning that we find a minimum)
+<p>and a second derivative which is always positive (meaning that we find a minimum)</p>
 $$
 \begin{equation*}
 \frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = \frac{1}{2}+\frac{3}{2\alpha^4}
 \end{equation*}
 $$
 
-The condition
+<p>The condition</p>
 $$
 \begin{equation*}
 \frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
 \end{equation*}
 $$
 
-gives the optimal \( \alpha=1 \), as expected.
+<p>gives the optimal \( \alpha=1 \), as expected.</p>
 </div>
 
 
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<p>
 <!-- --- begin exercise --- -->
-
 <h2 id="exercise-1-find-the-local-energy-for-the-harmonic-oscillator">Exercise 1: Find the local energy for the harmonic oscillator </h2>
 
+<!-- --- begin subexercise --- -->
 <p>
 <b>a)</b>
 Derive the local energy for the harmonic oscillator in one dimension and find its expectation value.
+</p>
 
+<!-- --- end subexercise --- -->
+
+<!-- --- begin subexercise --- -->
 <p>
 <b>b)</b>
 Show also that the optimal value of optimal \( \alpha=1 \)
+</p>
 
+<!-- --- end subexercise --- -->
+
+<!-- --- begin subexercise --- -->
 <p>
 <b>c)</b>
 Repeat the above steps in two dimensions for \( N \) bosons or electrons. What is the optimal value of \( \alpha \)?
+</p>
 
-<p>
+<!-- --- end subexercise --- -->
+
 <!-- --- end exercise --- -->
 
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
 <h2 id="variance-in-the-simple-model">Variance in the simple model </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
-We can also minimize the variance. In our simple model the variance is
+<p>We can also minimize the variance. In our simple model the variance is</p>
 
 $$
 \sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}^2.
 $$
 
-which yields a second derivative which is always positive.
+<p>which yields a second derivative which is always positive.</p>
 </div>
 
 
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
 <h2 id="computing-the-derivatives">Computing the derivatives </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 
-<p>
-In general we end up computing the expectation value of the energy in terms 
+<p>In general we end up computing the expectation value of the energy in terms 
 of some parameters \( \alpha_0,\alpha_1,\dots,\alpha_n \)
 and we search for a minimum in this multi-variable parameter space.  
 This leads to an energy minimization problem <em>where we need the derivative of the energy as a function of the variational parameters</em>.
+</p>
 
-<p>
-In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
+<p>In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
 However, in our actual calculations the energy is represented by a multi-dimensional integral with several variational parameters.
 How can we can then obtain the derivatives of the energy with respect to the variational parameters without having 
-to resort to expensive numerical derivations?
-
-
+to resort to expensive numerical derivations? 
+</p>
 </div>
 
 
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
 <h2 id="expressions-for-finding-the-derivatives-of-the-local-energy">Expressions for finding the derivatives of the local energy </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
 
-<p>
-To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.
+<p>To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.  </p>
 
-<p>
-Let us define 
+<p>Let us define </p>
 $$
 \bar{E}_{\alpha}=\frac{d\langle  E_L[\alpha]\rangle}{d\alpha}.
 $$
 
-as the derivative of the energy with respect to the variational parameter \( \alpha \) (we limit ourselves to one parameter only).
+<p>as the derivative of the energy with respect to the variational parameter \( \alpha \) (we limit ourselves to one parameter only).
 In the above example this was easy and we obtain a simple expression for the derivative.
 We define also the derivative of the trial function (skipping the subindex \( T \)) as 
+</p>
 $$
 \bar{\psi}_{\alpha}=\frac{d\psi[\alpha]\rangle}{d\alpha}.
 $$
 </div>
 
 
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
 <h2 id="derivatives-of-the-local-energy">Derivatives of the local energy </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
-The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)
+<p>The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)</p>
 $$
 \bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
 $$
 
-From a computational point of view it means that you need to compute the expectation values of 
+<p>From a computational point of view it means that you need to compute the expectation values of </p>
 $$
 \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle,
 $$
 
-and
+<p>and</p>
 $$
 \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
 $$
 </div>
 
 
-<p>
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 
-<p>
 <!-- --- begin exercise --- -->
-
 <h2 id="exercise-2-general-expression-for-the-derivative-of-the-energy">Exercise 2: General expression for the derivative of the energy </h2>
 
+<!-- --- begin subexercise --- -->
 <p>
 <b>a)</b>
 Show that 
+</p>
 $$
 \bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
 $$
 
+
+<!-- --- end subexercise --- -->
+
+<!-- --- begin subexercise --- -->
 <p>
 <b>b)</b>
 Find the corresponding expression for the variance.
+</p>
 
-<p>
+<!-- --- end subexercise --- -->
+
 <!-- --- end exercise --- -->
-
 <!-- ------------------- end of main content --------------- -->
-
-
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2021, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 1999-2022, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
 </center>
-
-
 </body>
 </html>
-    
 
