@@ -1,31 +1,28 @@
 <!--
-Automatically generated HTML file from DocOnce source
+HTML file automatically generated from DocOnce source
 (https://github.com/doconce/doconce/)
+doconce format html week4.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week4-bs --no_mako
 -->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 5 February 1-5: Importance Sampling, Fokker-Planck and Langevin equations">
-
-<title>Week 5 February 1-5: Importance Sampling, Fokker-Planck and Langevin equations</title>
-
+<meta name="description" content="Week 6: Importance Sampling, Fokker-Planck and Langevin equations">
+<title>Week 6: Importance Sampling, Fokker-Planck and Langevin equations</title>
 <!-- Bootstrap style: bootstrap -->
+<!-- doconce format html week4.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week4-bs --no_mako -->
 <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
 <!-- not necessary
 <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 -->
-
 <style type="text/css">
-
 /* Add scrollbar to dropdown menus in bootstrap navigation bar */
 .dropdown-menu {
    height: auto;
    max-height: 400px;
    overflow-x: hidden;
 }
-
 /* Adds an invisible element before each target to offset for the navigation
    bar */
 .anchor::before {
@@ -35,16 +32,14 @@ Automatically generated HTML file from DocOnce source
   margin:-50px 0 0; /* negative fixed header height */
 }
 </style>
-
-
 </head>
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [('Overview of week 5, February 1-5',
+ 'sections': [('Overview of week 6, February 7-11',
                2,
                None,
-               'overview-of-week-5-february-1-5'),
+               'overview-of-week-6-february-7-11'),
               ('Importance sampling, what we are planning this week',
                2,
                None,
@@ -242,8 +237,6 @@ MathJax.Hub.Config({
 </script>
 
 
-
-    
 <!-- Bootstrap navigation bar -->
 <div class="navbar navbar-default navbar-fixed-top">
   <div class="navbar-header">
@@ -252,15 +245,14 @@ MathJax.Hub.Config({
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="week4-bs.html">Week 5 February 1-5: Importance Sampling, Fokker-Planck and Langevin equations</a>
+    <a class="navbar-brand" href="week4-bs.html">Week 6: Importance Sampling, Fokker-Planck and Langevin equations</a>
   </div>
-
   <div class="navbar-collapse collapse navbar-responsive-collapse">
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
         <ul class="dropdown-menu">
-     <!-- navigation toc: --> <li><a href="._week4-bs001.html#overview-of-week-5-february-1-5" style="font-size: 80%;">Overview of week 5, February 1-5</a></li>
+     <!-- navigation toc: --> <li><a href="._week4-bs001.html#overview-of-week-6-february-7-11" style="font-size: 80%;">Overview of week 6, February 7-11</a></li>
      <!-- navigation toc: --> <li><a href="._week4-bs002.html#importance-sampling-what-we-are-planning-this-week" style="font-size: 80%;">Importance sampling, what we are planning this week</a></li>
      <!-- navigation toc: --> <li><a href="._week4-bs003.html#detailed-content" style="font-size: 80%;">Detailed content</a></li>
      <!-- navigation toc: --> <li><a href="._week4-bs004.html#teaching-material-videos-and-textbooks" style="font-size: 80%;">Teaching Material, videos and textbooks</a></li>
@@ -325,23 +317,22 @@ MathJax.Hub.Config({
   </div>
 </div>
 </div> <!-- end of navigation bar -->
-
 <div class="container">
-
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
-
 <a name="part0010"></a>
 <!-- !split -->
-
 <h2 id="code-example-for-the-interacting-case-with-importance-sampling" class="anchor">Code example for the interacting case with importance sampling </h2>
 
-<p>
-We are now ready to implement importance sampling. This is done here for the two-electron case with the Coulomb interaction, as in the previous example. We have two variational parameters \( \alpha \) and \( \beta \). After the set up of files
+<p>We are now ready to implement importance sampling. This is done here for the two-electron case with the Coulomb interaction, as in the previous example. We have two variational parameters \( \alpha \) and \( \beta \). After the set up of files</p>
 
-<p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #408080; font-style: italic"># Common imports</span>
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #f8f8f8">
+  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># Common imports</span>
 <span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">os</span>
 
 <span style="color: #408080; font-style: italic"># Where to save the figures and data files</span>
@@ -368,13 +359,30 @@ DATA_ID <span style="color: #666666">=</span> <span style="color: #BA2121">&quot
     plt<span style="color: #666666">.</span>savefig(image_path(fig_id) <span style="color: #666666">+</span> <span style="color: #BA2121">&quot;.png&quot;</span>, <span style="color: #008000">format</span><span style="color: #666666">=</span><span style="color: #BA2121">&#39;png&#39;</span>)
 
 outfile <span style="color: #666666">=</span> <span style="color: #008000">open</span>(data_path(<span style="color: #BA2121">&quot;VMCQdotImportance.dat&quot;</span>),<span style="color: #BA2121">&#39;w&#39;</span>)
-</pre></div>
-<p>
-we move on to the set up of the trial wave function, the analytical expression for the local energy and the analytical expression for the quantum force.
-<p>
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>we move on to the set up of the trial wave function, the analytical expression for the local energy and the analytical expression for the quantum force.</p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #408080; font-style: italic"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #f8f8f8">
+  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
 <span style="color: #408080; font-style: italic"># Using gaussian rng for new positions and Metropolis- Hastings </span>
 <span style="color: #408080; font-style: italic"># No energy minimization</span>
 <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> exp, sqrt
@@ -415,14 +423,31 @@ we move on to the set up of the trial wave function, the analytical expression f
     qforce[<span style="color: #666666">0</span>,:] <span style="color: #666666">=</span> <span style="color: #666666">-2*</span>r[<span style="color: #666666">0</span>,:]<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>(r[<span style="color: #666666">0</span>,:]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,:])<span style="color: #666666">*</span>deno<span style="color: #666666">*</span>deno<span style="color: #666666">/</span>r12
     qforce[<span style="color: #666666">1</span>,:] <span style="color: #666666">=</span> <span style="color: #666666">-2*</span>r[<span style="color: #666666">1</span>,:]<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>(r[<span style="color: #666666">1</span>,:]<span style="color: #666666">-</span>r[<span style="color: #666666">0</span>,:])<span style="color: #666666">*</span>deno<span style="color: #666666">*</span>deno<span style="color: #666666">/</span>r12
     <span style="color: #008000; font-weight: bold">return</span> qforce
-</pre></div>
-<p>
-The Monte Carlo sampling includes now the Metropolis-Hastings algorithm, with the additional complication of having to evaluate the <b>quantum force</b> and the Green's function which is the solution of the Fokker-Planck equation.
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<p>
+<p>The Monte Carlo sampling includes now the Metropolis-Hastings algorithm, with the additional complication of having to evaluate the <b>quantum force</b> and the Green's function which is the solution of the Fokker-Planck equation.</p>
+
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #408080; font-style: italic"># The Monte Carlo sampling with the Metropolis algo</span>
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #f8f8f8">
+  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># The Monte Carlo sampling with the Metropolis algo</span>
 <span style="color: #408080; font-style: italic"># jit decorator tells Numba to compile this function.</span>
 <span style="color: #408080; font-style: italic"># The argument types will be inferred by Numba when function is called.</span>
 <span style="color: #AA22FF">@jit</span>()
@@ -493,13 +518,30 @@ The Monte Carlo sampling includes now the Metropolis-Hastings algorithm, with th
             Energies[ia,jb] <span style="color: #666666">=</span> energy    
             outfile<span style="color: #666666">.</span>write(<span style="color: #BA2121">&#39;</span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&#39;</span> <span style="color: #666666">%</span>(alpha,beta,energy,variance,error))
     <span style="color: #008000; font-weight: bold">return</span> Energies, AlphaValues, BetaValues
-</pre></div>
-<p>
-The main part here contains the setup of the variational parameters, the energies and the variance.
-<p>
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>The main part here contains the setup of the variational parameters, the energies and the variance.</p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #408080; font-style: italic">#Here starts the main program with variable declarations</span>
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #f8f8f8">
+  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic">#Here starts the main program with variable declarations</span>
 NumberParticles <span style="color: #666666">=</span> <span style="color: #666666">2</span>
 Dimension <span style="color: #666666">=</span> <span style="color: #666666">2</span>
 MaxVariations <span style="color: #666666">=</span> <span style="color: #666666">10</span>
@@ -527,8 +569,22 @@ ax<span style="color: #666666">.</span>zaxis<span style="color: #666666">.</span
 fig<span style="color: #666666">.</span>colorbar(surf, shrink<span style="color: #666666">=0.5</span>, aspect<span style="color: #666666">=5</span>)
 save_fig(<span style="color: #BA2121">&quot;QdotImportance&quot;</span>)
 plt<span style="color: #666666">.</span>show()
-</pre></div>
-<p>
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
@@ -558,25 +614,18 @@ plt<span style="color: #666666">.</span>show()
   <li><a href="._week4-bs011.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
-
 </div>  <!-- end container -->
 <!-- include javascript, jQuery *first* -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-
 <!-- Bootstrap footer
 <footer>
 <a href="https://..."><img width="250" align=right src="https://..."></a>
 </footer>
 -->
-
-
 <center style="font-size:80%">
 <!-- copyright only on the titlepage -->
 </center>
-
-
 </body>
 </html>
-    
 

@@ -1,31 +1,28 @@
 <!--
-Automatically generated HTML file from DocOnce source
+HTML file automatically generated from DocOnce source
 (https://github.com/doconce/doconce/)
+doconce format html week4.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week4-bs --no_mako
 -->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 5 February 1-5: Importance Sampling, Fokker-Planck and Langevin equations">
-
-<title>Week 5 February 1-5: Importance Sampling, Fokker-Planck and Langevin equations</title>
-
+<meta name="description" content="Week 6: Importance Sampling, Fokker-Planck and Langevin equations">
+<title>Week 6: Importance Sampling, Fokker-Planck and Langevin equations</title>
 <!-- Bootstrap style: bootstrap -->
+<!-- doconce format html week4.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week4-bs --no_mako -->
 <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
 <!-- not necessary
 <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 -->
-
 <style type="text/css">
-
 /* Add scrollbar to dropdown menus in bootstrap navigation bar */
 .dropdown-menu {
    height: auto;
    max-height: 400px;
    overflow-x: hidden;
 }
-
 /* Adds an invisible element before each target to offset for the navigation
    bar */
 .anchor::before {
@@ -35,16 +32,14 @@ Automatically generated HTML file from DocOnce source
   margin:-50px 0 0; /* negative fixed header height */
 }
 </style>
-
-
 </head>
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [('Overview of week 5, February 1-5',
+ 'sections': [('Overview of week 6, February 7-11',
                2,
                None,
-               'overview-of-week-5-february-1-5'),
+               'overview-of-week-6-february-7-11'),
               ('Importance sampling, what we are planning this week',
                2,
                None,
@@ -242,8 +237,6 @@ MathJax.Hub.Config({
 </script>
 
 
-
-    
 <!-- Bootstrap navigation bar -->
 <div class="navbar navbar-default navbar-fixed-top">
   <div class="navbar-header">
@@ -252,15 +245,14 @@ MathJax.Hub.Config({
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="week4-bs.html">Week 5 February 1-5: Importance Sampling, Fokker-Planck and Langevin equations</a>
+    <a class="navbar-brand" href="week4-bs.html">Week 6: Importance Sampling, Fokker-Planck and Langevin equations</a>
   </div>
-
   <div class="navbar-collapse collapse navbar-responsive-collapse">
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
         <ul class="dropdown-menu">
-     <!-- navigation toc: --> <li><a href="._week4-bs001.html#overview-of-week-5-february-1-5" style="font-size: 80%;">Overview of week 5, February 1-5</a></li>
+     <!-- navigation toc: --> <li><a href="._week4-bs001.html#overview-of-week-6-february-7-11" style="font-size: 80%;">Overview of week 6, February 7-11</a></li>
      <!-- navigation toc: --> <li><a href="._week4-bs002.html#importance-sampling-what-we-are-planning-this-week" style="font-size: 80%;">Importance sampling, what we are planning this week</a></li>
      <!-- navigation toc: --> <li><a href="._week4-bs003.html#detailed-content" style="font-size: 80%;">Detailed content</a></li>
      <!-- navigation toc: --> <li><a href="._week4-bs004.html#teaching-material-videos-and-textbooks" style="font-size: 80%;">Teaching Material, videos and textbooks</a></li>
@@ -325,44 +317,55 @@ MathJax.Hub.Config({
   </div>
 </div>
 </div> <!-- end of navigation bar -->
-
 <div class="container">
-
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
-
 <a name="part0031"></a>
 <!-- !split -->
-
 <h2 id="use-the-c-random-class-for-rngs-the-metropolis-test" class="anchor">Use the C++ random class for RNGs, the Metropolis test  </h2>
 <div class="panel panel-default">
 <div class="panel-body">
-<p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
+<!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
 <b>Using the uniform distribution for the Metropolis test</b>
-<p>
 
 <!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span>      <span style="color: #408080; font-style: italic">//  Metropolis-Hastings algorithm</span>
-      <span style="color: #B00040">double</span> GreensFunction <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>;            
-      <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span> j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> Dimension; j<span style="color: #666666">++</span>) {
-        GreensFunction <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>(OldQuantumForce(i,j)<span style="color: #666666">+</span>NewQuantumForce(i,j))<span style="color: #666666">*</span>
-          (D<span style="color: #666666">*</span>timestep<span style="color: #666666">*0.5*</span>(OldQuantumForce(i,j)<span style="color: #666666">-</span>NewQuantumForce(i,j))<span style="color: #666666">-</span>NewPosition(i,j)<span style="color: #666666">+</span>OldPosition(i,j));
-      }
-      GreensFunction <span style="color: #666666">=</span> exp(GreensFunction);
-      <span style="color: #408080; font-style: italic">// The Metropolis test is performed by moving one particle at the time</span>
-      <span style="color: #008000; font-weight: bold">if</span>(UniformNumberGenerator(gen) <span style="color: #666666">&lt;=</span> GreensFunction<span style="color: #666666">*</span>NewWaveFunction<span style="color: #666666">*</span>NewWaveFunction<span style="color: #666666">/</span>OldWaveFunction<span style="color: #666666">/</span>OldWaveFunction ) { 
-        <span style="color: #008000; font-weight: bold">for</span> (<span style="color: #B00040">int</span>  j <span style="color: #666666">=</span> <span style="color: #666666">0</span>; j <span style="color: #666666">&lt;</span> Dimension; j<span style="color: #666666">++</span>) {
-          OldPosition(i,j) <span style="color: #666666">=</span> NewPosition(i,j);
-          OldQuantumForce(i,j) <span style="color: #666666">=</span> NewQuantumForce(i,j);
-        }
-        OldWaveFunction <span style="color: #666666">=</span> NewWaveFunction;
-      }
-</pre></div>
-<p>
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #f8f8f8">
+  <pre style="line-height: 125%;"><span style="color: #bbbbbb">      </span><span style="color: #408080; font-style: italic">//  Metropolis-Hastings algorithm</span>
+<span style="color: #bbbbbb">      </span><span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span>GreensFunction<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0.0</span>;<span style="color: #bbbbbb">            </span>
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">for</span><span style="color: #bbbbbb"> </span>(<span style="color: #B00040">int</span><span style="color: #bbbbbb"> </span>j<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>;<span style="color: #bbbbbb"> </span>j<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;</span><span style="color: #bbbbbb"> </span>Dimension;<span style="color: #bbbbbb"> </span>j<span style="color: #666666">++</span>)<span style="color: #bbbbbb"> </span>{<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">        </span>GreensFunction<span style="color: #bbbbbb"> </span><span style="color: #666666">+=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0.5*</span>(OldQuantumForce(i,j)<span style="color: #666666">+</span>NewQuantumForce(i,j))<span style="color: #666666">*</span><span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">          </span>(D<span style="color: #666666">*</span>timestep<span style="color: #666666">*0.5*</span>(OldQuantumForce(i,j)<span style="color: #666666">-</span>NewQuantumForce(i,j))<span style="color: #666666">-</span>NewPosition(i,j)<span style="color: #666666">+</span>OldPosition(i,j));<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">      </span>}<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">      </span>GreensFunction<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>exp(GreensFunction);<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">      </span><span style="color: #408080; font-style: italic">// The Metropolis test is performed by moving one particle at the time</span>
+<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">if</span>(UniformNumberGenerator(gen)<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;=</span><span style="color: #bbbbbb"> </span>GreensFunction<span style="color: #666666">*</span>NewWaveFunction<span style="color: #666666">*</span>NewWaveFunction<span style="color: #666666">/</span>OldWaveFunction<span style="color: #666666">/</span>OldWaveFunction<span style="color: #bbbbbb"> </span>)<span style="color: #bbbbbb"> </span>{<span style="color: #bbbbbb"> </span>
+<span style="color: #bbbbbb">        </span><span style="color: #008000; font-weight: bold">for</span><span style="color: #bbbbbb"> </span>(<span style="color: #B00040">int</span><span style="color: #bbbbbb">  </span>j<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>;<span style="color: #bbbbbb"> </span>j<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;</span><span style="color: #bbbbbb"> </span>Dimension;<span style="color: #bbbbbb"> </span>j<span style="color: #666666">++</span>)<span style="color: #bbbbbb"> </span>{<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">          </span>OldPosition(i,j)<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>NewPosition(i,j);<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">          </span>OldQuantumForce(i,j)<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>NewQuantumForce(i,j);<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">        </span>}<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">        </span>OldWaveFunction<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>NewWaveFunction;<span style="color: #bbbbbb"></span>
+<span style="color: #bbbbbb">      </span>}<span style="color: #bbbbbb"></span>
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 </div>
 
 
-<p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
@@ -392,25 +395,18 @@ MathJax.Hub.Config({
   <li><a href="._week4-bs032.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
-
 </div>  <!-- end container -->
 <!-- include javascript, jQuery *first* -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-
 <!-- Bootstrap footer
 <footer>
 <a href="https://..."><img width="250" align=right src="https://..."></a>
 </footer>
 -->
-
-
 <center style="font-size:80%">
 <!-- copyright only on the titlepage -->
 </center>
-
-
 </body>
 </html>
-    
 
