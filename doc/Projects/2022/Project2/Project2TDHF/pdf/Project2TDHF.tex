@@ -1,0 +1,560 @@
+%%
+%% Automatically generated file from DocOnce source
+%% (https://github.com/hplgit/doconce/)
+%%
+%%
+
+
+%-------------------- begin preamble ----------------------
+
+\documentclass[%
+oneside,                 % oneside: electronic viewing, twoside: printing
+final,                   % draft: marks overfull hboxes, figures with paths
+10pt]{article}
+
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{relsize,makeidx,color,setspace,amsmath,amsfonts,amssymb}
+\usepackage[table]{xcolor}
+\usepackage{bm,ltablex,microtype}
+
+\usepackage[pdftex]{graphicx}
+
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{lmodern}         % Latin Modern fonts derived from Computer Modern
+
+% Hyperlinks in PDF:
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=black,
+    filecolor=black,
+    %filecolor=blue,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+    }
+%\hyperbaseurl{}   % hyperlinks are relative to this root
+
+\setcounter{tocdepth}{2}  % levels in table of contents
+
+% --- fancyhdr package for fancy headers ---
+\usepackage{fancyhdr}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[LE,RO]{\thepage}
+% Ensure copyright on titlepage (article style) and chapter pages (book style)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2021, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+%  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+% Ensure copyright on titlepages with \thispagestyle{empty}
+\fancypagestyle{empty}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2021, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+
+\pagestyle{fancy}
+
+
+% prevent orhpans and widows
+\clubpenalty = 10000
+\widowpenalty = 10000
+
+% --- end of standard preamble for documents ---
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+\usepackage[totoc]{idxlayout}   % for index in the toc
+\usepackage[nottoc]{tocbibind}  % for references/bibliography in the toc
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+% matching end for #ifdef PREAMBLE
+
+\newcommand{\exercisesection}[1]{\subsection*{#1}}
+
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\thispagestyle{empty}
+
+\begin{center}
+{\LARGE\bf
+\begin{spacing}{1.25}
+Project 2, Modelling time-dependent quantum mechanical many-body systems. Deadline June 1
+\end{spacing}
+}
+\end{center}
+
+% ----------------- author(s) -------------------------
+
+\begin{center}
+{\bf \href{{http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html}}{Computational Physics II FYS4411/FYS9411}}
+\end{center}
+
+    \begin{center}
+% List of all institutions:
+\centerline{{\small Department of Physics, University of Oslo, Norway}}
+\end{center}
+    
+% ----------------- end author(s) -------------------------
+
+% --- begin date ---
+\begin{center}
+Apr 7, 2021
+\end{center}
+% --- end date ---
+
+\vspace{1cm}
+
+
+\subsection*{Introduction}
+
+The aim of this project is to use the time-dependent Hartree-Fock method to
+model electronic systems subject to an intense semi-classical laser. We will
+study how these systems react when they are perturbed by an external field.
+
+
+\subsection*{Theoretical background}
+
+We start our analysis by considering time-independent Hartree-Fock theory, as
+much of the tools and formalism will be the same as in the time-dependent case.
+Consider the time-independent Schrödinger equation
+
+\begin{align}
+    \hat{H}\vert\Psi\rangle = E\vert\Psi\rangle,
+\end{align}
+
+where $\hat{H}$ is a time-independent Hamiltonian, $\vert\Psi\rangle$ an
+eigenfunction of the Hamiltonian and $E$ the corresponding eigenenergy. In
+Hartree-Fock theory we assume that the full many-body wavefunction
+$\vert\Psi\rangle$ can be approximated well by a single Slater determinant. That
+is,
+
+\begin{align}
+    \vert\Psi\rangle = \vert\Phi\rangle = \vert\phi_1, \dots, \phi_N\rangle,
+\end{align}
+
+where we label this Slater determinant by $\vert\Phi\rangle$. In a coordinate
+representation this Slater determinant can be represented by
+
+\begin{align}
+    \Phi(x_1, \dots, x_N)
+    = \langle x_1, \dots, x_N \vert \phi_1, \dots, \phi_N \rangle
+    = \frac{1}{\sqrt{N!}}
+    \begin{vmatrix}
+        \phi_1(x_1) & \dots & \phi_1(x_N) \\
+        \vdots & \ddots & \vdots \\
+        \phi_N(x_1) & \dots & \phi_N(x_N)
+    \end{vmatrix},
+\end{align}
+
+% TODO: Is this the correct ordering of the indices?
+where the coordinates $x_i$ contain both position and spin. Hartree-Fock is a
+method for finding the "best" such Slater determinant, that is, the single
+Slater determinant that will yield the lowest energy for the given Hamiltonian.
+We achieve this by finding the \emph{molecular orbitals} $\vert\phi_i\rangle$
+that minimizes the energy using the variational method. In Hartree-Fock it is
+the molecular orbitals that are the unknowns we are trying to find. More
+specifically, we use \emph{atomic orbitals} $\vert\chi_{\alpha}\rangle$ as our
+initial guess, and the do a basis transformation
+
+\begin{align}
+    \vert\phi_j\rangle = \sum_{\alpha} C_{\alpha j}\vert\chi_{\alpha}\rangle.
+\end{align}
+
+Thus, we are interested in finding the coefficients $C_{\alpha j}$ such that we
+can transform from the known atomic orbitals $\vert\chi_{\alpha}\rangle$ to the
+optimal molecular orbitals $\vert\phi_j\rangle$.
+
+
+% Alternative derivation
+Recall that we in time-indepedent Hartree-Fock theory approximate the true
+many-body wavefunction $\vert\Psi\rangle$ by a single Slater determinant
+$\vert\Phi\rangle$ containing the $N$ occupied \emph{molecular orbitals}
+$\vert\phi_j\rangle$ subject to the constraint that
+
+\begin{align}
+    \langle \phi_i \vert \phi_j \rangle = \delta_{ij},
+\end{align}
+
+that is, the orbitals are orthonormal. The expectation value of the Hamiltonian
+is then
+
+\begin{align}
+    \langle \Phi \vert \hat{H} \vert \Phi \rangle
+    = \sum_{i} \langle \phi_i \vert \hat{h} \vert \phi_i \rangle
+    + \frac{1}{2} \sum_{ij}
+    \langle \phi_i \phi_j \vert \hat{u} \vert \phi_i \phi_j \rangle_{AS},
+\end{align}
+
+where the many-body Hamiltonian is given by
+
+\begin{align}
+    \hat{H} = \hat{h} + \hat{u}.
+\end{align}
+
+Here $\hat{h}$ is the one-body part of the Hamiltonian containing the kinetic
+energy and an external potential. The two-body part $\hat{u}$ will contain the
+two-body interactions between the particles in the system. In our case these
+interactions will be the Coulomb interaction. We have labeled the
+\emph{anti-symmetric two-body matrix elements} by
+
+\begin{align}
+    \langle \phi_p \phi_q \vert \hat{u} \vert \phi_r \phi_s \rangle_{AS}
+    \equiv
+    \langle \phi_p \phi_q \vert \hat{u} \vert \phi_r \phi_s \rangle
+    - \langle \phi_p \phi_q \vert \hat{u} \vert \phi_s \phi_r \rangle.
+\end{align}
+
+By constructing the Lagrangian functional
+
+\begin{align}
+    \mathcal{L}
+    &= \langle \Phi \vert \hat{H} \vert \Phi \rangle
+    - \sum_{ij} \lambda_{ji} \left(
+        \langle \phi_i \vert \phi_j \rangle - \delta_{ij}
+    \right)
+    \\
+    &=
+    \sum_{i} \langle \phi_i \vert \hat{h} \vert \phi_i \rangle
+    + \frac{1}{2} \sum_{ij}
+    \langle \phi_i \phi_j \vert \hat{u} \vert \phi_i \phi_j \rangle_{AS}
+    - \sum_{ij} \lambda_{ji} \left(
+        \langle \phi_i \vert \phi_j \rangle - \delta_{ij}
+    \right),
+\end{align}
+
+where $\lambda_{ji}$ are the Lagrange multipliers used to optimize the
+Lagrangian under the orthonormality constraint of the molecular orbitals.
+
+
+
+
+We consider a system of electrons confined in a pure two-dimensional
+isotropic harmonic oscillator potential, with an idealized  total Hamiltonian given by
+
+\begin{equation}
+\label{eq:finalH}
+\hat{H}=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2
++ \frac{1}{2} \omega^2r_i^2  \right)+\sum_{i<j}\frac{1}{r_{ij}},
+\end{equation}
+where natural units ($\hbar=c=e=m_e=1$) are used and all energies are in
+so-called atomic units a.u. We will study systems of many electrons $N$ as
+functions of the oscillator frequency  $\omega$ using the above Hamiltonian.
+The Hamiltonian includes a standard harmonic oscillator part
+
+\begin{equation*}
+\hat{H}_0=\sum_{i=1}^{N} \left(  -\frac{1}{2} \nabla_i^2 + \frac{1}{2} \omega^2r_i^2  \right),
+\end{equation*}
+and the repulsive interaction between two electrons given by
+
+\begin{equation*}
+\hat{H}_1=\sum_{i<j}\frac{1}{r_{ij}},
+\end{equation*}
+with the distance between electrons given by $r_{ij}=\vert \bm{r}_1-\bm{r}_2\vert$. We define the
+modulus of the positions of the electrons (for a given electron $i$) as $r_i = \sqrt{r_{i_x}^2+r_{i_y}^2}$.
+
+The aim of this project is to develop a coupled cluster doubles (CCD) code, where $2p-2h$ excitations are included only.
+
+We will start with a two-electron problem and compare our results to those of Taut, see reference [1] below.
+
+The ansatz for the ground state  is given by
+  \begin{equation*}
+     \vert \Psi_0\rangle = \vert \Psi_{CC}\rangle = e^{\hat{T}} \vert
+     \Phi_0\rangle = \left( \sum_{n=1}^{N} \frac{1}{n!} \hat{T}^n
+     \right) \vert \Phi_0\rangle,
+  \end{equation*}
+  where $N$ represents the maximum number of particle-hole excitations
+  and $\hat{T}$ is the cluster operator defined as
+  \begin{align*}
+              \hat{T} &= \hat{T}_1 + \hat{T}_2 + \ldots + \hat{T}_N
+              \\ \hat{T}_n &= \left(\frac{1}{n!}\right)^2
+              \sum_{\substack{ i_1,i_2,\ldots i_n \\ a_1,a_2,\ldots
+                  a_n}} t_{i_1i_2\ldots i_n}^{a_1a_2\ldots a_n}
+              a_{a_1}^\dagger a_{a_2}^\dagger \ldots a_{a_n}^\dagger
+              a_{i_n} \ldots a_{i_2} a_{i_1}.
+          \end{align*}
+      The energy is given by
+      \begin{equation*}
+          E_{\mathrm{CC}} = \langle\Phi_0\vert \overline{H}\vert
+          \Phi_0\rangle,
+      \end{equation*}
+      where $\overline{H}$ is a similarity transformed Hamiltonian
+      \begin{align*}
+          \overline{H}&= e^{-\hat{T}} \hat{H}_N e^{\hat{T}}
+          \\ \hat{H}_N &= \hat{H} - \langle\Phi_0\vert \hat{H} \vert
+          \Phi_0\rangle.
+      \end{align*}
+      The coupled cluster energy is a function of the unknown cluster
+      amplitudes $t_{i_1i_2\ldots i_n}^{a_1a_2\ldots a_n}$, given by
+      the solutions to the amplitude equations
+      \begin{equation}\label{eq:amplitudeeq}
+          0 = \langle\Phi_{i_1 \ldots i_n}^{a_1 \ldots a_n}\vert
+          \overline{H}\vert \Phi_0\rangle.
+      \end{equation}
+In order to set up the above equations,
+the similarity transformed Hamiltonian $\overline{H}$ is expanded
+  using the Baker-Campbell-Hausdorff expression,
+      \begin{equation}\label{eq:bch}
+          \overline{H}= \hat{H}_N + \left[ \hat{H}_N, \hat{T} \right]
+          + \frac{1}{2} \left[\left[ \hat{H}_N, \hat{T} \right],
+            \hat{T}\right] + \ldots + \frac{1}{n!} \left[
+            \ldots \left[ \hat{H}_N, \hat{T} \right], \ldots \hat{T}
+            \right] +\dots
+      \end{equation}
+  and simplified using the connected cluster theorem
+      \begin{equation*}
+          \overline{H}= \hat{H}_N + \left( \hat{H}_N \hat{T}\right)_c
+          + \frac{1}{2} \left( \hat{H}_N \hat{T}^2\right)_c + \dots +
+          \frac{1}{n!} \left( \hat{H}_N \hat{T}^n\right)_c +\dots
+      \end{equation*}
+We will discuss parts of the the derivation below.
+
+
+
+
+  We will now approximate the cluster operator $\hat{T}$ to include
+  only $2p-2h$ correlations. This leads to the so-called CCD
+  approximation, that is
+  \[
+  \hat{T}\approx
+  \hat{T}_2=\frac{1}{4}\sum_{abij}t_{ij}^{ab}a^{\dagger}_aa^{\dagger}_ba_ja_i,
+  \]
+  meaning that we have
+  \[
+  \vert \Psi_0 \rangle \approx \vert \Psi_{CCD} \rangle =
+  \exp{\left(\hat{T}_2\right)}\vert \Phi_0\rangle.
+  \]
+  Inserting these equations in the expression for the computation of
+  the energy we have, with a Hamiltonian defined with respect to a
+  general reference vacuum
+  \[
+  \hat{H}=\hat{H}_N+E_{\mathrm{ref}},
+  \]
+  with
+  \[
+  \hat{H}_N=\sum_{pq}\langle p \vert \hat{f} \vert q \rangle
+  a^{\dagger}_pa_q + \frac{1}{4}\sum_{pqrs}\langle pq \vert \hat{v}
+  \vert rs \rangle a^{\dagger}_pa^{\dagger}_qa_sa_r,
+  \]
+  we obtain that the energy can be written as
+  \[
+  \langle \Phi_0 \vert
+  \exp{\left(-\hat{T}_2\right)}\hat{H}_N\exp{\left(\hat{T}_2\right)}\vert
+  \Phi_0\rangle = \langle \Phi_0 \vert \hat{H}_N(1+\hat{T}_2)\vert
+  \Phi_0\rangle = E_{CCD}.
+  \]
+  This quantity becomes
+  \[
+  E_{CCD}=E_{\mathrm{ref}}+\frac{1}{4}\sum_{abij}\langle ij \vert
+  \hat{v} \vert ab \rangle t_{ij}^{ab},
+  \]
+  where the latter is the correlation energy from this level of
+  approximation of coupled cluster  theory.  Similarly, the expression for the
+  amplitudes reads
+  \[
+  \langle \Phi_{ij}^{ab} \vert
+  \exp{\left(-\hat{T}_2\right)}\hat{H}_N\exp{\left(\hat{T}_2\right)}\vert
+  \Phi_0\rangle = 0.
+  \]
+  These equations can be reduced to (after several applications of
+  Wick's theorem), for all $i > j$ and all $a > b$,
+  \begin{align}
+  0 = \langle ab \vert \hat{v} \vert ij \rangle +
+  \left(\epsilon_a+\epsilon_b-\epsilon_i-\epsilon_j\right)t_{ij}^{ab}+\frac{1}{2}\sum_{cd} \langle ab \vert \hat{v} \vert
+  cd \rangle t_{ij}^{cd}+\frac{1}{2}\sum_{kl} \langle kl \vert \hat{v}
+  \vert ij \rangle t_{kl}^{ab}+\hat{P}(ij\vert ab)\sum_{kc} \langle kb
+  \vert \hat{v} \vert cj \rangle t_{ik}^{ac} & \nonumber
+  \\ +\frac{1}{4}\sum_{klcd} \langle kl \vert \hat{v} \vert cd \rangle
+  t_{ij}^{cd}t_{kl}^{ab}+\hat{P}(ij)\sum_{klcd} \langle kl \vert
+  \hat{v} \vert cd \rangle t_{ik}^{ac}t_{jl}^{bd}-\frac{1}{2}\hat{P}(ij)\sum_{klcd} \langle kl \vert \hat{v} \vert
+  cd \rangle t_{ik}^{dc}t_{lj}^{ab}-\frac{1}{2}\hat{P}(ab)\sum_{klcd}
+  \langle kl \vert \hat{v} \vert cd \rangle t_{lk}^{ac}t_{ij}^{db},&
+  \label{eq:ccd}
+  \end{align}
+  where we have defined
+  \[
+  \hat{P}\left(ab\right)= 1-\hat{P}_{ab},
+  \]
+  where $\hat{P}_{ab}$ interchanges two particles occupying the
+  quantum numbers $a$ and $b$.  The operator $\hat{P}(ij\vert ab)$ is
+  defined as
+  \[
+  \hat{P}(ij\vert ab) = (1-\hat{P}_{ij})(1-\hat{P}_{ab}).
+  \]
+  The single-particle energies $\epsilon_p$ are normally taken to be Hartree-Fock single-particle energies.
+  Recall also that the unknown amplitudes $t_{ij}^{ab}$ represent
+  anti-symmetrized matrix elements, meaning that they obey the same
+  symmetry relations as the two-body interaction, that is
+  \[
+  t_{ij}^{ab}=-t_{ji}^{ab}=-t_{ij}^{ba}=t_{ji}^{ba}.
+  \]
+  The two-body matrix elements are also anti-symmetrized, meaning that
+  \[
+  \langle ab \vert \hat{v} \vert ij \rangle = -\langle ab \vert
+  \hat{v} \vert ji \rangle= -\langle ba \vert \hat{v} \vert ij
+  \rangle=\langle ba \vert \hat{v} \vert ji \rangle.
+  \]
+  The non-linear equations for the unknown amplitudes $t_{ij}^{ab}$
+  are solved iteratively.
+
+In order to develop a program, chapter 8 of the recent \href{{http://www.springer.com/us/book/9783319533353}}{Lecture Notes in Physics (volume 936)} is highly recommended as literature.
+All material is available from the \href{{https://github.com/ManyBodyPhysics/LectureNotesPhysics/blob/master/doc/src/lnp.pdf}}{source site}. Example of CCD codes are available from the \href{{https://github.com/ManyBodyPhysics/LectureNotesPhysics/tree/master/Programs/Chapter8-programs/cpp/CCD}}{program site}. These can be used to benchmark your own program.
+
+\paragraph{Project 2 a):}
+We will use our Hartree-Fock basis from project 1 to define matrix elements and the single-particle energies to be used in the CCD equations. The Hartree-Fock basis defines the so-called reference energy
+\begin{equation}
+  E_{\mathrm{ref}} = \sum_{i\le F} \sum_{\alpha\beta}
+  C^*_{i\alpha}C_{i\beta}\langle \alpha | h | \beta \rangle +
+  \frac{1}{2}\sum_{ij\le F}\sum_{{\alpha\beta\gamma\delta}}
+  C^*_{i\alpha}C^*_{j\beta}C_{i\gamma}C_{j\delta}\langle
+  \alpha\beta|\hat{v}|\gamma\delta\rangle.
+\end{equation}
+You will need to transform the matrix elements from the harmonic oscillator basis to the Hartree-Fock basis.
+The first step is to program
+\begin{equation}
+  \langle pq \vert \hat{v} \vert rs\rangle_{AS}=
+  \sum_{{\alpha\beta\gamma\delta}}
+  C^*_{p\alpha}C^*_{q\beta}C_{r\gamma}C_{s\delta}\langle
+  \alpha\beta|\hat{v}|\gamma\delta\rangle_{AS},
+\end{equation}
+where the coefficients are those from the last Hartree-Fock iteration and the matrix elements are all anti-symmetrized.
+You can extend your Hartree-Fock program to write out these matrix elements after the last Hartree-Fock iteration.
+Make sure that your matrix elements are structured according to conserved quantum numbers, avoiding thereby the write out of many zeros.
+
+To test that your matrix elements are set up correctly, when you read in these matrix elements in the CCD code, make sure that the reference energy from your Hartree-Fock calculations are reproduced.
+
+
+\paragraph{Project 2 b):}
+Set up a code which solves the CCD equation by encoding the equations as they stand, that is follow the mathematical expressions and perform the sums over all single-particle states.  Compute the energy of the two-electron systems using
+all single-particle states that were needed in order to obtain the Hartree-Fock limit. Compare these with Taut's results for $\omega=1$ a.u.  Since you do not include singles you will not get the exact result. If you wish to include singles, you will able to obtain the exact results in a basis with at least ten major oscillator shells.
+Perform also calculations with $N=6$, $N=12$ and $N=20$ electrons and compare with reference [2] of Pedersen et al below.
+
+\paragraph{Project 2 c):}
+The next step consists in rewriting the equations in terms of matrix-matrix multiplications and subdividing
+the matrix elements and operations in terms of two-particle configuration that conserve total spin projection and projection of the orbital momentum. Rewrite also the equations in terms of so-called intermediates, as detailed
+in section 8.7 of \href{{https://github.com/ManyBodyPhysics/LectureNotesPhysics/blob/master/doc/src/lnp.pdf}}{Lietz et al}.
+This section gives a detailed description on how to build a coupled cluster code and is highly recommended.
+
+Rerun your calculations for $=2$, $N=6$, $N=12$ and $N=20$ electrons using your optimal Hartree-Fock basis. Make sure your results from 2b) stay the same.
+
+Calculate as well ground state energies for $\omega=0.5$ and $\omega=0.1$. Try to compare with eventual variational
+Monte Carlo results from other students, if possible.
+
+\paragraph{Project 2 d):}
+The final step is to parallelize your CCD code using either OpenMP or MPI and do a performance analysis. Use the $N=6$ case. Make a performance analysis by timing your serial code
+with and without vectorization. Perform several runs and compute an average timing analysis
+with and without vectorization. Comment your results.
+
+Compare thereafter your serial code(s)  with the speedup you get by parallelizing your code, running either OpenMP or MPI or both.
+Do you get a near $100\%$ speedup with the parallel version? Comment again your results and perform timing benchmarks several times in order
+to extract  an average performance time.
+
+
+
+\paragraph{Literature.}
+\begin{enumerate}
+ \item M. Taut, Phys. Rev. A \textbf{48}, 3561 - 3566 (1993).
+
+ \item M. L. Pedersen, G. Hagen, M. Hjorth-Jensen, S. Kvaal,  and F. Pederiva, Phys. Rev. B \textbf{84}, 115302 (2011)
+\end{enumerate}
+
+\noindent
+\subsection*{Introduction to numerical projects}
+
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+
+\begin{itemize}
+  \item Give a short description of the nature of the problem and the eventual  numerical methods you have used.
+
+  \item Describe the algorithm you have used and/or developed. Here you may find it convenient to use pseudocoding. In many cases you can describe the algorithm in the program itself.
+
+  \item Include the source code of your program. Comment your program properly.
+
+  \item If possible, try to find analytic solutions, or known limits in order to test your program when developing the code.
+
+  \item Include your results either in figure form or in a table. Remember to        label your results. All tables and figures should have relevant captions        and labels on the axes.
+
+  \item Try to evaluate the reliabilty and numerical stability/precision of your results. If possible, include a qualitative and/or quantitative discussion of the numerical stability, eventual loss of precision etc.
+
+  \item Try to give an interpretation of you results in your answers to  the problems.
+
+  \item Critique: if possible include your comments and reflections about the  exercise, whether you felt you learnt something, ideas for improvements and  other thoughts you've made when solving the exercise. We wish to keep this course at the interactive level and your comments can help us improve it.
+
+  \item Try to establish a practice where you log your work at the  computerlab. You may find such a logbook very handy at later stages in your work, especially when you don't properly remember  what a previous test version  of your program did. Here you could also record  the time spent on solving the exercise, various algorithms you may have tested or other topics which you feel worthy of mentioning.
+\end{itemize}
+
+\noindent
+\subsection*{Format for electronic delivery of report and programs}
+
+The preferred format for the report is a PDF file. You can also use DOC or postscript formats or as an ipython notebook file.  As programming language we prefer that you choose between C/C++, Fortran2008 or Python. The following prescription should be followed when preparing the report:
+
+\begin{itemize}
+  \item Use canvas to hand in your projects, log in  at  \href{{http://canvas.uio.no}}{\nolinkurl{http://canvas.uio.no}} with your normal UiO username and password.
+
+  \item Upload \textbf{only} the report file!  For the source code file(s) you have developed please provide us with your link to your github domain.  The report file should include all of your discussions and a list of the codes you have developed.  The full version of the codes should be in your github repository.
+
+  \item In your github repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.
+
+  \item Still in your github make a folder where you place your codes. 
+
+  \item In this and all later projects, you should include tests (for example unit tests) of your code(s).
+
+  \item Comments  from us on your projects, approval or not, corrections to be made  etc can be found under your Devilry domain and are only visible to you and the teachers of the course.
+\end{itemize}
+
+\noindent
+Finally, 
+we encourage you to work two and two together. Optimal working groups consist of 
+2-3 students. You can then hand in a common report. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% ------------------- end of main content ---------------
+
+\end{document}
+
