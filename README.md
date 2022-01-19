@@ -97,7 +97,7 @@ to form small project groups of 2-3 participants, if possible.
 * _Office hours_: TBA
 
 ## Practicalities
-This course will be delivered in a hybrid mode, with online and on site lectures and on site and online laboratory sessions. The first week (January 17-21) is fully digital and the computer lab and the lectures will be done via zoom. 
+This course will be delivered in a hybrid mode, with online lectures and on site and online laboratory sessions. The first two weeks (January 17-28) is fully digital and the computer lab and the lectures will be done via zoom. 
 
 1. Two lectures per week, spring semester, 10 ECTS. The lectures are presented in a hybrid mode. The lectures will be recorded and linked to this site and the official University of Oslo website for the course;
 2. Thre hours of laboratory sessions for work on computational projects and exercises. There will  also be fully digital laboratory sessions for those who cannot attend in person;
@@ -192,5 +192,5 @@ Here we list several useful Python libraries we strongly recommend (if you use a
 
 ## Textbooks
 
-_Recommended textbooks_: Lecture Notes by Morten Hjorth-Jensen and Bernd A. Berg, Markov Chain Monte Carlo Simulations and their Statistical Analysis, World Scientific, 2004, chapters 1, 2
+_Recommended textbooks_: Lecture Notes by Morten Hjorth-Jensen
 
