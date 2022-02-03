@@ -4,7 +4,7 @@ DATE: today
 
 
 !split
-===== Overview of week 5 =====
+===== Overview of week 5, January 31-February 4 =====
 !bblock  Topics
 * Metropolis-Hastings sampling and Importance Sampling
 * Fokker-Planck and Langevin equations
@@ -304,14 +304,33 @@ The requirements for the transition $T_{i \rightarrow j}$ are
 
 
 
+
 !split
-===== Importance sampling =====
-!bblock 
-We need to replace the brute force
-Metropolis algorithm with a walk in coordinate space biased by the trial wave function.
-This approach is based on the Fokker-Planck equation and the Langevin equation for generating a trajectory in coordinate space.  The link between the Fokker-Planck equation and the Langevin equations are explained, only partly, in the slides below.
-An excellent reference on topics like Brownian motion, Markov chains, the Fokker-Planck equation and the Langevin equation is the text by  "Van Kampen": "http://www.elsevier.com/books/stochastic-processes-in-physics-and-chemistry/van-kampen/978-0-444-52965-7"
-Here we will focus first on the implementation part first.
+===== Importance sampling, what we are planning this week =====
+
+!bblock
+The plans are:
+o First we want to give you an overarching  view on the equations we need to program in order to perform importance sampling with a simple Python code that demonstrates the essential elements.
+o Secondly, we will go through the computational elements we need in order to program the local energy, the trial wave functions and the so-called _quantum force_ in the most efficient way (computationally).
+o Finally, we will try to give a better connection between the equations for importance sampling and their links with the Fokker-Planck and Langevin equations. 
+!eblock
+
+
+!split
+===== Teaching Material, videos and textbooks  =====
+
+!bblock
+o You may find the following "Lecture on the Langevin and Fokker-Planck equations":"https://www.youtube.com/watch?v=H9I0PmXwhdo" as a useful introduction. 
+
+o The textbook of "Gardiner on Stochastic Methods":"https://www.springer.com/gp/book/9783540707127" is a classic and chapters 4 and 5 are the most relevant ones in order to get a better understanding of these equations. The textbook can be downloaded via UiO's subscription to Springer. Alternatively, the "link here":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Literature/StochasticMethods.pdf" gives you an earlier version.
+
+o Another excellent reference on topics like Brownian motion, Markov chains, the Fokker-Planck equation and the Langevin equation is the text by  "Van Kampen": "http://www.elsevier.com/books/stochastic-processes-in-physics-and-chemistry/van-kampen/978-0-444-52965-7"
+!eblock
+
+!split
+===== Overview of what needs to be coded =====
+
+!bblock
 
 For a diffusion process characterized by a time-dependent probability density $P(x,t)$ in one dimension the Fokker-Planck
 equation reads (for one particle /walker) 
@@ -408,8 +427,202 @@ q(y,x) = \frac{G(x,y,\Delta t)|\Psi_T(y)|^2}{G(y,x,\Delta t)|\Psi_T(x)|^2}
 !eblock
 
 
+
+
 !split
-===== Importance sampling, program elements =====
+===== Code example for the interacting case with importance sampling =====
+
+We are now ready to implement importance sampling. This is done here for the two-electron case with the Coulomb interaction, as in the previous example. We have two variational parameters $\alpha$ and $\beta$. After the set up of files
+
+!bc pycod
+# Common imports
+import os
+
+# Where to save the figures and data files
+PROJECT_ROOT_DIR = "Results"
+FIGURE_ID = "Results/FigureFiles"
+DATA_ID = "Results/VMCQdotImportance"
+
+if not os.path.exists(PROJECT_ROOT_DIR):
+    os.mkdir(PROJECT_ROOT_DIR)
+
+if not os.path.exists(FIGURE_ID):
+    os.makedirs(FIGURE_ID)
+
+if not os.path.exists(DATA_ID):
+    os.makedirs(DATA_ID)
+
+def image_path(fig_id):
+    return os.path.join(FIGURE_ID, fig_id)
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+def save_fig(fig_id):
+    plt.savefig(image_path(fig_id) + ".png", format='png')
+
+outfile = open(data_path("VMCQdotImportance.dat"),'w')
+!ec
+we move on to the set up of the trial wave function, the analytical expression for the local energy and the analytical expression for the quantum force.
+!bc pycod
+# 2-electron VMC code for 2dim quantum dot with importance sampling
+# Using gaussian rng for new positions and Metropolis- Hastings 
+# No energy minimization
+from math import exp, sqrt
+from random import random, seed, normalvariate
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import sys
+from numba import jit,njit
+
+
+# Trial wave function for the 2-electron quantum dot in two dims
+def WaveFunction(r,alpha,beta):
+    r1 = r[0,0]**2 + r[0,1]**2
+    r2 = r[1,0]**2 + r[1,1]**2
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = r12/(1+beta*r12)
+    return exp(-0.5*alpha*(r1+r2)+deno)
+
+# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
+def LocalEnergy(r,alpha,beta):
+    
+    r1 = (r[0,0]**2 + r[0,1]**2)
+    r2 = (r[1,0]**2 + r[1,1]**2)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    deno2 = deno*deno
+    return 0.5*(1-alpha*alpha)*(r1 + r2) +2.0*alpha + 1.0/r12+deno2*(alpha*r12-deno2+2*beta*deno-1.0/r12)
+
+# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
+def QuantumForce(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    qforce[0,:] = -2*r[0,:]*alpha*(r[0,:]-r[1,:])*deno*deno/r12
+    qforce[1,:] = -2*r[1,:]*alpha*(r[1,:]-r[0,:])*deno*deno/r12
+    return qforce
+!ec
+
+The Monte Carlo sampling includes now the Metropolis-Hastings algorithm, with the additional complication of having to evaluate the _quantum force_ and the Green's function which is the solution of the Fokker-Planck equation.
+
+!bc pycod    
+# The Monte Carlo sampling with the Metropolis algo
+# jit decorator tells Numba to compile this function.
+# The argument types will be inferred by Numba when function is called.
+@jit()
+def MonteCarloSampling():
+
+    NumberMCcycles= 100000
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    # seed for rng generator 
+    seed()
+    # start variational parameter  loops, two parameters here
+    alpha = 0.9
+    for ia in range(MaxVariations):
+        alpha += .025
+        AlphaValues[ia] = alpha
+        beta = 0.2 
+        for jb in range(MaxVariations):
+            beta += .01
+            BetaValues[jb] = beta
+            energy = energy2 = 0.0
+            DeltaE = 0.0
+            #Initial position
+            for i in range(NumberParticles):
+                for j in range(Dimension):
+                    PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+            wfold = WaveFunction(PositionOld,alpha,beta)
+            QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+            #Loop over MC MCcycles
+            for MCcycle in range(NumberMCcycles):
+                #Trial position moving one particle at the time
+                for i in range(NumberParticles):
+                    for j in range(Dimension):
+                        PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                           QuantumForceOld[i,j]*TimeStep*D
+                    wfnew = WaveFunction(PositionNew,alpha,beta)
+                    QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+                    GreensFunction = 0.0
+                    for j in range(Dimension):
+                        GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+                    GreensFunction = exp(GreensFunction)
+                    ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+                    #Metropolis-Hastings test to see whether we accept the move
+                    if random() <= ProbabilityRatio:
+                       for j in range(Dimension):
+                           PositionOld[i,j] = PositionNew[i,j]
+                           QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                       wfold = wfnew
+                DeltaE = LocalEnergy(PositionOld,alpha,beta)
+                energy += DeltaE
+                energy2 += DeltaE**2
+            # We calculate mean, variance and error (no blocking applied)
+            energy /= NumberMCcycles
+            energy2 /= NumberMCcycles
+            variance = energy2 - energy**2
+            error = sqrt(variance/NumberMCcycles)
+            Energies[ia,jb] = energy    
+            outfile.write('%f %f %f %f %f\n' %(alpha,beta,energy,variance,error))
+    return Energies, AlphaValues, BetaValues
+!ec
+
+The main part here contains the setup of the variational parameters, the energies and the variance.
+!bc pycod
+#Here starts the main program with variable declarations
+NumberParticles = 2
+Dimension = 2
+MaxVariations = 10
+Energies = np.zeros((MaxVariations,MaxVariations))
+AlphaValues = np.zeros(MaxVariations)
+BetaValues = np.zeros(MaxVariations)
+(Energies, AlphaValues, BetaValues) = MonteCarloSampling()
+outfile.close()
+# Prepare for plots
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+# Plot the surface.
+X, Y = np.meshgrid(AlphaValues, BetaValues)
+surf = ax.plot_surface(X, Y, Energies,cmap=cm.coolwarm,linewidth=0, antialiased=False)
+# Customize the z axis.
+zmin = np.matrix(Energies).min()
+zmax = np.matrix(Energies).max()
+ax.set_zlim(zmin, zmax)
+ax.set_xlabel(r'$\alpha$')
+ax.set_ylabel(r'$\beta$')
+ax.set_zlabel(r'$\langle E \rangle$')
+ax.zaxis.set_major_locator(LinearLocator(10))
+ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+# Add a color bar which maps values to colors.
+fig.colorbar(surf, shrink=0.5, aspect=5)
+save_fig("QdotImportance")
+plt.show()
+
+!ec 
+
+
+
+
+
+!split
+===== Importance sampling, program elements in C++ =====
 !bblock 
 The full code is "this link": "https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/vmc/programs/c%2B%2B". Here we include only the parts pertaining to the computation of the quantum force and the Metropolis update. The program is a modfication of our previous c++ program discussed previously. Here we display only the part from the *vmcsolver.cpp*  file.  Note the usage of the function *GaussianDeviate*.
 !bc cppcod
