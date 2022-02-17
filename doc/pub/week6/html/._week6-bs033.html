@@ -1,31 +1,28 @@
 <!--
-Automatically generated HTML file from DocOnce source
+HTML file automatically generated from DocOnce source
 (https://github.com/doconce/doconce/)
+doconce format html week6.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week6-bs --no_mako
 -->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 7 February 15-19: Gradient Methods">
-
-<title>Week 7 February 15-19: Gradient Methods</title>
-
+<meta name="description" content="Week 8 February 21-25: Gradient Methods">
+<title>Week 8 February 21-25: Gradient Methods</title>
 <!-- Bootstrap style: bootstrap -->
+<!-- doconce format html week6.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week6-bs --no_mako -->
 <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
 <!-- not necessary
 <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 -->
-
 <style type="text/css">
-
 /* Add scrollbar to dropdown menus in bootstrap navigation bar */
 .dropdown-menu {
    height: auto;
    max-height: 400px;
    overflow-x: hidden;
 }
-
 /* Adds an invisible element before each target to offset for the navigation
    bar */
 .anchor::before {
@@ -35,16 +32,14 @@ Automatically generated HTML file from DocOnce source
   margin:-50px 0 0; /* negative fixed header height */
 }
 </style>
-
-
 </head>
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [('Overview of week 7, February 15-19',
+ 'sections': [('Overview of week 8, February 21-25',
                2,
                None,
-               'overview-of-week-7-february-15-19'),
+               'overview-of-week-8-february-21-25'),
               ('Top-down start', 2, None, 'top-down-start'),
               ('Motivation', 2, None, 'motivation'),
               ('Simple example and demonstration',
@@ -228,8 +223,6 @@ MathJax.Hub.Config({
 </script>
 
 
-
-    
 <!-- Bootstrap navigation bar -->
 <div class="navbar navbar-default navbar-fixed-top">
   <div class="navbar-header">
@@ -238,15 +231,14 @@ MathJax.Hub.Config({
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="week6-bs.html">Week 7 February 15-19: Gradient Methods</a>
+    <a class="navbar-brand" href="week6-bs.html">Week 8 February 21-25: Gradient Methods</a>
   </div>
-
   <div class="navbar-collapse collapse navbar-responsive-collapse">
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
         <ul class="dropdown-menu">
-     <!-- navigation toc: --> <li><a href="._week6-bs001.html#overview-of-week-7-february-15-19" style="font-size: 80%;">Overview of week 7, February 15-19</a></li>
+     <!-- navigation toc: --> <li><a href="._week6-bs001.html#overview-of-week-8-february-21-25" style="font-size: 80%;">Overview of week 8, February 21-25</a></li>
      <!-- navigation toc: --> <li><a href="._week6-bs002.html#top-down-start" style="font-size: 80%;">Top-down start</a></li>
      <!-- navigation toc: --> <li><a href="._week6-bs003.html#motivation" style="font-size: 80%;">Motivation</a></li>
      <!-- navigation toc: --> <li><a href="._week6-bs005.html#simple-example-and-demonstration" style="font-size: 80%;">Simple example and demonstration</a></li>
@@ -310,53 +302,59 @@ MathJax.Hub.Config({
   </div>
 </div>
 </div> <!-- end of navigation bar -->
-
 <div class="container">
-
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
-
 <a name="part0033"></a>
 <!-- !split -->
-
 <h2 id="simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come" class="anchor">Simple codes for  steepest descent and conjugate gradient using a \( 2\times 2 \) matrix, in c++, Python code to come </h2>
-<div class="panel panel-default">
-<div class="panel-body">
-<p> <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
-<p>
 
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
-<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;cmath&gt;</span><span style="color: #BC7A00"></span>
-<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iostream&gt;</span><span style="color: #BC7A00"></span>
-<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;fstream&gt;</span><span style="color: #BC7A00"></span>
-<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&lt;iomanip&gt;</span><span style="color: #BC7A00"></span>
-<span style="color: #BC7A00">#include</span> <span style="color: #408080; font-style: italic">&quot;vectormatrixclass.h&quot;</span><span style="color: #BC7A00"></span>
-<span style="color: #008000; font-weight: bold">using</span> <span style="color: #008000; font-weight: bold">namespace</span>  std;
-<span style="color: #408080; font-style: italic">//   Main function begins here</span>
-<span style="color: #B00040">int</span> <span style="color: #0000FF">main</span>(<span style="color: #B00040">int</span>  argc, <span style="color: #B00040">char</span> <span style="color: #666666">*</span> argv[]){
-  <span style="color: #B00040">int</span> dim <span style="color: #666666">=</span> <span style="color: #666666">2</span>;
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #f8f8f8">
+  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic">#include &lt;cmath&gt;</span>
+<span style="color: #408080; font-style: italic">#include &lt;iostream&gt;</span>
+<span style="color: #408080; font-style: italic">#include &lt;fstream&gt;</span>
+<span style="color: #408080; font-style: italic">#include &lt;iomanip&gt;</span>
+<span style="color: #408080; font-style: italic">#include &quot;vectormatrixclass.h&quot;</span>
+using namespace  std;
+<span style="color: #666666">//</span>   Main function begins here
+<span style="color: #008000">int</span> main(<span style="color: #008000">int</span>  argc, char <span style="color: #666666">*</span> argv[]){
+  <span style="color: #008000">int</span> dim <span style="color: #666666">=</span> <span style="color: #666666">2</span>;
   Vector x(dim),xsd(dim), b(dim),x0(dim);
   Matrix A(dim,dim);
 
-  <span style="color: #408080; font-style: italic">// Set our initial guess</span>
+  <span style="color: #666666">//</span> Set our initial guess
   x0(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> x0(<span style="color: #666666">1</span>) <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
-  <span style="color: #408080; font-style: italic">// Set the matrix</span>
+  <span style="color: #666666">//</span> Set the matrix
   A(<span style="color: #666666">0</span>,<span style="color: #666666">0</span>) <span style="color: #666666">=</span>  <span style="color: #666666">3</span>;    A(<span style="color: #666666">1</span>,<span style="color: #666666">0</span>) <span style="color: #666666">=</span>  <span style="color: #666666">2</span>;   A(<span style="color: #666666">0</span>,<span style="color: #666666">1</span>) <span style="color: #666666">=</span>  <span style="color: #666666">2</span>;   A(<span style="color: #666666">1</span>,<span style="color: #666666">1</span>) <span style="color: #666666">=</span>  <span style="color: #666666">6</span>;
   b(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> <span style="color: #666666">2</span>; b(<span style="color: #666666">1</span>) <span style="color: #666666">=</span> <span style="color: #666666">-8</span>;
   cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;The Matrix A that we are using: &quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
-  A.Print();
+  A<span style="color: #666666">.</span>Print();
   cout <span style="color: #666666">&lt;&lt;</span> endl;
   xsd <span style="color: #666666">=</span> SteepestDescent(A,b,x0);
   cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;The approximate solution using Steepest Descent is: &quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
-  xsd.Print();
+  xsd<span style="color: #666666">.</span>Print();
   cout <span style="color: #666666">&lt;&lt;</span> endl;
 }
-</pre></div>
-<p>
+</pre>
 </div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
-<p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
@@ -386,25 +384,18 @@ MathJax.Hub.Config({
   <li><a href="._week6-bs034.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
-
 </div>  <!-- end container -->
 <!-- include javascript, jQuery *first* -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-
 <!-- Bootstrap footer
 <footer>
 <a href="https://..."><img width="250" align=right src="https://..."></a>
 </footer>
 -->
-
-
 <center style="font-size:80%">
 <!-- copyright only on the titlepage -->
 </center>
-
-
 </body>
 </html>
-    
 
