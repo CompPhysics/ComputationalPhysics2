@@ -1,31 +1,28 @@
 <!--
-Automatically generated HTML file from DocOnce source
+HTML file automatically generated from DocOnce source
 (https://github.com/doconce/doconce/)
+doconce format html week8.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week8-bs --no_mako
 -->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 9 March 1-5: Resampling Techniques, Bootstrap and Blocking">
-
-<title>Week 9 March 1-5: Resampling Techniques, Bootstrap and Blocking</title>
-
+<meta name="description" content="Week 10 March 7-11: Resampling Techniques, Bootstrap and Blocking">
+<title>Week 10 March 7-11: Resampling Techniques, Bootstrap and Blocking</title>
 <!-- Bootstrap style: bootstrap -->
+<!-- doconce format html week8.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week8-bs --no_mako -->
 <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
 <!-- not necessary
 <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 -->
-
 <style type="text/css">
-
 /* Add scrollbar to dropdown menus in bootstrap navigation bar */
 .dropdown-menu {
    height: auto;
    max-height: 400px;
    overflow-x: hidden;
 }
-
 /* Adds an invisible element before each target to offset for the navigation
    bar */
 .anchor::before {
@@ -35,16 +32,14 @@ Automatically generated HTML file from DocOnce source
   margin:-50px 0 0; /* negative fixed header height */
 }
 </style>
-
-
 </head>
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [('Overview of week 9, March 1-5',
+ 'sections': [('Overview of week 10, March 7-11',
                2,
                None,
-               'overview-of-week-9-march-1-5'),
+               'overview-of-week-10-march-7-11'),
               ('The top-down approach, part 1',
                2,
                None,
@@ -136,8 +131,6 @@ MathJax.Hub.Config({
 </script>
 
 
-
-    
 <!-- Bootstrap navigation bar -->
 <div class="navbar navbar-default navbar-fixed-top">
   <div class="navbar-header">
@@ -146,15 +139,14 @@ MathJax.Hub.Config({
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="week8-bs.html">Week 9 March 1-5: Resampling Techniques, Bootstrap and Blocking</a>
+    <a class="navbar-brand" href="week8-bs.html">Week 10 March 7-11: Resampling Techniques, Bootstrap and Blocking</a>
   </div>
-
   <div class="navbar-collapse collapse navbar-responsive-collapse">
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
         <ul class="dropdown-menu">
-     <!-- navigation toc: --> <li><a href="._week8-bs001.html#overview-of-week-9-march-1-5" style="font-size: 80%;">Overview of week 9, March 1-5</a></li>
+     <!-- navigation toc: --> <li><a href="._week8-bs001.html#overview-of-week-10-march-7-11" style="font-size: 80%;">Overview of week 10, March 7-11</a></li>
      <!-- navigation toc: --> <li><a href="._week8-bs002.html#the-top-down-approach-part-1" style="font-size: 80%;">The top-down approach, part 1</a></li>
      <!-- navigation toc: --> <li><a href="#what-have-we-done" style="font-size: 80%;">What have we done?</a></li>
      <!-- navigation toc: --> <li><a href="._week8-bs004.html#code-part-2" style="font-size: 80%;">Code part 2</a></li>
@@ -189,55 +181,50 @@ MathJax.Hub.Config({
   </div>
 </div>
 </div> <!-- end of navigation bar -->
-
 <div class="container">
-
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
-
 <a name="part0003"></a>
 <!-- !split -->
-
 <h2 id="what-have-we-done" class="anchor">What have we done? </h2>
-The exact energy is \( 3.0 \) for an oscillator frequency \( \omega =1 \)
+<p>The exact energy is \( 3.0 \) for an oscillator frequency \( \omega =1 \)
 (with \( \hbar =1 \)). We note however that with this learning rate and
 number of iterations, the energies and the derivatives are not yet
 converged.
+</p>
 
-<p>
-We can improve upon this by using the algorithms provided by the <b>optimize</b> package in Python.
-One of these algorithms is  Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno (BFGS) algorithm.
+<p>We can improve upon this by using the algorithms provided by the <b>optimize</b> package in Python.
+One of these algorithms is  Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno (BFGS) algorithm. 
+</p>
 
-<p>
-The optimization problem is to minimize \( f(\mathbf {x} ) \) where
+<p>The optimization problem is to minimize \( f(\mathbf {x} ) \) where
 \( \mathbf {x} \) is a vector in \( R^{n} \), and \( f \) is a differentiable
 scalar function. There are no constraints on the values that \( \mathbf{x} \) can take.
+</p>
 
-<p>
-The algorithm begins at an initial estimate for the optimal value
+<p>The algorithm begins at an initial estimate for the optimal value
 \( \mathbf {x}_{0} \) and proceeds iteratively to get a better estimate at
 each stage.
+</p>
 
-<p>
-The search direction \( p_k \) at stage \( k \) is given by the solution of the analogue of the Newton equation
+<p>The search direction \( p_k \) at stage \( k \) is given by the solution of the analogue of the Newton equation</p>
 
 $$
 B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
 $$
 
-<p>
-where \( B_{k} \) is an approximation to the Hessian matrix, which is
+<p>where \( B_{k} \) is an approximation to the Hessian matrix, which is
 updated iteratively at each stage, and \( \nabla f(\mathbf {x} _{k}) \)
 is the gradient of the function
 evaluated at \( x_k \). 
 A line search in the direction \( p_k \) is then used to
 find the next point \( x_{k+1} \) by minimising 
+</p>
 $$
 f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
 $$
 
-over the scalar \( \alpha > 0 \).
+<p>over the scalar \( \alpha > 0 \).</p>
 
-<p>
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
@@ -260,25 +247,18 @@ over the scalar \( \alpha > 0 \).
   <li><a href="._week8-bs004.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
-
 </div>  <!-- end container -->
 <!-- include javascript, jQuery *first* -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-
 <!-- Bootstrap footer
 <footer>
 <a href="https://..."><img width="250" align=right src="https://..."></a>
 </footer>
 -->
-
-
 <center style="font-size:80%">
 <!-- copyright only on the titlepage -->
 </center>
-
-
 </body>
 </html>
-    
 
