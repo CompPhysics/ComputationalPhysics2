@@ -117,10 +117,27 @@ div.toc p,a {
                None,
                'statistics-more-on-sample-error'),
               ('Statistics', 2, None, 'statistics'),
-              ('Statistics, central limit theorem',
+              ('The Central Limit Theorem',
                2,
                None,
-               'statistics-central-limit-theorem'),
+               'the-central-limit-theorem'),
+              ('Finding the Limit', 2, None, 'finding-the-limit'),
+              ('Rewriting the $\\delta$-function',
+               2,
+               None,
+               'rewriting-the-delta-function'),
+              ('Identifying Terms', 2, None, 'identifying-terms'),
+              ('Wrapping it up', 2, None, 'wrapping-it-up'),
+              ('Resampling methods: Bootstrap steps',
+               2,
+               None,
+               'resampling-methods-bootstrap-steps'),
+              ('Code example for the Bootstrap method and demonstration of '
+               'central limit theorem',
+               2,
+               None,
+               'code-example-for-the-bootstrap-method-and-demonstration-of-central-limit-theorem'),
+              ('Plotting the Histogram', 2, None, 'plotting-the-histogram'),
               ('Statistics, more technicalities',
                2,
                None,
@@ -176,7 +193,7 @@ MathJax.Hub.Config({
 </center>
 <br>
 <center>
-<h4>Mar 9, 2022</h4>
+<h4>Mar 10, 2022</h4>
 </center> <!-- date -->
 <br>
 
@@ -1258,26 +1275,263 @@ $$
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="statistics-central-limit-theorem">Statistics, central limit theorem </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>It is generally not possible to express \( p_{\overline X_n}(x) \) in a
-closed form given an arbitrary PDF \( p_X^{\phantom X} \) and a number
-\( n \). But for the limit \( n\to\infty \) it is possible to make an
-approximation. The very important result is called <em>the central limit theorem</em>. It tells us that as \( n \) goes to infinity,
-\( p_{\overline X_n}(x) \) approaches a Gaussian distribution whose mean
-and variance equal the true mean and variance, \( \mu_{X}^{\phantom X} \)
-and \( \sigma_{X}^{2} \), respectively:
+<h2 id="the-central-limit-theorem">The Central Limit Theorem </h2>
+
+<p>Suppose we have a PDF \( p(x) \) from which we generate  a series \( N \)
+of averages \( \mathbb{E}[x_i] \). Each mean value \( \mathbb{E}[x_i] \)
+is viewed as the average of a specific measurement, e.g., throwing 
+dice 100 times and then taking the average value, or producing a certain
+amount of random numbers. 
+For notational ease, we set \( \mathbb{E}[x_i]=x_i \) in the discussion
+which follows. We do the same for \( \mathbb{E}[z]=z \).
+</p>
+
+<p>If we compute the mean \( z \) of \( m \) such mean values \( x_i \)   </p>
+$$
+   z=\frac{x_1+x_2+\dots+x_m}{m},
+$$
+
+<p>the question we pose is which is the PDF of the new variable \( z \).</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="finding-the-limit">Finding the Limit </h2>
+
+<p>The probability of obtaining an average value \( z \) is the product of the 
+probabilities of obtaining arbitrary individual mean values \( x_i \),
+but with the constraint that the average is \( z \). We can express this through
+the following expression
 </p>
 $$
-\begin{equation}
-\lim_{n\to\infty} p_{\overline X_n}(x) =
-\left(\frac{n}{2\pi\mathrm{var}(X)}\right)^{1/2}
-e^{-\frac{n(x-\bar x_n)^2}{2\mathrm{var}(X)}}
-\label{eq:central_limit_gaussian}
-\end{equation}
+    \tilde{p}(z)=\int dx_1p(x_1)\int dx_2p(x_2)\dots\int dx_mp(x_m)
+    \delta(z-\frac{x_1+x_2+\dots+x_m}{m}),
 $$
+
+<p>where the \( \delta \)-function enbodies the constraint that the mean is \( z \).
+All measurements that lead to each individual \( x_i \) are expected to
+be independent, which in turn means that we can express \( \tilde{p} \) as the 
+product of individual \( p(x_i) \).  The independence assumption is important in the derivation of the central limit theorem.
+</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="rewriting-the-delta-function">Rewriting the \( \delta \)-function </h2>
+
+<p>If we use the integral expression for the \( \delta \)-function</p>
+
+$$
+   \delta(z-\frac{x_1+x_2+\dots+x_m}{m})=\frac{1}{2\pi}\int_{-\infty}^{\infty}
+   dq\exp{\left(iq(z-\frac{x_1+x_2+\dots+x_m}{m})\right)},
+$$
+
+<p>and inserting \( e^{i\mu q-i\mu q} \) where \( \mu \) is the mean value
+we arrive at
+</p>
+$$
+   \tilde{p}(z)=\frac{1}{2\pi}\int_{-\infty}^{\infty}
+   dq\exp{\left(iq(z-\mu)\right)}\left[\int_{-\infty}^{\infty}
+   dxp(x)\exp{\left(iq(\mu-x)/m\right)}\right]^m,
+$$
+
+<p>with the integral over \( x \) resulting in</p>
+
+$$
+  \int_{-\infty}^{\infty}dxp(x)\exp{\left(iq(\mu-x)/m\right)}=
+  \int_{-\infty}^{\infty}dxp(x)
+   \left[1+\frac{iq(\mu-x)}{m}-\frac{q^2(\mu-x)^2}{2m^2}+\dots\right].
+$$
+
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="identifying-terms">Identifying Terms </h2>
+
+<p>The second term on the rhs disappears since this is just the mean and 
+employing the definition of \( \sigma^2 \) we have 
+</p>
+$$
+  \int_{-\infty}^{\infty}dxp(x)e^{\left(iq(\mu-x)/m\right)}=
+  1-\frac{q^2\sigma^2}{2m^2}+\dots,
+$$
+
+<p>resulting in </p>
+
+$$
+  \left[\int_{-\infty}^{\infty}dxp(x)\exp{\left(iq(\mu-x)/m\right)}\right]^m\approx
+  \left[1-\frac{q^2\sigma^2}{2m^2}+\dots \right]^m,
+$$
+
+<p>and in the limit \( m\rightarrow \infty \) we obtain </p>
+
+$$
+   \tilde{p}(z)=\frac{1}{\sqrt{2\pi}(\sigma/\sqrt{m})}
+    \exp{\left(-\frac{(z-\mu)^2}{2(\sigma/\sqrt{m})^2}\right)},
+$$
+
+<p>which is the normal distribution with variance
+\( \sigma^2_m=\sigma^2/m \), where \( \sigma \) is the variance of the PDF \( p(x) \)
+and \( \mu \) is also the mean of the PDF \( p(x) \). 
+</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="wrapping-it-up">Wrapping it up </h2>
+
+<p>Thus, the central limit theorem states that the PDF \( \tilde{p}(z) \) of
+the average of \( m \) random values corresponding to a PDF \( p(x) \) 
+is a normal distribution whose mean is the 
+mean value of the PDF \( p(x) \) and whose variance is the variance
+of the PDF \( p(x) \) divided by \( m \), the number of values used to compute \( z \).
+</p>
+
+<p>The central limit theorem leads to the well-known expression for the
+standard deviation, given by 
+</p>
+
+$$
+    \sigma_m=
+\frac{\sigma}{\sqrt{m}}.
+$$
+
+<p>The latter is true only if the average value is known exactly. This is obtained in the limit
+\( m\rightarrow \infty \)  only. Because the mean and the variance are measured quantities we obtain 
+the familiar expression in statistics (the so-called Bessel correction)
+</p>
+$$
+    \sigma_m\approx 
+\frac{\sigma}{\sqrt{m-1}}.
+$$
+
+<p>In many cases however the above estimate for the standard deviation,
+in particular if correlations are strong, may be too simplistic. Keep
+in mind that we have assumed that the variables \( x \) are independent
+and identically distributed. This is obviously not always the
+case. For example, the random numbers (or better pseudorandom numbers)
+we generate in various calculations do always exhibit some
+correlations.
+</p>
+
+<p>The theorem is satisfied by a large class of PDFs. Note however that for a
+finite \( m \), it is not always possible to find a closed form /analytic expression for
+\( \tilde{p}(x) \).
+</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="resampling-methods-bootstrap-steps">Resampling methods: Bootstrap steps </h2>
+
+<p>The independent bootstrap works like this: </p>
+
+<ol>
+<li> Draw with replacement \( n \) numbers for the observed variables \( \boldsymbol{x} = (x_1,x_2,\cdots,x_n) \).</li> 
+<li> Define a vector \( \boldsymbol{x}^* \) containing the values which were drawn from \( \boldsymbol{x} \).</li> 
+<li> Using the vector \( \boldsymbol{x}^* \) compute \( \widehat{\beta}^* \) by evaluating \( \widehat \beta \) under the observations \( \boldsymbol{x}^* \).</li> 
+<li> Repeat this process \( k \) times.</li> 
+</ol>
+<p>When you are done, you can draw a histogram of the relative frequency
+of \( \widehat \beta^* \). This is your estimate of the probability
+distribution \( p(t) \). Using this probability distribution you can
+estimate any statistics thereof. In principle you never draw the
+histogram of the relative frequency of \( \widehat{\beta}^* \). Instead
+you use the estimators corresponding to the statistic of interest. For
+example, if you are interested in estimating the variance of \( \widehat
+\beta \), apply the etsimator \( \widehat \sigma^2 \) to the values
+\( \widehat \beta^* \).
+</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="code-example-for-the-bootstrap-method-and-demonstration-of-central-limit-theorem">Code example for the Bootstrap method and demonstration of central limit theorem </h2>
+
+<p>The following code starts with a Gaussian distribution with mean value
+\( \mu =100 \) and variance \( \sigma=15 \). We use this to generate the data
+used in the bootstrap analysis. The bootstrap analysis returns a data
+set after a given number of bootstrap operations (as many as we have
+data points). This data set consists of estimated mean values for each
+bootstrap operation. The histogram generated by the bootstrap method
+shows that the distribution for these mean values is also a Gaussian,
+centered around the mean value \( \mu=100 \) but with standard deviation
+\( \sigma/\sqrt{n} \), where \( n \) is the number of bootstrap samples (in
+this case the same as the number of original data points). The value
+of the standard deviation is what we expect from the central limit
+theorem.
+</p>
+
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="line-height: 125%;"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.stats</span> <span style="color: #8B008B; font-weight: bold">import</span> norm
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+
+<span style="color: #228B22"># Returns mean of bootstrap samples </span>
+<span style="color: #228B22"># Bootstrap algorithm</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">bootstrap</span>(data, datapoints):
+    t = np.zeros(datapoints)
+    n = <span style="color: #658b00">len</span>(data)
+    <span style="color: #228B22"># non-parametric bootstrap         </span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(datapoints):
+        t[i] = np.mean(data[np.random.randint(<span style="color: #B452CD">0</span>,n,n)])
+    <span style="color: #228B22"># analysis    </span>
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Bootstrap Statistics :&quot;</span>)
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;original           bias      std. error&quot;</span>)
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;%8g %8g %14g %15g&quot;</span> % (np.mean(data), np.std(data),np.mean(t),np.std(t)))
+    <span style="color: #8B008B; font-weight: bold">return</span> t
+
+<span style="color: #228B22"># We set the mean value to 100 and the standard deviation to 15</span>
+mu, sigma = <span style="color: #B452CD">100</span>, <span style="color: #B452CD">15</span>
+datapoints = <span style="color: #B452CD">10000</span>
+<span style="color: #228B22"># We generate random numbers according to the normal distribution</span>
+x = mu + sigma*np.random.randn(datapoints)
+<span style="color: #228B22"># bootstrap returns the data sample                                    </span>
+t = bootstrap(x, datapoints)
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>We see that our new variance and from that the standard deviation, agrees with the central limit theorem.</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="plotting-the-histogram">Plotting the Histogram </h2>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="line-height: 125%;"><span style="color: #228B22"># the histogram of the bootstrapped data (normalized data if density = True)</span>
+n, binsboot, patches = plt.hist(t, <span style="color: #B452CD">50</span>, density=<span style="color: #8B008B; font-weight: bold">True</span>, facecolor=<span style="color: #CD5555">&#39;red&#39;</span>, alpha=<span style="color: #B452CD">0.75</span>)
+<span style="color: #228B22"># add a &#39;best fit&#39; line  </span>
+y = norm.pdf(binsboot, np.mean(t), np.std(t))
+lt = plt.plot(binsboot, y, <span style="color: #CD5555">&#39;b&#39;</span>, linewidth=<span style="color: #B452CD">1</span>)
+plt.xlabel(<span style="color: #CD5555">&#39;x&#39;</span>)
+plt.ylabel(<span style="color: #CD5555">&#39;Probability&#39;</span>)
+plt.grid(<span style="color: #8B008B; font-weight: bold">True</span>)
+plt.show()
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
