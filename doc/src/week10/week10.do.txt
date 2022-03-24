@@ -6,7 +6,6 @@ DATE: today
 !split
 ===== Overview of week 12, March 21-25 =====
 !bblock  Topics
-* Discussion of onebody densities
 * Parallelization with MPI and OpenMP
 !eblock
 
@@ -231,19 +230,7 @@ for (i = 0; i < n; i++){
 }
 !ec
 If the code is not vectorized  and we have a 128-bit register to store a 32 bits floating point number,
-it means that we have $3\times 32$ bits that are not used. For the first element we have
-
-
- |-------------------------------|
- | 0 | 1 | 2 | 3                 | 
- |-------------------------------|
- | a[0]= | not used | not used| not used |
- |-------------------------------|
- | b[0]+ | not used | not used| not used |
- |-------------------------------|
- | c[0] | not used | not used| not used |
- |-------------------------------|
-
+it means that we have $3\times 32$ bits that are not used. 
 
 We have thus unused space in our SIMD registers. These registers could hold three additional integers.
 
@@ -274,17 +261,7 @@ for (i = 0; i < n; i+=4){
     a[i+3] = b[i+3] + c[i+3];
 }
 !ec
-displayed here as
 
-|-------------------------------|
-| 0 | 1 | 2 | 3                 | 
-|-------------------------------|
-|  a[0]= | a[1]= | a[2]=| a[3]= |
-|-------------------------------|
-|  b[0]+ | b[1]+ | b[2]+| b[3]+ |
-|-------------------------------|
-| c[0]| c[1] | c[2] | c[3]      | 
-|-------------------------------|
 Four additions are now done in a single step.
 
 !split 
@@ -716,17 +693,13 @@ x_i = \frac{f_i}{b_i}
 =====  Thomas algorithm and counting of operations (floating point and memory)  =====
 !bblock
 
+We have in specific case the following operations with the floating operations
 
-|-------------------------------------------------------------------------------------------|
-|  Operation     | Floating Point | 
-|-------------------------------------------------------------------------------------------|
-| Memory Reads   |    $14(N-2)$   |
-| Memory Writes  |     $4(N-2)$   |
-| Subtractions   |     $3(N-2)$   |
-| Multiplications |     $3(N-2)$  |
-| Divisions       |     $4(N-2)$  |
-|-------------------------------------------------------------------------------------------|
-
+* Memory Reads: $14(N-2)$;
+* Memory Writes: $4(N-2)$; 
+* Subtractions: $3(N-2)$; 
+* Multiplications: $3(N-2)$;
+* Divisions: $4(N-2)$.
 !eblock
 
 !bblock
