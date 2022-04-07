@@ -617,7 +617,7 @@ plt.show()
 # The change of basis, from $x\rightarrow z=\phi(x)$ leads to the same type of equations to be solved, except that
 # we need to introduce for example a polynomial transformation to a two-dimensional training set.
 
-# In[ ]:
+# In[2]:
 
 
 import numpy as np
@@ -783,7 +783,7 @@ plt.show()
 # 
 # ## The moons example
 
-# In[ ]:
+# In[3]:
 
 
 from __future__ import division, print_function, unicode_literals
@@ -1008,7 +1008,7 @@ plt.show()
 # 
 # The functions we need are contained in the quadratic programming package **CVXOPT** and we need to import it together with **numpy** as
 
-# In[ ]:
+# In[4]:
 
 
 import numpy

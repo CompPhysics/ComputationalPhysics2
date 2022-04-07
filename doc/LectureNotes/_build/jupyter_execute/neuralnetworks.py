@@ -1076,7 +1076,7 @@ plt.show()
 # of such information, and are most commonly applied when analyzing
 # images.
 
-# In[ ]:
+# In[2]:
 
 
 # import necessary packages
@@ -1135,7 +1135,7 @@ plt.show()
 # You don't want to train your model on measurements taken from the hours 00.00 to 12.00, and then test it on data
 # collected from 12.00 to 24.00.
 
-# In[ ]:
+# In[3]:
 
 
 from sklearn.model_selection import train_test_split
@@ -1249,7 +1249,7 @@ print("Number of test images: " + str(len(X_test)))
 # 
 # The bias weights $\hat{b}$ are often initialized to zero, but a small value like $0.01$ ensures all neurons have some output which can be backpropagated in the first training cycle.
 
-# In[ ]:
+# In[4]:
 
 
 # building our neural network
@@ -1318,7 +1318,7 @@ output_bias = np.zeros(n_categories) + 0.01
 # 
 # $$ output = softmax (\hat{z}^{L}) = (n_{inputs}, n_{categories}) .$$
 
-# In[ ]:
+# In[5]:
 
 
 # setup the feed-forward pass, subscript h = hidden layer
@@ -1477,7 +1477,7 @@ print("correct label for image 0: " + str(Y_train[0]))
 # 
 # $$ \nabla b_{h} = \sum_{i=1}^{n_{inputs}} \delta_h = (n_{hidden}) .$$
 
-# In[ ]:
+# In[6]:
 
 
 # to categorical turns our integer vector into a onehot representation
@@ -1569,7 +1569,7 @@ print("New accuracy on training data: " + str(accuracy_score(predict(X_train), Y
 # It is very natural to think of the network as an object, with specific instances of the network
 # being realizations of this object with different hyperparameters. An implementation using Python classes provides a clean structure and interface, and the full implementation of our neural network is given below.
 
-# In[ ]:
+# In[7]:
 
 
 class NeuralNetwork:
@@ -1683,7 +1683,7 @@ class NeuralNetwork:
 # 
 # where $I$ is the indicator function, $1$ if $\hat{y}_i = y_i$ and $0$ otherwise.
 
-# In[ ]:
+# In[8]:
 
 
 epochs = 100
@@ -1709,7 +1709,7 @@ def accuracy_score_numpy(Y_test, Y_pred):
 # We now perform a grid search to find the optimal hyperparameters for the network.  
 # Note that we are only using 1 layer with 50 neurons, and human performance is estimated to be around $98\%$ ($2\%$ error rate).
 
-# In[ ]:
+# In[9]:
 
 
 eta_vals = np.logspace(-5, 1, 7)

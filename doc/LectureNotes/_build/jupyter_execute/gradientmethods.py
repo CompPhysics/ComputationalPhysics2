@@ -332,7 +332,7 @@ print(Energy, EDerivative[0], EDerivative[1])
 # ## Using Broyden's algorithm in scipy
 # The following function uses the above described BFGS algorithm. Here we have defined a function which calculates the energy and a function which computes the first derivative.
 
-# In[ ]:
+# In[2]:
 
 
 # 2-electron VMC code for 2dim quantum dot with importance sampling
@@ -992,7 +992,7 @@ print(res.x)
 
 # ## Steepest descent example
 
-# In[ ]:
+# In[3]:
 
 
 import numpy as np
@@ -1019,7 +1019,7 @@ ax.plot_surface(xmesh, ymesh, fmesh)
 
 # And then as countor plot
 
-# In[ ]:
+# In[4]:
 
 
 pt.axis("equal")
@@ -1029,7 +1029,7 @@ guesses = [np.array([2, 2./5])]
 
 # Find guesses
 
-# In[ ]:
+# In[5]:
 
 
 x = guesses[-1]
@@ -1038,7 +1038,7 @@ s = -df(x)
 
 # Run it!
 
-# In[ ]:
+# In[6]:
 
 
 def f1d(alpha):
@@ -1052,7 +1052,7 @@ print(next_guess)
 
 # What happened?
 
-# In[ ]:
+# In[7]:
 
 
 pt.axis("equal")
@@ -1354,7 +1354,7 @@ pt.plot(it_array.T[0], it_array.T[1], "x-")
 # 
 # ## Simple example code
 
-# In[ ]:
+# In[8]:
 
 
 import numpy as np 
@@ -1410,7 +1410,7 @@ for epoch in range(1,n_epochs+1):
 # pick the final $\beta$ that gives the lowest value of the cost
 # function.
 
-# In[ ]:
+# In[9]:
 
 
 import numpy as np 
@@ -1441,7 +1441,7 @@ print("gamma_j after %d epochs: %g" % (n_epochs,gamma_j))
 
 # ## Program for stochastic gradient
 
-# In[ ]:
+# In[10]:
 
 
 # Importing various packages
