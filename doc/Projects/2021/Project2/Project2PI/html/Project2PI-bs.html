@@ -45,6 +45,12 @@ doconce format html Project2PI.do.txt --html_style=bootstrap --pygments_html_sty
                None,
                'the-harmonic-oscillator-a-simple-example'),
               ('Project 2 a):', 3, None, 'project-2-a'),
+              ('Project 2 b) Simulating with the Langevin Equation and Hybrid '
+               'Monte Carlo:',
+               3,
+               None,
+               'project-2-b-simulating-with-the-langevin-equation-and-hybrid-monte-carlo'),
+              ('Project 2 c):', 3, None, 'project-2-c'),
               ('Literature', 3, None, 'literature'),
               ('Introduction to numerical projects',
                2,
@@ -91,6 +97,8 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="#path-integrals-concepts-and-formalism" style="font-size: 80%;"><b>Path Integrals: Concepts and Formalism</b></a></li>
      <!-- navigation toc: --> <li><a href="#the-harmonic-oscillator-a-simple-example" style="font-size: 80%;"><b>The Harmonic Oscillator: a Simple Example</b></a></li>
      <!-- navigation toc: --> <li><a href="#project-2-a" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Project 2 a):</a></li>
+     <!-- navigation toc: --> <li><a href="#project-2-b-simulating-with-the-langevin-equation-and-hybrid-monte-carlo" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Project 2 b) Simulating with the Langevin Equation and Hybrid Monte Carlo:</a></li>
+     <!-- navigation toc: --> <li><a href="#project-2-c" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Project 2 c):</a></li>
      <!-- navigation toc: --> <li><a href="#literature" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Literature</a></li>
      <!-- navigation toc: --> <li><a href="#introduction-to-numerical-projects" style="font-size: 80%;"><b>Introduction to numerical projects</b></a></li>
      <!-- navigation toc: --> <li><a href="#format-for-electronic-delivery-of-report-and-programs" style="font-size: 80%;"><b>Format for electronic delivery of report and programs</b></a></li>
@@ -119,7 +127,7 @@ MathJax.Hub.Config({
 </center>
 <br>
 <center>
-<h4>Apr 20, 2022</h4>
+<h4>Apr 21, 2022</h4>
 </center> <!-- date -->
 <br>
 
@@ -127,13 +135,22 @@ MathJax.Hub.Config({
 </div> <!-- end jumbotron -->
 <h2 id="path-integrals-concepts-and-formalism" class="anchor">Path Integrals: Concepts and Formalism </h2>
 
-<p>In the path integral formalism the evolution from a state \( \ket{x_i} \) do a state \( \ket{x_f} \) from time \( t_i \) to time \( t_f \) is given by:</p>
+<p>The aim of this project is to study the path integral formalism applied first to a Harmonic oscillator problem.</p>
+
+<p>In the path integral formalism the evolution from a state \( \vert x_i\rangle \)
+to a state \( \vert  x_f\rangle \) from time \( t_i \) to time \( t_f \) is given by:
+</p>
 
 $$
-	\bra{x_f}e^{-\hat{H}(t_f-t_i)}\ket{x_i} = \int \D x(t) e^{-S[x]}
+	\langle x_f\vert e^{-\hat{H}(t_f-t_i)}\vert x_i\rangle = \int \D x(t) e^{-S[x]}
 $$
 
-<p>On the lhs we have the standard quantum mechanical time evolution operator with \( \hat{H} \) being the Hamiltonian operator of the system, the rhs represents the path integral of all possible paths x(t) from \( x_i \) to \( x_f \) with \( t = t_i \rightarrow t_f \) weighted with the classical action \( S[x] \):</p>
+<p>On the left-hand side we have the standard quantum mechanical time
+evolution operator with \( \hat{H} \) being the Hamiltonian operator of
+the system, the right-hand side represents the path integral of all possible paths
+x(t) from \( x_i \) to \( x_f \) with \( t = t_i \rightarrow t_f \) weighted with
+the classical action \( S[x] \):
+</p>
 
 $$
 	S[x] = \int_{t_i}^{t_f} dt L(x,\dot{x}) =  \int_{t_i}^{t_f} dt \left( \frac{m\dot{x}(t)^2}{2} - V(x(t))\right),
@@ -141,15 +158,18 @@ $$
 
 <p>and  knowledge of the propagator gives full information about the system.</p>
 
-<p>In a simple one dimensional case the path integral can be seen as:</p>
+<p>In a simple one dimensional case the path integral can be written as</p>
 
 $$
 	 \int \D x(t) \rightarrow \int_{-\infty}^{\infty} dx_1dx_2\dots dx_{N-1}
 $$
 
-<p>where the time has been discretized in N slices from \( t_i = t_0 \) to \( t_f = t_N \). Consequently \( x_i = x(t_i) \).  </p>
+<p>where time has been discretized in \( N \) slices from \( t_i = t_0 \) to \( t_f = t_N \). Consequently \( x_i = x(t_i) \).  </p>
 
-<p>Given some functional \( \Gamma[x] \) that represents an observable at intermediate times of the evolution of the system we can write its expectation value as:</p>
+<p>Given some functional \( \Gamma[x] \) that represents an observable at
+intermediate times of the evolution of the system we can write its
+expectation value as:
+</p>
 
 $$
 	\braket{\Gamma[x]} = \frac{1}{Z} \int \D x(t) \Gamma[x] e^{-S[x]}
@@ -161,15 +181,18 @@ $$
 	Z = \int \D x(t) e^{-S[x]}
 $$
 
-<p>This can be computed using a set of configurations \( x^{(k)} = \{x^{(k)}_1x^{(k)}_2\dots x^{(k)}_{N-1} \} \) for \( k = 1,2,\dots N_{cf} \). The Monte Carlo estimator then becomes:</p>
+<p>This can be computed using a set of configurations \( x^{(k)} =
+\{x^{(k)}_1x^{(k)}_2\dots x^{(k)}_{N-1} \} \) for \( k = 1,2,\dots
+N_{cf} \). The Monte Carlo estimator then becomes:
+</p>
 
 $$
 	\braket{\Gamma[x]} \approx \bar{\Gamma} = \frac{1}{N_{cf}} \sum_{k = 1}^k \Gamma[x^{(k)}]
 $$
 
-<p>As and aside, when we generalize our theory to a four dimensional
+<p>As and aside, if we wish to  generalize our theory to a four dimensional
 euclidean space time an observable that depends on a scalar field can
-be computed in a very similar fashion as we just described:
+be computed in a very similar fashion
 </p>
 
 $$
@@ -190,96 +213,320 @@ $$
 <h2 id="the-harmonic-oscillator-a-simple-example" class="anchor">The Harmonic Oscillator: a Simple Example </h2>
 <h3 id="project-2-a" class="anchor">Project 2 a): </h3>
 
-<p>A first example of the path integral solution of quantum mechanical systems is  the 1D Harmonic Oscillator. It is particularly well suited because of:</p>
+<p>A first example of the path integral solution of quantum mechanical
+systems is the one-dimensional harmonic oscillator. It is particularly
+well suited because of:
+</p>
 
 <ol>
 <li> simple dimensional discretization</li>
-<li> well known results for expectation values</li>
+<li> well-known results for expectation values</li>
 <li> fast analytical analysis, implementation and runs</li> 
 </ol>
-<p>The classical action for the harmonic oscillator is given by:</p>
+<p>The classical action for the harmonic oscillator is given by</p>
 
 $$
 	S[x] = \int_{t_i}^{t_f} \left[ \frac{m\dot{x}(t)^2}{2} + \frac{1}{2}\omega x(t)^2\right] dt.
 $$
 
-<p>We can discretize the time domain into \( N \) slices of step \( a \), which imposes us to discretize the time derivative of the position as well. When considering the integral between time \( t_j \) and \( t_{j+1} \) the action becomes:</p>
+<p>We can discretize the time domain into \( N \) slices of step \( a \), which
+imposes us to discretize the time derivative of the position as
+well. When considering the integral between time \( t_j \) and \( t_{j+1} \)
+the action becomes
+</p>
 
 $$
 	S_{j} \approx a\left[ \frac{m(x_{j+1}-x_j)^2}{2a^2} + \frac{1}{4}\omega (x_{j+1} - x_j)^2 \right] dt.
 $$
 
 <p>When summing over all time slices (and applying periodic boundary conditions) we get</p>
+
 $$	
 	S_{latt} = \sum_{j = 0}^{N-1} \left[ \frac{m}{2a}(x_{j+1}-x_j)^2 + \frac{a}{2} x_j^2 \right]
 $$
 
-<p>In order to extract information from the system we need to construct and study an observable. We can look at a two point correlator of the form \( \langle x(t_2)x(t_1) \rangle \).  
-In the continuum this is equivalent to the calculation of the ratio of path integrals:
+<p>In order to extract information from the system we need to construct
+and study an observable. We can look at a two point correlator of the
+form \( \langle x(t_2)x(t_1) \rangle \).  In the continuum this is
+equivalent to the calculation of the ratio of path integrals
 </p>
 
 $$
 	\langle x(t_2)x(t_1) \rangle = \frac{\int \D x(t) x(t_2) x(t_1) e^{-S[x]}}{\int \D x(t) e^{-S[x]}}
 $$
 
-<p>In quantum mechanics the numerator (using the definition of the path integral) is equal to:</p>
+<p>In quantum mechanics the numerator (using the definition of the path integral) is equal to</p>
 
 $$	
-	\int dx \bra{x} e^{\bar{H}(t_f-t2)} \tilde{x} e^{\bar{H}(t_2-t1)} \tilde{x} e^{\bar{H}(t_1-ti)} \ket{x}
+v	\int dx \langle x\vert  e^{\bar{H}(t_f-t2)} \tilde{x} e^{\bar{H}(t_2-t1)} \tilde{x} e^{\bar{H}(t_1-ti)} \vert x\rangle,
 $$
 
-<p>If we look at the full integral, let the hamiltionian operator act on the states leaving the spectral decomposition of them, and substitute \( T = t_f-Ti \) and \( t = t_2 - t_1 \) we get to:</p>
+<p>If we look at the full integral, let the hamiltionian operator act on
+the states leaving the spectral decomposition of them, and substitute
+\( T = t_f-Ti \) and \( t = t_2 - t_1 \) we get to
+</p>
 
 $$
-	\langle x(t_2)x(t_1) \rangle = \frac{\sum e^{-E_n T} \bra{E_n} \tilde{x} e^{-(\bar{H}-E_n)t}  \tilde{x}\ket{E_n}}{\sum e^{-E_n T }}
+	\langle x(t_2)x(t_1) \rangle = \frac{\sum e^{-E_n T} \langle E_n\vert \tilde{x} e^{-(\bar{H}-E_n)t}  \tilde{x}\vert E_n\rangle }{\sum e^{-E_n T }}
 $$
 
 <p>and for \( T \gg t \) the ground state will dominate the summation:</p>
 
 $$
-	G(t) = \langle x(t_2)x(t_1)\rangle \rightarrow  \bra{E_0} \tilde{x} e^{-(\bar{H}-E_0)t}  \tilde{x}\ket{E_0}
+	G(t) = \langle x(t_2)x(t_1)\rangle \rightarrow  \langle E_0\vert \tilde{x} e^{-(\bar{H}-E_0)t}  \tilde{x}\vert E_0\rangle,
 $$
 
-<p>and letting \( t \) to be large as well the propagator ends up linking the two lowest energy states:</p>
+<p>and letting \( t \) to be large as well the propagator ends up linking the two lowest energy states</p>
 
 $$
-	G(t) \rightarrow  |\bra{E_0} \tilde{x} \ket{E_1}|^2e^{-(E_1-E_0)t}
+	G(t) \rightarrow  |\langle E_0\vert \tilde{x} \vert E_1\rangle|^2e^{-(E_1-E_0)t}.
 $$
 
-<p>We can now extract the first excitation energy of the quantum mechanical harmonic oscillator, in the limit of \( t \) large, as:</p>
+<p>We can now extract the first excitation energy of the quantum mechanical harmonic oscillator, in the limit of \( t \) large, as</p>
 
 $$
-	\log\left( \frac{G(t)}{G(t+\Delta t)}\right) = (E_1 - E_0)\Delta t
+	\log\left( \frac{G(t)}{G(t+\Delta t)}\right) = (E_1 - E_0)\Delta t.
 $$
 
-<p>On our discretized lattice the correlator can be obtained numerically by directly computing the average value of the operator:</p>
+<p>On our discretized lattice the correlator can be obtained numerically by directly computing the average value of the operator</p>
 
 $$
-	G(t) = \frac{1}{N}\sum_j\langle\braket{x(t_j+t)x(t_j)}\rangle
+	G(t) = \frac{1}{N}\sum_j\langle\braket{x(t_j+t)x(t_j)}\rangle,
 $$
 
-<p>for all \( t \) in \( 0, a, 2a\dots (N-1)a \). This might look trivial at a first glance, but it is the key point of the whole algorithm</p>
+<p>for all \( t \) in \( 0, a, 2a\dots (N-1)a \). This might look trivial at a first glance, but it is the key point of the whole algorithm.</p>
 
-<p>The computational algorithm required to compute the correlator is based on the idea of creating a Markov chain of possible paths for the harmonic oscillator, via subsequent updates. This procedure is called Metropolis algorithm:</p>
+<p>The computational algorithm required to compute the correlator is
+based on the idea of creating a Markov chain of possible paths for the
+harmonic oscillator, via subsequent updates. This procedure is called
+Metropolis algorithm:
+</p>
+
 <ol>
 <li> initialize an array of \( N \) position values for each time point (for example set everything to 0)</li>
 <li> suggest a new random configuration starting from the current one</li>
 <li> accept or reject the update, based on the action difference</li>
 <li> compute the correlator for the current configuration</li>
 <li> repeat the process \( N_{cf} \) times, sufficiently large to have a statistically relevant ensemble.</li>
-<li> In order to limit the auto correlation between data, the observable is only computed once every \( N_{corr} \) updates.</li> 
-<li> The rule for accepting an update is: \( \exp(-\Delta S) > \xi \). Where \( \xi \in [0,1] \), a randomly chosen number. This implies that if the classical action is reduced the update is automatically accepted, if it is positive, a random number \( \xi \) is generated and compared with the exponential of the action. This condition allows the system to explore all the phase space and not get stuck in a local minimum for example.</li>
 </ol>
-<p>Run for the HO using \( 10^5 \) configurations (\( N_{conf} \)), skipping 20 updates between every measurement (\( N_{corr} \)). The time axis is discretized into 20 nodes. Data, to improve the estimate of the error bars. These can be  resampled using the bootstrap or the blocking techniques. 
-The result that is physically relevant is the first excitation energy, which we expect to be \( 1\hbar\omega \). For simplicity we set \( \hbar=\omega=1 \) and the lattice spacing parameter \( a = 0.5 \).
+<p>In order to limit the auto correlation between data, the observable is
+only computed once every \( N_{corr} \) updates.  The rule for accepting
+an update is: \( \exp(-\Delta S) > \xi \). Where \( \xi \in [0,1] \), a
+randomly chosen number. This implies that if the classical action is
+reduced the update is automatically accepted, if it is positive, a
+random number \( \xi \) is generated and compared with the exponential of
+the action. This condition allows the system to explore all the phase
+space and not get stuck in a local minimum for example.
+</p>
+
+<p>Your task is to
+run for the harmonic oscillator  using \( 10^5-10^7 \) configurations (\( N_{conf} \)), skipping 20
+updates between every measurement (\( N_{corr} \)). The time axis is
+discretized into 20 nodes. Data, to improve the estimate of the error can be resampled using the bootstrap or the blocking
+techniques.  The result that is physically relevant is the first
+excitation energy, which we expect to be \( 1\hbar\omega \). For
+simplicity we set \( \hbar=\omega=1 \) and the lattice spacing parameter
+\( a = 0.5 \).
 </p>
 
 <p>Implement statistical bootstrapping and blocking. 
 Estimate energy and how it relates  with the correlation time.
 </p>
+<h3 id="project-2-b-simulating-with-the-langevin-equation-and-hybrid-monte-carlo" class="anchor">Project 2 b) Simulating with the Langevin Equation and Hybrid Monte Carlo: </h3>
+
+<p>The expectation value of a quantity \( A \) evaluated with path integrals is:</p>
+
+$$
+    \braket{A} = \frac{1}{Z}\int \D[\phi] A[\phi]e^{-S[\phi]}.
+$$
+
+<p>One can sample this with Monte Carlo integration by considering
+\( e^{-S[\phi]} \) as a Boltzmann weight and use it as a
+\textit{probability measure}. One than chooses a set of random
+configurations \( \{\phi_i\} \) according to the probability distribution:
+</p>
+
+$$
+    dP[\phi] = \frac{e^{-S[\phi]}\D[\phi]}{\int \D[\phi] e^{-S[\phi]}}.
+$$
+
+<p>The expectation value is then approximated as</p>
+
+$$
+    \braket{A} \approx \frac{1}{N_{conf}} \sum_{i=1}^{N_{conf}} A[\phi_i].
+$$
+
+<p>As done in the previous parts and in project 1, we normally employ Markov processes and the Metropolis algorithm.</p>
+
+<p>The Langevin equation can be used to model \textit{Brownian motion}. In its simplest form it reads:</p>
+
+$$
+    \frac{dx}{dt} = -\frac{\partial V(x)}{\partial x} + \eta(t)
+$$
+
+<p>where \( V(x) \) is some potential (hermonic oscillator) and \( \eta(t) \) are random noise variables distributed according to a Gaussian PDF. 
+It generates a time-dependent probability distribution for the vector \( x \), from which an observable \( O[x] \) can be evaluated as:
+</p>
+
+$$
+ \langle O[x(t)] \rangle = \int P(x, t) O(x)dx
+$$
+
+<p>As discussed in connection with project 1, the probability
+distribution of the Langevin equation has an associated Fokker-Planck
+equation
+</p>
+
+$$
+\frac{\partial P(x,t)}{\partial t} = \frac{1}{2} \frac{\partial}{\partial x_i}\left[ \Omega \frac{\partial P}{\partial x_i} + V(x)P\right]
+\].
+$$
+
+<p>This is a deterministic equation for the time dependent \( P(x,t) \). It
+is possible to relate this to the euclidean transporter in quantum
+mechanics.
+</p>
+
+<p>Using the same trick for the Hybrid Monte Carlo (HMC) discussed below,
+see \( S[\phi] \) as a potential of some fictitious hamiltonian, so that
+</p>
+
+$$
+\frac{d\phi(x)}{dt} = -\frac{\partial S[\phi(x)]}{\partial x} + \eta(t).
+$$
+
+<p>The numerical algorithm is straightforward:</p>
+$$
+\phi_{t+1}(x) = \phi_t(x) - \epsilon \frac{\partial S[\phi_t(x)]}{\partial x} + \sqrt{2\epsilon}\eta(t).
+$$
+
+<p>This method can lead to huge errors in discretization. Can be improved
+with Metropolis Adjusted Langevin Dynamics (MALA), by adding some
+metropolis tests during the integration.
+</p>
+
+<p>The Hybrid Monte Carlo  is based upon considering the Hamiltonian</p>
+
+$$
+   H[\phi,\pi] = \frac{\pi^2}{2} + S[\phi]
+$$
+
+<p>and integrating numerically the equations of motion:</p>
+
+$$
+  \frac{\partial \phi}{\partial t } = \pi, ~~~~~~~ \frac{\partial \pi}{\partial t } = -\frac{\partial S[\phi]}{\partial \phi}.
+$$
+
+<p>Then to correct for integration errors one performs metropolis tests
+using the weight \( e^{-\Delta H} \) to fulfill ergodicity and make
+the algorithm exact.  Note that it is a reversible algorithm,
+it satisfies detailed balance (we can use \( \pi \rightarrow - \pi \) as
+it only comes squared in the hamiltonian)
+</p>
+
+<p>We can extend the HMC algorithm by considering the stochastic evolution equations:</p>
+$$
+        \frac{\partial \phi}{\partial t } = \pi,
+    $$
+
+<p>and</p>
+$$
+ \frac{\partial \pi}{\partial t } = -\frac{\partial S[\phi]}{\partial \phi} - 2\mu_0\pi + \eta(t)
+$$
+
+<p>where \( \eta(t) \) is again white noise and \( \mu_0 > 0 \) is a "mass
+term". This reduces to Stochastic Molecular Dynamics (a variation of
+HMC) for \( \mu_0 \rightarrow 0 \). In the second order form:
+</p>
+
+$$
+\frac{\partial^2 \phi}{\partial t^2 } + 2\mu_0\frac{\partial \phi}{\partial t} = -\frac{\partial S[\phi]}{\partial \phi}  + \eta(t),
+$$
+
+<p>for large \( \mu_0 \) (after redefining time as \( '=2\mu_0t \)) this form recovers Langevin equation.
+Why is this interesting? 
+</p>
+<ol>
+<li> Langevin methods have been proven to be \textit{renormalizable} a long time ago</li>
+<li> HMC has been proven to be \textit{not renormalizable}</li>
+<li> But the existence of a parameter \( \mu_0 \) that interpolates between the two could suggest that they are in the \textit{same universality class}, hence have similar behavior when approaching the continuum limit.</li> 
+</ol>
+<p>For an algorithm to be renormalizable we mean that the autocorrelation function of the Markov Process has a finite scaling exponent when approaching the continuum theory (smaller lattice spacing).
+For example, the Metropolis algorithm scales as \( d^2 \) (\( d \) is the dimensionality of the system, degrees of freedom), while Langevin as \( d^{4/3} \).
+For very long trajectories the HMC scales as \( d^{5/4} \), better than Langevin, but this is not true in general
+Potentially renormalizable algorithms could be more efficient than the HMC near the continuum limit.
+</p>
+
+<p>Let us  again consider the harmonic oscillator in one dimension with action:</p>
+$$
+  S[x] = \sum_{i=1}^{N-1}\left[\frac{m}{2a}(x_i - x_{i+1})^2 + \frac{a}{2}\left(V(x_i) + V(x_{i+1})\right)\right],
+$$
+
+<p>and try to sample the ground state energy defined as \( E=\langle x^2\rangle \) using the Metropolis, the HMC and Langevin algorithms. </p>
+
+<p>The autocorrelation function is defined as:</p>
+
+$$
+\Gamma(t) = \Gamma(-t) = \langle (x_i - \bar x)(x_{i+t} - \bar x)\rangle \approx \frac{1}{N-t}\sum_{i=1}^{N-t}  (x_i - \bar x)(x_{i+t} - \bar x),
+$$
+
+<p>where \( t \) is the &quot;lag&quot; between two points. The integrated autocorrelation time is given by:</p>
+
+$$
+\tau_{int} = \frac{1}{2} \sum_{t=1}^\infty \frac{\Gamma(t)}{\Gamma(0)} = \frac{1}{2} \sum_{t=1}^\infty \rho(t).
+$$
+
+<p>In order to truncate the infinite summation one can look at the deviation squared of \( \rho(t) \):</p>
+$$
+    \langle \delta \rho(t)^2\rangle \approx \frac{1}{N} \sum_{k=1}^\infty \left[ \rho(k+t) + \rho(k-t) - 2\rho(k)\rho(t)\right]^2.
+$$
+
+<p>All these terms, for a sufficiently large value of \( k \) should all
+vanish, hence one can choose a cutoff \( \Lambda \) and truncate the sum
+up to \( t+\Lambda \). The integrated autocorrelation time, if the
+deviations of \( \rho(t) \) become small, plateaus.
+</p>
+
+<p>We choose a cutoff \( W \) such that:</p>
+
+$$
+    \tau_{int} = \frac{1}{2} \sum_{t=1}^W \rho(t),
+    \label{autocorr_time}
+$$
+
+<p>where \( W \) is the first lag \( t \) for which \( \rho(t) < \sqrt{ (\langle
+\delta \rho(t)^2\rangle} \), when the contribution to the integration of
+\( \tau_{int} \) from that lag become smaller than the deviation of that
+same lag. \\ An approximate error estimate of the integrated
+autocorrelation time can be defined as
+</p>
+
+$$
+    \sigma^2(\tau_{int}) \approx \frac{2(2W+1)}{N}\tau_{int}^2.
+$$
+<h3 id="project-2-c" class="anchor">Project 2 c): </h3>
+
+<p>Here the aim is to explore the Heisenberg-model in one and two
+dimensions, by use of stochastic series expansion (SSE). Hopefully, we
+will be able to calculate the critical temperature for the continious
+phase transition. With this value the critical exponents for the
+system can also be obtained.  The results should be compared with the
+relevant literature as provided in the references.
+</p>
+
+<p>Implementation of SSE for 1D Heisenberg model with periodic bound- ary conditions.</p>
+<ol>
+<li> Add external field and anisotropy dependencies.</li>
+<li> 2D implementation, again with periodic boundary conditions.
+<ol type="a"></li>
+<li> Study the temperature dependent phase transition and calculate the critical exponents for the system. By studying the system the follow- ing values should be attainable; \( M \), \( M^2 \), \( E \), \( \xi \), \( C_V \) , \( C(r) \), where \( M \) is magnetization, \( E \) is the energy, \( \xi \) is the magnetic suceptibility, \( C_V \) is the heat capacity and \( C(r) \) is the correlation length.</li>
+</ol>
+</ol>
 <h3 id="literature" class="anchor">Literature </h3>
 
 <ol>
+<li> M. L{\"{u}}scher , S. Schaefer, Non-renormalizability of the HMC algorithm,(2011), Journal of High Energy Physics</li>
+<li> R. M. Neal, MCMC using Hamiltonian dynamics, Chapter 5 of the Handbook of Markov Chain Monte Carlo</li>
 <li> A. W. Sandvik. Finite-size scaling of the ground-state parameters of the two-dimensional heisenberg model. Phys. Rev. B, 56:11678&#8211;11690, Nov 1997.</li>
 <li> A. W. Sandvik. Stochastic series expansion method with operator-loop update. Phys. Rev. B, 59:R14157&#8211;R14160, Jun 1999.</li>
 <li> O. F. Syljuasen and A. W. Sandvik. Quantum Monte Carlo with directed loops. Phys. Rev. E, 66:046701, Oct 2002.~</li>
@@ -316,16 +563,6 @@ project.
 <p>Finally, 
 we encourage you to work two and two together. Optimal working groups consist of 
 2-3 students. You can then hand in a common report. 
-</p>
-
-<p>In this project the aim is to explore the Heisenberg-model in 1D &amp; 2D, by use of stochastic series expansion (SSE). Hopefully, we will be able to calculate the critical temperature for the continious phase transition. With this value the critical exponents for the system can also be obtained.
-The results should be compared with the relevant literature as provided in the references.
-</p>
-
-<p>Implementation of SSE for 1D Heisenberg model with periodic bound- ary conditions.
-2. Add external field and anisotropy dependencies.
-3. 2D implementation, again with periodic boundary conditions.
-4. Study the temperature dependent phase transition and calculate the critical exponents for the system. By studying the system the follow- ing values should be attainable; &#10216;m&#10217;, &#10216;m2&#10217;, &#10216;E&#10217;, &#967;, cV , C(r), where m is magnetization, E is the energy, &#967; is the magnetic suceptibility, cV is the heat capacity and C(r) is the correlation length.
 </p>
 
 <!-- ------------------- end of main content --------------- -->
