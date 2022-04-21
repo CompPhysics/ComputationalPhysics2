@@ -1,8 +1,6 @@
 \documentclass[10pt]{beamer}
-
 \usetheme[progressbar=frametitle]{metropolis}
 \usepackage{appendixnumberbeamer}
-
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
 \usepackage{braket}
@@ -15,373 +13,240 @@
 \newcommand{\Tr}{\mathrm{Tr}}
 
 
-\title{Advanced Topics in MBP: Lattice QCD}
-\date{29$^\text{th}$ June 2017}
-\author{Giovanni Pederiva, Mathias Vege}
-\institute{University of Oslo}
+\title{Langevin Algorithm and Hybrid Monte Carlo}
+\subtitle{PHY989 Final Presentation}
+\date{11 December 2018}
+\author{Giovanni Pederiva}
+\institute{Michigan State University}
 
 \begin{document}
-
 \setbeamercolor{background canvas}{bg=white}
 \maketitle
 
-\begin{frame}{Overview}
-  \setbeamertemplate{section in toc}[sections numbered]
-  \tableofcontents[hideallsubsections]
-\end{frame}
-
-\section{Path Integrals: Concepts and Formalism}
-\begin{frame}{Path Integrals I}
-In the path integral formalism the evolution from a state $\ket{x_i}$ do a state $\ket{x_f}$ from time $t_i$ to time $t_f$ is given by:
+\begin{frame}{Basics of Importance Sampling}
+The expectation value of a quantity $A$ evaluated with path integrals is:
 \[
-	\bra{x_f}e^{-\hat{H}(t_f-t_i)}\ket{x_i} = \int \D x(t) e^{-S[x]}
+    \braket{A} = \frac{1}{Z}\int \D[\phi] A[\phi]e^{-S[\phi]}
 \]
-On the lhs we have the standard quantum mechanical time evolution operator with $\hat{H}$ being the Hamiltonian operator of the system, the rhs represents the path integral of all possible paths x(t) from $x_i$ to $x_f$ with $t = t_i \rightarrow t_f$ weighted with the classical action $S[x]$:
+One can sample this with Monte Carlo integration by considering $e^{-S[\phi]}$ as a Boltzmann weight and use it as a \textit{probability measure}. One than chooses a set of random configurations  $\{\phi_i\}$ according to the probability distribution:
 \[
-	S[x] = \int_{t_i}^{t_f} dt L(x,\dot{x}) =  \int_{t_i}^{t_f} dt \left( \frac{m\dot{x}(t)^2}{2} - V(x(t))\right)
+    dP[\phi] = \frac{e^{-S[\phi]}\D[\phi]}{\int \D[\phi] e^{-S[\phi]}}
 \]
-%% knowledge of the propagator gives full information about the system
-\end{frame}
-
-\begin{frame}{Path Integrals II}
-In a simple one dimensional case the path integral can be seen as:
+The expectation value is then approximated as:
 \[
-	 \int \D x(t) \rightarrow \int_{-\infty}^{\infty} dx_1dx_2\dots dx_{N-1}
-\]
-where the time has been discretized in N slices from $t_i = t_0$ to $t_f = t_N$. Consequently $x_i = x(t_i)$.  
-%% picture??
-\end{frame}
-
-\begin{frame}{Computation of Observables}
-Given some functional $\Gamma[x]$ that represents an observable at intermediate times of the evolution of the system we can write its expectation value as:
-\[
-	\braket{\Gamma[x]} = \frac{1}{Z} \int \D x(t) \Gamma[x] e^{-S[x]}
-\]
-where the normalization $Z$ is given by 
-\[
-	Z = \int \D x(t) e^{-S[x]}
-\]
-This can be computed using a set of configurations $x^{(k)} = \{x^{(k)}_1x^{(k)}_2\dots x^{(k)}_{N-1} \}$ for $k = 1,2,\dots N_{cf}$. The Monte Carlo estimator then becomes:
-\[
-	\braket{\Gamma[x]} \approx \bar{\Gamma} = \frac{1}{N_{cf}} \sum_{k = 1}^k \Gamma[x^{(k)}]
+    \braket{A} \approx \frac{1}{N_{conf}} \sum_{i=1}^{N_{conf}} A[\phi_i]
 \]
 \end{frame}
 
-\begin{frame}{Path Integrals for Field Theories}
-When we generalize our theory to a four dimensional euclidean space time an observable that depends on a scalar field can be computed in a very similar fashion as we just described:
+\begin{frame}{Markov Chains}
+\begin{itemize}
+\item Markov processes satisfy the \textit{balance equation}:
 \[
-	\braket{\Gamma[\phi]} = \frac{1}{Z} \int \D \phi \Gamma[\phi] e^{-S[\phi]}
+    \sum_U T(U'|U)P(U) = \sum_{U'} T(U|U')P(U') \Rightarrow \sum_U T(U'|U)P(U) = P(U')
 \]
-where the normalization $Z$ is given again by 
+the equilibrium distribution is a fixed point of the Markov process. 
+\item A more stringent requirement is that of \textit{detailed balance}:
 \[
-	Z = \int \D \phi e^{-S[\phi]}
+    T(U'|U)P(U) = T(U|U')P(U')
 \]
-But this time the path integral can be computed numerically by discretizing the 4 dimensional space in a lattice:
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Langevin Equation}
+The Langevin equation can be used to model \textit{Brownian motion}. In its simplest form it reads:
 \[
-	 \int \D \phi \rightarrow \int \prod_{x_i \in lattice} d\phi(x_i)
+    \frac{dx}{dt} = -\frac{\partial V(x)}{\partial x} + \eta(t)
+\]
+where $V(x)$ is some potential and $\eta(t)$ are random noise variables distributed according to a Gaussian PDF. \\
+It generates a time-dependent probability distribution for the vector $x$, from which an observable $O[x]$ can be evaluated as:
+\[
+ \langle O[x(t)] \rangle = \int P(x, t) O(x)dx
+\]
+\end{frame}
+
+\begin{frame}{Fokker-Planck Equation}
+The probability distribution of Langevin equation has an associated Fokker-Planck equation:
+\[
+    \frac{\partial P(x,t)}{\partial t} = \frac{1}{2} \frac{\partial}{\partial x_i}\left[ \Omega \frac{\partial P}{\partial x_i} + V(x)P\right]
+\]
+This is a deterministic equation for the time dependent $P(x,t)$. It is possible to relate this to the eucildean transporter in quantum mechanics.  
+\end{frame}
+
+\begin{frame}{Numerical Approach to Langevin Equation}
+    Using the same trick for the HMC, see $S[\phi]$ as a potential of some fictitious hamiltonian, so that:
+    \[
+        \frac{d\phi(x)}{dt} = -\frac{\partial S[\phi(x)]}{\partial x} + \eta(t)
+    \]
+    Numerical algorithm is straightforward:
+    \[
+        \phi_{t+1}(x) = \phi_t(x) - \epsilon \frac{\partial S[\phi_t(x)]}{\partial x} + \sqrt{2\epsilon}\eta(t)
+    \]
+    Huge error in discretization. Can be improved with Metropolis Adjusted Langevin Dynamics (MALA), by adding some metropolis tests during the integration.
+    
+\end{frame}
+
+\begin{frame}{Hybrid Monte Carlo}
+    The HMC is based upon considering the Hamiltonian
+    \[
+        H[\phi,\pi] = \frac{\pi^2}{2} + S[\phi]
+    \]
+    and integrating numerically the equations of motion:
+    \[
+        \frac{\partial \phi}{\partial t } = \pi, ~~~~~~~ \frac{\partial \pi}{\partial t } = -\frac{\partial S[\phi]}{\partial \phi}
+    \]
+    Then to correct for integration errors one performs metropolis tests using the weight $e^{-\Delta H}$ to fulfill ergodicity and make the algorithm exact.\\
+    Note that it is a reversible algorithm, satisfies detailed balance (we can use $\pi \rightarrow - \pi$ as it only comes squared in the hamiltonian)
+\end{frame}
+
+\begin{frame}{Generalized HMC}
+    We can extend the HMC algorithm by considering the stochastic evolution equations:
+    \[
+        \frac{\partial \phi}{\partial t } = \pi
+    \]
+    \[
+        \frac{\partial \pi}{\partial t } = -\frac{\partial S[\phi]}{\partial \phi} - 2\mu_0\pi + \eta(t)
+    \]
+    where $\eta(t)$ is again white noise and $\mu_0 > 0$ is a "mass term". This reduces to Stochastic Molecular Dynamics (a variation of HMC) for $\mu_0 \rightarrow 0$. In the second order form:
+    \[
+        \frac{\partial^2 \phi}{\partial t^2 } + 2\mu_0\frac{\partial \phi}{\partial t} = -\frac{\partial S[\phi]}{\partial \phi}  + \eta(t)
+    \]
+    for large $\mu_0$ (after redefining time as $'=2\mu_0t$) this form recovers Langevin equation.
+\end{frame}
+
+\begin{frame}{A Connection Between Algorithms}
+    Why is this interesting? \\
+    \begin{itemize}
+        \item Langevin methods have been proven to be \textit{renormalizable} a long time ago
+        \item HMC has been proven to be \textit{not renormalizable}, but SMD is.
+        \item But the existence of a parameter $\mu_0$ that interpolates between the two could suggest that they are in the \textit{same universality class}, hence have similar behavior when approaching the continuum limit. 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Implication of Renormalizability}
+    \begin{itemize}
+        \item For an algorithm to be renormalizable we mean that the autocorrelation function of the Markov Process has a finite scaling exponent when approaching the continuum theory (smaller lattice spacing).
+        \item For example the Metropolis algorithm scales as $d^2$ ($d$ is the dimensionality of the system, degrees of freedom), while Langevin as $d^{4/3}$.
+        \item For very long trajectories the HMC scales as $d^{5/4}$, better than Langevin, but this is not true in general
+    \end{itemize}
+    Potentially renormalizable algorithms could be more efficient than the HMC near the continuum limit.
+\end{frame}
+
+\begin{frame}{Some Real Data for Free-Theory}
+    \begin{figure}
+        \includegraphics[width=0.8\textwidth]{autocorr.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Some Real Data for Free-Theory}
+    \begin{figure}
+        \includegraphics[width=0.8\textwidth]{scaling.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{A Small Test}
+    Let's consider the harmonic oscillator in one dimension with action:
+    \[
+        S[x] = \sum_{i=1}^{N-1}\left[\frac{m}{2a}(x_i - x_{i+1})^2 + \frac{a}{2}\left(V(x_i) + V(x_{i+1})\right)\right]
+    \]
+    and try to sample the ground state energy defined as $E=\langle x^2\rangle$ using the Metropolis, the HMC and Langevin algorithms. 
+\end{frame}
+
+\begin{frame}{Metropolis Code}
+    \begin{figure}
+        \includegraphics[width=0.8\textwidth]{metropolis_code.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{HMC Code}
+    \begin{figure}
+        \includegraphics[width=0.8\textwidth]{hmc_code.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Langevin Code}
+    \begin{figure}
+        \includegraphics[width=0.8\textwidth]{langevin_code.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Sample Monte Carlo Histories}
+    \begin{figure}
+        \includegraphics[width=0.5\textwidth]{metropolis.pdf}
+        \includegraphics[width=0.5\textwidth]{hmc.pdf}
+    \end{figure}
+    \vspace{-0.5cm}
+    \begin{figure}
+        \includegraphics[width=0.5\textwidth]{langevin.pdf}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Estimation of $\tau_{int}$}
+The autocorrelation function is defined as:
+    \[
+    \Gamma(t) = \Gamma(-t) = \langle (x_i - \bar x)(x_{i+t} - \bar x)\rangle \approx \frac{1}{N-t}\sum_{i=1}^{N-t}  (x_i - \bar x)(x_{i+t} - \bar x),
 \] 
+where $t$ is the ``lag'' between two points. The integrated autocorrelation time is given by:
+\[
+    \tau_{int} = \frac{1}{2} \sum_{t=1}^\infty \frac{\Gamma(t)}{\Gamma(0)} = \frac{1}{2} \sum_{t=1}^\infty \rho(t).
+    \label{autocorr:inf}
+\]
+In order to truncate the infinite summation one can look at the deviation squared of $\rho(t)$:
+\[
+    \langle \delta \rho(t)^2\rangle \approx \frac{1}{N} \sum_{k=1}^\infty \left[ \rho(k+t) + \rho(k-t) - 2\rho(k)\rho(t)\right]^2.
+\]
+All these terms, for a sufficiently large value of $k$ should all vanish, hence one can choose a cutoff $\Lambda$ and truncate the sum up to $t+\Lambda$. The integrated autocorrelation time, if the deviations of $\rho(t)$ become small, plateaus.
 \end{frame}
 
-
-
-\section{The Harmonic Oscillator: a Simple Example}
-\begin{frame}{The Harmonic Oscillator}
-A first example of the path integral solution of quantum mechanical systems can be the 1D Harmonic Oscillator. It is particularly well suited because of:
-\begin{itemize}
-\item simple dimensional discretization
-\item well known results for expectation values
-\item fast analytical analysis, implementation and runs 
-\end{itemize}
-\end{frame}
-
-\begin{frame}{The Harmonic Oscillator}
-The classical action for the harmonic oscillator is given by:
+\begin{frame}{Windowing Procedure for $\tau_{int}$ }
+We choose a cutoff $W$ such that:
 \[
-	S[x] = \int_{t_i}^{t_f} \left[ \frac{m\dot{x}(t)^2}{2} + \frac{1}{2}\omega x(t)^2\right] dt
+    \tau_{int} = \frac{1}{2} \sum_{t=1}^W \rho(t),
+    \label{autocorr_time}
 \]
-We can discretize the time domain into $N$ slices of step $a$, which imposes us to discretize the time derivative of the position as well. When considering the integral between time $t_j$ and $t_{j+1}$ the action becomes:
+where $W$ is the first lag $t$ for which $\rho(t) < \sqrt{ (\langle \delta \rho(t)^2\rangle}$, when the contribution to the integration of $\tau_{int}$ from that lag become smaller than the deviation of that same lag. \\
+An approximate error estimate of the integrated autocorrelation time can be defined as:
 \[
-	S_{j} \approx a\left[ \frac{m(x_{j+1}-x_j)^2}{2a^2} + \frac{1}{4}\omega (x_{j+1} - x_j)^2 \right] dt 
-\]
-When summing over all time slices (and applying periodic boundary conditions) we get
-\[	
-	S_{latt} = \sum_{j = 0}^{N-1} \left[ \frac{m}{2a}(x_{j+1}-x_j)^2 + \frac{a}{2} x_j^2 \right]
+    \sigma^2(\tau_{int}) \approx \frac{2(2W+1)}{N}\tau_{int}^2
+    \label{eq:tauint_error}
 \]
 \end{frame}
-
-\begin{frame}{The Two Point Correlator}
-In order to extract information from the system we need to construct and study an observable. We can look at a two point correlator of the form $\langle x(t_2)x(t_1) \rangle$.  
-In the continuum this is equivalent to the calculation of the ratio of path integrals:
-\[
-	\langle x(t_2)x(t_1) \rangle = \frac{\int \D x(t) x(t_2) x(t_1) e^{-S[x]}}{\int \D x(t) e^{-S[x]}}
-\]
-In quantum mechanics the numerator (using the definition of the path integral) is equal to:
-\[	
-	\int dx \bra{x} e^{\bar{H}(t_f-t2)} \tilde{x} e^{\bar{H}(t_2-t1)} \tilde{x} e^{\bar{H}(t_1-ti)} \ket{x}
-\]
-\end{frame}
-
-\begin{frame}{The Two Point Correlator}
-If we look at the full integral, let the hamiltionian operator act on the states leaving the spectral decomposition of them, and substitute $T = t_f-Ti$ and $t = t_2 - t_1$ we get to:
-\[
-	\langle x(t_2)x(t_1) \rangle = \frac{\sum e^{-E_n T} \bra{E_n} \tilde{x} e^{-(\bar{H}-E_n)t}  \tilde{x}\ket{E_n}}{\sum e^{-E_n T }}
-\]
-and for $T \gg t$ the ground state will dominate the summation:
-\[
-	G(t) = \langle x(t_2)x(t_1)\rangle \rightarrow  \bra{E_0} \tilde{x} e^{-(\bar{H}-E_0)t}  \tilde{x}\ket{E_0}
-\]
-and letting $t$ to be large as well the propagator ends up linking the two lowest energy states:
-\[
-	G(t) \rightarrow  |\bra{E_0} \tilde{x} \ket{E_1}|^2e^{-(E_1-E_0)t}
-\]
-\end{frame}
-
-\begin{frame}{Discretizing the Two Point Correlator }
-We can now extract the first excitation energy of the quantum mechanical harmonic oscillator, in the limit of $t$ large, as:
-\[
-	\log\left( \frac{G(t)}{G(t+\Delta t)}\right) = (E_1 - E_0)\Delta t
-\]
-On our discretized lattice the correlator can be obtained numerically by directly computing the average value of the operator:
-\[
-	G(t) = \frac{1}{N}\sum_j\langle\braket{x(t_j+t)x(t_j)}\rangle
-\]
-for all $t$ in $0, a, 2a\dots (N-1)a$. This might look trivial at a first glance, but it is the key point of the whole algorithm
-\end{frame}
-
-\begin{frame}{The Metropolis Algorithm}
-The computational algorithm required to compute the correlator is based on the idea of creating a Markov chain of possible paths for the harmonic oscillator, via subsequent updates. This procedure is called Metropolis algorithm:
-\begin{itemize}
-\item initialize an array of N position values for each time point (for example set everything to 0)
-\item suggest a new random configuration starting from the current one
-\item accept or reject the update, based on the action difference
-\item compute the correlator for the current configuration
-\item repeat the process $N_{cf}$ times, sufficiently large to have a statistically relevant ensemble.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Further Details on the Metropolis Algorithm}
-\begin{itemize}
-\item In order to limit the auto correlation between data, the observable is only computed once every $N_{corr}$ updates. 
-\item The rule for accepting an update is: $\exp(-\Delta S) > \xi$. Where $\xi \in [0,1]$, a randomly chosen number. This implies that if the classical action is reduced the update is automatically accepted, if it is positive, a random number $\xi$ is generated and compared with the exponential of the action. This condition allows the system to explore all the phase space and not get stuck in a local minimum for example.
-\end{itemize} 
-\end{frame}
-
-
-\begin{frame}{Numerical Tests}
-Runs for the HO were made using $10^5$ configurations ($N_{conf}$), skipping 20 updates between every measurement ($N_{corr}$). The time axis was discretized into 20 nodes. Data, to improve the estimate of the error bars, have been resampled using the bootstrap technique. 
-The result that is physically relevant is the first excitation energy, which we expect to be $1\hbar\omega$. For simplicity we set $\hbar=\omega=1$ and the lattice spacing parameter $a = 0.5$.
-\end{frame}
-
-
-\begin{frame}{Bootstrapping}
-Due to the demanding calculations of LQCD, we implemented statistical bootstrapping. The general method for bootstrapping goes as following: Given a data set of $N$ data points with an observable $\hat{\theta}$. We now \textit{resample} the dataset $K$ times. For each resample, we compute the observable which we call $\theta_k$. We now have $K$ $\theta_k$. We can now compute the average and variance of of the bootstrapped data.
-\[
-\tilde{\theta} \equiv \frac{1}{K}\sum^K_{k=1}\theta_k,
-\]
-\[
-\sigma^2_{\tilde{\theta}} \equiv \frac{1}{K}\sum^K_{k=1}(\theta_k - \tilde{\theta})^2
-\]
-\end{frame}
-
 
 \begin{frame}{Results}
-As we can see, the estimate of the energy varies considerably with the correlation time (it is antisymmetric due to periodicity). However it is close to one (or minus one) at both ends. 
-\begin{figure}
-\includegraphics[width=0.8\textwidth]{HOEnergies.png}
-\caption{First excitation energy of the harmonic oscillator as a function of the correlation time.}
-\end{figure}
+    \centering
+    \begin{figure}
+        \includegraphics[width=0.8\textwidth]{tau_ints.pdf}
+    \end{figure}
 \end{frame}
 
+\section{Conclusions}
 
-\begin{frame}{Results}
-A precise estimate of the excitation energy was obtained by mirroring the last data points to the left of the first ones, and taking a linear fit.
-\begin{figure}
-\includegraphics[width=0.8\textwidth]{Fit.png}
-\caption{Linear fit results for the first excitation energy of the harmonic oscillator.}
-\end{figure}
+\begin{frame}{Sources}
+    
+\begin{thebibliography}{99}
+\bibitem{luscher_flow}
+        M. L{\"{u}}scher , S. Schaefer,
+        {\em Non-renormalizability of the HMC algorithm},
+        (2011),
+        Journal of High Energy Physics
+\bibitem{luscher_flow_}
+        M. L{\"{u}}scher , S. Schaefer,
+        {\em Lattice QCD without topology barriers},
+        (2011),
+        Journal of High Energy Physics
+\bibitem{zinn}
+        J. Zinn-Justin,
+        {\em Quantum Field Theory and Critical Phenomena},
+        (1996),
+\bibitem{gattringer}
+        C.Gattringer, C.B. Lang,
+        {\em Quantum Chromodynamics on the Lattice}
+        (2010),
+        Springer
+\bibitem{sommer}
+        R. M. Neal, 
+        {\em MCMC using Hamiltonian dynamics},
+        Chapter 5 of the "Handbook of Markov Chain Monte Carlo"
+\end{thebibliography}
 \end{frame}
-
-
-\section{Overview of Lattice QCD Calculations}
-
-
-\begin{frame}{QCD in the continuum}
-We are looking at pure gauge action, excluding fermions.
-\[
-S_G = \int d^4 x \frac{1}{2}\sum_{\mu,\nu}\Tr F_{\mu\nu}^2(x)
-\]
-with the field strength tensor given as the commutator of the covariant derivatives
-\[
-F_{\mu\nu}(x) = -i[D_\mu(x,D_\nu(x)]
-\]
-Our goal is to build a gauge invariant, discretized (gluon) action under the $SU(3)$ gauge symmetry. Demanding invariance under $SU(3)$, forces the covariant derivatives to become,
-\[
-D_\mu(x) \rightarrow D_\mu'(x) = \partial_\mu+igA'_\mu(x) = \Omega(x) D_\mu(x) \Omega^\dagger(x)
-\]
-This leads to a more familiar form of the field strength tensor
-\[
-F_{\mu\nu}(x) = \partial_\mu A_\mu(x) - \partial_\nu A_\mu(x) + ig[A_\mu(x), A_\nu(x)]
-\]
-with the $g$ being the coupling constant. The $\Omega(x)$ is a $3\times 3$ $SU(3)$ matrix(complex, unitary, $\Omega(x)^\dagger = \Omega(x)^{-1}$ and $\det[\Omega(x)]=1$).
-\end{frame}
-
-
-\begin{frame}{QCD on the lattice I: links}
-When translating QCD to the lattice $\Lambda$, we discretize space time to 
-\[
-\Lambda = \{n=\{n_1,n_2,n_3,n_4\} | n_1,n_2,n_3 = 0,1,\dots,N-1; n_4 =0,1,\dots,N_T-1\}
-\]
-$N$ is the number of spatial points, and $N_T$ is the temporal ones. A link between two space time points $n$ and $n+\hat{\mu}$ is defined by $SU(3)$ matrices $U_\mu(n)$. The $\hat{\mu}$ indicates a single step in the $\mu$ space time direction. Conversely, going from point $n$ to $n-\hat{\mu}$, is given as (draw on link on blackboard for illustration)
-\[
-U_{-\mu}(n) \equiv U_{\mu}(n-\hat{\mu})^\dagger
-\]
-The link, is in this case our gauge field and is given as
-\[
-U_\mu = \exp(iaA_\mu(n))
-\]
-This comes from the line integral,
-\[
-U_\mu(x) = \mathcal{P}\exp\left(-i\int^{x+a\hat{\mu}}_x gA\cdot dx\right) \approx  \exp\left(-igaA_\mu\right)
-\]
-With the $\mathcal{P}$ being the path ordering of the integral.
-\end{frame}
-
-
-\begin{frame}{QCD on the lattice II: using links to build gauge invariant objects}
-We will ignore all other symmetries such as rotational, Lorentz ect., as preserving the gauge symmetry ensures couplings between quark-gluon, three-gluon, four gluons are equal and the bare gluon mass is zero. In order to preserve gauge invariance, we use links to build gauge invariant objects. \textit{All closed loops of connected links are gauge invariant}. The simplest gauge invariant object to build is the \textit{plaquette}(draw on blackboard).
-\[
-P_{\mu\nu} = U_\mu(n)U_\nu(n+\hat{\mu})U_{-\mu}(n+\hat{\mu}+\hat{\nu})U_{-\nu}(n+\hat{\nu}) 
-\]
-Using the relation for the inverse gauge link, we can rewrite this to,
-\[
-P_{\mu\nu} = U_\mu(n)U_\nu(n+\hat{\mu})U_{\mu}(n+\hat{\nu})^\dagger U_{\nu}(n)^\dagger
-\]
-\end{frame}
-
-
-\begin{frame}{QCD on the lattice III: Wilson gauge action}
-A possible formulation of the discretized gauge action is given by the \textit{Wilson gauge action}.
-\[
-S_G[U] = \frac{2}{g^2} \sum_x\sum_{\mu <\nu} \mathrm{Re} \Tr [1-P_{\mu\nu}(x)]
-\]
-No color indices is included, as the trace of the $SU(3)$ matrices ensures that the color is gauge invariant.
-
-It can be shown, that this expression reproduces the continuum action, by using the $\exp(A)\exp(B)=\exp(A+B+\frac{1}{2}[A,B] + \dots)$ for matrices, and the expression for the line integral of $U_\mu(n)$, and then Taylor expanding.
-\end{frame}
-
-
-\begin{frame}{Lattice QCD Calculations}
-In general all Lattice QCD Calculations can be designed to be split into two main parts:
-\begin{itemize}
-\item Generation of Configurations: generating a numerical statistical ensemble of lattice field configurations weighted according to some action. They can be generated through various methods, such as Metropolis algorithm, the Heatbath method or Hybrid Monte Carlo methods. 
-\item Computation of Observables: extracting information about correlators, masses, excitation levels from the lattice field configurations. 
-\end{itemize}
-Usually the ensembles are rather small (few hundreds configurations) so the statistical analysis of observables has to be done using methods as bootstrapping or jackknife.
-\end{frame}
-
-
-\begin{frame}{Observables on the Lattice}
-The simplest observable we have is the plaquette operator,
-\[
-\langle P \rangle = \frac{1}{6|\Lambda|N}\sum_{x,\mu<\nu} \mathrm{Re}\Tr P_{\mu\nu}
-\]
-with the plaquette being given as earlier,
-\[
-P_{\mu\nu} = U_\mu(n)U_\nu(n+\hat{\mu})U_{\mu}(n+\hat{\nu})^\dagger U_{\nu}(n)^\dagger
-\]
-The $|\Lambda|$ is the number of lattice points, $N$ is the number of our gauge group(3 in our case). The 6 stems from us having to average the number of plaquettes we are taking.
-\end{frame}
-
-
-\section{Generating Pure Gauge Field Configurations}
-\begin{frame}{Generating Pure Gauge Field Configurations}
-Each site on the lattice has 4 $SU(3)$ matrices associated with itself. One for each space time direction. The inverse of this matrix corresponds to the opposite direction. These matrices will be our links $U_\mu(x)$ and represents our gauge field $A_\mu(x)$. In order to generate these matrices, we can do following,
-\begin{itemize}
-\item We generate random two complex vectors, $\mathbf{u}$ and $\mathbf{v}$
-\item We normalize the first column by $|\mathbf{u}|^2=\mathbf{u}^*\cdot \mathbf{u}=1$.
-\item Use Gram-Schmitt to make the vectors orthogonal to each other.
-\item We normalize the second column.
-\item We take the cross product between $\mathbf{u}^* \times \mathbf{v}^*$, to create a third orthonormal column.
-\end{itemize}
-This proved a possible start configuration for our gauge field. \textit{Problem}: this is a random matrix which is not near the unity, and will make the matrix updates problematic as we may move too far away from the original configuration.
-\end{frame}
-
-
-\begin{frame}{Updating the gauge field I: Metropolis algorithm}
-The Metropolis algorithm described in the harmonic oscillator example bear strong resemblance to the one applied for the pure gauge case.  
-\begin{itemize}
-\item Initialize the lattice to a random $SU(3)$ configuration, or set all matrices to identity.
-\item Select one of the links(matrices) at a space time point, and update it by multiplying by a $X$ matrix close to the identity.
-\item accept or reject the update, based on the action difference $\Delta S$.
-\item compute the correlator for the current configuration
-\item repeat this for all links at all space time points.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Updating the gauge field II: Change in gauge action}
-When computing the change in action for a given updated link $U_\mu'(n)$, we can calculate the following local contribution to the change
-\[
-\Delta S = - \frac{\beta}{3}\mathrm{Re}\Tr[(U_\mu(n)' - U_\mu(n))A]
-\]
-where $A$ is the staple product,
-\[
-\begin{split}
-A &= \sum_{\nu\neq\mu}\big( U_\nu(n+\hat{\mu})U_{-\mu}(n+\hat{\mu}+\hat{\nu})U_{-\nu}(n+\hat{\nu}) \\
-&+ U_{-\nu}(n+\hat{\mu})U_{-\mu}(n+\hat{\mu}-\hat{\nu})U_{\nu}(n-\hat{\nu})\big)
-\end{split}
-\]
-\end{frame}
-
-
-\begin{frame}{Updating the gauge field III: the matrix update}
-In order to optimize the gauge field updates, we will make the Metropolis update use $SU(3)$ matrices close to the identity.
-\[
-U_\mu'(n) = X U_\mu(n)
-\]
-The $X$ matrix will be the a product of three matrices build of matrices containing $SU(2)$ matrices,
-\[
-X = RST
-\]
-where R,S and T are built from
-\[
-R = \begin{pmatrix}
-r_{11} & r_{12} & 0 \\
-r_{21} & r_{22} & 0 \\
-0 & 0 & 1
-\end{pmatrix}, 
-S = \begin{pmatrix}
-s_{11} & 0 & s_{12} \\
-0 & 1 & 0 \\
-s_{21} & 0 & s_{22}
-\end{pmatrix},
-T = \begin{pmatrix}
-1 & 0 & 0 \\
-0 & t_{11} & t_{12} \\
-0 & t_{21} & t_{22}
-\end{pmatrix}
-\]
-The $r,s,t$ are $SU(2)$ matrices.
-\end{frame}
-
-
-\begin{frame}{Updating the gauge field IV: further details}
-\begin{itemize}
-\item As with the HO example, we will in order to limit correlation and computational time only compute the observable once every $N_\text{corr}$ updates.
-\item When computing the Wilson gauge action at a point, we will have that the staple $A$ can be computed once for a point, then update that space time point many times in order to save computational time.
-\end{itemize}
-\end{frame}
-
-
-\section{Data analysis}
-\begin{frame}{Topological susceptibility}
-An analysis of the topological susceptibility were performed using the bootstrapping technique. First, the topological susceptibility $\chi_\text{top}$, is related to the topological charge $Q_\text{top}$ which tells us about how many left- and right-handed zero modes.
-\begin{figure}
-\includegraphics[width=0.65\textwidth]{chi_400bootstraps.png}
-\caption{The topological susceptibility with 200 bootstraps.	}
-\end{figure}
-\end{frame}
-
 \end{document}
 
