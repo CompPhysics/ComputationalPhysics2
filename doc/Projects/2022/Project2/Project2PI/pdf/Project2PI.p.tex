@@ -1,0 +1,604 @@
+%%
+%% Automatically generated file from DocOnce source
+%% (https://github.com/doconce/doconce/)
+%% doconce format latex Project2PI.do.txt --print_latex_style=trac --latex_admon=paragraph
+%%
+% #ifdef PTEX2TEX_EXPLANATION
+%%
+%% The file follows the ptex2tex extended LaTeX format, see
+%% ptex2tex: https://code.google.com/p/ptex2tex/
+%%
+%% Run
+%%      ptex2tex myfile
+%% or
+%%      doconce ptex2tex myfile
+%%
+%% to turn myfile.p.tex into an ordinary LaTeX file myfile.tex.
+%% (The ptex2tex program: https://code.google.com/p/ptex2tex)
+%% Many preprocess options can be added to ptex2tex or doconce ptex2tex
+%%
+%%      ptex2tex -DMINTED myfile
+%%      doconce ptex2tex myfile envir=minted
+%%
+%% ptex2tex will typeset code environments according to a global or local
+%% .ptex2tex.cfg configure file. doconce ptex2tex will typeset code
+%% according to options on the command line (just type doconce ptex2tex to
+%% see examples). If doconce ptex2tex has envir=minted, it enables the
+%% minted style without needing -DMINTED.
+% #endif
+
+% #define PREAMBLE
+
+% #ifdef PREAMBLE
+%-------------------- begin preamble ----------------------
+
+\documentclass[%
+oneside,                 % oneside: electronic viewing, twoside: printing
+final,                   % draft: marks overfull hboxes, figures with paths
+10pt]{article}
+
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{relsize,makeidx,color,setspace,amsmath,amsfonts,amssymb}
+\usepackage[table]{xcolor}
+\usepackage{bm,ltablex,microtype}
+
+\usepackage[pdftex]{graphicx}
+
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{lmodern}         % Latin Modern fonts derived from Computer Modern
+
+% Hyperlinks in PDF:
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=black,
+    filecolor=black,
+    %filecolor=blue,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+    }
+%\hyperbaseurl{}   % hyperlinks are relative to this root
+
+\setcounter{tocdepth}{2}  % levels in table of contents
+
+% --- fancyhdr package for fancy headers ---
+\usepackage{fancyhdr}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[LE,RO]{\thepage}
+% Ensure copyright on titlepage (article style) and chapter pages (book style)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2022, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+%  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+% Ensure copyright on titlepages with \thispagestyle{empty}
+\fancypagestyle{empty}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2022, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+
+\pagestyle{fancy}
+
+
+% prevent orhpans and widows
+\clubpenalty = 10000
+\widowpenalty = 10000
+
+% --- end of standard preamble for documents ---
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+\usepackage[totoc]{idxlayout}   % for index in the toc
+\usepackage[nottoc]{tocbibind}  % for references/bibliography in the toc
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+% matching end for #ifdef PREAMBLE
+% #endif
+
+\newcommand{\exercisesection}[1]{\subsection*{#1}}
+
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\thispagestyle{empty}
+
+\begin{center}
+{\LARGE\bf
+\begin{spacing}{1.25}
+Project 2, Path integral formalism. Deadline June 1, Spring 2022
+\end{spacing}
+}
+\end{center}
+
+% ----------------- author(s) -------------------------
+
+\begin{center}
+{\bf \href{{http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html}}{Computational Physics II FYS4411/FYS9411}}
+\end{center}
+
+    \begin{center}
+% List of all institutions:
+\centerline{{\small Department of Physics, University of Oslo, Norway}}
+\end{center}
+    
+% ----------------- end author(s) -------------------------
+
+% --- begin date ---
+\begin{center}
+Apr 21, 2022
+\end{center}
+% --- end date ---
+
+\vspace{1cm}
+
+
+\subsection{Path Integrals: Concepts and Formalism}
+
+The aim of this project is to study the path integral formalism applied first to a Harmonic oscillator problem.
+
+In the path integral formalism the evolution from a state $\vert x_i\rangle$
+to a state $\vert  x_f\rangle$ from time $t_i$ to time $t_f$ is given by:
+
+\[
+	\langle x_f\vert e^{-\hat{H}(t_f-t_i)}\vert x_i\rangle = \int \D x(t) e^{-S[x]}
+\]
+
+On the left-hand side we have the standard quantum mechanical time
+evolution operator with $\hat{H}$ being the Hamiltonian operator of
+the system, the right-hand side represents the path integral of all possible paths
+x(t) from $x_i$ to $x_f$ with $t = t_i \rightarrow t_f$ weighted with
+the classical action $S[x]$:
+
+\[
+	S[x] = \int_{t_i}^{t_f} dt L(x,\dot{x}) =  \int_{t_i}^{t_f} dt \left( \frac{m\dot{x}(t)^2}{2} - V(x(t))\right),
+\]
+
+and  knowledge of the propagator gives full information about the system.
+
+In a simple one dimensional case the path integral can be written as
+
+\[
+	 \int \D x(t) \rightarrow \int_{-\infty}^{\infty} dx_1dx_2\dots dx_{N-1}
+\]
+
+where time has been discretized in $N$ slices from $t_i = t_0$ to $t_f = t_N$. Consequently $x_i = x(t_i)$.  
+
+Given some functional $\Gamma[x]$ that represents an observable at
+intermediate times of the evolution of the system we can write its
+expectation value as:
+
+\[
+	\braket{\Gamma[x]} = \frac{1}{Z} \int \D x(t) \Gamma[x] e^{-S[x]}
+\]
+
+where the normalization $Z$ is given by 
+
+\[
+	Z = \int \D x(t) e^{-S[x]}
+\]
+
+This can be computed using a set of configurations $x^{(k)} =
+\{x^{(k)}_1x^{(k)}_2\dots x^{(k)}_{N-1} \}$ for $k = 1,2,\dots
+N_{cf}$. The Monte Carlo estimator then becomes:
+
+\[
+	\braket{\Gamma[x]} \approx \bar{\Gamma} = \frac{1}{N_{cf}} \sum_{k = 1}^k \Gamma[x^{(k)}]
+\]
+
+As and aside, if we wish to  generalize our theory to a four dimensional
+euclidean space time an observable that depends on a scalar field can
+be computed in a very similar fashion
+
+\[
+	\braket{\Gamma[\phi]} = \frac{1}{Z} \int \D \phi \Gamma[\phi] e^{-S[\phi]}
+\]
+
+where the normalization $Z$ is given again by 
+
+\[
+	Z = \int \D \phi e^{-S[\phi]}
+\]
+
+But this time the path integral can be computed numerically by discretizing the 4 dimensional space in a lattice:
+
+\[
+	 \int \D \phi \rightarrow \int \prod_{x_i \in lattice} d\phi(x_i)
+\] 
+
+\subsection{The Harmonic Oscillator: a Simple Example}
+
+\paragraph{Project 2 a):}
+A first example of the path integral solution of quantum mechanical
+systems is the one-dimensional harmonic oscillator. It is particularly
+well suited because of:
+
+\begin{enumerate}
+\item simple dimensional discretization
+
+\item well-known results for expectation values
+
+\item fast analytical analysis, implementation and runs 
+\end{enumerate}
+
+\noindent
+The classical action for the harmonic oscillator is given by
+
+\[
+	S[x] = \int_{t_i}^{t_f} \left[ \frac{m\dot{x}(t)^2}{2} + \frac{1}{2}\omega x(t)^2\right] dt.
+\]
+
+We can discretize the time domain into $N$ slices of step $a$, which
+imposes us to discretize the time derivative of the position as
+well. When considering the integral between time $t_j$ and $t_{j+1}$
+the action becomes
+
+\[
+	S_{j} \approx a\left[ \frac{m(x_{j+1}-x_j)^2}{2a^2} + \frac{1}{4}\omega (x_{j+1} - x_j)^2 \right] dt.
+\]
+
+When summing over all time slices (and applying periodic boundary conditions) we get
+
+\[	
+	S_{latt} = \sum_{j = 0}^{N-1} \left[ \frac{m}{2a}(x_{j+1}-x_j)^2 + \frac{a}{2} x_j^2 \right]
+\]
+
+In order to extract information from the system we need to construct
+and study an observable. We can look at a two point correlator of the
+form $\langle x(t_2)x(t_1) \rangle$.  In the continuum this is
+equivalent to the calculation of the ratio of path integrals
+
+\[
+	\langle x(t_2)x(t_1) \rangle = \frac{\int \D x(t) x(t_2) x(t_1) e^{-S[x]}}{\int \D x(t) e^{-S[x]}}
+\]
+
+In quantum mechanics the numerator (using the definition of the path integral) is equal to
+
+\[	
+v	\int dx \langle x\vert  e^{\bar{H}(t_f-t2)} \tilde{x} e^{\bar{H}(t_2-t1)} \tilde{x} e^{\bar{H}(t_1-ti)} \vert x\rangle,
+\]
+
+If we look at the full integral, let the hamiltionian operator act on
+the states leaving the spectral decomposition of them, and substitute
+$T = t_f-Ti$ and $t = t_2 - t_1$ we get to
+
+\[
+	\langle x(t_2)x(t_1) \rangle = \frac{\sum e^{-E_n T} \langle E_n\vert \tilde{x} e^{-(\bar{H}-E_n)t}  \tilde{x}\vert E_n\rangle }{\sum e^{-E_n T }}
+\]
+
+and for $T \gg t$ the ground state will dominate the summation:
+
+\[
+	G(t) = \langle x(t_2)x(t_1)\rangle \rightarrow  \langle E_0\vert \tilde{x} e^{-(\bar{H}-E_0)t}  \tilde{x}\vert E_0\rangle,
+\]
+
+and letting $t$ to be large as well the propagator ends up linking the two lowest energy states
+
+\[
+	G(t) \rightarrow  |\langle E_0\vert \tilde{x} \vert E_1\rangle|^2e^{-(E_1-E_0)t}.
+\]
+
+We can now extract the first excitation energy of the quantum mechanical harmonic oscillator, in the limit of $t$ large, as
+
+\[
+	\log\left( \frac{G(t)}{G(t+\Delta t)}\right) = (E_1 - E_0)\Delta t.
+\]
+
+On our discretized lattice the correlator can be obtained numerically by directly computing the average value of the operator
+
+\[
+	G(t) = \frac{1}{N}\sum_j\langle\braket{x(t_j+t)x(t_j)}\rangle,
+\]
+for all $t$ in $0, a, 2a\dots (N-1)a$. This might look trivial at a first glance, but it is the key point of the whole algorithm.
+
+The computational algorithm required to compute the correlator is
+based on the idea of creating a Markov chain of possible paths for the
+harmonic oscillator, via subsequent updates. This procedure is called
+Metropolis algorithm:
+
+\begin{enumerate}
+\item initialize an array of $N$ position values for each time point (for example set everything to 0)
+
+\item suggest a new random configuration starting from the current one
+
+\item accept or reject the update, based on the action difference
+
+\item compute the correlator for the current configuration
+
+\item repeat the process $N_{cf}$ times, sufficiently large to have a statistically relevant ensemble.
+\end{enumerate}
+
+\noindent
+In order to limit the auto correlation between data, the observable is
+only computed once every $N_{corr}$ updates.  The rule for accepting
+an update is: $\exp(-\Delta S) > \xi$. Where $\xi \in [0,1]$, a
+randomly chosen number. This implies that if the classical action is
+reduced the update is automatically accepted, if it is positive, a
+random number $\xi$ is generated and compared with the exponential of
+the action. This condition allows the system to explore all the phase
+space and not get stuck in a local minimum for example.
+
+Your task is to
+run for the harmonic oscillator  using $10^5-10^7$ configurations ($N_{conf}$), skipping 20
+updates between every measurement ($N_{corr}$). The time axis is
+discretized into 20 nodes. Data, to improve the estimate of the error can be resampled using the bootstrap or the blocking
+techniques.  The result that is physically relevant is the first
+excitation energy, which we expect to be $1\hbar\omega$. For
+simplicity we set $\hbar=\omega=1$ and the lattice spacing parameter
+$a = 0.5$.
+
+Implement statistical bootstrapping and blocking. 
+Estimate energy and how it relates  with the correlation time.
+
+\paragraph{Project 2 b) Simulating with the Langevin Equation and Hybrid Monte Carlo:}
+The expectation value of a quantity $A$ evaluated with path integrals is:
+
+\[
+    \braket{A} = \frac{1}{Z}\int \D[\phi] A[\phi]e^{-S[\phi]}.
+\]
+
+One can sample this with Monte Carlo integration by considering
+$e^{-S[\phi]}$ as a Boltzmann weight and use it as a
+\textit{probability measure}. One than chooses a set of random
+configurations $\{\phi_i\}$ according to the probability distribution:
+
+\[
+    dP[\phi] = \frac{e^{-S[\phi]}\D[\phi]}{\int \D[\phi] e^{-S[\phi]}}.
+\]
+
+The expectation value is then approximated as
+
+\[
+    \braket{A} \approx \frac{1}{N_{conf}} \sum_{i=1}^{N_{conf}} A[\phi_i].
+\]
+
+As done in the previous parts and in project 1, we normally employ Markov processes and the Metropolis algorithm.
+
+The Langevin equation can be used to model \textit{Brownian motion}. In its simplest form it reads:
+
+\[
+    \frac{dx}{dt} = -\frac{\partial V(x)}{\partial x} + \eta(t)
+\]
+where $V(x)$ is some potential (hermonic oscillator) and $\eta(t)$ are random noise variables distributed according to a Gaussian PDF. 
+It generates a time-dependent probability distribution for the vector $x$, from which an observable $O[x]$ can be evaluated as:
+
+\[
+ \langle O[x(t)] \rangle = \int P(x, t) O(x)dx
+\]
+
+As discussed in connection with project 1, the probability
+distribution of the Langevin equation has an associated Fokker-Planck
+equation
+
+\[
+\frac{\partial P(x,t)}{\partial t} = \frac{1}{2} \frac{\partial}{\partial x_i}\left[ \Omega \frac{\partial P}{\partial x_i} + V(x)P\right]
+\].
+
+This is a deterministic equation for the time dependent $P(x,t)$. It
+is possible to relate this to the euclidean transporter in quantum
+mechanics.
+
+Using the same trick for the Hybrid Monte Carlo (HMC) discussed below,
+see $S[\phi]$ as a potential of some fictitious hamiltonian, so that
+
+\[
+\frac{d\phi(x)}{dt} = -\frac{\partial S[\phi(x)]}{\partial x} + \eta(t).
+\]
+
+The numerical algorithm is straightforward:
+\[
+\phi_{t+1}(x) = \phi_t(x) - \epsilon \frac{\partial S[\phi_t(x)]}{\partial x} + \sqrt{2\epsilon}\eta(t).
+\]
+
+This method can lead to huge errors in discretization. Can be improved
+with Metropolis Adjusted Langevin Dynamics (MALA), by adding some
+metropolis tests during the integration.
+
+The Hybrid Monte Carlo  is based upon considering the Hamiltonian
+
+\[
+   H[\phi,\pi] = \frac{\pi^2}{2} + S[\phi]
+\]
+and integrating numerically the equations of motion:
+
+\[
+  \frac{\partial \phi}{\partial t } = \pi, ~~~~~~~ \frac{\partial \pi}{\partial t } = -\frac{\partial S[\phi]}{\partial \phi}.
+\]
+
+Then to correct for integration errors one performs metropolis tests
+using the weight $e^{-\Delta H}$ to fulfill ergodicity and make
+the algorithm exact.  Note that it is a reversible algorithm,
+it satisfies detailed balance (we can use $\pi \rightarrow - \pi$ as
+it only comes squared in the hamiltonian)
+
+We can extend the HMC algorithm by considering the stochastic evolution equations:
+\[
+        \frac{\partial \phi}{\partial t } = \pi,
+    \]
+and
+\[
+ \frac{\partial \pi}{\partial t } = -\frac{\partial S[\phi]}{\partial \phi} - 2\mu_0\pi + \eta(t)
+\]
+
+where $\eta(t)$ is again white noise and $\mu_0 > 0$ is a "mass
+term". This reduces to Stochastic Molecular Dynamics (a variation of
+HMC) for $\mu_0 \rightarrow 0$. In the second order form:
+
+\[
+\frac{\partial^2 \phi}{\partial t^2 } + 2\mu_0\frac{\partial \phi}{\partial t} = -\frac{\partial S[\phi]}{\partial \phi}  + \eta(t),
+\]
+for large $\mu_0$ (after redefining time as $'=2\mu_0t$) this form recovers Langevin equation.
+Why is this interesting? 
+\begin{enumerate}
+\item Langevin methods have been proven to be \textit{renormalizable} a long time ago
+
+\item HMC has been proven to be \textit{not renormalizable}
+
+\item But the existence of a parameter $\mu_0$ that interpolates between the two could suggest that they are in the \textit{same universality class}, hence have similar behavior when approaching the continuum limit. 
+\end{enumerate}
+
+\noindent
+For an algorithm to be renormalizable we mean that the autocorrelation function of the Markov Process has a finite scaling exponent when approaching the continuum theory (smaller lattice spacing).
+For example, the Metropolis algorithm scales as $d^2$ ($d$ is the dimensionality of the system, degrees of freedom), while Langevin as $d^{4/3}$.
+For very long trajectories the HMC scales as $d^{5/4}$, better than Langevin, but this is not true in general
+Potentially renormalizable algorithms could be more efficient than the HMC near the continuum limit.
+
+Let us  again consider the harmonic oscillator in one dimension with action:
+\[
+  S[x] = \sum_{i=1}^{N-1}\left[\frac{m}{2a}(x_i - x_{i+1})^2 + \frac{a}{2}\left(V(x_i) + V(x_{i+1})\right)\right],
+\]
+and try to sample the ground state energy defined as $E=\langle x^2\rangle$ using the Metropolis, the HMC and Langevin algorithms. 
+
+The autocorrelation function is defined as:
+
+\[
+\Gamma(t) = \Gamma(-t) = \langle (x_i - \bar x)(x_{i+t} - \bar x)\rangle \approx \frac{1}{N-t}\sum_{i=1}^{N-t}  (x_i - \bar x)(x_{i+t} - \bar x),
+\]
+where $t$ is the ``lag'' between two points. The integrated autocorrelation time is given by:
+
+\[
+\tau_{int} = \frac{1}{2} \sum_{t=1}^\infty \frac{\Gamma(t)}{\Gamma(0)} = \frac{1}{2} \sum_{t=1}^\infty \rho(t).
+\]
+
+In order to truncate the infinite summation one can look at the deviation squared of $\rho(t)$:
+\[
+    \langle \delta \rho(t)^2\rangle \approx \frac{1}{N} \sum_{k=1}^\infty \left[ \rho(k+t) + \rho(k-t) - 2\rho(k)\rho(t)\right]^2.
+\]
+
+All these terms, for a sufficiently large value of $k$ should all
+vanish, hence one can choose a cutoff $\Lambda$ and truncate the sum
+up to $t+\Lambda$. The integrated autocorrelation time, if the
+deviations of $\rho(t)$ become small, plateaus.
+
+We choose a cutoff $W$ such that:
+
+\[
+    \tau_{int} = \frac{1}{2} \sum_{t=1}^W \rho(t),
+    \label{autocorr_time}
+\]
+
+where $W$ is the first lag $t$ for which $\rho(t) < \sqrt{ (\langle
+\delta \rho(t)^2\rangle}$, when the contribution to the integration of
+$\tau_{int}$ from that lag become smaller than the deviation of that
+same lag. \\ An approximate error estimate of the integrated
+autocorrelation time can be defined as
+
+\[
+    \sigma^2(\tau_{int}) \approx \frac{2(2W+1)}{N}\tau_{int}^2.
+\]
+
+\paragraph{Project 2 c):}
+Here the aim is to explore the Heisenberg-model in one and two
+dimensions, by use of stochastic series expansion (SSE). Hopefully, we
+will be able to calculate the critical temperature for the continious
+phase transition. With this value the critical exponents for the
+system can also be obtained.  The results should be compared with the
+relevant literature as provided in the references.
+
+Implementation of SSE for 1D Heisenberg model with periodic bound- ary conditions.
+\begin{enumerate}
+\item Add external field and anisotropy dependencies.
+
+\item 2D implementation, again with periodic boundary conditions.
+\begin{enumerate}
+
+\item Study the temperature dependent phase transition and calculate the critical exponents for the system. By studying the system the follow- ing values should be attainable; $M$, $M^2$, $E$, $\xi$, $C_V$ , $C(r)$, where $M$ is magnetization, $E$ is the energy, $\xi$ is the magnetic suceptibility, $C_V$ is the heat capacity and $C(r)$ is the correlation length.
+\end{enumerate}
+
+\noindent
+\end{enumerate}
+
+\noindent
+\paragraph{Literature.}
+\begin{enumerate}
+\item M. L{\"{u}}scher , S. Schaefer, Non-renormalizability of the HMC algorithm,(2011), Journal of High Energy Physics
+
+\item R. M. Neal, MCMC using Hamiltonian dynamics, Chapter 5 of the Handbook of Markov Chain Monte Carlo
+
+\item A. W. Sandvik. Finite-size scaling of the ground-state parameters of the two-dimensional heisenberg model. Phys. Rev. B, 56:11678–11690, Nov 1997.
+
+\item A. W. Sandvik. Stochastic series expansion method with operator-loop update. Phys. Rev. B, 59:R14157–R14160, Jun 1999.
+
+\item O. F. Syljuasen and A. W. Sandvik. Quantum Monte Carlo with directed loops. Phys. Rev. E, 66:046701, Oct 2002.~
+\end{enumerate}
+
+\noindent
+\subsection{Introduction to numerical projects}
+
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+
+\begin{itemize}
+  \item Give a short description of the nature of the problem and the eventual  numerical methods you have used.
+
+  \item Describe the algorithm you have used and/or developed. Here you may find it convenient to use pseudocoding. In many cases you can describe the algorithm in the program itself.
+
+  \item Include the source code of your program. Comment your program properly.
+
+  \item If possible, try to find analytic solutions, or known limits in order to test your program when developing the code.
+
+  \item Include your results either in figure form or in a table. Remember to        label your results. All tables and figures should have relevant captions        and labels on the axes.
+
+  \item Try to evaluate the reliabilty and numerical stability/precision of your results. If possible, include a qualitative and/or quantitative discussion of the numerical stability, eventual loss of precision etc.
+
+  \item Try to give an interpretation of you results in your answers to  the problems.
+
+  \item Critique: if possible include your comments and reflections about the  exercise, whether you felt you learnt something, ideas for improvements and  other thoughts you've made when solving the exercise. We wish to keep this course at the interactive level and your comments can help us improve it.
+
+  \item Try to establish a practice where you log your work at the  computerlab. You may find such a logbook very handy at later stages in your work, especially when you don't properly remember  what a previous test version  of your program did. Here you could also record  the time spent on solving the exercise, various algorithms you may have tested or other topics which you feel worthy of mentioning.
+\end{itemize}
+
+\noindent
+\subsection{Format for electronic delivery of report and programs}
+
+The preferred format for the report is a PDF file. You can also use DOC or postscript formats or as an ipython notebook file.  As programming language we prefer that you choose between C/C++, Fortran2008 or Python. The following prescription should be followed when preparing the report:
+
+\begin{itemize}
+  \item Use canvas to hand in your projects, log in  at  \href{{http://canvas.uio.no}}{\nolinkurl{http://canvas.uio.no}} with your normal UiO username and password.
+
+  \item Upload \textbf{only} the report file!  For the source code file(s) you have developed please provide us with your link to your github domain.  The report file should include all of your discussions and a list of the codes you have developed.  The full version of the codes should be in your github repository.
+
+  \item In your github repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.
+
+  \item Still in your github make a folder where you place your codes. 
+
+  \item In this and all later projects, you should include tests (for example unit tests) of your code(s).
+
+  \item Comments  from us on your projects, approval or not, corrections to be made  etc can be found under your Devilry domain and are only visible to you and the teachers of the course.
+\end{itemize}
+
+\noindent
+Finally, 
+we encourage you to work two and two together. Optimal working groups consist of 
+2-3 students. You can then hand in a common report. 
+
+
+% ------------------- end of main content ---------------
+
+% #ifdef PREAMBLE
+\end{document}
+% #endif
+
