@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from numba import jit
+#from numba import jit
 from tqdm import trange
 
 # Constants
@@ -17,7 +17,7 @@ corr = 20
 
 
 # Lattice Action
-@jit(nopython=True)
+#@jit(nopython=True)
 def action(x):
     potential = 0.5 * omega_sq * x * x * a
     kinetic = np.zeros(len(x))
