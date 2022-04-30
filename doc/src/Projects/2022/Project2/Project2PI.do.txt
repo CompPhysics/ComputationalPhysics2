@@ -526,3 +526,71 @@ we encourage you to work two and two together. Optimal working groups consist of
 
 
 
+\paragraph{Project 2 b) Harmonic Oscillator with imaginary-time path integrals:}
+
+We now take a slightly different approach to the problem. We can write the partition function \(Z\) of a quantum system as 
+\begin{equation*}
+    Z = Tr(e^{-\beta H}),
+\end{equation*}
+where \(\beta\) is the inverse of the temperature and \(H\) is the Hamiltonian. We can rewrite this as a product of \(L\) operators, \(\Delta_\tau = \beta / L\),
+\begin{align*}
+    Z &= Tr\left(\prod_{l=1}^L e^{-\Delta_\tau H}\right) \\
+    &= \sum_{\alpha_0} \hdots \sum_{\alpha_{L-1}} \bra{\alpha_0}  e^{-\Delta_\tau H} \ket{\alpha_{L-1}} \hdots \bra{\alpha_1} e^{-\Delta_\tau H} \ket{\alpha_0}
+\end{align*}
+Formally, the exponential operator is equivalent to the Schrödinger time evolution operator \(e^{−iHt}\) (with \(\hbar = 1\)) at imaginary time \(t = -i\Delta_\tau\). The state index \(l\) corresponds to a discrete set of imaginary time points \(\tau_l = l \Delta_\tau\) , with \(0 \leq \tau_l \leq \beta\) and periodic time-boundary conditions (\(\alpha_L = \alpha_0\)) for the states. Often the discrete times are referred to as “time slices”. If \(\Delta_\tau\) is small, i.e. large \(L\), we can Taylor expand the exponentials to easily evaluate the matrix elements of \(e^{−iHt}\). So,
+\begin{equation*}
+    Z \approx \sum_{\{\alpha\}} \bra{\alpha_0} 1 - \Delta_\tau H \ket{\alpha_{L-1}} \hdots \bra{\alpha_2} 1 - \Delta_\tau H \ket{\alpha_1} \bra{\alpha_1} 1 - \Delta_\tau H \ket{\alpha_0},
+\end{equation*}
+where \(\{\alpha\}\) reefers to the collectively of all states \(\ket{\alpha_0} \hdots \ket{\alpha_{L-1}}\). For better approximations we should take \(\Delta_\tau\) to zero, or use a higher order expansions such as the Suzuki-Trotter decomposition.
+
+We will now simulate a system of \(N\) Bosons with only kinetic energy on a lattice,
+\begin{equation*}
+    H = - \sum_{\langle i, j \rangle} (a^\dagger_j a_i + a_j a^\dagger_i),
+\end{equation*}
+where \(a^\dagger\) and \(a\) are the boson creation and destruction operators, respectively. We will consider hard-core bosons, for which the \(\ket{\alpha_i}\) states can only take the values \(0\) and \(1\), corresponding to the site being empty or having one boson.
+
+We can measure thermal averages of operators as 
+\begin{equation*}
+    \langle O \rangle = \frac{1}{M} \sum_{j=1}^M O(\{\alpha\}_j).
+\end{equation*}
+For diagonal operators, 
+\begin{equation*}
+    O(\{\alpha\}) = \frac{1}{N} \sum_{l=0}^{N-1} O(\alpha_l),
+\end{equation*}
+where the sum over \(l\) is the sum over the time slices. Thus the energy is given by
+\begin{equation*}
+    \langle E \rangle = - \frac{\langle n_K \rangle}{\beta},
+\end{equation*}
+where \(\langle n_K \rangle\) is the number of kinetic jumps of the bosons.
+
+Simulate this system using the imaginary-time path integral method. Measure the mean energy as a function of the temperature. What happens to the accuracy of the results when we take the low temperature limit (\(\beta \rightarrow 0\), or high \(\Delta_\tau\))? Can we estimate the ground state energy? 
+
+\paragraph{Project 2 c):}
+Here the aim is to explore the Heisenberg-model in one and two
+dimensions, by use of stochastic series expansion (SSE). Hopefully, we
+will be able to calculate the critical temperature for the continious
+phase transition. With this value the critical exponents for the
+system can also be obtained.  The results should be compared with the
+relevant literature as provided in the references.
+
+Implementation of SSE for 1D Heisenberg model with periodic bound- ary conditions.
+\begin{enumerate}
+\item Add external field and anisotropy dependencies.
+
+\item 2D implementation, again with periodic boundary conditions.
+
+\item Study the temperature dependent phase transition and calculate the critical exponents for the system. By studying the system the follow- ing values should be attainable; $M$, $M^2$, $E$, $\xi$, $C_V$ , $C(r)$, where $M$ is magnetization, $E$ is the energy, $\xi$ is the magnetic suceptibility, $C_V$ is the heat capacity and $C(r)$ is the correlation length.
+\end{enumerate}
+
+\noindent
+\paragraph{Literature.}
+\begin{enumerate}
+\item A. W. Sandvik. Computational Studies of Quantum Spin Systems. https://doi.org/10.1063/1.3518900, Jan. 2011.
+
+\item A. W. Sandvik. Finite-size scaling of the ground-state parameters of the two-dimensional heisenberg model. Phys. Rev. B, 56:11678–11690, Nov 1997.
+
+\item A. W. Sandvik. Stochastic series expansion method with operator-loop update. Phys. Rev. B, 59:R14157–R14160, Jun 1999.
+
+\item O. F. Syljuasen and A. W. Sandvik. Quantum Monte Carlo with directed loops. Phys. Rev. E, 66:046701, Oct 2002.~
+\end{enumerate}
+
