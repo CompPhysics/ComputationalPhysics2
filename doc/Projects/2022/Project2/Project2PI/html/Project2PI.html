@@ -172,7 +172,7 @@ MathJax.Hub.Config({
 </center>
 <br>
 <center>
-<h4>Apr 21, 2022</h4>
+<h4>May 1, 2022</h4>
 </center> <!-- date -->
 <br>
 <h2 id="path-integrals-concepts-and-formalism">Path Integrals: Concepts and Formalism </h2>
@@ -376,175 +376,87 @@ Estimate energy and how it relates  with the correlation time.
 </p>
 <h3 id="project-2-b-simulating-with-the-langevin-equation-and-hybrid-monte-carlo">Project 2 b) Simulating with the Langevin Equation and Hybrid Monte Carlo: </h3>
 
-<p>The expectation value of a quantity \( A \) evaluated with path integrals is:</p>
+<p>We now take a slightly different approach to the problem. We can write the partition function \(Z\) of a quantum system as </p>
 
 $$
-    \langle A\rangle = \frac{1}{Z}\int \mathcal{D} [\phi] A[\phi]e^{-S[\phi]}.
+\begin{equation*}
+    Z = Tr(e^{-\beta H}),
+\end{equation*}
 $$
 
-<p>One can sample this with Monte Carlo integration by considering
-\( e^{-S[\phi]} \) as a Boltzmann weight and use it as a
-\textit{probability measure}. One than chooses a set of random
-configurations \( \{\phi_i\} \) according to the probability distribution:
+<p>where \(\beta\) is the inverse of the temperature and \(H\) is the Hamiltonian. We can rewrite this as a product of \(L\) operators, \(\Delta_\tau = \beta / L\),</p>
+$$
+\begin{align*}
+    Z &= Tr\left(\prod_{l=1}^L e^{-\Delta_\tau H}\right) \\
+    &= \sum_{\alpha_0} \hdots \sum_{\alpha_{L-1}} \bra{\alpha_0}  e^{-\Delta_\tau H} \ket{\alpha_{L-1}} \hdots \bra{\alpha_1} e^{-\Delta_\tau H} \ket{\alpha_0}
+\end{align*}
+$$
+
+<p>Formally, the exponential operator is equivalent to the Schr&#246;dinger
+time evolution operator \(e^{&#8722;iHt}\) (with \(\hbar = 1\)) at imaginary
+time \(t = -i\Delta_\tau\). The state index \(l\) corresponds to a
+discrete set of imaginary time points \(\tau_l = l \Delta_\tau\) ,
+with \(0 \leq \tau_l \leq \beta\) and periodic time-boundary
+conditions (\(\alpha_L = \alpha_0\)) for the states. Often the
+discrete times are referred to as &#8220;time slices&#8221;. If \(\Delta_\tau\) is
+small, i.e. large \(L\), we can Taylor expand the exponentials to
+easily evaluate the matrix elements of \(e^{&#8722;iHt}\). So,
 </p>
 
 $$
-    dP[\phi] = \frac{e^{-S[\phi]}\mathcal{D}[\phi]}{\int \mathcal{D}[\phi] e^{-S[\phi]}}.
+\begin{equation*}
+    Z \approx \sum_{\{\alpha\}} \bra{\alpha_0} 1 - \Delta_\tau H \ket{\alpha_{L-1}} \hdots \bra{\alpha_2} 1 - \Delta_\tau H \ket{\alpha_1} \bra{\alpha_1} 1 - \Delta_\tau H \ket{\alpha_0},
+\end{equation*}
 $$
 
-<p>The expectation value is then approximated as</p>
+<p>where \(\{\alpha\}\) reefers to the collectively of all states \(\ket{\alpha_0} \hdots \ket{\alpha_{L-1}}\). For better approximations we should take \(\Delta_\tau\) to zero, or use a higher order expansions such as the Suzuki-Trotter decomposition.</p>
+
+<p>We will now simulate a system of \(N\) Bosons with only kinetic energy on a lattice,</p>
 
 $$
-    \langle A\rangle \approx \frac{1}{N_{conf}} \sum_{i=1}^{N_{conf}} A[\phi_i].
+\begin{equation*}
+    H = - \sum_{\langle i, j \rangle} (a^\dagger_j a_i + a_j a^\dagger_i),
+\end{equation*}
 $$
 
-<p>As done in the previous parts and in project 1, we normally employ Markov processes and the Metropolis algorithm.</p>
-
-<p>The Langevin equation can be used to model \textit{Brownian motion}. In its simplest form it reads:</p>
-
-$$
-    \frac{dx}{dt} = -\frac{\partial V(x)}{\partial x} + \eta(t)
-$$
-
-<p>where \( V(x) \) is some potential (hermonic oscillator) and \( \eta(t) \) are random noise variables distributed according to a Gaussian PDF. 
-It generates a time-dependent probability distribution for the vector \( x \), from which an observable \( O[x] \) can be evaluated as:
+<p>where \(a^\dagger\) and \(a\) are the boson creation and destruction
+operators, respectively. We will consider hard-core bosons, for which
+the \(\ket{\alpha_i}\) states can only take the values \(0\) and
+\(1\), corresponding to the site being empty or having one boson.
 </p>
 
+<p>We can measure thermal averages of operators as </p>
+
 $$
- \langle O[x(t)] \rangle = \int P(x, t) O(x)dx
+\begin{equation*}
+    \langle O \rangle = \frac{1}{M} \sum_{j=1}^M O(\{\alpha\}_j).
+\end{equation*}
 $$
 
-<p>As discussed in connection with project 1, the probability
-distribution of the Langevin equation has an associated Fokker-Planck
-equation
+<p>For diagonal operators, </p>
+
+$$
+\begin{equation*}
+    O(\{\alpha\}) = \frac{1}{N} \sum_{l=0}^{N-1} O(\alpha_l),
+\end{equation*}
+$$
+
+<p>where the sum over \(l\) is the sum over the time slices. Thus the energy is given by</p>
+
+$$
+\begin{equation*}
+    \langle E \rangle = - \frac{\langle n_K \rangle}{\beta},
+\end{equation*}
+$$
+
+<p>where \(\langle n_K \rangle\) is the number of kinetic jumps of the bosons.</p>
+
+<p>Simulate this system using the imaginary-time path integral
+method. Measure the mean energy as a function of the temperature. What
+happens to the accuracy of the results when we take the low
+temperature limit (\(\beta \rightarrow 0\), or high \(\Delta_\tau\))?
+Can you estimate the ground state energy?
 </p>
-
-$$
-\frac{\partial P(x,t)}{\partial t} = \frac{1}{2} \frac{\partial}{\partial x_i}\left[ \Omega \frac{\partial P}{\partial x_i} + V(x)P\right].
-$$
-
-<p>This is a deterministic equation for the time dependent \( P(x,t) \). It
-is possible to relate this to the euclidean transporter in quantum
-mechanics.
-</p>
-
-<p>Using the same trick for the Hybrid Monte Carlo (HMC) discussed below,
-see \( S[\phi] \) as a potential of some fictitious hamiltonian, so that
-</p>
-
-$$
-\frac{d\phi(x)}{dt} = -\frac{\partial S[\phi(x)]}{\partial x} + \eta(t).
-$$
-
-<p>The numerical algorithm is straightforward:</p>
-$$
-\phi_{t+1}(x) = \phi_t(x) - \epsilon \frac{\partial S[\phi_t(x)]}{\partial x} + \sqrt{2\epsilon}\eta(t).
-$$
-
-<p>This method can lead to huge errors in discretization. Can be improved
-with Metropolis Adjusted Langevin Dynamics (MALA), by adding some
-metropolis tests during the integration.
-</p>
-
-<p>The Hybrid Monte Carlo  is based upon considering the Hamiltonian</p>
-
-$$
-   H[\phi,\pi] = \frac{\pi^2}{2} + S[\phi]
-$$
-
-<p>and integrating numerically the equations of motion:</p>
-
-$$
-  \frac{\partial \phi}{\partial t } = \pi, ~~~~~~~ \frac{\partial \pi}{\partial t } = -\frac{\partial S[\phi]}{\partial \phi}.
-$$
-
-<p>Then to correct for integration errors one performs metropolis tests
-using the weight \( e^{-\Delta H} \) to fulfill ergodicity and make
-the algorithm exact.  Note that it is a reversible algorithm,
-it satisfies detailed balance (we can use \( \pi \rightarrow - \pi \) as
-it only comes squared in the hamiltonian)
-</p>
-
-<p>We can extend the HMC algorithm by considering the stochastic evolution equations:</p>
-$$
-        \frac{\partial \phi}{\partial t } = \pi,
-    $$
-
-<p>and</p>
-$$
- \frac{\partial \pi}{\partial t } = -\frac{\partial S[\phi]}{\partial \phi} - 2\mu_0\pi + \eta(t)
-$$
-
-<p>where \( \eta(t) \) is again white noise and \( \mu_0 > 0 \) is a "mass
-term". This reduces to Stochastic Molecular Dynamics (a variation of
-HMC) for \( \mu_0 \rightarrow 0 \). In the second order form:
-</p>
-
-$$
-\frac{\partial^2 \phi}{\partial t^2 } + 2\mu_0\frac{\partial \phi}{\partial t} = -\frac{\partial S[\phi]}{\partial \phi}  + \eta(t),
-$$
-
-<p>for large \( \mu_0 \) (after redefining time as \( '=2\mu_0t \)) this form recovers Langevin equation.
-Why is this interesting? 
-</p>
-<ol>
-<li> Langevin methods have been proven to be \textit{renormalizable} a long time ago</li>
-<li> HMC has been proven to be \textit{not renormalizable}</li>
-<li> But the existence of a parameter \( \mu_0 \) that interpolates between the two could suggest that they are in the \textit{same universality class}, hence have similar behavior when approaching the continuum limit.</li> 
-</ol>
-<p>For an algorithm to be renormalizable we mean that the autocorrelation function of the Markov Process has a finite scaling exponent when approaching the continuum theory (smaller lattice spacing).
-For example, the Metropolis algorithm scales as \( d^2 \) (\( d \) is the dimensionality of the system, degrees of freedom), while Langevin as \( d^{4/3} \).
-For very long trajectories the HMC scales as \( d^{5/4} \), better than Langevin, but this is not true in general
-Potentially renormalizable algorithms could be more efficient than the HMC near the continuum limit.
-</p>
-
-<p>Let us  again consider the harmonic oscillator in one dimension with action:</p>
-$$
-  S[x] = \sum_{i=1}^{N-1}\left[\frac{m}{2a}(x_i - x_{i+1})^2 + \frac{a}{2}\left(V(x_i) + V(x_{i+1})\right)\right],
-$$
-
-<p>and try to sample the ground state energy defined as \( E=\langle x^2\rangle \) using the Metropolis, the HMC and Langevin algorithms. </p>
-
-<p>The autocorrelation function is defined as:</p>
-
-$$
-\Gamma(t) = \Gamma(-t) = \langle (x_i - \bar x)(x_{i+t} - \bar x)\rangle \approx \frac{1}{N-t}\sum_{i=1}^{N-t}  (x_i - \bar x)(x_{i+t} - \bar x),
-$$
-
-<p>where \( t \) is the &quot;lag&quot; between two points. The integrated autocorrelation time is given by:</p>
-
-$$
-\tau_{int} = \frac{1}{2} \sum_{t=1}^\infty \frac{\Gamma(t)}{\Gamma(0)} = \frac{1}{2} \sum_{t=1}^\infty \rho(t).
-$$
-
-<p>In order to truncate the infinite summation one can look at the deviation squared of \( \rho(t) \):</p>
-$$
-    \langle \delta \rho(t)^2\rangle \approx \frac{1}{N} \sum_{k=1}^\infty \left[ \rho(k+t) + \rho(k-t) - 2\rho(k)\rho(t)\right]^2.
-$$
-
-<p>All these terms, for a sufficiently large value of \( k \) should all
-vanish, hence one can choose a cutoff \( \Lambda \) and truncate the sum
-up to \( t+\Lambda \). The integrated autocorrelation time, if the
-deviations of \( \rho(t) \) become small, plateaus.
-</p>
-
-<p>We choose a cutoff \( W \) such that:</p>
-
-$$
-    \tau_{int} = \frac{1}{2} \sum_{t=1}^W \rho(t),
-    \label{autocorr_time}
-$$
-
-<p>where \( W \) is the first lag \( t \) for which \( \rho(t) < \sqrt{ (\langle
-\delta \rho(t)^2\rangle} \), when the contribution to the integration of
-\( \tau_{int} \) from that lag become smaller than the deviation of that
-same lag. \\ An approximate error estimate of the integrated
-autocorrelation time can be defined as
-</p>
-
-$$
-    \sigma^2(\tau_{int}) \approx \frac{2(2W+1)}{N}\tau_{int}^2.
-$$
 <h3 id="project-2-c">Project 2 c): </h3>
 
 <p>Here the aim is to explore the Heisenberg-model in one and two
@@ -564,11 +476,10 @@ relevant literature as provided in the references.
 <h3 id="literature">Literature </h3>
 
 <ol>
-<li> M. L{\"{u}}scher , S. Schaefer, Non-renormalizability of the HMC algorithm,(2011), Journal of High Energy Physics</li>
-<li> R. M. Neal, MCMC using Hamiltonian dynamics, Chapter 5 of the Handbook of Markov Chain Monte Carlo</li>
+<li> A. W. Sandvik. Computational Studies of Quantum Spin Systems. <a href="https://doi.org/10.1063/1.3518900" target="_blank"><tt>https://doi.org/10.1063/1.3518900</tt></a>, Jan. 2011.</li>
 <li> A. W. Sandvik. Finite-size scaling of the ground-state parameters of the two-dimensional heisenberg model. Phys. Rev. B, 56:11678&#8211;11690, Nov 1997.</li>
 <li> A. W. Sandvik. Stochastic series expansion method with operator-loop update. Phys. Rev. B, 59:R14157&#8211;R14160, Jun 1999.</li>
-<li> O. F. Syljuasen and A. W. Sandvik. Quantum Monte Carlo with directed loops. Phys. Rev. E, 66:046701, Oct 2002.~</li>
+<li> O. F. Syljuasen and A. W. Sandvik. Quantum Monte Carlo with directed loops. Phys. Rev. E, 66:046701, Oct 2002.</li>
 </ol>
 <h2 id="introduction-to-numerical-projects">Introduction to numerical projects </h2>
 
