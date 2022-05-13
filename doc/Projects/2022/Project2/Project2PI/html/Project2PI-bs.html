@@ -45,12 +45,7 @@ doconce format html Project2PI.do.txt --html_style=bootstrap --pygments_html_sty
                None,
                'the-harmonic-oscillator-a-simple-example'),
               ('Project 2 a):', 3, None, 'project-2-a'),
-              ('Project 2 b) Moving over to a statistical mechanics '
-               'description',
-               3,
-               None,
-               'project-2-b-moving-over-to-a-statistical-mechanics-description'),
-              ('Project 2 c):', 3, None, 'project-2-c'),
+              ('Project 2 b):', 3, None, 'project-2-b'),
               ('Literature', 3, None, 'literature'),
               ('Introduction to numerical projects',
                2,
@@ -97,8 +92,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="#path-integrals-concepts-and-formalism" style="font-size: 80%;"><b>Path Integrals: Concepts and Formalism</b></a></li>
      <!-- navigation toc: --> <li><a href="#the-harmonic-oscillator-a-simple-example" style="font-size: 80%;"><b>The Harmonic Oscillator: a Simple Example</b></a></li>
      <!-- navigation toc: --> <li><a href="#project-2-a" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Project 2 a):</a></li>
-     <!-- navigation toc: --> <li><a href="#project-2-b-moving-over-to-a-statistical-mechanics-description" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Project 2 b) Moving over to a statistical mechanics description</a></li>
-     <!-- navigation toc: --> <li><a href="#project-2-c" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Project 2 c):</a></li>
+     <!-- navigation toc: --> <li><a href="#project-2-b" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Project 2 b):</a></li>
      <!-- navigation toc: --> <li><a href="#literature" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Literature</a></li>
      <!-- navigation toc: --> <li><a href="#introduction-to-numerical-projects" style="font-size: 80%;"><b>Introduction to numerical projects</b></a></li>
      <!-- navigation toc: --> <li><a href="#format-for-electronic-delivery-of-report-and-programs" style="font-size: 80%;"><b>Format for electronic delivery of report and programs</b></a></li>
@@ -127,7 +121,7 @@ MathJax.Hub.Config({
 </center>
 <br>
 <center>
-<h4>May 5, 2022</h4>
+<h4>May 13, 2022</h4>
 </center> <!-- date -->
 <br>
 
@@ -135,7 +129,22 @@ MathJax.Hub.Config({
 </div> <!-- end jumbotron -->
 <h2 id="path-integrals-concepts-and-formalism" class="anchor">Path Integrals: Concepts and Formalism </h2>
 
-<p>The aim of this project is to study the path integral formalism applied first to a Harmonic oscillator problem.</p>
+<p>The aim of this project is to study the path integral formalism
+applied first to a Harmonic oscillator problem and then to a spin-like Hamiltonian. This provide us with
+many of the basic elements for moving to part b). Part a) starts with
+a field-theoretic approach reformulating the path integral in
+euclidean time, see for example the text of <a href="https://link.springer.com/book/10.1007/978-3-642-01850-3" target="_self">Gattringer and
+Lang</a>.
+</p>
+
+<p>It introduces concepts like the <a href="https://arxiv.org/abs/1912.08854" target="_self">Trotter-Suzuki
+approximation</a> and how to evaluate
+the energy for a simple Hamiltonian like the harmonic oscillator in
+one dimension. It bridges thus the gap between project 1 and the
+present as well as serving as an introduction to part b).  For the
+second part, due to the structure of the Hamiltonian, one can
+circumvent the needs for doing a Trotter expansion.
+</p>
 
 <p>In the path integral formalism the evolution from a state \( \vert x_i\rangle \)
 to a state \( \vert  x_f\rangle \) from time \( t_i \) to time \( t_f \) is given by:
@@ -336,90 +345,7 @@ simplicity we set \( \hbar=\omega=1 \) and the lattice spacing parameter
 <p>Implement statistical bootstrapping and blocking. 
 Estimate energy and how it relates  with the correlation time. This exercise follows closely <a href="https://arxiv.org/pdf/hep-lat/0506036.pdf" target="_self">LePage's article</a>. You may find it a useful read.
 </p>
-<h3 id="project-2-b-moving-over-to-a-statistical-mechanics-description" class="anchor">Project 2 b) Moving over to a statistical mechanics description </h3>
-
-<p>We now take a slightly different approach to the problem. We can write the partition function \(Z\) of a quantum system as </p>
-
-$$
-\begin{equation*}
-    Z = Tr(e^{-\beta H}),
-\end{equation*}
-$$
-
-<p>where \(\beta\) is the inverse of the temperature and \(H\) is the Hamiltonian. We can rewrite this as a product of \(L\) operators, \(\Delta_\tau = \beta / L\),</p>
-$$
-\begin{align*}
-    Z &= Tr\left(\prod_{l=1}^L e^{-\Delta_\tau H}\right) \\
-    &= \sum_{\alpha_0} \hdots \sum_{\alpha_{L-1}} \bra{\alpha_0}  e^{-\Delta_\tau H} \ket{\alpha_{L-1}} \hdots \bra{\alpha_1} e^{-\Delta_\tau H} \ket{\alpha_0}
-\end{align*}
-$$
-
-<p>Formally, the exponential operator is equivalent to the Schr&#246;dinger
-time evolution operator \(e^{&#8722;iHt}\) (with \(\hbar = 1\)) at imaginary
-time \(t = -i\Delta_\tau\). The state index \(l\) corresponds to a
-discrete set of imaginary time points \(\tau_l = l \Delta_\tau\) ,
-with \(0 \leq \tau_l \leq \beta\) and periodic time-boundary
-conditions (\(\alpha_L = \alpha_0\)) for the states. Often the
-discrete times are referred to as &#8220;time slices&#8221;. If \(\Delta_\tau\) is
-small, i.e. large \(L\), we can Taylor expand the exponentials to
-easily evaluate the matrix elements of \(e^{&#8722;iHt}\). So,
-</p>
-
-$$
-\begin{equation*}
-    Z \approx \sum_{\{\alpha\}} \bra{\alpha_0} 1 - \Delta_\tau H \ket{\alpha_{L-1}} \hdots \bra{\alpha_2} 1 - \Delta_\tau H \ket{\alpha_1} \bra{\alpha_1} 1 - \Delta_\tau H \ket{\alpha_0},
-\end{equation*}
-$$
-
-<p>where \(\{\alpha\}\) reefers to the collectively of all states \(\ket{\alpha_0} \hdots \ket{\alpha_{L-1}}\). For better approximations we should take \(\Delta_\tau\) to zero, or use a higher order expansions such as the Suzuki-Trotter decomposition.</p>
-
-<p>We will now simulate a system of \(N\) Bosons with only kinetic energy on a lattice,</p>
-
-$$
-\begin{equation*}
-    H = - \sum_{\langle i, j \rangle} (a^\dagger_j a_i + a_j a^\dagger_i),
-\end{equation*}
-$$
-
-<p>where \(a^\dagger\) and \(a\) are the boson creation and destruction
-operators, respectively. We will consider hard-core bosons, for which
-the \(\ket{\alpha_i}\) states can only take the values \(0\) and
-\(1\), corresponding to the site being empty or having one boson.
-</p>
-
-<p>We can measure thermal averages of operators as </p>
-
-$$
-\begin{equation*}
-    \langle O \rangle = \frac{1}{M} \sum_{j=1}^M O(\{\alpha\}_j).
-\end{equation*}
-$$
-
-<p>For diagonal operators, </p>
-
-$$
-\begin{equation*}
-    O(\{\alpha\}) = \frac{1}{N} \sum_{l=0}^{N-1} O(\alpha_l),
-\end{equation*}
-$$
-
-<p>where the sum over \(l\) is the sum over the time slices. Thus the energy is given by</p>
-
-$$
-\begin{equation*}
-    \langle E \rangle = - \frac{\langle n_K \rangle}{\beta},
-\end{equation*}
-$$
-
-<p>where \(\langle n_K \rangle\) is the number of kinetic jumps of the bosons.</p>
-
-<p>Simulate this system using the imaginary-time path integral
-method. Measure the mean energy as a function of the temperature. What
-happens to the accuracy of the results when we take the low
-temperature limit (\(\beta \rightarrow 0\), or high \(\Delta_\tau\))?
-Can you estimate the ground state energy?
-</p>
-<h3 id="project-2-c" class="anchor">Project 2 c): </h3>
+<h3 id="project-2-b" class="anchor">Project 2 b): </h3>
 
 <p>Here the aim is to explore the Heisenberg-model in one and two
 dimensions, by use of stochastic series expansion (SSE). Hopefully, we
