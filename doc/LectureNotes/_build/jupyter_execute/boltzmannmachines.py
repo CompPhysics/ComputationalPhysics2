@@ -2090,7 +2090,7 @@ NumberParticles = 2
 Dimension = 2
 NumberHidden = 2
 
-interaction=False
+interaction=True
 
 # guess for parameters
 a=np.random.normal(loc=0.0, scale=0.001, size=(NumberParticles,Dimension))
@@ -2134,4 +2134,10 @@ data ={'Energy':Energies}#,'A Derivative':EnergyDerivatives1,'B Derivative':Ener
 
 frame = pd.DataFrame(data)
 print(frame)
+
+
+# In[ ]:
+
+
+
 
