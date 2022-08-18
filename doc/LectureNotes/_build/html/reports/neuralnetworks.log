@@ -1,15 +1,4 @@
 Traceback (most recent call last):
-  File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/client.py", line 730, in _async_poll_for_reply
-    msg = await ensure_async(self.kc.shell_channel.get_msg(timeout=new_timeout))
-  File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/util.py", line 96, in ensure_async
-    result = await obj
-  File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/jupyter_client/channels.py", line 230, in get_msg
-    raise Empty
-_queue.Empty
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
   File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/jupyter_cache/executors/utils.py", line 51, in single_nb_execution
     executenb(
   File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/client.py", line 1204, in execute
@@ -22,18 +11,19 @@ Traceback (most recent call last):
     return future.result()
   File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/client.py", line 663, in async_execute
     await self.async_execute_cell(
-  File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/client.py", line 949, in async_execute_cell
-    exec_reply = await self.task_poll_for_reply
-  File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/client.py", line 754, in _async_poll_for_reply
-    await self._async_handle_timeout(timeout, cell)
-  File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/client.py", line 801, in _async_handle_timeout
-    raise CellTimeoutError.error_from_timeout_and_cell(
-nbclient.exceptions.CellTimeoutError: A cell timed out while it was being executed, after 30 seconds.
-The message was: Cell execution timed out.
-Here is a preview of the cell contents:
--------------------
-['eta_vals = np.logspace(-5, 1, 7)', 'lmbd_vals = np.logspace(-5, 1, 7)', '# store the models for later use', 'DNN_numpy = np.zeros((len(eta_vals), len(lmbd_vals)), dtype=object)', '']
-...
-['        ', '        print("Learning rate  = ", eta)', '        print("Lambda = ", lmbd)', '        print("Accuracy score on test set: ", accuracy_score(Y_test, test_predict))', '        print()']
--------------------
+  File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/client.py", line 965, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/Users/mhjensen/miniforge3/envs/myenv/lib/python3.9/site-packages/nbclient/client.py", line 862, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+pip3 install tensorflow
+------------------
+
+[0;36m  File [0;32m"<ipython-input-13-6ea927cc6e88>"[0;36m, line [0;32m1[0m
+[0;31m    pip3 install tensorflow[0m
+[0m         ^[0m
+[0;31mSyntaxError[0m[0;31m:[0m invalid syntax
+
+SyntaxError: invalid syntax (<ipython-input-13-6ea927cc6e88>, line 1)
 
