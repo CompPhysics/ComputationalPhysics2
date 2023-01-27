@@ -1069,7 +1069,7 @@ import cvxopt
 # Since we don't have any equalities the matrix $\boldsymbol{A}$ is set to zero
 # The following code solves the equations for us
 
-# In[ ]:
+# In[5]:
 
 
 # Import the necessary packages

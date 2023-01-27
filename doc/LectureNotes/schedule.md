@@ -12,8 +12,9 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 ## Teaching schedule with links to material
 
 
-###  Week 3, January 17-21, 2022
+###  Week 4, January 23-27, 2023
 - Introduction to the course and start variational Monte Carlo
+- Video of Lecture at https://youtu.be/2wg5rDJ7bek
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week1/html/week1.html
 
 ###  Week 4, January 24-28, 2022
