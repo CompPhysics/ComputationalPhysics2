@@ -17,96 +17,88 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 - Video of Lecture at https://youtu.be/2wg5rDJ7bek
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week1/html/week1.html
 
-###  Week 4, January 30-February 3, 2023
-
+###  Week 5, January 30-February 3, 2023
 - Building a variational Monte Carlo program, Metropolis algorithm
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week2/html/week2.html
 - Video of Lecture at https://www.youtube.com/watch?v=wUULie1JWk4
-### Week 5, January 31-February 4, 2023
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week2/html/week2.html
 
+### Week 6, February 6-10, 2023
 - Metropolis sampling and Importance Sampling
+- Video of lecture at https://youtu.be/9_pPGtwlF4s
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week3/html/week3.html
 
-### Week 6, February 7-11, 2023
+### Week 7, February 13-17, 2023
 
 - Importance sampling, Fokker-Planck and Langevin Equations
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week4/html/week4.html
 
-### Week 7, February 14-18, 2023
+### Week 8, February 20-24, 2023
 
 - Optimization, gradient descent methods and finalization of discussion on importance sampling
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week5/html/week5.html
 
 
-### Week 8, February 21-25, 2023
+### Week 9, February 27-March 3, 2023
 
 - Optimization, Stochastic Gradient Descent
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week6/html/week6.html
 
 
-### Week 9, February 28-March 4, 2023
+### Week 10, March 6-10, 2023
 
 - Gradient Descent and start resampling methods
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week7/html/week7.html
 
 
-### Week 10, March 7-11, 2023
+### Week 11, March 13-17, 2023
 
 - Resampling methods, Blocking and Bootstrapping
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week8/html/week8.html
 
 
-### Week 11, March 14-18, 2023
+### Week 12, March 20-24, 2023
 
 - Blocking and bootstrap techniques for resampling
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week9/html/week9.html
 
 
-### Week 12, March  21-25, 2023
+### Week 13, March  27-31, 2023
 
 - High-performance computing
+- Final discussion of project 1 and summary of first part of semester
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week10/html/week10.html
 
+### Week 14, April 3-7, 2023
 
-### Week 13, March 28-April 1, 2023
+- No lectures, university closed
 
-- Final discussion of project 1 and summary of first part of semester
+### Week 15, April 10-14, 2023
+
+- Discussions of project 2
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week11/html/week11.html
 
-
-### Week 14, April 4-8, 2023
-
-- Deep learning and quantum many-body systems, start project 2
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week13/html/week13.html
-
-
-
-### Week 15, April 11-15, 2023
-- Holiday break
-
-
-### Week 16, April  18-22, 2023
+### Week 16, April  17-21, 2023
 
 - Deep learning and quantum many-body systems
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week14/html/week14.html
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week14/html/week12.html
 
 
-### Week 17, April 25-29, 2023
-
-- Deep learning and quantum many-body systems
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week15/html/week15.html
-
-
-### Week 18, May 2-6, 2023
+### Week 17, April 24-28, 2023
 
 - Deep learning and quantum many-body systems
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week16/html/week16.html
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week15/html/week13.html
+
+
+### Week 18, May 1-5, 2023
+
+- Deep learning and quantum many-body systems
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week16/html/week14.html
 
 
 ### Week 19, May 9-13, 2023
 
 
 - Summary of course and last lecture and lab session
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week13/html/week13.html
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week13/html/week15.html
 
 
