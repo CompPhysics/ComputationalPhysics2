@@ -1,60 +1,26 @@
-TITLE: Week 6: Importance Sampling and Metropolis-Hastings' algorithm
+TITLE: Week 7: Importance Sampling and Metropolis-Hastings' algorithm
 AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA
-DATE: February 6-10, 2023
-
+DATE: February 13-17, 2023
 
 !split
-===== Overview of week 6, February 6-10 =====
-
+===== Overview of week 7, February 13-17 =====
 !bblock  Topics
-* Importance Sampling, practical aspects, discussion of code and computational issues
-* Fokker-Planck and Langevin equations
-* "Video of lecture":"https://youtu.be/9_pPGtwlF4s"
+* Finalize discussion on importance sampling and Fokker-Planck and Langevin equations and computational aspects
+* Gradient Descent methods, getting started
+!eblock
+
+!bblock Teaching Material, videos and written material
+* On importance sampling, see notes from last week at URL:"http://compphysics.github.io/ComputationalPhysics2/doc/pub/week4/html/week4-reveal.html"
+* These lecture notes
+* Recommended background literature, "Convex Optimization":"https://web.stanford.edu/~boyd/cvxbook/" by Boyd and Vandenberghe. Their "lecture slides":"https://web.stanford.edu/~boyd/cvxbook/bv_cvxslides.pdf" are very useful (warning, these are some 300 pages).
+* "Video of lecture TBA":"https://youtu.be/JPmU4BWTd2Y"
+* "Handwritten notes":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2023/NotesFebruary16.pdf"
 !eblock
 
 
-!split
-===== Importance sampling, what we are planning this week =====
-!bblock 
-
-Last week we discussed the Metropolis algorithm with and without
-importance sampling and derived the Metropolis-Hastings algorithm.
-
-We replaced the brute force Metropolis algorithm with a walk in
-coordinate space biased by the trial wave function.  This approach is
-based on the Fokker-Planck equation and the Langevin equation for
-generating a trajectory in coordinate space.  The link between the
-Fokker-Planck equation and the Langevin equations and
-importance sampling is non-trivial and perhaps almost impossible to
-explain without a full semester course in for example statistical mechanics
-and transport theory. However, we will try.
-
-!eblock
-
 
 !split
-===== Detailed content =====
-
-!bblock
-The plans for this week  are:
-o First we want to give you an overarching  view on the equations we need to program in order to perform importance sampling with a simple Python code that demonstrates the essential elements.
-o Secondly, we will go through the computational elements we need in order to program the local energy, the trial wave functions and the so-called _quantum force_ in the most efficient way (computationally).
-!eblock
-
-
-!split
-===== Teaching Material, videos and textbooks  =====
-
-!bblock
-o You may find the following "Lecture on the Langevin and Fokker-Planck equations":"https://www.youtube.com/watch?v=H9I0PmXwhdo" as a useful introduction. 
-
-o The textbook of "Gardiner on Stochastic Methods":"https://www.springer.com/gp/book/9783540707127" is a classic and chapters 4 and 5 are the most relevant ones in order to get a better understanding of these equations. The textbook can be downloaded via UiO's subscription to Springer. Alternatively, the "link here":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Literature/StochasticMethods.pdf" gives you an earlier version.
-
-o Another excellent reference on topics like Brownian motion, Markov chains, the Fokker-Planck equation and the Langevin equation is the text by  "Van Kampen": "http://www.elsevier.com/books/stochastic-processes-in-physics-and-chemistry/van-kampen/978-0-444-52965-7"
-!eblock
-
-!split
-===== Overview of what needs to be coded =====
+===== Importance sampling and  overview of what needs to be coded, from last week =====
 
 !bblock
 
@@ -346,8 +312,6 @@ plt.show()
 
 
 
-
-
 !split
 ===== Importance sampling, program elements =====
 !bblock
@@ -361,7 +325,7 @@ The general derivative formula of the Jastrow factor is (the subscript $C$ stand
 \]
 !et
 However, 
-with our trial state function written in a way which can be reused later as
+with our written in way which can be reused later as
 !bt
 \[
 \Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}f(r_{ij})\right\}},
@@ -647,5 +611,759 @@ we have
 \]
 !et
 !eblock
+
+
+
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+A stochastic process is simply a function of two variables, one is the time,
+the other is a stochastic variable $X$, defined by specifying
+* the set $\left\{x\right\}$ of possible values for $X$;
+* the probability distribution, $w_X(x)$,  over this set, or briefly $w(x)$
+
+The set of values $\left\{x\right\}$ for $X$ 
+may be discrete, or continuous. If the set of
+values is continuous, then $w_X (x)$ is a probability density so that 
+$w_X (x)dx$
+is the probability that one finds the stochastic variable $X$ to have values
+in the range $[x, x + dx]$ .
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+     An arbitrary number of other stochastic variables may be derived from
+$X$. For example, any $Y$ given by a mapping of $X$, is also a stochastic
+variable. The mapping may also be time-dependent, that is, the mapping
+depends on an additional variable $t$
+!bt
+\[
+                              Y_X (t) = f (X, t) .
+\]
+!et
+The quantity $Y_X (t)$ is called a random function, or, since $t$ often is time,
+a stochastic process. A stochastic process is a function of two variables,
+one is the time, the other is a stochastic variable $X$. Let $x$ be one of the
+possible values of $X$ then
+!bt
+\[
+                               y(t) = f (x, t),
+\]
+!et
+is a function of $t$, called a sample function or realization of the process.
+In physics one considers the stochastic process to be an ensemble of such
+sample functions.
+!eblock
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+     For many physical systems initial distributions of a stochastic 
+variable $y$ tend to equilibrium distributions: $w(y, t)\rightarrow w_0(y)$ 
+as $t\rightarrow\infty$. In
+equilibrium detailed balance constrains the transition rates
+!bt
+\[
+     W(y\rightarrow y')w(y ) = W(y'\rightarrow y)w_0 (y),
+\]
+!et
+where $W(y'\rightarrow y)$ 
+is the probability, per unit time, that the system changes
+from a state $|y\rangle$ , characterized by the value $y$ 
+for the stochastic variable $Y$ , to a state $|y'\rangle$.
+
+Note that for a system in equilibrium the transition rate 
+$W(y'\rightarrow y)$ and
+the reverse $W(y\rightarrow y')$ may be very different. 
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+Consider, for instance, a simple
+system that has only two energy levels $\epsilon_0 = 0$ and 
+$\epsilon_1 = \Delta E$. 
+
+For a system governed by the Boltzmann distribution we find (the partition function has been taken out)
+!bt
+\[
+     W(0\rightarrow 1)\exp{-(\epsilon_0/kT)} = W(1\rightarrow 0)\exp{-(\epsilon_1/kT)}
+\]
+!et
+We get then
+!bt
+\[
+     \frac{W(1\rightarrow 0)}{W(0 \rightarrow 1)}=\exp{-(\Delta E/kT)},
+\]
+!et
+which goes to zero when $T$ tends to zero.
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+If we assume a discrete set of events,
+our initial probability
+distribution function can be  given by 
+!bt
+\[
+   w_i(0) = \delta_{i,0},
+\]
+!et
+and its time-development after a given time step $\Delta t=\epsilon$ is
+!bt
+\[ 
+   w_i(t) = \sum_{j}W(j\rightarrow i)w_j(t=0).
+\] 
+!et  
+The continuous analog to $w_i(0)$ is
+!bt
+\[
+   w(\mathbf{x})\rightarrow \delta(\mathbf{x}),
+\]
+!et
+where we now have generalized the one-dimensional position $x$ to a generic-dimensional  
+vector $\mathbf{x}$. The Kroenecker $\delta$ function is replaced by the $\delta$ distribution
+function $\delta(\mathbf{x})$ at  $t=0$.  
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+The transition from a state $j$ to a state $i$ is now replaced by a transition
+to a state with position $\mathbf{y}$ from a state with position $\mathbf{x}$. 
+The discrete sum of transition probabilities can then be replaced by an integral
+and we obtain the new distribution at a time $t+\Delta t$ as 
+!bt
+\[
+   w(\mathbf{y},t+\Delta t)= \int W(\mathbf{y},t+\Delta t| \mathbf{x},t)w(\mathbf{x},t)d\mathbf{x},
+\]
+!et
+and after $m$ time steps we have
+!bt
+\[
+   w(\mathbf{y},t+m\Delta t)= \int W(\mathbf{y},t+m\Delta t| \mathbf{x},t)w(\mathbf{x},t)d\mathbf{x}.
+\]
+!et
+When equilibrium is reached we have
+!bt
+\[
+   w(\mathbf{y})= \int W(\mathbf{y}|\mathbf{x}, t)w(\mathbf{x})d\mathbf{x},
+\]
+!et
+that is no time-dependence. Note our change of notation for $W$
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can solve the equation for $w(\mathbf{y},t)$ by making a Fourier transform to
+momentum space. 
+The PDF $w(\mathbf{x},t)$ is related to its Fourier transform
+$\tilde{w}(\mathbf{k},t)$ through
+!bt
+\[
+   w(\mathbf{x},t) = \int_{-\infty}^{\infty}d\mathbf{k} \exp{(i\mathbf{kx})}\tilde{w}(\mathbf{k},t),
+\]
+!et
+and using the definition of the 
+$\delta$-function 
+!bt
+\[
+   \delta(\mathbf{x}) = \frac{1}{2\pi} \int_{-\infty}^{\infty}d\mathbf{k} \exp{(i\mathbf{kx})},
+\]
+!et
+ we see that
+!bt
+\[
+   \tilde{w}(\mathbf{k},0)=1/2\pi.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can then use the Fourier-transformed diffusion equation 
+!bt
+\[
+    \frac{\partial \tilde{w}(\mathbf{k},t)}{\partial t} = -D\mathbf{k}^2\tilde{w}(\mathbf{k},t),
+\]
+!et
+with the obvious solution
+!bt
+\[
+   \tilde{w}(\mathbf{k},t)=\tilde{w}(\mathbf{k},0)\exp{\left[-(D\mathbf{k}^2t)\right)}=
+    \frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}. 
+\]
+!et
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+With the Fourier transform we obtain 
+!bt
+\[
+   w(\mathbf{x},t)=\int_{-\infty}^{\infty}d\mathbf{k} \exp{\left[i\mathbf{kx}\right]}\frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}=
+    \frac{1}{\sqrt{4\pi Dt}}\exp{\left[-(\mathbf{x}^2/4Dt)\right]}, 
+\]
+!et
+with the normalization condition
+!bt
+\[
+   \int_{-\infty}^{\infty}w(\mathbf{x},t)d\mathbf{x}=1.
+\]
+!et
+
+!eblock
+
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+The solution represents the probability of finding
+our random walker at position $\mathbf{x}$ at time $t$ if the initial distribution 
+was placed at $\mathbf{x}=0$ at $t=0$. 
+
+There is another interesting feature worth observing. The discrete transition probability $W$
+itself is given by a binomial distribution.
+The results from the central limit theorem state that 
+transition probability in the limit $n\rightarrow \infty$ converges to the normal 
+distribution. It is then possible to show that
+!bt
+\[
+    W(il-jl,n\epsilon)\rightarrow W(\mathbf{y},t+\Delta t|\mathbf{x},t)=
+    \frac{1}{\sqrt{4\pi D\Delta t}}\exp{\left[-((\mathbf{y}-\mathbf{x})^2/4D\Delta t)\right]},
+\]
+!et
+and that it satisfies the normalization condition and is itself a solution
+to the diffusion equation.
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+Let us now assume that we have three PDFs for times $t_0 < t' < t$, that is
+$w(\mathbf{x}_0,t_0)$, $w(\mathbf{x}',t')$ and $w(\mathbf{x},t)$.
+We have then  
+!bt
+\[
+   w(\mathbf{x},t)= \int_{-\infty}^{\infty} W(\mathbf{x}.t|\mathbf{x}'.t')w(\mathbf{x}',t')d\mathbf{x}',
+\]
+!et
+and
+!bt
+\[
+   w(\mathbf{x},t)= \int_{-\infty}^{\infty} W(\mathbf{x}.t|\mathbf{x}_0.t_0)w(\mathbf{x}_0,t_0)d\mathbf{x}_0,
+\]
+!et
+and
+!bt
+\[
+   w(\mathbf{x}',t')= \int_{-\infty}^{\infty} W(\mathbf{x}'.t'|\mathbf{x}_0,t_0)w(\mathbf{x}_0,t_0)d\mathbf{x}_0.
+\]
+!et
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can combine these equations and arrive at the famous Einstein-Smoluchenski-Kolmogorov-Chapman (ESKC) relation
+!bt
+\[
+ W(\mathbf{x}t|\mathbf{x}_0t_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},t|\mathbf{x}',t')W(\mathbf{x}',t'|\mathbf{x}_0,t_0)d\mathbf{x}'.
+\]
+!et
+We can replace the spatial dependence with a dependence upon say the velocity
+(or momentum), that is we have
+!bt
+\[
+ W(\mathbf{v},t|\mathbf{v}_0,t_0)  = \int_{-\infty}^{\infty} W(\mathbf{v},t|\mathbf{v}',t')W(\mathbf{v}',t'|\mathbf{v}_0,t_0)d\mathbf{x}'.
+\]
+!et
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We will now derive the Fokker-Planck equation. 
+We start from the ESKC equation
+!bt
+\[
+ W(\mathbf{x},t|\mathbf{x}_0,t_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},t|\mathbf{x}',t')W(\mathbf{x}',t'|\mathbf{x}_0,t_0)d\mathbf{x}'.
+\]
+!et
+Define $s=t'-t_0$, $\tau=t-t'$ and $t-t_0=s+\tau$. We have then
+!bt
+\[
+ W(\mathbf{x},s+\tau|\mathbf{x}_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},\tau|\mathbf{x}')W(\mathbf{x}',s|\mathbf{x}_0)d\mathbf{x}'.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+Assume now that $\tau$ is very small so that we can make an expansion in terms of a small step $xi$, with $\mathbf{x}'=\mathbf{x}-\xi$, that is
+!bt
+\[
+ W(\mathbf{x},s|\mathbf{x}_0)+\frac{\partial W}{\partial s}\tau +O(\tau^2) = \int_{-\infty}^{\infty} W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0)d\mathbf{x}'.
+\]
+!et
+We assume that $W(\mathbf{x},\tau|\mathbf{x}-\xi)$ takes non-negligible values only when $\xi$ is small. This is just another way of stating the Master equation!!
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We say thus that $\mathbf{x}$ changes only by a small amount in the time interval $\tau$. 
+This means that we can make a Taylor expansion in terms of $\xi$, that is we
+expand
+!bt
+\[
+W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0) =
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W(\mathbf{x}+\xi,\tau|\mathbf{x})W(\mathbf{x},s|\mathbf{x}_0)
+\right].
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can then rewrite the ESKC equation as 
+!bt
+\[
+\frac{\partial W}{\partial s}\tau=-W(\mathbf{x},s|\mathbf{x}_0)+
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W(\mathbf{x},s|\mathbf{x}_0)\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\xi,\tau|\mathbf{x})d\xi\right].
+\]
+!et
+We have neglected higher powers of $\tau$ and have used that for $n=0$ 
+we get simply $W(\mathbf{x},s|\mathbf{x}_0)$ due to normalization.
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We say thus that $\mathbf{x}$ changes only by a small amount in the time interval $\tau$. 
+This means that we can make a Taylor expansion in terms of $\xi$, that is we
+expand
+!bt
+\[
+W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0) =
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W(\mathbf{x}+\xi,\tau|\mathbf{x})W(\mathbf{x},s|\mathbf{x}_0)
+\right].
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can then rewrite the ESKC equation as 
+!bt
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}\tau=-W(\mathbf{x},s|\mathbf{x}_0)+
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W(\mathbf{x},s|\mathbf{x}_0)\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\xi,\tau|\mathbf{x})d\xi\right].
+\]
+!et
+We have neglected higher powers of $\tau$ and have used that for $n=0$ 
+we get simply $W(\mathbf{x},s|\mathbf{x}_0)$ due to normalization.
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We simplify the above by introducing the moments 
+!bt
+\[
+M_n=\frac{1}{\tau}\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\xi,\tau|\mathbf{x})d\xi=
+\frac{\langle [\Delta x(\tau)]^n\rangle}{\tau},
+\]
+!et
+resulting in
+!bt
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}=
+\sum_{n=1}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W(\mathbf{x},s|\mathbf{x}_0)M_n\right].
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+When $\tau \rightarrow 0$ we assume that $\langle [\Delta x(\tau)]^n\rangle \rightarrow 0$ more rapidly than $\tau$ itself if $n > 2$. 
+When $\tau$ is much larger than the standard correlation time of 
+system then $M_n$ for $n > 2$ can normally be neglected.
+This means that fluctuations become negligible at large time scales.
+
+If we neglect such terms we can rewrite the ESKC equation as 
+!bt
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}=
+-\frac{\partial M_1W(\mathbf{x},s|\mathbf{x}_0)}{\partial x}+
+\frac{1}{2}\frac{\partial^2 M_2W(\mathbf{x},s|\mathbf{x}_0)}{\partial x^2}.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+In a more compact form we have
+!bt
+\[
+\frac{\partial W}{\partial s}=
+-\frac{\partial M_1W}{\partial x}+
+\frac{1}{2}\frac{\partial^2 M_2W}{\partial x^2},
+\]
+!et
+which is the Fokker-Planck equation!  It is trivial to replace 
+position with velocity (momentum).
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+Consider a particle  suspended in a liquid. On its path through the liquid it will continuously collide with the liquid molecules. Because on average the particle  will collide more often on the front side than on the back side, it will experience a systematic force proportional with its velocity, and directed opposite to its velocity. Besides this systematic force the particle  will experience a stochastic force  $\mathbf{F}(t)$. 
+The equations of motion are 
+* $\frac{d\mathbf{r}}{dt}=\mathbf{v}$ and 
+* $\frac{d\mathbf{v}}{dt}=-\xi \mathbf{v}+\mathbf{F}$.
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+From hydrodynamics  we know that the friction constant  $\xi$ is given by
+!bt
+\[
+\xi =6\pi \eta a/m 
+\]
+!et
+where $\eta$ is the viscosity  of the solvent and a is the radius of the particle .
+
+Solving the second equation in the previous slide we get 
+!bt
+\[
+\mathbf{v}(t)=\mathbf{v}_{0}e^{-\xi t}+\int_{0}^{t}d\tau e^{-\xi (t-\tau )}\mathbf{F }(\tau ). 
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+If we want to get some useful information out of this, we have to average over all possible realizations of 
+$\mathbf{F}(t)$, with the initial velocity as a condition. A useful quantity for example is
+!bt
+\[ 
+\langle \mathbf{v}(t)\cdot \mathbf{v}(t)\rangle_{\mathbf{v}_{0}}=v_{0}^{-\xi 2t}
++2\int_{0}^{t}d\tau e^{-\xi (2t-\tau)}\mathbf{v}_{0}\cdot \langle \mathbf{F}(\tau )\rangle_{\mathbf{v}_{0}}
+\]
+!et
+!bt
+\[  	  	
+ +\int_{0}^{t}d\tau ^{\prime }\int_{0}^{t}d\tau e^{-\xi (2t-\tau -\tau ^{\prime })}
+\langle \mathbf{F}(\tau )\cdot \mathbf{F}(\tau ^{\prime })\rangle_{ \mathbf{v}_{0}}.
+\]
+!et
+!eblock
+
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+In order to continue we have to make some assumptions about the conditional averages of the stochastic forces. 
+In view of the chaotic character of the stochastic forces the following 
+assumptions seem to be appropriate
+!bt  
+\[ 
+\langle \mathbf{F}(t)\rangle=0, 
+\]
+!et
+and
+!bt
+\[
+\langle \mathbf{F}(t)\cdot \mathbf{F}(t^{\prime })\rangle_{\mathbf{v}_{0}}=  C_{\mathbf{v}_{0}}\delta (t-t^{\prime }).
+\] 	
+!et
+
+We omit the subscript $\mathbf{v}_{0}$, when the quantity of interest turns out to be independent of $\mathbf{v}_{0}$. Using the last three equations we get
+!bt
+ \[
+\langle \mathbf{v}(t)\cdot \mathbf{v}(t)\rangle_{\mathbf{v}_{0}}=v_{0}^{2}e^{-2\xi t}+\frac{C_{\mathbf{v}_{0}}}{2\xi }(1-e^{-2\xi t}).
+\]
+!et
+For large t this should be equal to 3kT/m, from which it follows that
+!bt
+\[
+\langle \mathbf{F}(t)\cdot \mathbf{F}(t^{\prime })\rangle =6\frac{kT}{m}\xi \delta (t-t^{\prime }). 
+\]
+!et
+This result is called the fluctuation-dissipation theorem .
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+Integrating 
+!bt
+ \[ 
+\mathbf{v}(t)=\mathbf{v}_{0}e^{-\xi t}+\int_{0}^{t}d\tau e^{-\xi (t-\tau )}\mathbf{F }(\tau ), 
+\] 
+!et
+we get
+!bt
+\[
+\mathbf{r}(t)=\mathbf{r}_{0}+\mathbf{v}_{0}\frac{1}{\xi }(1-e^{-\xi t})+
+\int_0^td\tau \int_0^{\tau}\tau ^{\prime } e^{-\xi (\tau -\tau ^{\prime })}\mathbf{F}(\tau ^{\prime }), 
+\]
+!et
+from which we calculate the mean square displacement 
+!bt
+\[
+\langle ( \mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle _{\mathbf{v}_{0}}=\frac{v_0^2}{\xi}(1-e^{-\xi t})^{2}+\frac{3kT}{m\xi ^{2}}(2\xi t-3+4e^{-\xi t}-e^{-2\xi t}). 
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+For very large $t$ this becomes
+!bt
+\[
+\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =\frac{6kT}{m\xi }t 
+\] 
+!et
+from which we get the Einstein relation  
+!bt
+ \[ 
+D= \frac{kT}{m\xi } 
+\] 	
+!et
+where we have used $\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =6Dt$.
+!eblock
+
+
+
+
+
+!split
+===== Motivation  ===== 
+!bblock
+Our aim with this part of the project is to be able to
+* find an optimal value for the variational parameters using only some few Monte Carlo cycles
+* use these optimal values for the variational parameters to perform a large-scale Monte Carlo calculation
+
+To achieve this will look at methods like standard *Gradtient Descent*, *Sochastic gradient descent*, *Stochastic reconfigurations*, *Steepest descent* and the *conjugate gradient method*. All these methods allow us to find
+the minima of a multivariable  function like our energy (function of several variational parameters). 
+Alternatively, you can always use Newton's method. In particular, since we will normally have one variational parameter,
+Newton's method can be easily used in finding the minimum of the local energy. However, as we will see, the latter requires that we can evaluate the second derivative of the energy with respect to the variational parameters.
+ 
+!eblock
+
+!split
+===== Simple example and demonstration ===== 
+
+Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
+For the harmonic oscillator in one-dimension we have a  trial wave function and probability
+!bt
+\[
+\psi_T(x;\alpha) = \exp{-(\frac{1}{2}\alpha^2x^2)},
+\]
+!et 
+which results in a local energy 
+!bt
+\[
+\frac{1}{2}\left(\alpha^2+x^2(1-\alpha^4)\right).
+\]
+!et
+We can compare our numerically calculated energies with the exact energy as function of $\alpha$
+!bt
+\[
+\overline{E}[\alpha] = \frac{1}{4}\left(\alpha^2+\frac{1}{\alpha^2}\right).
+\]
+!et
+
+
+!split
+===== Simple example and demonstration ===== 
+!bblock
+The derivative of the energy with respect to $\alpha$ gives
+!bt
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \frac{1}{2}\alpha-\frac{1}{2\alpha^3}
+\end{equation*}
+!et
+and a second derivative which is always positive (meaning that we find a minimum)
+!bt
+\begin{equation*}
+\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = \frac{1}{2}+\frac{3}{2\alpha^4}
+\end{equation*}
+!et
+The condition
+!bt
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
+\end{equation*}
+!et
+gives the optimal $\alpha=1$, as expected.
+!eblock
+
+!split
+===== Exercise: Find the local energy for the harmonic oscillator =====
+!bsubex
+Derive the local energy for the harmonic oscillator in one dimension and find its expectation value.
+!esubex
+!bsubex
+Show also that the optimal value of optimal $\alpha=1$
+!esubex
+!bsubex
+Repeat the above steps in two dimensions for $N$ bosons or electrons. What is the optimal value of $\alpha$?
+!esubex
+
+
+!split
+===== Variance in the simple model ===== 
+!bblock
+We can also minimize the variance. In our simple model the variance is
+
+!bt
+\[
+\sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}^2.
+\]
+!et
+which yields a second derivative which is always positive.
+!eblock
+
+
+!split
+===== Computing the derivatives ===== 
+!bblock
+
+In general we end up computing the expectation value of the energy in terms 
+of some parameters $\alpha_0,\alpha_1,\dots,\alpha_n$
+and we search for a minimum in this multi-variable parameter space.  
+This leads to an energy minimization problem *where we need the derivative of the energy as a function of the variational parameters*.
+
+In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
+However, in our actual calculations the energy is represented by a multi-dimensional integral with several variational parameters.
+How can we can then obtain the derivatives of the energy with respect to the variational parameters without having 
+to resort to expensive numerical derivations? 
+
+!eblock
+
+
+!split
+===== Expressions for finding the derivatives of the local energy ===== 
+!bblock
+
+To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.  
+
+Let us define 
+!bt
+\[
+\bar{E}_{\alpha}=\frac{d\langle  E_L[\alpha]\rangle}{d\alpha}.
+\]
+!et
+as the derivative of the energy with respect to the variational parameter $\alpha$ (we limit ourselves to one parameter only).
+In the above example this was easy and we obtain a simple expression for the derivative.
+We define also the derivative of the trial function (skipping the subindex $T$) as 
+!bt
+\[
+\bar{\psi}_{\alpha}=\frac{d\psi[\alpha]\rangle}{d\alpha}.
+\]
+!et  
+!eblock
+
+
+
+!split
+===== Derivatives of the local energy ===== 
+!bblock
+The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)
+!bt
+\[
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+\]
+!et
+From a computational point of view it means that you need to compute the expectation values of 
+!bt
+\[
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle,
+\]
+!et
+and
+!bt
+\[
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
+\]
+!et
+!eblock
+
+
+!split
+===== Exercise: General expression for the derivative of the energy =====
+!bsubex
+Show that 
+!bt
+\[
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+\]
+!et
+!esubex
+!bsubex
+Find the corresponding expression for the variance.
+!esubex
+
+
+
 
 
