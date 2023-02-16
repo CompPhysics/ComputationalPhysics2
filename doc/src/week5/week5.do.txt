@@ -1,4 +1,4 @@
-TITLE: Week 7 February 13-17: Finalization of importance sampling, start Gradient methods, steepest descent
+TITLE: Week 7 February 13-17: Finalization of importance sampling, start Gradient methods
 AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA
 DATE: February 13-17
 
@@ -6,7 +6,7 @@ DATE: February 13-17
 !split
 ===== Overview of week 7, February 13-17 =====
 !bblock  Topics
-* Finalize discussion on importance sampling and Fokker-Planck and Langevin equations
+* Finalize discussion on importance sampling and Fokker-Planck and Langevin equations and computational aspects
 * Gradient Descent methods, getting started
 !eblock
 
@@ -20,10 +20,1184 @@ DATE: February 13-17
 
 
 
+
+
+
+!split
+===== Importance sampling and  overview of what needs to be coded, from last week =====
+
+!bblock
+
+For a diffusion process characterized by a time-dependent probability density $P(x,t)$ in one dimension the Fokker-Planck
+equation reads (for one particle /walker) 
+!bt
+\[
+   \frac{\partial P}{\partial t} = D\frac{\partial }{\partial x}\left(\frac{\partial }{\partial x} -F\right)P(x,t),
+\]
+!et
+where $F$ is a drift term and $D$ is the diffusion coefficient. 
+
+!eblock
+
+
 !split
 ===== Importance sampling =====
+!bblock 
+The new positions in coordinate space are given as the solutions of the Langevin equation using Euler's method, namely,
+we go from the Langevin equation
+!bt
+\[ 
+   \frac{\partial x(t)}{\partial t} = DF(x(t)) +\eta,
+\]
+!et
+with $\eta$ a random variable,
+yielding a new position 
+!bt
+\[
+   y = x+DF(x)\Delta t +\xi\sqrt{\Delta t},
+\]
+!et
+where $\xi$ is gaussian random variable and $\Delta t$ is a chosen time step. 
+The quantity $D$ is, in atomic units, equal to $1/2$ and comes from the factor $1/2$ in the kinetic energy operator. Note that $\Delta t$ is to be viewed as a parameter. Values of $\Delta t \in [0.001,0.01]$ yield in general rather stable values of the ground state energy.  
+!eblock
 
-Here we will use the material from the previous week, see the "Jupyter-notebook":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/pub/week4/ipynb/week4.ipynb"
+!split
+===== Importance sampling =====
+!bblock 
+The process of isotropic diffusion characterized by a time-dependent probability density $P(\mathbf{x},t)$ obeys (as an approximation) the so-called Fokker-Planck equation 
+!bt
+\[
+   \frac{\partial P}{\partial t} = \sum_i D\frac{\partial }{\partial \mathbf{x_i}}\left(\frac{\partial }{\partial \mathbf{x_i}} -\mathbf{F_i}\right)P(\mathbf{x},t),
+\]
+!et
+where $\mathbf{F_i}$ is the $i^{th}$ component of the drift term (drift velocity) caused by an external potential, and $D$ is the diffusion coefficient. The convergence to a stationary probability density can be obtained by setting the left hand side to zero. The resulting equation will be satisfied if and only if all the terms of the sum are equal zero,
+!bt
+\[
+\frac{\partial^2 P}{\partial {\mathbf{x_i}^2}} = P\frac{\partial}{\partial {\mathbf{x_i}}}\mathbf{F_i} + \mathbf{F_i}\frac{\partial}{\partial {\mathbf{x_i}}}P.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
+The drift vector should be of the form $\mathbf{F} = g(\mathbf{x}) \frac{\partial P}{\partial \mathbf{x}}$. Then,
+!bt
+\[
+\frac{\partial^2 P}{\partial {\mathbf{x_i}^2}} = P\frac{\partial g}{\partial P}\left( \frac{\partial P}{\partial {\mathbf{x}_i}}  \right)^2 + P g \frac{\partial ^2 P}{\partial {\mathbf{x}_i^2}}  + g \left( \frac{\partial P}{\partial {\mathbf{x}_i}}  \right)^2.
+\]
+!et
+The condition of stationary density means that the left hand side equals zero. In other words, the terms containing first and second derivatives have to cancel each other. It is possible only if $g = \frac{1}{P}$, which yields
+!bt
+\[
+\mathbf{F} = 2\frac{1}{\Psi_T}\nabla\Psi_T,
+\]
+!et
+which is known as the so-called *quantum force*. This term is responsible for pushing the walker towards regions of configuration space where the trial wave function is large, increasing the efficiency of the simulation in contrast to the Metropolis algorithm where the walker has the same probability of moving in every direction.
+!eblock
+
+
+
+!split
+===== Importance sampling =====
+!bblock
+The Fokker-Planck equation yields a (the solution to the equation) transition probability given by the Green's function
+!bt
+\[
+  G(y,x,\Delta t) = \frac{1}{(4\pi D\Delta t)^{3N/2}} \exp{\left(-(y-x-D\Delta t F(x))^2/4D\Delta t\right)}
+\]
+!et
+which in turn means that our brute force Metropolis algorithm
+!bt
+\[ 
+    A(y,x) = \mathrm{min}(1,q(y,x))),
+\]
+!et
+with $q(y,x) = |\Psi_T(y)|^2/|\Psi_T(x)|^2$ is now replaced by the "Metropolis-Hastings algorithm":"http://scitation.aip.org/content/aip/journal/jcp/21/6/10.1063/1.1699114" as well as "Hasting's article":"http://biomet.oxfordjournals.org/content/57/1/97.abstract", 
+!bt
+\[
+q(y,x) = \frac{G(x,y,\Delta t)|\Psi_T(y)|^2}{G(y,x,\Delta t)|\Psi_T(x)|^2}
+\]
+!et
+!eblock
+
+
+
+
+!split
+===== Code example for the interacting case with importance sampling =====
+
+We are now ready to implement importance sampling. This is done here for the two-electron case with the Coulomb interaction, as in the previous example. We have two variational parameters $\alpha$ and $\beta$. After the set up of files
+
+!bc pycod
+# Common imports
+import os
+
+# Where to save the figures and data files
+PROJECT_ROOT_DIR = "Results"
+FIGURE_ID = "Results/FigureFiles"
+DATA_ID = "Results/VMCQdotImportance"
+
+if not os.path.exists(PROJECT_ROOT_DIR):
+    os.mkdir(PROJECT_ROOT_DIR)
+
+if not os.path.exists(FIGURE_ID):
+    os.makedirs(FIGURE_ID)
+
+if not os.path.exists(DATA_ID):
+    os.makedirs(DATA_ID)
+
+def image_path(fig_id):
+    return os.path.join(FIGURE_ID, fig_id)
+
+def data_path(dat_id):
+    return os.path.join(DATA_ID, dat_id)
+
+def save_fig(fig_id):
+    plt.savefig(image_path(fig_id) + ".png", format='png')
+
+outfile = open(data_path("VMCQdotImportance.dat"),'w')
+!ec
+we move on to the set up of the trial wave function, the analytical expression for the local energy and the analytical expression for the quantum force.
+!bc pycod
+# 2-electron VMC code for 2dim quantum dot with importance sampling
+# Using gaussian rng for new positions and Metropolis- Hastings 
+# No energy minimization
+from math import exp, sqrt
+from random import random, seed, normalvariate
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import sys
+from numba import jit,njit
+
+
+# Trial wave function for the 2-electron quantum dot in two dims
+def WaveFunction(r,alpha,beta):
+    r1 = r[0,0]**2 + r[0,1]**2
+    r2 = r[1,0]**2 + r[1,1]**2
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = r12/(1+beta*r12)
+    return exp(-0.5*alpha*(r1+r2)+deno)
+
+# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
+def LocalEnergy(r,alpha,beta):
+    
+    r1 = (r[0,0]**2 + r[0,1]**2)
+    r2 = (r[1,0]**2 + r[1,1]**2)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    deno2 = deno*deno
+    return 0.5*(1-alpha*alpha)*(r1 + r2) +2.0*alpha + 1.0/r12+deno2*(alpha*r12-deno2+2*beta*deno-1.0/r12)
+
+# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
+def QuantumForce(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    qforce[0,:] = -2*r[0,:]*alpha*(r[0,:]-r[1,:])*deno*deno/r12
+    qforce[1,:] = -2*r[1,:]*alpha*(r[1,:]-r[0,:])*deno*deno/r12
+    return qforce
+!ec
+
+The Monte Carlo sampling includes now the Metropolis-Hastings algorithm, with the additional complication of having to evaluate the _quantum force_ and the Green's function which is the solution of the Fokker-Planck equation.
+
+!bc pycod    
+# The Monte Carlo sampling with the Metropolis algo
+# jit decorator tells Numba to compile this function.
+# The argument types will be inferred by Numba when function is called.
+@jit()
+def MonteCarloSampling():
+
+    NumberMCcycles= 100000
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    # seed for rng generator 
+    seed()
+    # start variational parameter  loops, two parameters here
+    alpha = 0.9
+    for ia in range(MaxVariations):
+        alpha += .025
+        AlphaValues[ia] = alpha
+        beta = 0.2 
+        for jb in range(MaxVariations):
+            beta += .01
+            BetaValues[jb] = beta
+            energy = energy2 = 0.0
+            DeltaE = 0.0
+            #Initial position
+            for i in range(NumberParticles):
+                for j in range(Dimension):
+                    PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+            wfold = WaveFunction(PositionOld,alpha,beta)
+            QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+            #Loop over MC MCcycles
+            for MCcycle in range(NumberMCcycles):
+                #Trial position moving one particle at the time
+                for i in range(NumberParticles):
+                    for j in range(Dimension):
+                        PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                           QuantumForceOld[i,j]*TimeStep*D
+                    wfnew = WaveFunction(PositionNew,alpha,beta)
+                    QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+                    GreensFunction = 0.0
+                    for j in range(Dimension):
+                        GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+                    GreensFunction = exp(GreensFunction)
+                    ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+                    #Metropolis-Hastings test to see whether we accept the move
+                    if random() <= ProbabilityRatio:
+                       for j in range(Dimension):
+                           PositionOld[i,j] = PositionNew[i,j]
+                           QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                       wfold = wfnew
+                DeltaE = LocalEnergy(PositionOld,alpha,beta)
+                energy += DeltaE
+                energy2 += DeltaE**2
+            # We calculate mean, variance and error (no blocking applied)
+            energy /= NumberMCcycles
+            energy2 /= NumberMCcycles
+            variance = energy2 - energy**2
+            error = sqrt(variance/NumberMCcycles)
+            Energies[ia,jb] = energy    
+            outfile.write('%f %f %f %f %f\n' %(alpha,beta,energy,variance,error))
+    return Energies, AlphaValues, BetaValues
+!ec
+
+The main part here contains the setup of the variational parameters, the energies and the variance.
+!bc pycod
+#Here starts the main program with variable declarations
+NumberParticles = 2
+Dimension = 2
+MaxVariations = 10
+Energies = np.zeros((MaxVariations,MaxVariations))
+AlphaValues = np.zeros(MaxVariations)
+BetaValues = np.zeros(MaxVariations)
+(Energies, AlphaValues, BetaValues) = MonteCarloSampling()
+outfile.close()
+# Prepare for plots
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+# Plot the surface.
+X, Y = np.meshgrid(AlphaValues, BetaValues)
+surf = ax.plot_surface(X, Y, Energies,cmap=cm.coolwarm,linewidth=0, antialiased=False)
+# Customize the z axis.
+zmin = np.matrix(Energies).min()
+zmax = np.matrix(Energies).max()
+ax.set_zlim(zmin, zmax)
+ax.set_xlabel(r'$\alpha$')
+ax.set_ylabel(r'$\beta$')
+ax.set_zlabel(r'$\langle E \rangle$')
+ax.zaxis.set_major_locator(LinearLocator(10))
+ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+# Add a color bar which maps values to colors.
+fig.colorbar(surf, shrink=0.5, aspect=5)
+save_fig("QdotImportance")
+plt.show()
+
+!ec 
+
+
+
+
+!split
+===== Importance sampling, program elements =====
+!bblock
+The general derivative formula of the Jastrow factor is (the subscript $C$ stands for Correlation)
+!bt
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k}
+\]
+!et
+However, 
+with our written in way which can be reused later as
+!bt
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}f(r_{ij})\right\}},
+\]
+!et
+the gradient needed for the quantum force and local energy is easy to compute.  
+The function $f(r_{ij})$ will depends on the system under study. In the equations below we will keep this general form.
+
+!eblock
+
+
+!split
+===== Importance sampling, program elements =====
+!bblock
+In the Metropolis/Hasting algorithm, the *acceptance ratio* determines the probability for a particle  to be accepted at a new position. The ratio of the trial wave functions evaluated at the new and current positions is given by ($OB$ for the onebody  part)
+!bt
+\[
+R \equiv \frac{\Psi_{T}^{new}}{\Psi_{T}^{old}} = 
+\frac{\Psi_{OB}^{new}}{\Psi_{OB}^{old}}\frac{\Psi_{C}^{new}}{\Psi_{C}^{old}}
+\]
+!et
+Here $\Psi_{OB}$ is our onebody part (Slater determinant or product of boson single-particle states)  while $\Psi_{C}$ is our correlation function, or Jastrow factor. 
+We need to optimize the $\nabla \Psi_T / \Psi_T$ ratio and the second derivative as well, that is
+the $\mathbf{\nabla}^2 \Psi_T/\Psi_T$ ratio. The first is needed when we compute the so-called quantum force in importance sampling.
+The second is needed when we compute the kinetic energy term of the local energy.
+!bt
+\[
+\frac{\mathbf{\mathbf{\nabla}}  \Psi}{\Psi}  = \frac{\mathbf{\nabla}  (\Psi_{OB} \, \Psi_{C})}{\Psi_{OB} \, \Psi_{C}}  =  \frac{ \Psi_C \mathbf{\nabla}  \Psi_{OB} + \Psi_{OB} \mathbf{\nabla}  \Psi_{C}}{\Psi_{OB} \Psi_{C}} = \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+\]
+!et
+!eblock
+
+!split
+===== Importance sampling =====
+!bblock 
+The expectation value of the kinetic energy expressed in atomic units for electron $i$ is 
+!bt
+\[
+ \langle \hat{K}_i \rangle = -\frac{1}{2}\frac{\langle\Psi|\mathbf{\nabla}_{i}^2|\Psi \rangle}{\langle\Psi|\Psi \rangle},
+\]
+!et
+!bt
+\[
+\hat{K}_i = -\frac{1}{2}\frac{\mathbf{\nabla}_{i}^{2} \Psi}{\Psi}.
+\]
+!et
+
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
+The second derivative which enters the definition of the local energy is 
+!bt
+\[
+\frac{\mathbf{\nabla}^2 \Psi}{\Psi}=\frac{\mathbf{\nabla}^2 \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}^2  \Psi_C}{ \Psi_C} + 2 \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}}\cdot\frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+\]
+!et
+We discuss here how to calculate these quantities in an optimal way,
+!eblock
+!split
+===== Importance sampling =====
+!bblock 
+We have defined the correlated function as
+!bt
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})=\prod_{i< j}^Ng(r_{ij})= \prod_{i=1}^N\prod_{j=i+1}^Ng(r_{ij}),
+\]
+!et
+with 
+$r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2+(z_i-z_j)^2}$ in three dimensions or
+$r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2}$ if we work with two-dimensional systems.
+
+In our particular case we have
+!bt
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})=\exp{\left\{\sum_{i<j}f(r_{ij})\right\}}.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
+The total number of different relative distances $r_{ij}$ is $N(N-1)/2$. In a matrix storage format, the relative distances  form a strictly upper triangular matrix
+!bt
+\[
+ \mathbf{r} \equiv \begin{pmatrix}
+  0 & r_{1,2} & r_{1,3} & \cdots & r_{1,N} \\
+  \vdots & 0       & r_{2,3} & \cdots & r_{2,N} \\
+  \vdots & \vdots  & 0  & \ddots & \vdots  \\
+  \vdots & \vdots  & \vdots  & \ddots  & r_{N-1,N} \\
+  0 & 0  & 0  & \cdots  & 0
+ \end{pmatrix}.
+\]
+!et
+This applies to  $\mathbf{g} = \mathbf{g}(r_{ij})$ as well. 
+
+In our algorithm we will move one particle  at the time, say the $kth$-particle.  This sampling will be seen to be particularly efficient when we are going to compute a Slater determinant. 
+!eblock
+!split
+===== Importance sampling =====
+!bblock
+We have that the ratio between Jastrow factors $R_C$ is given by
+!bt
+\[
+R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} =
+\prod_{i=1}^{k-1}\frac{g_{ik}^\mathrm{new}}{g_{ik}^\mathrm{cur}}
+\prod_{i=k+1}^{N}\frac{ g_{ki}^\mathrm{new}} {g_{ki}^\mathrm{cur}}.
+\]
+!et
+For the Pade-Jastrow form
+!bt
+\[
+ R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} = 
+\frac{\exp{U_{new}}}{\exp{U_{cur}}} = \exp{\Delta U},
+\]
+!et
+where
+!bt
+\[
+\Delta U =
+\sum_{i=1}^{k-1}\big(f_{ik}^\mathrm{new}-f_{ik}^\mathrm{cur}\big)
++
+\sum_{i=k+1}^{N}\big(f_{ki}^\mathrm{new}-f_{ki}^\mathrm{cur}\big)
+\]
+!et
+
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
+One needs to develop a special algorithm 
+that runs only through the elements of the upper triangular
+matrix $\mathbf{g}$ and have $k$ as an index. 
+
+The expression to be derived in the following is of interest when computing the quantum force and the kinetic energy. It has the form
+!bt
+\[
+\frac{\mathbf{\nabla}_i\Psi_C}{\Psi_C} = \frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_i},
+\]
+!et
+for all dimensions and with $i$ running over all particles.
+!eblock
+!split
+===== Importance sampling =====
+!bblock
+For the first derivative only $N-1$ terms survive the ratio because the $g$-terms that are not differentiated cancel with their corresponding ones in the denominator. Then,
+!bt
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_k}.
+\]
+!et
+An equivalent equation is obtained for the exponential form after replacing $g_{ij}$ by $\exp(f_{ij})$, yielding:
+!bt
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k},
+\]
+!et
+with both expressions scaling as $\mathcal{O}(N)$.
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock
+
+Using the identity 
+!bt
+\[
+\frac{\partial}{\partial x_i}g_{ij} = -\frac{\partial}{\partial x_j}g_{ij},
+\]
+!et
+we get expressions where all the derivatives acting on the particle  are represented by the *second* index of $g$:
+!bt
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
+-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_i},
+\]
+!et
+and for the exponential case:
+!bt
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
+-\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}.
+\]
+!et
+!eblock
+
+!split
+===== Importance sampling =====
+!bblock 
+For correlation forms depending only on the scalar distances $r_{ij}$ we can use the chain rule. Noting that 
+!bt
+\[
+\frac{\partial g_{ij}}{\partial x_j} = \frac{\partial g_{ij}}{\partial r_{ij}} \frac{\partial r_{ij}}{\partial x_j} = \frac{x_j - x_i}{r_{ij}} \frac{\partial g_{ij}}{\partial r_{ij}},
+\]
+!et
+we arrive at
+!bt
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} = 
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}} \frac{\mathbf{r_{ik}}}{r_{ik}} \frac{\partial g_{ik}}{\partial r_{ik}}
+-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial g_{ki}}{\partial r_{ki}}.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
+Note that for the Pade-Jastrow form we can set $g_{ij} \equiv g(r_{ij}) = e^{f(r_{ij})} = e^{f_{ij}}$ and 
+!bt
+\[
+\frac{\partial g_{ij}}{\partial r_{ij}} = g_{ij} \frac{\partial f_{ij}}{\partial r_{ij}}.
+\]
+!et
+Therefore, 
+!bt
+\[
+\frac{1}{\Psi_{C}}\frac{\partial \Psi_{C}}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\mathbf{r_{ik}}}{r_{ik}}\frac{\partial f_{ik}}{\partial r_{ik}}
+-\sum_{i=k+1}^{N}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial f_{ki}}{\partial r_{ki}},
+\]
+!et
+where 
+!bt
+\[
+ \mathbf{r}_{ij} = |\mathbf{r}_j - \mathbf{r}_i| = (x_j - x_i)\mathbf{e}_1 + (y_j - y_i)\mathbf{e}_2 + (z_j - z_i)\mathbf{e}_3
+\]
+!et
+is the relative distance. 
+!eblock
+
+
+!split
+===== Importance sampling =====
+!bblock 
+The second derivative of the Jastrow factor divided by the Jastrow factor (the way it enters the kinetic energy) is
+!bt
+\[
+\left[\frac{\mathbf{\nabla}^2 \Psi_C}{\Psi_C}\right]_x =\  
+2\sum_{k=1}^{N}
+\sum_{i=1}^{k-1}\frac{\partial^2 g_{ik}}{\partial x_k^2}\ +\ 
+\sum_{k=1}^N
+\left(
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k} -
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}
+\right)^2
+\]
+!et
+!eblock
+
+!split
+===== Importance sampling =====
+!bblock 
+But we have a simple form for the function, namely
+!bt
+\[
+\Psi_{C}=\prod_{i< j}\exp{f(r_{ij})},
+\]
+!et
+and it is easy to see that for particle  $k$
+we have
+!bt
+\[
+  \frac{\mathbf{\nabla}^2_k \Psi_C}{\Psi_C }=
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}f'(r_{ki})f'(r_{kj})+
+\sum_{j\ne k}\left( f''(r_{kj})+\frac{2}{r_{kj}}f'(r_{kj})\right)
+\]
+!et
+!eblock
+
+
+
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+A stochastic process is simply a function of two variables, one is the time,
+the other is a stochastic variable $X$, defined by specifying
+* the set $\left\{x\right\}$ of possible values for $X$;
+* the probability distribution, $w_X(x)$,  over this set, or briefly $w(x)$
+
+The set of values $\left\{x\right\}$ for $X$ 
+may be discrete, or continuous. If the set of
+values is continuous, then $w_X (x)$ is a probability density so that 
+$w_X (x)dx$
+is the probability that one finds the stochastic variable $X$ to have values
+in the range $[x, x + dx]$ .
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+     An arbitrary number of other stochastic variables may be derived from
+$X$. For example, any $Y$ given by a mapping of $X$, is also a stochastic
+variable. The mapping may also be time-dependent, that is, the mapping
+depends on an additional variable $t$
+!bt
+\[
+                              Y_X (t) = f (X, t) .
+\]
+!et
+The quantity $Y_X (t)$ is called a random function, or, since $t$ often is time,
+a stochastic process. A stochastic process is a function of two variables,
+one is the time, the other is a stochastic variable $X$. Let $x$ be one of the
+possible values of $X$ then
+!bt
+\[
+                               y(t) = f (x, t),
+\]
+!et
+is a function of $t$, called a sample function or realization of the process.
+In physics one considers the stochastic process to be an ensemble of such
+sample functions.
+!eblock
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+     For many physical systems initial distributions of a stochastic 
+variable $y$ tend to equilibrium distributions: $w(y, t)\rightarrow w_0(y)$ 
+as $t\rightarrow\infty$. In
+equilibrium detailed balance constrains the transition rates
+!bt
+\[
+     W(y\rightarrow y')w(y ) = W(y'\rightarrow y)w_0 (y),
+\]
+!et
+where $W(y'\rightarrow y)$ 
+is the probability, per unit time, that the system changes
+from a state $|y\rangle$ , characterized by the value $y$ 
+for the stochastic variable $Y$ , to a state $|y'\rangle$.
+
+Note that for a system in equilibrium the transition rate 
+$W(y'\rightarrow y)$ and
+the reverse $W(y\rightarrow y')$ may be very different. 
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+Consider, for instance, a simple
+system that has only two energy levels $\epsilon_0 = 0$ and 
+$\epsilon_1 = \Delta E$. 
+
+For a system governed by the Boltzmann distribution we find (the partition function has been taken out)
+!bt
+\[
+     W(0\rightarrow 1)\exp{-(\epsilon_0/kT)} = W(1\rightarrow 0)\exp{-(\epsilon_1/kT)}
+\]
+!et
+We get then
+!bt
+\[
+     \frac{W(1\rightarrow 0)}{W(0 \rightarrow 1)}=\exp{-(\Delta E/kT)},
+\]
+!et
+which goes to zero when $T$ tends to zero.
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+If we assume a discrete set of events,
+our initial probability
+distribution function can be  given by 
+!bt
+\[
+   w_i(0) = \delta_{i,0},
+\]
+!et
+and its time-development after a given time step $\Delta t=\epsilon$ is
+!bt
+\[ 
+   w_i(t) = \sum_{j}W(j\rightarrow i)w_j(t=0).
+\] 
+!et  
+The continuous analog to $w_i(0)$ is
+!bt
+\[
+   w(\mathbf{x})\rightarrow \delta(\mathbf{x}),
+\]
+!et
+where we now have generalized the one-dimensional position $x$ to a generic-dimensional  
+vector $\mathbf{x}$. The Kroenecker $\delta$ function is replaced by the $\delta$ distribution
+function $\delta(\mathbf{x})$ at  $t=0$.  
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+The transition from a state $j$ to a state $i$ is now replaced by a transition
+to a state with position $\mathbf{y}$ from a state with position $\mathbf{x}$. 
+The discrete sum of transition probabilities can then be replaced by an integral
+and we obtain the new distribution at a time $t+\Delta t$ as 
+!bt
+\[
+   w(\mathbf{y},t+\Delta t)= \int W(\mathbf{y},t+\Delta t| \mathbf{x},t)w(\mathbf{x},t)d\mathbf{x},
+\]
+!et
+and after $m$ time steps we have
+!bt
+\[
+   w(\mathbf{y},t+m\Delta t)= \int W(\mathbf{y},t+m\Delta t| \mathbf{x},t)w(\mathbf{x},t)d\mathbf{x}.
+\]
+!et
+When equilibrium is reached we have
+!bt
+\[
+   w(\mathbf{y})= \int W(\mathbf{y}|\mathbf{x}, t)w(\mathbf{x})d\mathbf{x},
+\]
+!et
+that is no time-dependence. Note our change of notation for $W$
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can solve the equation for $w(\mathbf{y},t)$ by making a Fourier transform to
+momentum space. 
+The PDF $w(\mathbf{x},t)$ is related to its Fourier transform
+$\tilde{w}(\mathbf{k},t)$ through
+!bt
+\[
+   w(\mathbf{x},t) = \int_{-\infty}^{\infty}d\mathbf{k} \exp{(i\mathbf{kx})}\tilde{w}(\mathbf{k},t),
+\]
+!et
+and using the definition of the 
+$\delta$-function 
+!bt
+\[
+   \delta(\mathbf{x}) = \frac{1}{2\pi} \int_{-\infty}^{\infty}d\mathbf{k} \exp{(i\mathbf{kx})},
+\]
+!et
+ we see that
+!bt
+\[
+   \tilde{w}(\mathbf{k},0)=1/2\pi.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can then use the Fourier-transformed diffusion equation 
+!bt
+\[
+    \frac{\partial \tilde{w}(\mathbf{k},t)}{\partial t} = -D\mathbf{k}^2\tilde{w}(\mathbf{k},t),
+\]
+!et
+with the obvious solution
+!bt
+\[
+   \tilde{w}(\mathbf{k},t)=\tilde{w}(\mathbf{k},0)\exp{\left[-(D\mathbf{k}^2t)\right)}=
+    \frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}. 
+\]
+!et
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+With the Fourier transform we obtain 
+!bt
+\[
+   w(\mathbf{x},t)=\int_{-\infty}^{\infty}d\mathbf{k} \exp{\left[i\mathbf{kx}\right]}\frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}=
+    \frac{1}{\sqrt{4\pi Dt}}\exp{\left[-(\mathbf{x}^2/4Dt)\right]}, 
+\]
+!et
+with the normalization condition
+!bt
+\[
+   \int_{-\infty}^{\infty}w(\mathbf{x},t)d\mathbf{x}=1.
+\]
+!et
+
+!eblock
+
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+The solution represents the probability of finding
+our random walker at position $\mathbf{x}$ at time $t$ if the initial distribution 
+was placed at $\mathbf{x}=0$ at $t=0$. 
+
+There is another interesting feature worth observing. The discrete transition probability $W$
+itself is given by a binomial distribution.
+The results from the central limit theorem state that 
+transition probability in the limit $n\rightarrow \infty$ converges to the normal 
+distribution. It is then possible to show that
+!bt
+\[
+    W(il-jl,n\epsilon)\rightarrow W(\mathbf{y},t+\Delta t|\mathbf{x},t)=
+    \frac{1}{\sqrt{4\pi D\Delta t}}\exp{\left[-((\mathbf{y}-\mathbf{x})^2/4D\Delta t)\right]},
+\]
+!et
+and that it satisfies the normalization condition and is itself a solution
+to the diffusion equation.
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+Let us now assume that we have three PDFs for times $t_0 < t' < t$, that is
+$w(\mathbf{x}_0,t_0)$, $w(\mathbf{x}',t')$ and $w(\mathbf{x},t)$.
+We have then  
+!bt
+\[
+   w(\mathbf{x},t)= \int_{-\infty}^{\infty} W(\mathbf{x}.t|\mathbf{x}'.t')w(\mathbf{x}',t')d\mathbf{x}',
+\]
+!et
+and
+!bt
+\[
+   w(\mathbf{x},t)= \int_{-\infty}^{\infty} W(\mathbf{x}.t|\mathbf{x}_0.t_0)w(\mathbf{x}_0,t_0)d\mathbf{x}_0,
+\]
+!et
+and
+!bt
+\[
+   w(\mathbf{x}',t')= \int_{-\infty}^{\infty} W(\mathbf{x}'.t'|\mathbf{x}_0,t_0)w(\mathbf{x}_0,t_0)d\mathbf{x}_0.
+\]
+!et
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can combine these equations and arrive at the famous Einstein-Smoluchenski-Kolmogorov-Chapman (ESKC) relation
+!bt
+\[
+ W(\mathbf{x}t|\mathbf{x}_0t_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},t|\mathbf{x}',t')W(\mathbf{x}',t'|\mathbf{x}_0,t_0)d\mathbf{x}'.
+\]
+!et
+We can replace the spatial dependence with a dependence upon say the velocity
+(or momentum), that is we have
+!bt
+\[
+ W(\mathbf{v},t|\mathbf{v}_0,t_0)  = \int_{-\infty}^{\infty} W(\mathbf{v},t|\mathbf{v}',t')W(\mathbf{v}',t'|\mathbf{v}_0,t_0)d\mathbf{x}'.
+\]
+!et
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We will now derive the Fokker-Planck equation. 
+We start from the ESKC equation
+!bt
+\[
+ W(\mathbf{x},t|\mathbf{x}_0,t_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},t|\mathbf{x}',t')W(\mathbf{x}',t'|\mathbf{x}_0,t_0)d\mathbf{x}'.
+\]
+!et
+Define $s=t'-t_0$, $\tau=t-t'$ and $t-t_0=s+\tau$. We have then
+!bt
+\[
+ W(\mathbf{x},s+\tau|\mathbf{x}_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},\tau|\mathbf{x}')W(\mathbf{x}',s|\mathbf{x}_0)d\mathbf{x}'.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+Assume now that $\tau$ is very small so that we can make an expansion in terms of a small step $xi$, with $\mathbf{x}'=\mathbf{x}-\xi$, that is
+!bt
+\[
+ W(\mathbf{x},s|\mathbf{x}_0)+\frac{\partial W}{\partial s}\tau +O(\tau^2) = \int_{-\infty}^{\infty} W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0)d\mathbf{x}'.
+\]
+!et
+We assume that $W(\mathbf{x},\tau|\mathbf{x}-\xi)$ takes non-negligible values only when $\xi$ is small. This is just another way of stating the Master equation!!
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We say thus that $\mathbf{x}$ changes only by a small amount in the time interval $\tau$. 
+This means that we can make a Taylor expansion in terms of $\xi$, that is we
+expand
+!bt
+\[
+W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0) =
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W(\mathbf{x}+\xi,\tau|\mathbf{x})W(\mathbf{x},s|\mathbf{x}_0)
+\right].
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can then rewrite the ESKC equation as 
+!bt
+\[
+\frac{\partial W}{\partial s}\tau=-W(\mathbf{x},s|\mathbf{x}_0)+
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W(\mathbf{x},s|\mathbf{x}_0)\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\xi,\tau|\mathbf{x})d\xi\right].
+\]
+!et
+We have neglected higher powers of $\tau$ and have used that for $n=0$ 
+we get simply $W(\mathbf{x},s|\mathbf{x}_0)$ due to normalization.
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We say thus that $\mathbf{x}$ changes only by a small amount in the time interval $\tau$. 
+This means that we can make a Taylor expansion in terms of $\xi$, that is we
+expand
+!bt
+\[
+W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0) =
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W(\mathbf{x}+\xi,\tau|\mathbf{x})W(\mathbf{x},s|\mathbf{x}_0)
+\right].
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We can then rewrite the ESKC equation as 
+!bt
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}\tau=-W(\mathbf{x},s|\mathbf{x}_0)+
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W(\mathbf{x},s|\mathbf{x}_0)\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\xi,\tau|\mathbf{x})d\xi\right].
+\]
+!et
+We have neglected higher powers of $\tau$ and have used that for $n=0$ 
+we get simply $W(\mathbf{x},s|\mathbf{x}_0)$ due to normalization.
+
+
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+We simplify the above by introducing the moments 
+!bt
+\[
+M_n=\frac{1}{\tau}\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\xi,\tau|\mathbf{x})d\xi=
+\frac{\langle [\Delta x(\tau)]^n\rangle}{\tau},
+\]
+!et
+resulting in
+!bt
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}=
+\sum_{n=1}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W(\mathbf{x},s|\mathbf{x}_0)M_n\right].
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+When $\tau \rightarrow 0$ we assume that $\langle [\Delta x(\tau)]^n\rangle \rightarrow 0$ more rapidly than $\tau$ itself if $n > 2$. 
+When $\tau$ is much larger than the standard correlation time of 
+system then $M_n$ for $n > 2$ can normally be neglected.
+This means that fluctuations become negligible at large time scales.
+
+If we neglect such terms we can rewrite the ESKC equation as 
+!bt
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}=
+-\frac{\partial M_1W(\mathbf{x},s|\mathbf{x}_0)}{\partial x}+
+\frac{1}{2}\frac{\partial^2 M_2W(\mathbf{x},s|\mathbf{x}_0)}{\partial x^2}.
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock 
+In a more compact form we have
+!bt
+\[
+\frac{\partial W}{\partial s}=
+-\frac{\partial M_1W}{\partial x}+
+\frac{1}{2}\frac{\partial^2 M_2W}{\partial x^2},
+\]
+!et
+which is the Fokker-Planck equation!  It is trivial to replace 
+position with velocity (momentum).
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+Consider a particle  suspended in a liquid. On its path through the liquid it will continuously collide with the liquid molecules. Because on average the particle  will collide more often on the front side than on the back side, it will experience a systematic force proportional with its velocity, and directed opposite to its velocity. Besides this systematic force the particle  will experience a stochastic force  $\mathbf{F}(t)$. 
+The equations of motion are 
+* $\frac{d\mathbf{r}}{dt}=\mathbf{v}$ and 
+* $\frac{d\mathbf{v}}{dt}=-\xi \mathbf{v}+\mathbf{F}$.
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+From hydrodynamics  we know that the friction constant  $\xi$ is given by
+!bt
+\[
+\xi =6\pi \eta a/m 
+\]
+!et
+where $\eta$ is the viscosity  of the solvent and a is the radius of the particle .
+
+Solving the second equation in the previous slide we get 
+!bt
+\[
+\mathbf{v}(t)=\mathbf{v}_{0}e^{-\xi t}+\int_{0}^{t}d\tau e^{-\xi (t-\tau )}\mathbf{F }(\tau ). 
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+If we want to get some useful information out of this, we have to average over all possible realizations of 
+$\mathbf{F}(t)$, with the initial velocity as a condition. A useful quantity for example is
+!bt
+\[ 
+\langle \mathbf{v}(t)\cdot \mathbf{v}(t)\rangle_{\mathbf{v}_{0}}=v_{0}^{-\xi 2t}
++2\int_{0}^{t}d\tau e^{-\xi (2t-\tau)}\mathbf{v}_{0}\cdot \langle \mathbf{F}(\tau )\rangle_{\mathbf{v}_{0}}
+\]
+!et
+!bt
+\[  	  	
+ +\int_{0}^{t}d\tau ^{\prime }\int_{0}^{t}d\tau e^{-\xi (2t-\tau -\tau ^{\prime })}
+\langle \mathbf{F}(\tau )\cdot \mathbf{F}(\tau ^{\prime })\rangle_{ \mathbf{v}_{0}}.
+\]
+!et
+!eblock
+
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+In order to continue we have to make some assumptions about the conditional averages of the stochastic forces. 
+In view of the chaotic character of the stochastic forces the following 
+assumptions seem to be appropriate
+!bt  
+\[ 
+\langle \mathbf{F}(t)\rangle=0, 
+\]
+!et
+and
+!bt
+\[
+\langle \mathbf{F}(t)\cdot \mathbf{F}(t^{\prime })\rangle_{\mathbf{v}_{0}}=  C_{\mathbf{v}_{0}}\delta (t-t^{\prime }).
+\] 	
+!et
+
+We omit the subscript $\mathbf{v}_{0}$, when the quantity of interest turns out to be independent of $\mathbf{v}_{0}$. Using the last three equations we get
+!bt
+ \[
+\langle \mathbf{v}(t)\cdot \mathbf{v}(t)\rangle_{\mathbf{v}_{0}}=v_{0}^{2}e^{-2\xi t}+\frac{C_{\mathbf{v}_{0}}}{2\xi }(1-e^{-2\xi t}).
+\]
+!et
+For large t this should be equal to 3kT/m, from which it follows that
+!bt
+\[
+\langle \mathbf{F}(t)\cdot \mathbf{F}(t^{\prime })\rangle =6\frac{kT}{m}\xi \delta (t-t^{\prime }). 
+\]
+!et
+This result is called the fluctuation-dissipation theorem .
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+Integrating 
+!bt
+ \[ 
+\mathbf{v}(t)=\mathbf{v}_{0}e^{-\xi t}+\int_{0}^{t}d\tau e^{-\xi (t-\tau )}\mathbf{F }(\tau ), 
+\] 
+!et
+we get
+!bt
+\[
+\mathbf{r}(t)=\mathbf{r}_{0}+\mathbf{v}_{0}\frac{1}{\xi }(1-e^{-\xi t})+
+\int_0^td\tau \int_0^{\tau}\tau ^{\prime } e^{-\xi (\tau -\tau ^{\prime })}\mathbf{F}(\tau ^{\prime }), 
+\]
+!et
+from which we calculate the mean square displacement 
+!bt
+\[
+\langle ( \mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle _{\mathbf{v}_{0}}=\frac{v_0^2}{\xi}(1-e^{-\xi t})^{2}+\frac{3kT}{m\xi ^{2}}(2\xi t-3+4e^{-\xi t}-e^{-2\xi t}). 
+\]
+!et
+!eblock
+
+
+!split
+===== Importance sampling, Fokker-Planck and Langevin equations =====
+!bblock Langevin equation
+For very large $t$ this becomes
+!bt
+\[
+\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =\frac{6kT}{m\xi }t 
+\] 
+!et
+from which we get the Einstein relation  
+!bt
+ \[ 
+D= \frac{kT}{m\xi } 
+\] 	
+!et
+where we have used $\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =6Dt$.
+!eblock
+
+
+
+
 
 !split
 ===== Motivation  ===== 
