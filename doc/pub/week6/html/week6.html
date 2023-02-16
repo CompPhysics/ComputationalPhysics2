@@ -8,8 +8,8 @@ doconce format html week6.do.txt --pygments_html_style=default --html_style=bloo
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 8 February 20-24: Gradient Methods">
-<title>Week 8 February 20-24: Gradient Methods</title>
+<meta name="description" content="Week 9 February 27-March 3: Gradient Methods">
+<title>Week 9 February 27-March 3: Gradient Methods</title>
 <style type="text/css">
 /* bloodish style */
 body {
@@ -140,53 +140,7 @@ div.toc p,a {
 
 <!-- tocinfo
 {'highest level': 2,
- 'sections': [('Overview of week 8, February 20-24',
-               2,
-               None,
-               'overview-of-week-8-february-20-24'),
-              ('Top-down start', 2, None, 'top-down-start'),
-              ('Motivation', 2, None, 'motivation'),
-              ('Simple example and demonstration',
-               2,
-               None,
-               'simple-example-and-demonstration'),
-              ('Simple example and demonstration',
-               2,
-               None,
-               'simple-example-and-demonstration'),
-              ('Exercise 1: Find the local energy for the harmonic oscillator',
-               2,
-               None,
-               'exercise-1-find-the-local-energy-for-the-harmonic-oscillator'),
-              ('Variance in the simple model',
-               2,
-               None,
-               'variance-in-the-simple-model'),
-              ('Computing the derivatives',
-               2,
-               None,
-               'computing-the-derivatives'),
-              ('Expressions for finding the derivatives of the local energy',
-               2,
-               None,
-               'expressions-for-finding-the-derivatives-of-the-local-energy'),
-              ('Derivatives of the local energy',
-               2,
-               None,
-               'derivatives-of-the-local-energy'),
-              ('Exercise 2: General expression for the derivative of the '
-               'energy',
-               2,
-               None,
-               'exercise-2-general-expression-for-the-derivative-of-the-energy'),
-              ('Python program for 2-electrons in 2 dimensions',
-               2,
-               None,
-               'python-program-for-2-electrons-in-2-dimensions'),
-              ("Using Broyden's algorithm in scipy",
-               2,
-               None,
-               'using-broyden-s-algorithm-in-scipy'),
+ 'sections': [('Overview of week 9', 2, None, 'overview-of-week-9'),
               ("Brief reminder on Newton-Raphson's method",
                2,
                None,
@@ -329,7 +283,7 @@ MathJax.Hub.Config({
 
 <!-- ------------------- main content ---------------------- -->
 <center>
-<h1>Week 8 February 20-24: Gradient Methods</h1>
+<h1>Week 9 February 27-March 3: Gradient Methods</h1>
 </center>  <!-- document title -->
 
 <!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
@@ -345,22 +299,33 @@ MathJax.Hub.Config({
 </center>
 <br>
 <center>
-<h4>Dec 25, 2022</h4>
+<h4>Feb 16, 2023</h4>
 </center> <!-- date -->
 <br>
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="overview-of-week-8-february-20-24">Overview of week 8, February 20-24 </h2>
+<h2 id="overview-of-week-9">Overview of week 9 </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Topics</b>
 <p>
 <ul>
-<li> Gradient Descent methods, Steepest descent and Stochastic gradient descent</li>
-<li> Conjugate Gradient Descent</li> 
-<li> <a href="https://youtu.be/" target="_blank">Video of Lecture TBA</a></li>
-<li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2022/NotesFebruary23.pdf" target="_blank">Handwritten notes</a></li>
-<li> To be added: stochastich back flow (see Sorella, PRB 2011).</li>
+<li> Gradient methods:
+<ol type="a"></li>
+ <li> Semi-Newton methods (Broyden's algorithm)</li>
+ <li> Steepest descent and conjugate gradient descent</li>
+ <li> Stochastic gradient descent</li>
+</ol>
 </ul>
+</div>
+
+
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Video and handwriten notes</b>
+<p>
+<ol>
+<li> <a href="https://youtu.be/" target="_blank">Video of lecture TBA</a></li>
+<li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2022/NotesMarch2.pdf" target="_blank">Handwritten notes</a></li>
+</ol>
 </div>
 
 
@@ -374,605 +339,6 @@ MathJax.Hub.Config({
 </ul>
 </div>
 
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="top-down-start">Top-down start </h2>
-
-<ul>
-<li> We will start with a top-down view, with a simple harmonic oscillator problem in one dimension as case.</li>
-<li> Thereafter we continue with implementing the simplest possible steepest descent approach to our two-electron problem with an electrostatic (Coulomb) interaction. Our code includes also importance sampling. The simple Python code here illustrates the basic elements which need to be included in our own code.</li>
-<li> Then we move on to the mathematical description of various gradient methods.</li>
-</ul>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="motivation">Motivation  </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>Our aim with this part of the project is to be able to</p>
-<ul>
-<li> find an optimal value for the variational parameters using only some few Monte Carlo cycles</li>
-<li> use these optimal values for the variational parameters to perform a large-scale Monte Carlo calculation</li>
-</ul>
-<p>To achieve this will look at methods like <em>Steepest descent</em> and the <em>conjugate gradient method</em>. Both these methods allow us to find
-the minima of a multivariable  function like our energy (function of several variational parameters). 
-Alternatively, you can always use Newton's method. In particular, since we will normally have one variational parameter,
-Newton's method can be easily used in finding the minimum of the local energy.
-</p>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="simple-example-and-demonstration">Simple example and demonstration </h2>
-
-<p>Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
-For the harmonic oscillator in one-dimension we have a  trial wave function and probability
-</p>
-$$
-\psi_T(x;\alpha) = \exp{-(\frac{1}{2}\alpha^2x^2)},
-$$
-
-<p>which results in a local energy </p>
-$$
-\frac{1}{2}\left(\alpha^2+x^2(1-\alpha^4)\right).
-$$
-
-<p>We can compare our numerically calculated energies with the exact energy as function of \( \alpha \)</p>
-$$
-\overline{E}[\alpha] = \frac{1}{4}\left(\alpha^2+\frac{1}{\alpha^2}\right).
-$$
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="simple-example-and-demonstration">Simple example and demonstration </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>The derivative of the energy with respect to \( \alpha \) gives</p>
-$$
-\begin{equation*}
-\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \frac{1}{2}\alpha-\frac{1}{2\alpha^3}
-\end{equation*}
-$$
-
-<p>and a second derivative which is always positive (meaning that we find a minimum)</p>
-$$
-\begin{equation*}
-\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = \frac{1}{2}+\frac{3}{2\alpha^4}
-\end{equation*}
-$$
-
-<p>The condition</p>
-$$
-\begin{equation*}
-\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
-\end{equation*}
-$$
-
-<p>gives the optimal \( \alpha=1 \), as expected.</p>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<!-- --- begin exercise --- -->
-<h2 id="exercise-1-find-the-local-energy-for-the-harmonic-oscillator">Exercise 1: Find the local energy for the harmonic oscillator </h2>
-
-<!-- --- begin subexercise --- -->
-<p>
-<b>a)</b>
-Derive the local energy for the harmonic oscillator in one dimension and find its expectation value.
-</p>
-
-<!-- --- end subexercise --- -->
-
-<!-- --- begin subexercise --- -->
-<p>
-<b>b)</b>
-Show also that the optimal value of optimal \( \alpha=1 \)
-</p>
-
-<!-- --- end subexercise --- -->
-
-<!-- --- begin subexercise --- -->
-<p>
-<b>c)</b>
-Repeat the above steps in two dimensions for \( N \) bosons or electrons. What is the optimal value of \( \alpha \)?
-</p>
-
-<!-- --- end subexercise --- -->
-
-<!-- --- end exercise --- -->
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="variance-in-the-simple-model">Variance in the simple model </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>We can also minimize the variance. In our simple model the variance is</p>
-
-$$
-\sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}^2.
-$$
-
-<p>which yields a second derivative which is always positive.</p>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="computing-the-derivatives">Computing the derivatives </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-
-<p>In general we end up computing the expectation value of the energy in terms 
-of some parameters \( \alpha_0,\alpha_1,\dots,\alpha_n \)
-and we search for a minimum in this multi-variable parameter space.  
-This leads to an energy minimization problem <em>where we need the derivative of the energy as a function of the variational parameters</em>.
-</p>
-
-<p>In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
-However, in our actual calculations the energy is represented by a multi-dimensional integral with several variational parameters.
-How can we can then obtain the derivatives of the energy with respect to the variational parameters without having 
-to resort to expensive numerical derivations? 
-</p>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="expressions-for-finding-the-derivatives-of-the-local-energy">Expressions for finding the derivatives of the local energy </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-
-<p>To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.  </p>
-
-<p>Let us define </p>
-$$
-\bar{E}_{\alpha}=\frac{d\langle  E_L[\alpha]\rangle}{d\alpha}.
-$$
-
-<p>as the derivative of the energy with respect to the variational parameter \( \alpha \) (we limit ourselves to one parameter only).
-In the above example this was easy and we obtain a simple expression for the derivative.
-We define also the derivative of the trial function (skipping the subindex \( T \)) as 
-</p>
-$$
-\bar{\psi}_{\alpha}=\frac{d\psi[\alpha]\rangle}{d\alpha}.
-$$
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="derivatives-of-the-local-energy">Derivatives of the local energy </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)</p>
-$$
-\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
-$$
-
-<p>From a computational point of view it means that you need to compute the expectation values of </p>
-$$
-\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle,
-$$
-
-<p>and</p>
-$$
-\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
-$$
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-
-<!-- --- begin exercise --- -->
-<h2 id="exercise-2-general-expression-for-the-derivative-of-the-energy">Exercise 2: General expression for the derivative of the energy </h2>
-
-<!-- --- begin subexercise --- -->
-<p>
-<b>a)</b>
-Show that 
-</p>
-$$
-\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
-$$
-
-
-<!-- --- end subexercise --- -->
-
-<!-- --- begin subexercise --- -->
-<p>
-<b>b)</b>
-Find the corresponding expression for the variance.
-</p>
-
-<!-- --- end subexercise --- -->
-
-<!-- --- end exercise --- -->
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="python-program-for-2-electrons-in-2-dimensions">Python program for 2-electrons in 2 dimensions </h2>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
-<span style="color: #408080; font-style: italic"># Using gaussian rng for new positions and Metropolis- Hastings </span>
-<span style="color: #408080; font-style: italic"># Added energy minimization with gradient descent using fixed step size</span>
-<span style="color: #408080; font-style: italic"># To do: replace with optimization codes from scipy and/or use stochastic gradient descent</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> exp, sqrt
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">random</span> <span style="color: #008000; font-weight: bold">import</span> random, seed, normalvariate
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">mpl_toolkits.mplot3d</span> <span style="color: #008000; font-weight: bold">import</span> Axes3D
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib</span> <span style="color: #008000; font-weight: bold">import</span> cm
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib.ticker</span> <span style="color: #008000; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">sys</span>
-
-
-
-<span style="color: #408080; font-style: italic"># Trial wave function for the 2-electron quantum dot in two dims</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">WaveFunction</span>(r,alpha,beta):
-    r1 <span style="color: #666666">=</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
-    r2 <span style="color: #666666">=</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> r12<span style="color: #666666">/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    <span style="color: #008000; font-weight: bold">return</span> exp(<span style="color: #666666">-0.5*</span>alpha<span style="color: #666666">*</span>(r1<span style="color: #666666">+</span>r2)<span style="color: #666666">+</span>deno)
-
-<span style="color: #408080; font-style: italic"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">LocalEnergy</span>(r,alpha,beta):
-    
-    r1 <span style="color: #666666">=</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r2 <span style="color: #666666">=</span> (r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    deno2 <span style="color: #666666">=</span> deno<span style="color: #666666">*</span>deno
-    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0.5*</span>(<span style="color: #666666">1-</span>alpha<span style="color: #666666">*</span>alpha)<span style="color: #666666">*</span>(r1 <span style="color: #666666">+</span> r2) <span style="color: #666666">+2.0*</span>alpha <span style="color: #666666">+</span> <span style="color: #666666">1.0/</span>r12<span style="color: #666666">+</span>deno2<span style="color: #666666">*</span>(alpha<span style="color: #666666">*</span>r12<span style="color: #666666">-</span>deno2<span style="color: #666666">+2*</span>beta<span style="color: #666666">*</span>deno<span style="color: #666666">-1.0/</span>r12)
-
-<span style="color: #408080; font-style: italic"># Derivate of wave function ansatz as function of variational parameters</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">DerivativeWFansatz</span>(r,alpha,beta):
-    
-    WfDer  <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((<span style="color: #666666">2</span>), np<span style="color: #666666">.</span>double)
-    r1 <span style="color: #666666">=</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r2 <span style="color: #666666">=</span> (r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    deno2 <span style="color: #666666">=</span> deno<span style="color: #666666">*</span>deno
-    WfDer[<span style="color: #666666">0</span>] <span style="color: #666666">=</span> <span style="color: #666666">-0.5*</span>(r1<span style="color: #666666">+</span>r2)
-    WfDer[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> <span style="color: #666666">-</span>r12<span style="color: #666666">*</span>r12<span style="color: #666666">*</span>deno2
-    <span style="color: #008000; font-weight: bold">return</span>  WfDer
-
-<span style="color: #408080; font-style: italic"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">QuantumForce</span>(r,alpha,beta):
-
-    qforce <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    qforce[<span style="color: #666666">0</span>,:] <span style="color: #666666">=</span> <span style="color: #666666">-2*</span>r[<span style="color: #666666">0</span>,:]<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>(r[<span style="color: #666666">0</span>,:]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,:])<span style="color: #666666">*</span>deno<span style="color: #666666">*</span>deno<span style="color: #666666">/</span>r12
-    qforce[<span style="color: #666666">1</span>,:] <span style="color: #666666">=</span> <span style="color: #666666">-2*</span>r[<span style="color: #666666">1</span>,:]<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>(r[<span style="color: #666666">1</span>,:]<span style="color: #666666">-</span>r[<span style="color: #666666">0</span>,:])<span style="color: #666666">*</span>deno<span style="color: #666666">*</span>deno<span style="color: #666666">/</span>r12
-    <span style="color: #008000; font-weight: bold">return</span> qforce
-    
-
-<span style="color: #408080; font-style: italic"># Computing the derivative of the energy and the energy </span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">EnergyMinimization</span>(alpha, beta):
-
-    NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">10000</span>
-    <span style="color: #408080; font-style: italic"># Parameters in the Fokker-Planck simulation of the quantum force</span>
-    D <span style="color: #666666">=</span> <span style="color: #666666">0.5</span>
-    TimeStep <span style="color: #666666">=</span> <span style="color: #666666">0.05</span>
-    <span style="color: #408080; font-style: italic"># positions</span>
-    PositionOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    PositionNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    <span style="color: #408080; font-style: italic"># Quantum force</span>
-    QuantumForceOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    QuantumForceNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-
-    <span style="color: #408080; font-style: italic"># seed for rng generator </span>
-    seed()
-    energy <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    DeltaE <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    EnergyDer <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((<span style="color: #666666">2</span>), np<span style="color: #666666">.</span>double)
-    DeltaPsi <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((<span style="color: #666666">2</span>), np<span style="color: #666666">.</span>double)
-    DerivativePsiE <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((<span style="color: #666666">2</span>), np<span style="color: #666666">.</span>double)
-    <span style="color: #408080; font-style: italic">#Initial position</span>
-    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
-        <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-            PositionOld[i,j] <span style="color: #666666">=</span> normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)
-    wfold <span style="color: #666666">=</span> WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld <span style="color: #666666">=</span> QuantumForce(PositionOld,alpha, beta)
-
-    <span style="color: #408080; font-style: italic">#Loop over MC MCcycles</span>
-    <span style="color: #008000; font-weight: bold">for</span> MCcycle <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberMCcycles):
-        <span style="color: #408080; font-style: italic">#Trial position moving one particle at the time</span>
-        <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
-            <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                PositionNew[i,j] <span style="color: #666666">=</span> PositionOld[i,j]<span style="color: #666666">+</span>normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)<span style="color: #666666">+</span>\
-                                       QuantumForceOld[i,j]<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*</span>D
-            wfnew <span style="color: #666666">=</span> WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew <span style="color: #666666">=</span> QuantumForce(PositionNew,alpha, beta)
-            GreensFunction <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-            <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                GreensFunction <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">+</span>QuantumForceNew[i,j])<span style="color: #666666">*</span>\
-	                              (D<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">-</span>QuantumForceNew[i,j])<span style="color: #666666">-</span>\
-                                      PositionNew[i,j]<span style="color: #666666">+</span>PositionOld[i,j])
-      
-            GreensFunction <span style="color: #666666">=</span> exp(GreensFunction)
-            ProbabilityRatio <span style="color: #666666">=</span> GreensFunction<span style="color: #666666">*</span>wfnew<span style="color: #666666">**2/</span>wfold<span style="color: #666666">**2</span>
-            <span style="color: #408080; font-style: italic">#Metropolis-Hastings test to see whether we accept the move</span>
-            <span style="color: #008000; font-weight: bold">if</span> random() <span style="color: #666666">&lt;=</span> ProbabilityRatio:
-                <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                    PositionOld[i,j] <span style="color: #666666">=</span> PositionNew[i,j]
-                    QuantumForceOld[i,j] <span style="color: #666666">=</span> QuantumForceNew[i,j]
-                wfold <span style="color: #666666">=</span> wfnew
-        DeltaE <span style="color: #666666">=</span> LocalEnergy(PositionOld,alpha,beta)
-        DerPsi <span style="color: #666666">=</span> DerivativeWFansatz(PositionOld,alpha,beta)
-        DeltaPsi <span style="color: #666666">+=</span> DerPsi
-        energy <span style="color: #666666">+=</span> DeltaE
-        DerivativePsiE <span style="color: #666666">+=</span> DerPsi<span style="color: #666666">*</span>DeltaE
-            
-    <span style="color: #408080; font-style: italic"># We calculate mean values</span>
-    energy <span style="color: #666666">/=</span> NumberMCcycles
-    DerivativePsiE <span style="color: #666666">/=</span> NumberMCcycles
-    DeltaPsi <span style="color: #666666">/=</span> NumberMCcycles
-    EnergyDer  <span style="color: #666666">=</span> <span style="color: #666666">2*</span>(DerivativePsiE<span style="color: #666666">-</span>DeltaPsi<span style="color: #666666">*</span>energy)
-    <span style="color: #008000; font-weight: bold">return</span> energy, EnergyDer
-
-
-<span style="color: #408080; font-style: italic">#Here starts the main program with variable declarations</span>
-NumberParticles <span style="color: #666666">=</span> <span style="color: #666666">2</span>
-Dimension <span style="color: #666666">=</span> <span style="color: #666666">2</span>
-<span style="color: #408080; font-style: italic"># guess for variational parameters</span>
-alpha <span style="color: #666666">=</span> <span style="color: #666666">0.9</span>
-beta <span style="color: #666666">=</span> <span style="color: #666666">0.2</span>
-<span style="color: #408080; font-style: italic"># Set up iteration using gradient descent method</span>
-Energy <span style="color: #666666">=</span> <span style="color: #666666">0</span>
-EDerivative <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((<span style="color: #666666">2</span>), np<span style="color: #666666">.</span>double)
-eta <span style="color: #666666">=</span> <span style="color: #666666">0.01</span>
-Niterations <span style="color: #666666">=</span> <span style="color: #666666">50</span>
-<span style="color: #408080; font-style: italic"># </span>
-<span style="color: #008000; font-weight: bold">for</span> <span style="color: #008000">iter</span> <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Niterations):
-    Energy, EDerivative <span style="color: #666666">=</span> EnergyMinimization(alpha,beta)
-    alphagradient <span style="color: #666666">=</span> EDerivative[<span style="color: #666666">0</span>]
-    betagradient <span style="color: #666666">=</span> EDerivative[<span style="color: #666666">1</span>]
-    alpha <span style="color: #666666">-=</span> eta<span style="color: #666666">*</span>alphagradient
-    beta <span style="color: #666666">-=</span> eta<span style="color: #666666">*</span>betagradient 
-
-<span style="color: #008000">print</span>(alpha, beta)
-<span style="color: #008000">print</span>(Energy, EDerivative[<span style="color: #666666">0</span>], EDerivative[<span style="color: #666666">1</span>])
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="using-broyden-s-algorithm-in-scipy">Using Broyden's algorithm in scipy </h2>
-<p>The following function uses the above described BFGS algorithm. Here we have defined a function which calculates the energy and a function which computes the first derivative.</p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
-<span style="color: #408080; font-style: italic"># Using gaussian rng for new positions and Metropolis- Hastings </span>
-<span style="color: #408080; font-style: italic"># Added energy minimization using the BFGS algorithm, see p. 136 of https://www.springer.com/it/book/9780387303031</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> exp, sqrt
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">random</span> <span style="color: #008000; font-weight: bold">import</span> random, seed, normalvariate
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">mpl_toolkits.mplot3d</span> <span style="color: #008000; font-weight: bold">import</span> Axes3D
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib</span> <span style="color: #008000; font-weight: bold">import</span> cm
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib.ticker</span> <span style="color: #008000; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">scipy.optimize</span> <span style="color: #008000; font-weight: bold">import</span> minimize
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">sys</span>
-
-
-<span style="color: #408080; font-style: italic"># Trial wave function for the 2-electron quantum dot in two dims</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">WaveFunction</span>(r,alpha,beta):
-    r1 <span style="color: #666666">=</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
-    r2 <span style="color: #666666">=</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> r12<span style="color: #666666">/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    <span style="color: #008000; font-weight: bold">return</span> exp(<span style="color: #666666">-0.5*</span>alpha<span style="color: #666666">*</span>(r1<span style="color: #666666">+</span>r2)<span style="color: #666666">+</span>deno)
-
-<span style="color: #408080; font-style: italic"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">LocalEnergy</span>(r,alpha,beta):
-    
-    r1 <span style="color: #666666">=</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r2 <span style="color: #666666">=</span> (r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    deno2 <span style="color: #666666">=</span> deno<span style="color: #666666">*</span>deno
-    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0.5*</span>(<span style="color: #666666">1-</span>alpha<span style="color: #666666">*</span>alpha)<span style="color: #666666">*</span>(r1 <span style="color: #666666">+</span> r2) <span style="color: #666666">+2.0*</span>alpha <span style="color: #666666">+</span> <span style="color: #666666">1.0/</span>r12<span style="color: #666666">+</span>deno2<span style="color: #666666">*</span>(alpha<span style="color: #666666">*</span>r12<span style="color: #666666">-</span>deno2<span style="color: #666666">+2*</span>beta<span style="color: #666666">*</span>deno<span style="color: #666666">-1.0/</span>r12)
-
-<span style="color: #408080; font-style: italic"># Derivate of wave function ansatz as function of variational parameters</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">DerivativeWFansatz</span>(r,alpha,beta):
-    
-    WfDer  <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((<span style="color: #666666">2</span>), np<span style="color: #666666">.</span>double)
-    r1 <span style="color: #666666">=</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r2 <span style="color: #666666">=</span> (r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    deno2 <span style="color: #666666">=</span> deno<span style="color: #666666">*</span>deno
-    WfDer[<span style="color: #666666">0</span>] <span style="color: #666666">=</span> <span style="color: #666666">-0.5*</span>(r1<span style="color: #666666">+</span>r2)
-    WfDer[<span style="color: #666666">1</span>] <span style="color: #666666">=</span> <span style="color: #666666">-</span>r12<span style="color: #666666">*</span>r12<span style="color: #666666">*</span>deno2
-    <span style="color: #008000; font-weight: bold">return</span>  WfDer
-
-<span style="color: #408080; font-style: italic"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">QuantumForce</span>(r,alpha,beta):
-
-    qforce <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
-    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
-    qforce[<span style="color: #666666">0</span>,:] <span style="color: #666666">=</span> <span style="color: #666666">-2*</span>r[<span style="color: #666666">0</span>,:]<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>(r[<span style="color: #666666">0</span>,:]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,:])<span style="color: #666666">*</span>deno<span style="color: #666666">*</span>deno<span style="color: #666666">/</span>r12
-    qforce[<span style="color: #666666">1</span>,:] <span style="color: #666666">=</span> <span style="color: #666666">-2*</span>r[<span style="color: #666666">1</span>,:]<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>(r[<span style="color: #666666">1</span>,:]<span style="color: #666666">-</span>r[<span style="color: #666666">0</span>,:])<span style="color: #666666">*</span>deno<span style="color: #666666">*</span>deno<span style="color: #666666">/</span>r12
-    <span style="color: #008000; font-weight: bold">return</span> qforce
-    
-
-<span style="color: #408080; font-style: italic"># Computing the derivative of the energy and the energy </span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">EnergyDerivative</span>(x0):
-
-    
-    <span style="color: #408080; font-style: italic"># Parameters in the Fokker-Planck simulation of the quantum force</span>
-    D <span style="color: #666666">=</span> <span style="color: #666666">0.5</span>
-    TimeStep <span style="color: #666666">=</span> <span style="color: #666666">0.05</span>
-    NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">10000</span>
-    <span style="color: #408080; font-style: italic"># positions</span>
-    PositionOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    PositionNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    <span style="color: #408080; font-style: italic"># Quantum force</span>
-    QuantumForceOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    QuantumForceNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-
-    energy <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    DeltaE <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    alpha <span style="color: #666666">=</span> x0[<span style="color: #666666">0</span>]
-    beta <span style="color: #666666">=</span> x0[<span style="color: #666666">1</span>]
-    EnergyDer <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    DeltaPsi <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    DerivativePsiE <span style="color: #666666">=</span> <span style="color: #666666">0.0</span> 
-    <span style="color: #408080; font-style: italic">#Initial position</span>
-    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
-        <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-            PositionOld[i,j] <span style="color: #666666">=</span> normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)
-    wfold <span style="color: #666666">=</span> WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld <span style="color: #666666">=</span> QuantumForce(PositionOld,alpha, beta)
-
-    <span style="color: #408080; font-style: italic">#Loop over MC MCcycles</span>
-    <span style="color: #008000; font-weight: bold">for</span> MCcycle <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberMCcycles):
-        <span style="color: #408080; font-style: italic">#Trial position moving one particle at the time</span>
-        <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
-            <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                PositionNew[i,j] <span style="color: #666666">=</span> PositionOld[i,j]<span style="color: #666666">+</span>normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)<span style="color: #666666">+</span>\
-                                       QuantumForceOld[i,j]<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*</span>D
-            wfnew <span style="color: #666666">=</span> WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew <span style="color: #666666">=</span> QuantumForce(PositionNew,alpha, beta)
-            GreensFunction <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-            <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                GreensFunction <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">+</span>QuantumForceNew[i,j])<span style="color: #666666">*</span>\
-	                              (D<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">-</span>QuantumForceNew[i,j])<span style="color: #666666">-</span>\
-                                      PositionNew[i,j]<span style="color: #666666">+</span>PositionOld[i,j])
-      
-            GreensFunction <span style="color: #666666">=</span> exp(GreensFunction)
-            ProbabilityRatio <span style="color: #666666">=</span> GreensFunction<span style="color: #666666">*</span>wfnew<span style="color: #666666">**2/</span>wfold<span style="color: #666666">**2</span>
-            <span style="color: #408080; font-style: italic">#Metropolis-Hastings test to see whether we accept the move</span>
-            <span style="color: #008000; font-weight: bold">if</span> random() <span style="color: #666666">&lt;=</span> ProbabilityRatio:
-                <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                    PositionOld[i,j] <span style="color: #666666">=</span> PositionNew[i,j]
-                    QuantumForceOld[i,j] <span style="color: #666666">=</span> QuantumForceNew[i,j]
-                wfold <span style="color: #666666">=</span> wfnew
-        DeltaE <span style="color: #666666">=</span> LocalEnergy(PositionOld,alpha,beta)
-        DerPsi <span style="color: #666666">=</span> DerivativeWFansatz(PositionOld,alpha,beta)
-        DeltaPsi <span style="color: #666666">+=</span> DerPsi
-        energy <span style="color: #666666">+=</span> DeltaE
-        DerivativePsiE <span style="color: #666666">+=</span> DerPsi<span style="color: #666666">*</span>DeltaE
-            
-    <span style="color: #408080; font-style: italic"># We calculate mean values</span>
-    energy <span style="color: #666666">/=</span> NumberMCcycles
-    DerivativePsiE <span style="color: #666666">/=</span> NumberMCcycles
-    DeltaPsi <span style="color: #666666">/=</span> NumberMCcycles
-    EnergyDer  <span style="color: #666666">=</span> <span style="color: #666666">2*</span>(DerivativePsiE<span style="color: #666666">-</span>DeltaPsi<span style="color: #666666">*</span>energy)
-    <span style="color: #008000; font-weight: bold">return</span> EnergyDer
-
-
-<span style="color: #408080; font-style: italic"># Computing the expectation value of the local energy </span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">Energy</span>(x0):
-    <span style="color: #408080; font-style: italic"># Parameters in the Fokker-Planck simulation of the quantum force</span>
-    D <span style="color: #666666">=</span> <span style="color: #666666">0.5</span>
-    TimeStep <span style="color: #666666">=</span> <span style="color: #666666">0.05</span>
-    <span style="color: #408080; font-style: italic"># positions</span>
-    PositionOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    PositionNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    <span style="color: #408080; font-style: italic"># Quantum force</span>
-    QuantumForceOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-    QuantumForceNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
-
-    energy <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    DeltaE <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    alpha <span style="color: #666666">=</span> x0[<span style="color: #666666">0</span>]
-    beta <span style="color: #666666">=</span> x0[<span style="color: #666666">1</span>]
-    NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">10000</span>
-    <span style="color: #408080; font-style: italic">#Initial position</span>
-    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
-        <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-            PositionOld[i,j] <span style="color: #666666">=</span> normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)
-    wfold <span style="color: #666666">=</span> WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld <span style="color: #666666">=</span> QuantumForce(PositionOld,alpha, beta)
-
-    <span style="color: #408080; font-style: italic">#Loop over MC MCcycles</span>
-    <span style="color: #008000; font-weight: bold">for</span> MCcycle <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberMCcycles):
-        <span style="color: #408080; font-style: italic">#Trial position moving one particle at the time</span>
-        <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
-            <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                PositionNew[i,j] <span style="color: #666666">=</span> PositionOld[i,j]<span style="color: #666666">+</span>normalvariate(<span style="color: #666666">0.0</span>,<span style="color: #666666">1.0</span>)<span style="color: #666666">*</span>sqrt(TimeStep)<span style="color: #666666">+</span>\
-                                       QuantumForceOld[i,j]<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*</span>D
-            wfnew <span style="color: #666666">=</span> WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew <span style="color: #666666">=</span> QuantumForce(PositionNew,alpha, beta)
-            GreensFunction <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-            <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                GreensFunction <span style="color: #666666">+=</span> <span style="color: #666666">0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">+</span>QuantumForceNew[i,j])<span style="color: #666666">*</span>\
-	                              (D<span style="color: #666666">*</span>TimeStep<span style="color: #666666">*0.5*</span>(QuantumForceOld[i,j]<span style="color: #666666">-</span>QuantumForceNew[i,j])<span style="color: #666666">-</span>\
-                                      PositionNew[i,j]<span style="color: #666666">+</span>PositionOld[i,j])
-      
-            GreensFunction <span style="color: #666666">=</span> exp(GreensFunction)
-            ProbabilityRatio <span style="color: #666666">=</span> GreensFunction<span style="color: #666666">*</span>wfnew<span style="color: #666666">**2/</span>wfold<span style="color: #666666">**2</span>
-            <span style="color: #408080; font-style: italic">#Metropolis-Hastings test to see whether we accept the move</span>
-            <span style="color: #008000; font-weight: bold">if</span> random() <span style="color: #666666">&lt;=</span> ProbabilityRatio:
-                <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
-                    PositionOld[i,j] <span style="color: #666666">=</span> PositionNew[i,j]
-                    QuantumForceOld[i,j] <span style="color: #666666">=</span> QuantumForceNew[i,j]
-                wfold <span style="color: #666666">=</span> wfnew
-        DeltaE <span style="color: #666666">=</span> LocalEnergy(PositionOld,alpha,beta)
-        energy <span style="color: #666666">+=</span> DeltaE
-            
-    <span style="color: #408080; font-style: italic"># We calculate mean values</span>
-    energy <span style="color: #666666">/=</span> NumberMCcycles
-    <span style="color: #008000; font-weight: bold">return</span> energy
-
-
-
-
-<span style="color: #408080; font-style: italic">#Here starts the main program with variable declarations</span>
-NumberParticles <span style="color: #666666">=</span> <span style="color: #666666">2</span>
-Dimension <span style="color: #666666">=</span> <span style="color: #666666">2</span>
-<span style="color: #408080; font-style: italic"># seed for rng generator </span>
-seed()
-<span style="color: #408080; font-style: italic"># guess for variational parameters</span>
-x0 <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array([<span style="color: #666666">0.9</span>,<span style="color: #666666">0.2</span>])
-<span style="color: #408080; font-style: italic"># Using Broydens method</span>
-res <span style="color: #666666">=</span> minimize(Energy, x0, method<span style="color: #666666">=</span><span style="color: #BA2121">&#39;BFGS&#39;</span>, jac<span style="color: #666666">=</span>EnergyDerivative, options<span style="color: #666666">=</span>{<span style="color: #BA2121">&#39;gtol&#39;</span>: <span style="color: #666666">1e-4</span>,<span style="color: #BA2121">&#39;disp&#39;</span>: <span style="color: #008000; font-weight: bold">True</span>})
-<span style="color: #008000">print</span>(res<span style="color: #666666">.</span>x)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>Note that the <b>minimize</b> function returns the finale values for the variable \( \alpha=x0[0] \) and \( \beta=x0[1] \) in the array \( x \). </p>
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="brief-reminder-on-newton-raphson-s-method">Brief reminder on Newton-Raphson's method </h2>
@@ -1420,6 +786,9 @@ $$
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come">Simple codes for  steepest descent and conjugate gradient using a \( 2\times 2 \) matrix, in c++, Python code to come </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
@@ -1466,39 +835,42 @@ using namespace  std;
     </div>
   </div>
 </div>
+</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="the-routine-for-the-steepest-descent-method">The routine for the steepest descent method </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
 
-
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
   <div class="input">
     <div class="inner_cell">
       <div class="input_area">
         <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;">Vector<span style="color: #bbbbbb"> </span><span style="color: #0000FF">SteepestDescent</span>(Matrix<span style="color: #bbbbbb"> </span>A,<span style="color: #bbbbbb"> </span>Vector<span style="color: #bbbbbb"> </span>b,<span style="color: #bbbbbb"> </span>Vector<span style="color: #bbbbbb"> </span>x0){<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #B00040">int</span><span style="color: #bbbbbb"> </span>IterMax,<span style="color: #bbbbbb"> </span>i;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #B00040">int</span><span style="color: #bbbbbb"> </span>dim<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>x0.Dimension();<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">const</span><span style="color: #bbbbbb"> </span><span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span>tolerance<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">1.0e-14</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>Vector<span style="color: #bbbbbb"> </span>x(dim),f(dim),z(dim);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span>c,alpha,d;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>IterMax<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">30</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>x<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>x0;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>r<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>A<span style="color: #666666">*</span>x<span style="color: #666666">-</span>b;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>i<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">while</span><span style="color: #bbbbbb"> </span>(i<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;=</span><span style="color: #bbbbbb"> </span>IterMax){<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>z<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>A<span style="color: #666666">*</span>r;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>c<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>dot(r,r);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>alpha<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>c<span style="color: #666666">/</span>dot(r,z);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>x<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>x<span style="color: #bbbbbb"> </span><span style="color: #666666">-</span><span style="color: #bbbbbb"> </span>alpha<span style="color: #666666">*</span>r;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>r<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb">  </span>A<span style="color: #666666">*</span>x<span style="color: #666666">-</span>b;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">if</span>(sqrt(dot(r,r))<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;</span><span style="color: #bbbbbb"> </span>tolerance)<span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">break</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>i<span style="color: #666666">++</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>}<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">return</span><span style="color: #bbbbbb"> </span>x;<span style="color: #bbbbbb"></span>
-}<span style="color: #bbbbbb"></span>
+  <pre style="line-height: 125%;">Vector SteepestDescent(Matrix A, Vector b, Vector x0){
+  <span style="color: #008000">int</span> IterMax, i;
+  <span style="color: #008000">int</span> dim <span style="color: #666666">=</span> x0<span style="color: #666666">.</span>Dimension();
+  const double tolerance <span style="color: #666666">=</span> <span style="color: #666666">1.0e-14</span>;
+  Vector x(dim),f(dim),z(dim);
+  double c,alpha,d;
+  IterMax <span style="color: #666666">=</span> <span style="color: #666666">30</span>;
+  x <span style="color: #666666">=</span> x0;
+  r <span style="color: #666666">=</span> A<span style="color: #666666">*</span>x<span style="color: #666666">-</span>b;
+  i <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
+  <span style="color: #008000; font-weight: bold">while</span> (i <span style="color: #666666">&lt;=</span> IterMax){
+    z <span style="color: #666666">=</span> A<span style="color: #666666">*</span>r;
+    c <span style="color: #666666">=</span> dot(r,r);
+    alpha <span style="color: #666666">=</span> c<span style="color: #666666">/</span>dot(r,z);
+    x <span style="color: #666666">=</span> x <span style="color: #666666">-</span> alpha<span style="color: #666666">*</span>r;
+    r <span style="color: #666666">=</span>  A<span style="color: #666666">*</span>x<span style="color: #666666">-</span>b;
+    <span style="color: #008000; font-weight: bold">if</span>(sqrt(dot(r,r)) <span style="color: #666666">&lt;</span> tolerance) <span style="color: #008000; font-weight: bold">break</span>;
+    i<span style="color: #666666">++</span>;
+  }
+  <span style="color: #008000; font-weight: bold">return</span> x;
+}
 </pre>
 </div>
       </div>
@@ -1512,6 +884,7 @@ using namespace  std;
       </div>
     </div>
   </div>
+</div>
 </div>
 
 
@@ -1907,36 +1280,36 @@ $$
 <b></b>
 <p>
 
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
   <div class="input">
     <div class="inner_cell">
       <div class="input_area">
         <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #bbbbbb">  </span>Vector<span style="color: #bbbbbb"> </span><span style="color: #0000FF">ConjugateGradient</span>(Matrix<span style="color: #bbbbbb"> </span>A,<span style="color: #bbbbbb"> </span>Vector<span style="color: #bbbbbb"> </span>b,<span style="color: #bbbbbb"> </span>Vector<span style="color: #bbbbbb"> </span>x0){<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #B00040">int</span><span style="color: #bbbbbb"> </span>dim<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>x0.Dimension();<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">const</span><span style="color: #bbbbbb"> </span><span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span>tolerance<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">1.0e-14</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>Vector<span style="color: #bbbbbb"> </span>x(dim),r(dim),v(dim),z(dim);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span>c,t,d;<span style="color: #bbbbbb"></span>
+  <pre style="line-height: 125%;">  Vector ConjugateGradient(Matrix A, Vector b, Vector x0){
+  <span style="color: #008000">int</span> dim <span style="color: #666666">=</span> x0<span style="color: #666666">.</span>Dimension();
+  const double tolerance <span style="color: #666666">=</span> <span style="color: #666666">1.0e-14</span>;
+  Vector x(dim),r(dim),v(dim),z(dim);
+  double c,t,d;
 
-<span style="color: #bbbbbb">  </span>x<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>x0;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>r<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>b<span style="color: #bbbbbb"> </span><span style="color: #666666">-</span><span style="color: #bbbbbb"> </span>A<span style="color: #666666">*</span>x;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>v<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>r;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>c<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>dot(r,r);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #B00040">int</span><span style="color: #bbbbbb"> </span>i<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>;<span style="color: #bbbbbb"> </span>IterMax<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>dim;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">while</span>(i<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;=</span><span style="color: #bbbbbb"> </span>IterMax){<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>z<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>A<span style="color: #666666">*</span>v;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>t<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>c<span style="color: #666666">/</span>dot(v,z);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>x<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>x<span style="color: #bbbbbb"> </span><span style="color: #666666">+</span><span style="color: #bbbbbb"> </span>t<span style="color: #666666">*</span>v;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>r<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>r<span style="color: #bbbbbb"> </span><span style="color: #666666">-</span><span style="color: #bbbbbb"> </span>t<span style="color: #666666">*</span>z;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>d<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>dot(r,r);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span><span style="color: #008000; font-weight: bold">if</span>(sqrt(d)<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;</span><span style="color: #bbbbbb"> </span>tolerance)<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">break</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>v<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>r<span style="color: #bbbbbb"> </span><span style="color: #666666">+</span><span style="color: #bbbbbb"> </span>(d<span style="color: #666666">/</span>c)<span style="color: #666666">*</span>v;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">    </span>c<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>d;<span style="color: #bbbbbb">  </span>i<span style="color: #666666">++</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>}<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">return</span><span style="color: #bbbbbb"> </span>x;<span style="color: #bbbbbb"></span>
-}<span style="color: #bbbbbb"> </span>
+  x <span style="color: #666666">=</span> x0;
+  r <span style="color: #666666">=</span> b <span style="color: #666666">-</span> A<span style="color: #666666">*</span>x;
+  v <span style="color: #666666">=</span> r;
+  c <span style="color: #666666">=</span> dot(r,r);
+  <span style="color: #008000">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; IterMax <span style="color: #666666">=</span> dim;
+  <span style="color: #008000; font-weight: bold">while</span>(i <span style="color: #666666">&lt;=</span> IterMax){
+    z <span style="color: #666666">=</span> A<span style="color: #666666">*</span>v;
+    t <span style="color: #666666">=</span> c<span style="color: #666666">/</span>dot(v,z);
+    x <span style="color: #666666">=</span> x <span style="color: #666666">+</span> t<span style="color: #666666">*</span>v;
+    r <span style="color: #666666">=</span> r <span style="color: #666666">-</span> t<span style="color: #666666">*</span>z;
+    d <span style="color: #666666">=</span> dot(r,r);
+    <span style="color: #008000; font-weight: bold">if</span>(sqrt(d) <span style="color: #666666">&lt;</span> tolerance)
+      <span style="color: #008000; font-weight: bold">break</span>;
+    v <span style="color: #666666">=</span> r <span style="color: #666666">+</span> (d<span style="color: #666666">/</span>c)<span style="color: #666666">*</span>v;
+    c <span style="color: #666666">=</span> d;  i<span style="color: #666666">++</span>;
+  }
+  <span style="color: #008000; font-weight: bold">return</span> x;
+} 
 </pre>
 </div>
       </div>
@@ -2311,33 +1684,33 @@ Here we present a program, which you also can find at the webpage of the course 
 <b></b>
 <p>
 
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
   <div class="input">
     <div class="inner_cell">
       <div class="input_area">
         <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic">//   Main function begins here</span>
-<span style="color: #B00040">int</span><span style="color: #bbbbbb"> </span><span style="color: #0000FF">main</span>()<span style="color: #bbbbbb"></span>
-{<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span><span style="color: #B00040">int</span><span style="color: #bbbbbb"> </span>n,<span style="color: #bbbbbb"> </span>iter;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span><span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span>gtol,<span style="color: #bbbbbb"> </span>fret;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span><span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span>alpha;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span>n<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">1</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #408080; font-style: italic">//   reserve space in memory for vectors containing the variational</span>
-<span style="color: #408080; font-style: italic">//   parameters</span>
-<span style="color: #bbbbbb">     </span>Vector<span style="color: #bbbbbb"> </span>g(n),<span style="color: #bbbbbb"> </span>p(n);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span>cout<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Read in guess for alpha&quot;</span><span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span>endl;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span>cin<span style="color: #bbbbbb"> </span><span style="color: #666666">&gt;&gt;</span><span style="color: #bbbbbb"> </span>alpha;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span>gtol<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #666666">1.0e-5</span>;<span style="color: #bbbbbb"></span>
-<span style="color: #408080; font-style: italic">//   now call dfmin and compute the minimum</span>
-<span style="color: #bbbbbb">     </span>p(<span style="color: #666666">0</span>)<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>alpha;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span>dfpmin(p,<span style="color: #bbbbbb"> </span>n,<span style="color: #bbbbbb"> </span>gtol,<span style="color: #bbbbbb"> </span><span style="color: #666666">&amp;</span>iter,<span style="color: #bbbbbb"> </span><span style="color: #666666">&amp;</span>fret,<span style="color: #bbbbbb"> </span>Efunction,<span style="color: #bbbbbb"> </span>dEfunction);<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span>cout<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Value of energy minimum = &quot;</span><span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span>fret<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span>endl;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span>cout<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Number of iterations = &quot;</span><span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span>iter<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span>endl;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">     </span>cout<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span><span style="color: #BA2121">&quot;Value of alpha at minimum = &quot;</span><span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span>p(<span style="color: #666666">0</span>)<span style="color: #bbbbbb"> </span><span style="color: #666666">&lt;&lt;</span><span style="color: #bbbbbb"> </span>endl;<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">      </span><span style="color: #008000; font-weight: bold">return</span><span style="color: #bbbbbb"> </span><span style="color: #666666">0</span>;<span style="color: #bbbbbb"></span>
-}<span style="color: #bbbbbb">  </span><span style="color: #408080; font-style: italic">// end of main program</span>
+  <pre style="line-height: 125%;"><span style="color: #666666">//</span>   Main function begins here
+<span style="color: #008000">int</span> main()
+{
+     <span style="color: #008000">int</span> n, <span style="color: #008000">iter</span>;
+     double gtol, fret;
+     double alpha;
+     n <span style="color: #666666">=</span> <span style="color: #666666">1</span>;
+<span style="color: #666666">//</span>   reserve space <span style="color: #AA22FF; font-weight: bold">in</span> memory <span style="color: #008000; font-weight: bold">for</span> vectors containing the variational
+<span style="color: #666666">//</span>   parameters
+     Vector g(n), p(n);
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Read in guess for alpha&quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
+     cin <span style="color: #666666">&gt;&gt;</span> alpha;
+     gtol <span style="color: #666666">=</span> <span style="color: #666666">1.0e-5</span>;
+<span style="color: #666666">//</span>   now call dfmin <span style="color: #AA22FF; font-weight: bold">and</span> compute the minimum
+     p(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> alpha;
+     dfpmin(p, n, gtol, <span style="color: #666666">&amp;</span><span style="color: #008000">iter</span>, <span style="color: #666666">&amp;</span>fret, Efunction, dEfunction);
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of energy minimum = &quot;</span> <span style="color: #666666">&lt;&lt;</span> fret <span style="color: #666666">&lt;&lt;</span> endl;
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Number of iterations = &quot;</span> <span style="color: #666666">&lt;&lt;</span> <span style="color: #008000">iter</span> <span style="color: #666666">&lt;&lt;</span> endl;
+     cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;Value of alpha at minimum = &quot;</span> <span style="color: #666666">&lt;&lt;</span> p(<span style="color: #666666">0</span>) <span style="color: #666666">&lt;&lt;</span> endl;
+      <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0</span>;
+}  <span style="color: #666666">//</span> end of main program
 </pre>
 </div>
       </div>
@@ -2366,24 +1739,24 @@ It uses the first derivatives only. The BFGS algorithm has proven good performan
 These functions need to be changed when you want to your own derivatives.
 </p>
 
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
   <div class="input">
     <div class="inner_cell">
       <div class="input_area">
         <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic">//  this function defines the expectation value of the local energy</span>
-<span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span><span style="color: #0000FF">Efunction</span>(Vector<span style="color: #bbbbbb">  </span><span style="color: #666666">&amp;</span>x)<span style="color: #bbbbbb"></span>
-{<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #B00040">double</span><span style="color: #bbbbbb"> </span>value<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*0.5+1.0/</span>(<span style="color: #666666">8*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>));<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">return</span><span style="color: #bbbbbb"> </span>value;<span style="color: #bbbbbb"></span>
-}<span style="color: #bbbbbb"> </span><span style="color: #408080; font-style: italic">// end of function to evaluate</span>
+  <pre style="line-height: 125%;"><span style="color: #666666">//</span>  this function defines the expectation value of the local energy
+double Efunction(Vector  <span style="color: #666666">&amp;</span>x)
+{
+  double value <span style="color: #666666">=</span> x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*0.5+1.0/</span>(<span style="color: #666666">8*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>));
+  <span style="color: #008000; font-weight: bold">return</span> value;
+} <span style="color: #666666">//</span> end of function to evaluate
 
-<span style="color: #408080; font-style: italic">//  this function defines the derivative of the energy </span>
-<span style="color: #B00040">void</span><span style="color: #bbbbbb"> </span><span style="color: #0000FF">dEfunction</span>(Vector<span style="color: #bbbbbb"> </span><span style="color: #666666">&amp;</span>x,<span style="color: #bbbbbb"> </span>Vector<span style="color: #bbbbbb"> </span><span style="color: #666666">&amp;</span>g)<span style="color: #bbbbbb"></span>
-{<span style="color: #bbbbbb"></span>
-<span style="color: #bbbbbb">  </span>g(<span style="color: #666666">0</span>)<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>x(<span style="color: #666666">0</span>)<span style="color: #666666">-1.0/</span>(<span style="color: #666666">4*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>));<span style="color: #bbbbbb"></span>
-}<span style="color: #bbbbbb"> </span><span style="color: #408080; font-style: italic">// end of function to evaluate</span>
+<span style="color: #666666">//</span>  this function defines the derivative of the energy 
+void dEfunction(Vector <span style="color: #666666">&amp;</span>x, Vector <span style="color: #666666">&amp;</span>g)
+{
+  g(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> x(<span style="color: #666666">0</span>)<span style="color: #666666">-1.0/</span>(<span style="color: #666666">4*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>)<span style="color: #666666">*</span>x(<span style="color: #666666">0</span>));
+} <span style="color: #666666">//</span> end of function to evaluate
 </pre>
 </div>
       </div>
@@ -2406,9 +1779,10 @@ After roughly 10-20 iterations I got a converged result in terms of \( \alpha \)
 </p>
 </div>
 
+
 <!-- ------------------- end of main content --------------- -->
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2022, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 1999-2023, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
 </center>
 </body>
 </html>

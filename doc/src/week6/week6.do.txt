@@ -1,18 +1,20 @@
-TITLE: Week 8 February 20-24: Gradient Methods
+TITLE: Week 9 February 27-March 3: Gradient Methods
 AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Isotope Beams, Michigan State University, East Lansing, Michigan, USA
 DATE: today
 
-
 !split
-===== Overview of week 8, February 20-24 =====
+===== Overview of week 9 =====
 !bblock  Topics
-* Gradient Descent methods, Steepest descent and Stochastic gradient descent
-* Conjugate Gradient Descent 
-* "Video of Lecture TBA":"https://youtu.be/"
-* "Handwritten notes":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2022/NotesFebruary23.pdf"
-* To be added: stochastich back flow (see Sorella, PRB 2011).
+* Gradient methods:
+  o Semi-Newton methods (Broyden's algorithm)
+  o Steepest descent and conjugate gradient descent
+  o Stochastic gradient descent
 !eblock
 
+!bblock Video and handwriten notes
+o "Video of lecture TBA":"https://youtu.be/"
+o "Handwritten notes":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2022/NotesMarch2.pdf"
+!eblock
 
 
 !bblock Teaching Material, videos and written material
@@ -20,538 +22,6 @@ DATE: today
 * "Video on the Conjugate Gradient methods":"https://www.youtube.com/watch?v=eAYohMUpPMA&ab_channel=TomCarlone"
 * Recommended background literature, "Convex Optimization":"https://web.stanford.edu/~boyd/cvxbook/" by Boyd and Vandenberghe. Their "lecture slides":"https://web.stanford.edu/~boyd/cvxbook/bv_cvxslides.pdf" are very useful (warning, these are some 300 pages).
 !eblock
-
-
-
-!split
-=====  Top-down start =====
-
-* We will start with a top-down view, with a simple harmonic oscillator problem in one dimension as case.
-* Thereafter we continue with implementing the simplest possible steepest descent approach to our two-electron problem with an electrostatic (Coulomb) interaction. Our code includes also importance sampling. The simple Python code here illustrates the basic elements which need to be included in our own code.
-* Then we move on to the mathematical description of various gradient methods.
-
-
-!split
-===== Motivation  ===== 
-!bblock
-Our aim with this part of the project is to be able to
-* find an optimal value for the variational parameters using only some few Monte Carlo cycles
-* use these optimal values for the variational parameters to perform a large-scale Monte Carlo calculation
-
-To achieve this will look at methods like *Steepest descent* and the *conjugate gradient method*. Both these methods allow us to find
-the minima of a multivariable  function like our energy (function of several variational parameters). 
-Alternatively, you can always use Newton's method. In particular, since we will normally have one variational parameter,
-Newton's method can be easily used in finding the minimum of the local energy.
- 
-!eblock
-
-!split
-===== Simple example and demonstration ===== 
-
-Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
-For the harmonic oscillator in one-dimension we have a  trial wave function and probability
-!bt
-\[
-\psi_T(x;\alpha) = \exp{-(\frac{1}{2}\alpha^2x^2)},
-\]
-!et 
-which results in a local energy 
-!bt
-\[
-\frac{1}{2}\left(\alpha^2+x^2(1-\alpha^4)\right).
-\]
-!et
-We can compare our numerically calculated energies with the exact energy as function of $\alpha$
-!bt
-\[
-\overline{E}[\alpha] = \frac{1}{4}\left(\alpha^2+\frac{1}{\alpha^2}\right).
-\]
-!et
-
-
-!split
-===== Simple example and demonstration ===== 
-!bblock
-The derivative of the energy with respect to $\alpha$ gives
-!bt
-\begin{equation*}
-\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \frac{1}{2}\alpha-\frac{1}{2\alpha^3}
-\end{equation*}
-!et
-and a second derivative which is always positive (meaning that we find a minimum)
-!bt
-\begin{equation*}
-\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = \frac{1}{2}+\frac{3}{2\alpha^4}
-\end{equation*}
-!et
-The condition
-!bt
-\begin{equation*}
-\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
-\end{equation*}
-!et
-gives the optimal $\alpha=1$, as expected.
-!eblock
-
-!split
-===== Exercise: Find the local energy for the harmonic oscillator =====
-!bsubex
-Derive the local energy for the harmonic oscillator in one dimension and find its expectation value.
-!esubex
-!bsubex
-Show also that the optimal value of optimal $\alpha=1$
-!esubex
-!bsubex
-Repeat the above steps in two dimensions for $N$ bosons or electrons. What is the optimal value of $\alpha$?
-!esubex
-
-
-!split
-===== Variance in the simple model ===== 
-!bblock
-We can also minimize the variance. In our simple model the variance is
-
-!bt
-\[
-\sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}^2.
-\]
-!et
-which yields a second derivative which is always positive.
-!eblock
-
-
-!split
-===== Computing the derivatives ===== 
-!bblock
-
-In general we end up computing the expectation value of the energy in terms 
-of some parameters $\alpha_0,\alpha_1,\dots,\alpha_n$
-and we search for a minimum in this multi-variable parameter space.  
-This leads to an energy minimization problem *where we need the derivative of the energy as a function of the variational parameters*.
-
-In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
-However, in our actual calculations the energy is represented by a multi-dimensional integral with several variational parameters.
-How can we can then obtain the derivatives of the energy with respect to the variational parameters without having 
-to resort to expensive numerical derivations? 
-
-!eblock
-
-
-!split
-===== Expressions for finding the derivatives of the local energy ===== 
-!bblock
-
-To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.  
-
-Let us define 
-!bt
-\[
-\bar{E}_{\alpha}=\frac{d\langle  E_L[\alpha]\rangle}{d\alpha}.
-\]
-!et
-as the derivative of the energy with respect to the variational parameter $\alpha$ (we limit ourselves to one parameter only).
-In the above example this was easy and we obtain a simple expression for the derivative.
-We define also the derivative of the trial function (skipping the subindex $T$) as 
-!bt
-\[
-\bar{\psi}_{\alpha}=\frac{d\psi[\alpha]\rangle}{d\alpha}.
-\]
-!et  
-!eblock
-
-
-
-!split
-===== Derivatives of the local energy ===== 
-!bblock
-The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)
-!bt
-\[
-\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
-\]
-!et
-From a computational point of view it means that you need to compute the expectation values of 
-!bt
-\[
-\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle,
-\]
-!et
-and
-!bt
-\[
-\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
-\]
-!et
-!eblock
-
-
-!split
-===== Exercise: General expression for the derivative of the energy =====
-!bsubex
-Show that 
-!bt
-\[
-\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
-\]
-!et
-!esubex
-!bsubex
-Find the corresponding expression for the variance.
-!esubex
-
-
-
-
-!split
-=====  Python program for 2-electrons in 2 dimensions =====
-!bc pycod
-# 2-electron VMC code for 2dim quantum dot with importance sampling
-# Using gaussian rng for new positions and Metropolis- Hastings 
-# Added energy minimization with gradient descent using fixed step size
-# To do: replace with optimization codes from scipy and/or use stochastic gradient descent
-from math import exp, sqrt
-from random import random, seed, normalvariate
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-import sys
-
-
-
-# Trial wave function for the 2-electron quantum dot in two dims
-def WaveFunction(r,alpha,beta):
-    r1 = r[0,0]**2 + r[0,1]**2
-    r2 = r[1,0]**2 + r[1,1]**2
-    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
-    deno = r12/(1+beta*r12)
-    return exp(-0.5*alpha*(r1+r2)+deno)
-
-# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
-def LocalEnergy(r,alpha,beta):
-    
-    r1 = (r[0,0]**2 + r[0,1]**2)
-    r2 = (r[1,0]**2 + r[1,1]**2)
-    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
-    deno = 1.0/(1+beta*r12)
-    deno2 = deno*deno
-    return 0.5*(1-alpha*alpha)*(r1 + r2) +2.0*alpha + 1.0/r12+deno2*(alpha*r12-deno2+2*beta*deno-1.0/r12)
-
-# Derivate of wave function ansatz as function of variational parameters
-def DerivativeWFansatz(r,alpha,beta):
-    
-    WfDer  = np.zeros((2), np.double)
-    r1 = (r[0,0]**2 + r[0,1]**2)
-    r2 = (r[1,0]**2 + r[1,1]**2)
-    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
-    deno = 1.0/(1+beta*r12)
-    deno2 = deno*deno
-    WfDer[0] = -0.5*(r1+r2)
-    WfDer[1] = -r12*r12*deno2
-    return  WfDer
-
-# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
-def QuantumForce(r,alpha,beta):
-
-    qforce = np.zeros((NumberParticles,Dimension), np.double)
-    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
-    deno = 1.0/(1+beta*r12)
-    qforce[0,:] = -2*r[0,:]*alpha*(r[0,:]-r[1,:])*deno*deno/r12
-    qforce[1,:] = -2*r[1,:]*alpha*(r[1,:]-r[0,:])*deno*deno/r12
-    return qforce
-    
-
-# Computing the derivative of the energy and the energy 
-def EnergyMinimization(alpha, beta):
-
-    NumberMCcycles= 10000
-    # Parameters in the Fokker-Planck simulation of the quantum force
-    D = 0.5
-    TimeStep = 0.05
-    # positions
-    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
-    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
-    # Quantum force
-    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
-    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
-
-    # seed for rng generator 
-    seed()
-    energy = 0.0
-    DeltaE = 0.0
-    EnergyDer = np.zeros((2), np.double)
-    DeltaPsi = np.zeros((2), np.double)
-    DerivativePsiE = np.zeros((2), np.double)
-    #Initial position
-    for i in range(NumberParticles):
-        for j in range(Dimension):
-            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
-    wfold = WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
-
-    #Loop over MC MCcycles
-    for MCcycle in range(NumberMCcycles):
-        #Trial position moving one particle at the time
-        for i in range(NumberParticles):
-            for j in range(Dimension):
-                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
-                                       QuantumForceOld[i,j]*TimeStep*D
-            wfnew = WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
-            GreensFunction = 0.0
-            for j in range(Dimension):
-                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
-	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
-                                      PositionNew[i,j]+PositionOld[i,j])
-      
-            GreensFunction = exp(GreensFunction)
-            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
-            #Metropolis-Hastings test to see whether we accept the move
-            if random() <= ProbabilityRatio:
-                for j in range(Dimension):
-                    PositionOld[i,j] = PositionNew[i,j]
-                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
-                wfold = wfnew
-        DeltaE = LocalEnergy(PositionOld,alpha,beta)
-        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
-        DeltaPsi += DerPsi
-        energy += DeltaE
-        DerivativePsiE += DerPsi*DeltaE
-            
-    # We calculate mean values
-    energy /= NumberMCcycles
-    DerivativePsiE /= NumberMCcycles
-    DeltaPsi /= NumberMCcycles
-    EnergyDer  = 2*(DerivativePsiE-DeltaPsi*energy)
-    return energy, EnergyDer
-
-
-#Here starts the main program with variable declarations
-NumberParticles = 2
-Dimension = 2
-# guess for variational parameters
-alpha = 0.9
-beta = 0.2
-# Set up iteration using gradient descent method
-Energy = 0
-EDerivative = np.zeros((2), np.double)
-eta = 0.01
-Niterations = 50
-# 
-for iter in range(Niterations):
-    Energy, EDerivative = EnergyMinimization(alpha,beta)
-    alphagradient = EDerivative[0]
-    betagradient = EDerivative[1]
-    alpha -= eta*alphagradient
-    beta -= eta*betagradient 
-
-print(alpha, beta)
-print(Energy, EDerivative[0], EDerivative[1])
-
-
-
-!ec
-
-
-!split
-===== Using Broyden's algorithm in scipy =====
-The following function uses the above described BFGS algorithm. Here we have defined a function which calculates the energy and a function which computes the first derivative.
-!bc pycod
-# 2-electron VMC code for 2dim quantum dot with importance sampling
-# Using gaussian rng for new positions and Metropolis- Hastings 
-# Added energy minimization using the BFGS algorithm, see p. 136 of https://www.springer.com/it/book/9780387303031
-from math import exp, sqrt
-from random import random, seed, normalvariate
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from scipy.optimize import minimize
-import sys
-
-
-# Trial wave function for the 2-electron quantum dot in two dims
-def WaveFunction(r,alpha,beta):
-    r1 = r[0,0]**2 + r[0,1]**2
-    r2 = r[1,0]**2 + r[1,1]**2
-    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
-    deno = r12/(1+beta*r12)
-    return exp(-0.5*alpha*(r1+r2)+deno)
-
-# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
-def LocalEnergy(r,alpha,beta):
-    
-    r1 = (r[0,0]**2 + r[0,1]**2)
-    r2 = (r[1,0]**2 + r[1,1]**2)
-    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
-    deno = 1.0/(1+beta*r12)
-    deno2 = deno*deno
-    return 0.5*(1-alpha*alpha)*(r1 + r2) +2.0*alpha + 1.0/r12+deno2*(alpha*r12-deno2+2*beta*deno-1.0/r12)
-
-# Derivate of wave function ansatz as function of variational parameters
-def DerivativeWFansatz(r,alpha,beta):
-    
-    WfDer  = np.zeros((2), np.double)
-    r1 = (r[0,0]**2 + r[0,1]**2)
-    r2 = (r[1,0]**2 + r[1,1]**2)
-    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
-    deno = 1.0/(1+beta*r12)
-    deno2 = deno*deno
-    WfDer[0] = -0.5*(r1+r2)
-    WfDer[1] = -r12*r12*deno2
-    return  WfDer
-
-# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
-def QuantumForce(r,alpha,beta):
-
-    qforce = np.zeros((NumberParticles,Dimension), np.double)
-    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
-    deno = 1.0/(1+beta*r12)
-    qforce[0,:] = -2*r[0,:]*alpha*(r[0,:]-r[1,:])*deno*deno/r12
-    qforce[1,:] = -2*r[1,:]*alpha*(r[1,:]-r[0,:])*deno*deno/r12
-    return qforce
-    
-
-# Computing the derivative of the energy and the energy 
-def EnergyDerivative(x0):
-
-    
-    # Parameters in the Fokker-Planck simulation of the quantum force
-    D = 0.5
-    TimeStep = 0.05
-    NumberMCcycles= 10000
-    # positions
-    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
-    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
-    # Quantum force
-    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
-    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
-
-    energy = 0.0
-    DeltaE = 0.0
-    alpha = x0[0]
-    beta = x0[1]
-    EnergyDer = 0.0
-    DeltaPsi = 0.0
-    DerivativePsiE = 0.0 
-    #Initial position
-    for i in range(NumberParticles):
-        for j in range(Dimension):
-            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
-    wfold = WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
-
-    #Loop over MC MCcycles
-    for MCcycle in range(NumberMCcycles):
-        #Trial position moving one particle at the time
-        for i in range(NumberParticles):
-            for j in range(Dimension):
-                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
-                                       QuantumForceOld[i,j]*TimeStep*D
-            wfnew = WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
-            GreensFunction = 0.0
-            for j in range(Dimension):
-                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
-	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
-                                      PositionNew[i,j]+PositionOld[i,j])
-      
-            GreensFunction = exp(GreensFunction)
-            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
-            #Metropolis-Hastings test to see whether we accept the move
-            if random() <= ProbabilityRatio:
-                for j in range(Dimension):
-                    PositionOld[i,j] = PositionNew[i,j]
-                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
-                wfold = wfnew
-        DeltaE = LocalEnergy(PositionOld,alpha,beta)
-        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
-        DeltaPsi += DerPsi
-        energy += DeltaE
-        DerivativePsiE += DerPsi*DeltaE
-            
-    # We calculate mean values
-    energy /= NumberMCcycles
-    DerivativePsiE /= NumberMCcycles
-    DeltaPsi /= NumberMCcycles
-    EnergyDer  = 2*(DerivativePsiE-DeltaPsi*energy)
-    return EnergyDer
-
-
-# Computing the expectation value of the local energy 
-def Energy(x0):
-    # Parameters in the Fokker-Planck simulation of the quantum force
-    D = 0.5
-    TimeStep = 0.05
-    # positions
-    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
-    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
-    # Quantum force
-    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
-    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
-
-    energy = 0.0
-    DeltaE = 0.0
-    alpha = x0[0]
-    beta = x0[1]
-    NumberMCcycles= 10000
-    #Initial position
-    for i in range(NumberParticles):
-        for j in range(Dimension):
-            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
-    wfold = WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
-
-    #Loop over MC MCcycles
-    for MCcycle in range(NumberMCcycles):
-        #Trial position moving one particle at the time
-        for i in range(NumberParticles):
-            for j in range(Dimension):
-                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
-                                       QuantumForceOld[i,j]*TimeStep*D
-            wfnew = WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
-            GreensFunction = 0.0
-            for j in range(Dimension):
-                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
-	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
-                                      PositionNew[i,j]+PositionOld[i,j])
-      
-            GreensFunction = exp(GreensFunction)
-            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
-            #Metropolis-Hastings test to see whether we accept the move
-            if random() <= ProbabilityRatio:
-                for j in range(Dimension):
-                    PositionOld[i,j] = PositionNew[i,j]
-                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
-                wfold = wfnew
-        DeltaE = LocalEnergy(PositionOld,alpha,beta)
-        energy += DeltaE
-            
-    # We calculate mean values
-    energy /= NumberMCcycles
-    return energy
-
-
-
-
-#Here starts the main program with variable declarations
-NumberParticles = 2
-Dimension = 2
-# seed for rng generator 
-seed()
-# guess for variational parameters
-x0 = np.array([0.9,0.2])
-# Using Broydens method
-res = minimize(Energy, x0, method='BFGS', jac=EnergyDerivative, options={'gtol': 1e-4,'disp': True})
-print(res.x)
-!ec
-Note that the _minimize_ function returns the finale values for the variable $\alpha=x0[0]$ and $\beta=x0[1]$ in the array $x$. 
-
-
-
 
 
 
@@ -974,6 +444,7 @@ leading to the iterative scheme
 
 !split
 ===== Simple codes for  steepest descent and conjugate gradient using a $2\times 2$ matrix, in c++, Python code to come =====
+!bblock
 !bc pycod
 #include <cmath>
 #include <iostream>
@@ -1001,11 +472,12 @@ int main(int  argc, char * argv[]){
   cout << endl;
 }
 !ec
+!eblock
 
 !split
 ===== The routine for the steepest descent method =====
-
-!bc cppcod
+!bblock
+!bc pycod
 Vector SteepestDescent(Matrix A, Vector b, Vector x0){
   int IterMax, i;
   int dim = x0.Dimension();
@@ -1028,6 +500,7 @@ Vector SteepestDescent(Matrix A, Vector b, Vector x0){
   return x;
 }
 !ec
+!eblock
 
 
 !split
@@ -1276,7 +749,7 @@ which gives
 !split
 ===== Simple implementation of the Conjugate gradient algorithm =====
 !bblock
-!bc cppcod
+!bc pycod
   Vector ConjugateGradient(Matrix A, Vector b, Vector x0){
   int dim = x0.Dimension();
   const double tolerance = 1.0e-14;
@@ -1605,7 +1078,7 @@ Below we show only excerpts from the main program. For the full program, see the
 !split
 ===== Finding the minimum of the harmonic oscillator model in one dimension =====
 !bblock
-!bc cppcod
+!bc pycod
 //   Main function begins here
 int main()
 {
@@ -1640,7 +1113,7 @@ The functions _Efunction_ and _dEfunction_ compute the expectation value of the 
 They use the the quasi-Newton method of "Broyden, Fletcher, Goldfarb, and Shanno (BFGS)":"https://www.springer.com/it/book/9780387303031"
 It uses the first derivatives only. The BFGS algorithm has proven good performance even for non-smooth optimizations. 
 These functions need to be changed when you want to your own derivatives.
-!bc cppcod
+!bc pycod
 //  this function defines the expectation value of the local energy
 double Efunction(Vector  &x)
 {
@@ -1659,5 +1132,7 @@ cycles per call to get a new value of $\langle E_L[\alpha]\rangle$.
 When I compute the local energy I also compute its derivative.
 After roughly 10-20 iterations I got a converged result in terms of $\alpha$.
 !eblock
+
+
 
 
