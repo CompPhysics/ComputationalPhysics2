@@ -29,11 +29,13 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 
 ### Week 7, February 13-17, 2023
 
+- Video of lecture at https://youtu.be/JPmU4BWTd2Y
 - Importance sampling, Fokker-Planck and Langevin Equations
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week4/html/week4.html
 
 ### Week 8, February 20-24, 2023
 
+- Video of lecture at https://youtu.be/KieUu9ni60w
 - Optimization, gradient descent methods and finalization of discussion on importance sampling
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week5/html/week5.html
 
