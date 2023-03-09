@@ -42,15 +42,14 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 
 ### Week 9, February 27-March 3, 2023
 
-- Optimization, Stochastic Gradient Descent
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week6/html/week6.html
+- Lab session only
 
 
 ### Week 10, March 6-10, 2023
 
-- Gradient Descent and start resampling methods
+- Gradient Descent and optmization
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week7/html/week7.html
-
+- Video of lecture at https://youtu.be/-iBHxpE9byQ
 
 ### Week 11, March 13-17, 2023
 
