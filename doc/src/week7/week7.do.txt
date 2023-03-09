@@ -1,678 +1,2928 @@
-TITLE: Week 10, March 6-10: Resampling Techniques, Bootstrap and Blocking
-AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Isotope Beams, Michigan State University, East Lansing, Michigan, USA
+TITLE: March 6-10: Gradient Methods
+AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA
 DATE: March 6-10
 
 
 !split
-===== Overview of week 10, March 6-10 =====
+===== Overview of week March 6-10 =====
 !bblock  Topics
-* Resampling Techniques and statistics: Bootstrap and Blocking 
-* Discussion of onebody densities
-* "Video of lecture TBA":"https://youtu.be/"
-* "Handwritten notes":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2023/NotesMarch16.pdf"
+* Gradient methods:
+  - Semi-Newton methods (Broyden's algorithm)
+  - Steepest descent and conjugate gradient descent
+  - Stochastic gradient descent
 !eblock
+
 
 !bblock Teaching Material, videos and written material
-* Overview video on the "Bootstrap method":"https://www.youtube.com/watch?v=O_Fj4q8lgmc&ab_channel=MarinStatsLectures-RProgramming%26Statistics"
-* "Marius Johnson's Master thesis on the Blocking Method":"https://www.duo.uio.no/bitstream/handle/10852/68360/PhysRevE.98.043304.pdf?sequence=2&isAllowed=y"
-!eblock
-
-
-
-!split
-===== Why resampling methods ? ===== 
-!bblock Statistical analysis
-    * Our simulations can be treated as *computer experiments*. This is particularly the case for Monte Carlo methods
-    * The results can be analysed with the same statistical tools as we would use analysing experimental data.
-    * As in all experiments, we are looking for expectation values and an estimate of how accurate they are, i.e., possible sources for errors.
-
-
-!eblock    
-
-!split
-=====  Statistical analysis ===== 
-!bblock 
-    * As in other experiments, many numerical  experiments have two classes of errors:
-      * Statistical errors
-      * Systematical errors
-    * Statistical errors can be estimated using standard tools from statistics
-    * Systematical errors are method specific and must be treated differently from case to case. 
-!eblock    
-
-
-
-
-!split
-===== Statistics, wrapping up from last week =====
-!bblock
-Let us analyze the problem by splitting up the correlation term into
-partial sums of the form:
-!bt
-\[
-f_d = \frac{1}{n-d}\sum_{k=1}^{n-d}(x_k - \bar x_n)(x_{k+d} - \bar x_n)
-\]
-!et
-The correlation term of the error can now be rewritten in terms of
-$f_d$
-!bt
-\[
-\frac{2}{n}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n) =
-2\sum_{d=1}^{n-1} f_d
-\]
-!et
-The value of $f_d$ reflects the correlation between measurements
-separated by the distance $d$ in the sample samples.  Notice that for
-$d=0$, $f$ is just the sample variance, $\mathrm{var}(x)$. If we divide $f_d$
-by $\mathrm{var}(x)$, we arrive at the so called *autocorrelation function*
-!bt
-\[
-\kappa_d = \frac{f_d}{\mathrm{var}(x)}
-\]
-!et
-which gives us a useful measure of pairwise correlations
-starting always at $1$ for $d=0$.
-!eblock
-
-
-!split
-===== Statistics, final expression =====
-!bblock
-The sample error can now be
-written in terms of the autocorrelation function:
-
-!bt
-\begin{align}
-\mathrm{err}_X^2 &=
-\frac{1}{n}\mathrm{var}(x)+\frac{2}{n}\cdot\mathrm{var}(x)\sum_{d=1}^{n-1}
-\frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
-\left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
-&=\frac{\tau}{n}\cdot\mathrm{var}(x)
-\end{align}
-
-!et
-and we see that $\mathrm{err}_X$ can be expressed in terms the
-uncorrelated sample variance times a correction factor $\tau$ which
-accounts for the correlation between measurements. We call this
-correction factor the *autocorrelation time*:
-!bt
-\begin{equation}
-\tau = 1+2\sum_{d=1}^{n-1}\kappa_d
-label{eq:autocorrelation_time}
-\end{equation}
-!et
-!eblock
-
-!split
-===== Statistics, effective number of correlations =====
-!bblock
-For a correlation free experiment, $\tau$
-equals 1.
-
-We can interpret a sequential
-correlation as an effective reduction of the number of measurements by
-a factor $\tau$. The effective number of measurements becomes:
-!bt
-\[
-n_\mathrm{eff} = \frac{n}{\tau}
-\]
-!et
-To neglect the autocorrelation time $\tau$ will always cause our
-simple uncorrelated estimate of $\mathrm{err}_X^2\approx \mathrm{var}(x)/n$ to
-be less than the true sample error. The estimate of the error will be
-too *good*. On the other hand, the calculation of the full
-autocorrelation time poses an efficiency problem if the set of
-measurements is very large.
-!eblock
-
-
-
-
-
-
-!split
-===== Can we understand this? Time Auto-correlation Function =====
-!bblock
-
-The so-called time-displacement autocorrelation $\phi(t)$ for a quantity $\mathbf{M}$ is given by
-!bt
-\[
-\phi(t) = \int dt' \left[\mathbf{M}(t')-\langle \mathbf{M} \rangle\right]\left[\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle\right],
-\]
-!et
-which can be rewritten as 
-!bt
-\[
-\phi(t) = \int dt' \left[\mathbf{M}(t')\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle^2\right],
-\]
-!et
-where $\langle \mathbf{M} \rangle$ is the average value and
-$\mathbf{M}(t)$ its instantaneous value. We can discretize this function as follows, where we used our
-set of computed values $\mathbf{M}(t)$ for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
-!bt
-\[
-\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\mathbf{M}(t'+t)
--\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\times
-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t'+t).
-label{eq:phitf}
-\]
-!et
-!eblock
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-
-One should be careful with times close to $t_{\mathrm{max}}$, the upper limit of the sums 
-becomes small and we end up integrating over a rather small time interval. This means that the statistical
-error in $\phi(t)$ due to the random nature of the fluctuations in $\mathbf{M}(t)$ can become large.
-
-One should therefore choose $t \ll t_{\mathrm{max}}$.
-
-Note that the variable $\mathbf{M}$ can be any expectation values of interest.
-
-
-
-The time-correlation function gives a measure of the correlation between the various values of the variable 
-at a time $t'$ and a time $t'+t$. If we multiply the values of $\mathbf{M}$ at these two different times,
-we will get a positive contribution if they are fluctuating in the same direction, or a negative value
-if they fluctuate in the opposite direction. If we then integrate over time, or use the discretized version of, the time correlation function $\phi(t)$ should take a non-zero value if the fluctuations are 
-correlated, else it should gradually go to zero. For times a long way apart 
-the different values of $\mathbf{M}$  are most likely 
-uncorrelated and $\phi(t)$ should be zero.
+* These lecture notes
+* "Video on the Conjugate Gradient methods":"https://www.youtube.com/watch?v=eAYohMUpPMA&ab_channel=TomCarlone"
+* Recommended background literature, "Convex Optimization":"https://web.stanford.edu/~boyd/cvxbook/" by Boyd and Vandenberghe. Their "lecture slides":"https://web.stanford.edu/~boyd/cvxbook/bv_cvxslides.pdf" are very useful (warning, these are some 300 pages).
 !eblock
 
 
 
 
 !split
-===== Time Auto-correlation Function =====
-!bblock
-We can derive the correlation time by observing that our Metropolis algorithm is based on a random
-walk in the space of all  possible spin configurations. 
-Our probability 
-distribution function $\mathbf{\hat{w}}(t)$ after a given number of time steps $t$ could be written as
-!bt
-\[
-   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}^t\hat{w}}(0),
-\]
-!et
-with $\mathbf{\hat{w}}(0)$ the distribution at $t=0$ and $\mathbf{\hat{W}}$ representing the 
-transition probability matrix. 
-We can always expand $\mathbf{\hat{w}}(0)$ in terms of the right eigenvectors of 
-$\mathbf{\hat{v}}$ of $\mathbf{\hat{W}}$ as 
-!bt
-\[
-    \mathbf{\hat{w}}(0)  = \sum_i\alpha_i\mathbf{\hat{v}}_i,
-\]
-!et
-resulting in 
-!bt
-\[
-   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}}^t\mathbf{\hat{w}}(0)=\mathbf{\hat{W}}^t\sum_i\alpha_i\mathbf{\hat{v}}_i=
-\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i,
-\]
-!et
-with $\lambda_i$ the $i^{\mathrm{th}}$ eigenvalue corresponding to  
-the eigenvector $\mathbf{\hat{v}}_i$. 
-!eblock
+===== Brief reminder on Newton-Raphson's method =====
 
+Let us quickly remind ourselves how we derive the above method.
+
+Perhaps the most celebrated of all one-dimensional root-finding
+routines is Newton's method, also called the Newton-Raphson
+method. This method  requires the evaluation of both the
+function $f$ and its derivative $f'$ at arbitrary points. 
+If you can only calculate the derivative
+numerically and/or your function is not of the smooth type, we
+normally discourage the use of this method.
+
+!split
+===== The equations =====
+
+The Newton-Raphson formula consists geometrically of extending the
+tangent line at a current point until it crosses zero, then setting
+the next guess to the abscissa of that zero-crossing.  The mathematics
+behind this method is rather simple. Employing a Taylor expansion for
+$x$ sufficiently close to the solution $s$, we have
+
+
+!bt
+\[
+    f(s)=0=f(x)+(s-x)f'(x)+\frac{(s-x)^2}{2}f''(x) +\dots.
+    \label{eq:taylornr}
+\]
+!et
+
+For small enough values of the function and for well-behaved
+functions, the terms beyond linear are unimportant, hence we obtain
+
+
+!bt
+\[
+   f(x)+(s-x)f'(x)\approx 0,
+\]
+!et
+yielding
+!bt
+\[
+   s\approx x-\frac{f(x)}{f'(x)}.
+\]
+!et
+
+Having in mind an iterative procedure, it is natural to start iterating with
+!bt
+\[
+   x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}.
+\]
+!et
+
+!split
+===== Simple geometric interpretation =====
+
+The above is Newton-Raphson's method. It has a simple geometric
+interpretation, namely $x_{n+1}$ is the point where the tangent from
+$(x_n,f(x_n))$ crosses the $x$-axis.  Close to the solution,
+Newton-Raphson converges fast to the desired result. However, if we
+are far from a root, where the higher-order terms in the series are
+important, the Newton-Raphson formula can give grossly inaccurate
+results. For instance, the initial guess for the root might be so far
+from the true root as to let the search interval include a local
+maximum or minimum of the function.  If an iteration places a trial
+guess near such a local extremum, so that the first derivative nearly
+vanishes, then Newton-Raphson may fail totally
+
+
+!split
+===== Extending to more than one variable =====
+
+Newton's method can be generalized to systems of several non-linear equations
+and variables. Consider the case with two equations
+!bt
+\[
+   \begin{array}{cc} f_1(x_1,x_2) &=0\\
+                     f_2(x_1,x_2) &=0,\end{array}
+\]
+!et
+which we Taylor expand to obtain
+
+!bt
+\[
+   \begin{array}{cc} 0=f_1(x_1+h_1,x_2+h_2)=&f_1(x_1,x_2)+h_1
+                     \partial f_1/\partial x_1+h_2
+                     \partial f_1/\partial x_2+\dots\\
+                     0=f_2(x_1+h_1,x_2+h_2)=&f_2(x_1,x_2)+h_1
+                     \partial f_2/\partial x_1+h_2
+                     \partial f_2/\partial x_2+\dots
+                       \end{array}.
+\]
+!et
+Defining the Jacobian matrix $\hat{J}$ we have
+!bt
+\[
+ \hat{J}=\left( \begin{array}{cc}
+                         \partial f_1/\partial x_1  & \partial f_1/\partial x_2 \\
+                          \partial f_2/\partial x_1     &\partial f_2/\partial x_2
+             \end{array} \right),
+\]
+!et
+we can rephrase Newton's method as
+!bt
+\[
+\left(\begin{array}{c} x_1^{n+1} \\ x_2^{n+1} \end{array} \right)=
+\left(\begin{array}{c} x_1^{n} \\ x_2^{n} \end{array} \right)+
+\left(\begin{array}{c} h_1^{n} \\ h_2^{n} \end{array} \right),
+\]
+!et
+where we have defined
+!bt
+\[
+   \left(\begin{array}{c} h_1^{n} \\ h_2^{n} \end{array} \right)=
+   -{\bf \hat{J}}^{-1}
+   \left(\begin{array}{c} f_1(x_1^{n},x_2^{n}) \\ f_2(x_1^{n},x_2^{n}) \end{array} \right).
+\]
+!et
+We need thus to compute the inverse of the Jacobian matrix and it
+is to understand that difficulties  may
+arise in case $\hat{J}$ is nearly singular.
+
+It is rather straightforward to extend the above scheme to systems of
+more than two non-linear equations. In our case, the Jacobian matrix is given by the Hessian that represents the second derivative of cost function. 
 
 
 
 !split
-===== Time Auto-correlation Function =====
-!bblock
-If we assume that $\lambda_0$ is the largest eigenvector we see that in the limit $t\rightarrow \infty$,
-$\mathbf{\hat{w}}(t)$ becomes proportional to the corresponding eigenvector 
-$\mathbf{\hat{v}}_0$. This is our steady state or final distribution. 
+===== Steepest descent =====
 
-We can relate this property to an observable like the mean energy.
-With the probabilty $\mathbf{\hat{w}}(t)$ (which in our case is the squared trial wave function) we
-can write the expectation values as 
+The basic idea of gradient descent is
+that a function $F(\mathbf{x})$, 
+$\mathbf{x} \equiv (x_1,\cdots,x_n)$, decreases fastest if one goes from $\bf {x}$ in the
+direction of the negative gradient $-\nabla F(\mathbf{x})$.
+
+It can be shown that if 
 !bt
 \[
- \langle \mathbf{M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}\mathbf{M}_{\mu},
-\] 
+\mathbf{x}_{k+1} = \mathbf{x}_k - \gamma_k \nabla F(\mathbf{x}_k),
+\]
+!et
+with $\gamma_k > 0$.
+
+For $\gamma_k$ small enough, then $F(\mathbf{x}_{k+1}) \leq
+F(\mathbf{x}_k)$. This means that for a sufficiently small $\gamma_k$
+we are always moving towards smaller function values, i.e a minimum.
+
+!split 
+===== More on Steepest descent =====
+
+The previous observation is the basis of the method of steepest
+descent, which is also referred to as just gradient descent (GD). One
+starts with an initial guess $\mathbf{x}_0$ for a minimum of $F$ and
+computes new approximations according to
+
+!bt
+\[
+\mathbf{x}_{k+1} = \mathbf{x}_k - \gamma_k \nabla F(\mathbf{x}_k), \ \ k \geq 0.
+\]
+!et
+
+The parameter $\gamma_k$ is often referred to as the step length or
+the learning rate within the context of Machine Learning.
+
+!split 
+===== The ideal =====
+
+Ideally the sequence $\{\mathbf{x}_k \}_{k=0}$ converges to a global
+minimum of the function $F$. In general we do not know if we are in a
+global or local minimum. In the special case when $F$ is a convex
+function, all local minima are also global minima, so in this case
+gradient descent can converge to the global solution. The advantage of
+this scheme is that it is conceptually simple and straightforward to
+implement. However the method in this form has some severe
+limitations:
+
+In machine learing we are often faced with non-convex high dimensional
+cost functions with many local minima. Since GD is deterministic we
+will get stuck in a local minimum, if the method converges, unless we
+have a very good intial guess. This also implies that the scheme is
+sensitive to the chosen initial condition.
+
+Note that the gradient is a function of $\mathbf{x} =
+(x_1,\cdots,x_n)$ which makes it expensive to compute numerically.
+
+
+!split 
+===== The sensitiveness of the gradient descent ===== 
+
+The gradient descent method 
+is sensitive to the choice of learning rate $\gamma_k$. This is due
+to the fact that we are only guaranteed that $F(\mathbf{x}_{k+1}) \leq
+F(\mathbf{x}_k)$ for sufficiently small $\gamma_k$. The problem is to
+determine an optimal learning rate. If the learning rate is chosen too
+small the method will take a long time to converge and if it is too
+large we can experience erratic behavior.
+
+Many of these shortcomings can be alleviated by introducing
+randomness. One such method is that of Stochastic Gradient Descent
+(SGD), see below.
+
+
+!split 
+===== Convex functions ===== 
+
+Ideally we want our cost/loss function to be convex(concave).
+
+First we give the definition of a convex set: A set $C$ in
+$\mathbb{R}^n$ is said to be convex if, for all $x$ and $y$ in $C$ and
+all $t \in (0,1)$ , the point $(1 − t)x + ty$ also belongs to
+C. Geometrically this means that every point on the line segment
+connecting $x$ and $y$ is in $C$ as discussed below.
+
+The convex subsets of $\mathbb{R}$ are the intervals of
+$\mathbb{R}$. Examples of convex sets of $\mathbb{R}^2$ are the
+regular polygons (triangles, rectangles, pentagons, etc...).
+
+!split
+===== Convex function =====
+
+_Convex function_: Let $X \subset \mathbb{R}^n$ be a convex set. Assume that the function $f: X \rightarrow \mathbb{R}$ is continuous, then $f$ is said to be convex if $$f(tx_1 + (1-t)x_2) \leq tf(x_1) + (1-t)f(x_2) $$ for all $x_1, x_2 \in X$ and for all $t \in [0,1]$. If $\leq$ is replaced with a strict inequaltiy in the definition, we demand $x_1 \neq x_2$ and $t\in(0,1)$ then $f$ is said to be strictly convex. For a single variable function, convexity means that if you draw a straight line connecting $f(x_1)$ and $f(x_2)$, the value of the function on the interval $[x_1,x_2]$ is always below the line as illustrated below.
+
+!split
+===== Conditions on convex functions =====
+
+In the following we state first and second-order conditions which
+ensures convexity of a function $f$. We write $D_f$ to denote the
+domain of $f$, i.e the subset of $R^n$ where $f$ is defined. For more
+details and proofs we refer to: "S. Boyd and L. Vandenberghe. Convex Optimization. Cambridge University Press":"http://stanford.edu/boyd/cvxbook/, 2004".
+
+!bblock First order condition
+Suppose $f$ is differentiable (i.e $\nabla f(x)$ is well defined for
+all $x$ in the domain of $f$). Then $f$ is convex if and only if $D_f$
+is a convex set and $$f(y) \geq f(x) + \nabla f(x)^T (y-x) $$ holds
+for all $x,y \in D_f$. This condition means that for a convex function
+the first order Taylor expansion (right hand side above) at any point
+a global under estimator of the function. To convince yourself you can
+make a drawing of $f(x) = x^2+1$ and draw the tangent line to $f(x)$ and
+note that it is always below the graph.  
+!eblock
+
+!bblock Second order condition 
+Assume that $f$ is twice
+differentiable, i.e the Hessian matrix exists at each point in
+$D_f$. Then $f$ is convex if and only if $D_f$ is a convex set and its
+Hessian is positive semi-definite for all $x\in D_f$. For a
+single-variable function this reduces to $f''(x) \geq 0$. Geometrically this means that $f$ has nonnegative curvature
+everywhere.
+!eblock
+
+This condition is particularly useful since it gives us an procedure for determining if the function under consideration is convex, apart from using the definition.
+
+!split
+===== More on convex functions =====
+
+The next result is of great importance to us and the reason why we are
+going on about convex functions. In machine learning we frequently
+have to minimize a loss/cost function in order to find the best
+parameters for the model we are considering. 
+
+Ideally we want the
+global minimum (for high-dimensional models it is hard to know
+if we have local or global minimum). However, if the cost/loss function
+is convex the following result provides invaluable information:
+
+!bblock Any minimum is global for convex functions
+Consider the problem of finding $x \in \mathbb{R}^n$ such that $f(x)$
+is minimal, where $f$ is convex and differentiable. Then, any point
+$x^*$ that satisfies $\nabla f(x^*) = 0$ is a global minimum.
+!eblock
+
+This result means that if we know that the cost/loss function is convex and we are able to find a minimum, we are guaranteed that it is a global minimum.
+
+!split
+===== Some simple problems =====
+
+o Show that $f(x)=x^2$ is convex for $x \in \mathbb{R}$ using the definition of convexity. Hint: If you re-write the definition, $f$ is convex if the following holds for all $x,y \in D_f$ and any $\lambda \in [0,1]$ $\lambda f(x)+(1-\lambda)f(y)-f(\lambda x + (1-\lambda) y ) \geq 0$.
+
+o Using the second order condition show that the following functions are convex on the specified domain.
+ * $f(x) = e^x$ is convex for $x \in \mathbb{R}$.
+ * $g(x) = -\ln(x)$ is convex for $x \in (0,\infty)$.
+o Let $f(x) = x^2$ and $g(x) = e^x$. Show that $f(g(x))$ and $g(f(x))$ is convex for $x \in \mathbb{R}$. Also show that if $f(x)$ is any convex function than $h(x) = e^{f(x)}$ is convex.
+
+o A norm is any function that satisfy the following properties
+ * $f(\alpha x) = |\alpha| f(x)$ for all $\alpha \in \mathbb{R}$.
+ * $f(x+y) \leq f(x) + f(y)$
+ * $f(x) \leq 0$ for all $x \in \mathbb{R}^n$ with equality if and only if $x = 0$
+
+Using the definition of convexity, try to show that a function satisfying the properties above is convex (the third condition is not needed to show this).
+
+
+!split
+===== Standard steepest descent =====
+
+
+Before we proceed, we would like to discuss the approach called the
+_standard Steepest descent_, which again leads to us having to be able
+to compute a matrix. It belongs to the class of Conjugate Gradient methods (CG).
+
+"The success of the CG method":"https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf"
+for finding solutions of non-linear problems is based on the theory
+of conjugate gradients for linear systems of equations. It belongs to
+the class of iterative methods for solving problems from linear
+algebra of the type 
+!bt 
+\begin{equation*} 
+\hat{A}\hat{x} = \hat{b}.
+\end{equation*} 
 !et 
-or as the scalar of a  vector product
+
+In the iterative process we end up with a problem like
+
 !bt
- \[
- \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
-\] 
-!et 
-with $\mathbf{m}$ being the vector whose elements are the values of $\mathbf{M}_{\mu}$ in its 
-various microstates $\mu$.
-!eblock
+\begin{equation*}
+  \hat{r}= \hat{b}-\hat{A}\hat{x},
+\end{equation*}
+!et
+where $\hat{r}$ is the so-called residual or error in the iterative process.
+
+When we have found the exact solution, $\hat{r}=0$.
+
+!split
+===== Gradient method =====
+
+The residual is zero when we reach the minimum of the quadratic equation
+!bt
+\begin{equation*}
+  P(\hat{x})=\frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T\hat{b},
+\end{equation*}
+!et
+
+with the constraint that the matrix $\hat{A}$ is positive definite and
+symmetric.  This defines also the Hessian and we want it to be  positive definite.  
 
 
 !split
-===== Time Auto-correlation Function =====
+===== Steepest descent  method ===== 
 
+We denote the initial guess for $\hat{x}$ as $\hat{x}_0$. 
+We can assume without loss of generality that
+!bt
+\begin{equation*}
+\hat{x}_0=0,
+\end{equation*}
+!et
+or consider the system
+!bt
+\begin{equation*}
+\hat{A}\hat{z} = \hat{b}-\hat{A}\hat{x}_0,
+\end{equation*}
+!et
+instead.
+
+
+!split
+===== Steepest descent  method ===== 
 !bblock
+One can show that the solution $\hat{x}$ is also the unique minimizer of the quadratic form
+!bt
+\begin{equation*}
+  f(\hat{x}) = \frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T \hat{x} , \quad \hat{x}\in\mathbf{R}^n. 
+\end{equation*}
+!et
+This suggests taking the first basis vector $\hat{r}_1$ (see below for definition) 
+to be the gradient of $f$ at $\hat{x}=\hat{x}_0$, 
+which equals
+!bt
+\begin{equation*}
+\hat{A}\hat{x}_0-\hat{b},
+\end{equation*}
+!et
+and 
+$\hat{x}_0=0$ it is equal $-\hat{b}$.
 
-We rewrite this relation  as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
-\] 
-!et 
-If we define $m_i=\mathbf{\hat{v}}_i\mathbf{m}_i$ as the expectation value of
-$\mathbf{M}$ in the $i^{\mathrm{th}}$ eigenstate we can rewrite the last equation as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
-\] 
-!et
-Since we have that in the limit $t\rightarrow \infty$ the mean value is dominated by the 
-the largest eigenvalue $\lambda_0$, we can rewrite the last equation as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
-\] 
-!et
-We define the quantity
-!bt
-\[
-   \tau_i=-\frac{1}{log\lambda_i},
-\]
-!et
-and rewrite the last expectation value as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
-label{eq:finalmeanm}
-\] 
-!et
 !eblock
 
-
 !split
-===== Time Auto-correlation Function =====
+===== Final expressions ===== 
 !bblock
+We can compute the residual iteratively as
+!bt
+\begin{equation*}
+\hat{r}_{k+1}=\hat{b}-\hat{A}\hat{x}_{k+1},
+ \end{equation*}
+!et
+which equals
+!bt
+\begin{equation*}
+\hat{b}-\hat{A}(\hat{x}_k+\alpha_k\hat{r}_k),
+ \end{equation*}
+!et
+or
+!bt
+\begin{equation*}
+(\hat{b}-\hat{A}\hat{x}_k)-\alpha_k\hat{A}\hat{r}_k,
+ \end{equation*}
+!et
+which gives
 
-The quantities $\tau_i$ are the correlation times for the system. They control also the auto-correlation function 
-discussed above.  The longest correlation time is obviously given by the second largest
-eigenvalue $\tau_1$, which normally defines the correlation time discussed above. For large times, this is the 
-only correlation time that survives. If higher eigenvalues of the transition matrix are well separated from 
-$\lambda_1$ and we simulate long enough,  $\tau_1$ may well define the correlation time. 
-In other cases we may not be able to extract a reliable result for $\tau_1$. 
-Coming back to the time correlation function $\phi(t)$ we can present a more general definition in terms
-of the mean magnetizations $ \langle \mathbf{M}(t) \rangle$. Recalling that the mean value is equal 
-to $ \langle \mathbf{M}(\infty) \rangle$ we arrive at the expectation values
 !bt
 \[
-\phi(t) =\langle \mathbf{M}(0)-\mathbf{M}(\infty)\rangle \langle \mathbf{M}(t)-\mathbf{M}(\infty)\rangle,
+\alpha_k = \frac{\hat{r}_k^T\hat{r}_k}{\hat{r}_k^T\hat{A}\hat{r}_k}
 \]
 !et
-resulting in
+leading to the iterative scheme
 !bt
-\[
-\phi(t) =\sum_{i,j\ne 0}m_i\alpha_im_j\alpha_je^{-t/\tau_i},
-\]
+\begin{equation*}
+\hat{x}_{k+1}=\hat{x}_k-\alpha_k\hat{r}_{k},
+ \end{equation*}
 !et
-which is appropriate for all times.
 !eblock
 
 
+!split
+=====  Code examples for steepest descent =====
 
 !split
-===== Correlation Time =====
+===== Simple codes for  steepest descent and conjugate gradient using a $2\times 2$ matrix, in c++, Python code to come =====
 !bblock
-
-If the correlation function decays exponentially
-!bt
-\[ \phi (t) \sim \exp{(-t/\tau)}\]
-!et
-then the exponential correlation time can be computed as the average
-!bt
-\[   \tau_{\mathrm{exp}}  =  -\langle  \frac{t}{log|\frac{\phi(t)}{\phi(0)}|} \rangle. \]
-!et
-If the decay is exponential, then
-!bt
-\[  \int_0^{\infty} dt \phi(t)  = \int_0^{\infty} dt \phi(0)\exp{(-t/\tau)}  = \tau \phi(0),\] 
-!et
-which  suggests another measure of correlation
-!bt
-\[   \tau_{\mathrm{int}} = \sum_k \frac{\phi(k)}{\phi(0)}, \]
-!et
-called the integrated correlation time.
-!eblock
-
-
-
-
-
-
-!split
-===== Resampling methods: Jackknife and Bootstrap =====
-
-Two famous
-resampling methods are the _independent bootstrap_ and _the jackknife_. 
-
-The jackknife is a special case of the independent bootstrap. Still, the jackknife was made
-popular prior to the independent bootstrap. And as the popularity of
-the independent bootstrap soared, new variants, such as _the dependent bootstrap_.
-
-The Jackknife and independent bootstrap work for
-independent, identically distributed random variables.
-If these conditions are not
-satisfied, the methods will fail.  Yet, it should be said that if the data are
-independent, identically distributed, and we only want to estimate the
-variance of $\overline{X}$ (which often is the case), then there is no
-need for bootstrapping. 
-
-!split
-===== Resampling methods: Jackknife =====
-
-The Jackknife works by making many replicas of the estimator $\widehat{\theta}$. 
-The jackknife is a resampling method, we explained that this happens by scrambling the data in some way. When using the jackknife, this is done by systematically leaving out one observation from the vector of observed values $\hat{x} = (x_1,x_2,\cdots,X_n)$. 
-Let $\hat{x}_i$ denote the vector
-!bt
-\[
-\hat{x}_i = (x_1,x_2,\cdots,x_{i-1},x_{i+1},\cdots,x_n),
-\]
-!et
-
-which equals the vector $\hat{x}$ with the exception that observation
-number $i$ is left out. Using this notation, define
-$\widehat{\theta}_i$ to be the estimator
-$\widehat{\theta}$ computed using $\vec{X}_i$. 
-
-!split
-===== Resampling methods: Jackknife estimator =====
-
-To get an estimate for the bias and
-standard error of $\widehat{\theta}$, use the following
-estimators for each component of $\widehat{\theta}$
-
-!bt
-\[
-\widehat{\mathrm{Bias}}(\widehat \theta,\theta) = (n-1)\left( - \widehat{\theta} + \frac{1}{n}\sum_{i=1}^{n} \widehat \theta_i \right) \qquad \text{and} \qquad \widehat{\sigma}^2_{\widehat{\theta} } = \frac{n-1}{n}\sum_{i=1}^{n}( \widehat{\theta}_i - \frac{1}{n}\sum_{j=1}^{n}\widehat \theta_j )^2.
-\]
-!et
-
-
-!split
-=====  Jackknife code example =====
 !bc pycod
-from numpy import *
-from numpy.random import randint, randn
-from time import time
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include "vectormatrixclass.h"
+using namespace  std;
+//   Main function begins here
+int main(int  argc, char * argv[]){
+  int dim = 2;
+  Vector x(dim),xsd(dim), b(dim),x0(dim);
+  Matrix A(dim,dim);
 
-def jackknife(data, stat):
-    n = len(data);t = zeros(n); inds = arange(n); t0 = time()
-    ## 'jackknifing' by leaving out an observation for each i                                                                                                                      
-    for i in range(n):
-        t[i] = stat(delete(data,i) )
+  // Set our initial guess
+  x0(0) = x0(1) = 0;
+  // Set the matrix
+  A(0,0) =  3;    A(1,0) =  2;   A(0,1) =  2;   A(1,1) =  6;
+  b(0) = 2; b(1) = -8;
+  cout << "The Matrix A that we are using: " << endl;
+  A.Print();
+  cout << endl;
+  xsd = SteepestDescent(A,b,x0);
+  cout << "The approximate solution using Steepest Descent is: " << endl;
+  xsd.Print();
+  cout << endl;
+}
+!ec
+!eblock
 
-    # analysis                                                                                                                                                                     
-    print("Runtime: %g sec" % (time()-t0)); print("Jackknife Statistics :")
-    print("original           bias      std. error")
-    print("%8g %14g %15g" % (stat(data),(n-1)*mean(t)/n, (n*var(t))**.5))
+!split
+===== The routine for the steepest descent method =====
+!bblock
+!bc pycod
+Vector SteepestDescent(Matrix A, Vector b, Vector x0){
+  int IterMax, i;
+  int dim = x0.Dimension();
+  const double tolerance = 1.0e-14;
+  Vector x(dim),f(dim),z(dim);
+  double c,alpha,d;
+  IterMax = 30;
+  x = x0;
+  r = A*x-b;
+  i = 0;
+  while (i <= IterMax){
+    z = A*r;
+    c = dot(r,r);
+    alpha = c/dot(r,z);
+    x = x - alpha*r;
+    r =  A*x-b;
+    if(sqrt(dot(r,r)) < tolerance) break;
+    i++;
+  }
+  return x;
+}
+!ec
+!eblock
 
-    return t
+
+!split
+===== Steepest descent example =====
+
+!bc pycod
+import numpy as np
+import numpy.linalg as la
+
+import scipy.optimize as sopt
+
+import matplotlib.pyplot as pt
+from mpl_toolkits.mplot3d import axes3d
+
+def f(x):
+    return 0.5*x[0]**2 + 2.5*x[1]**2
+
+def df(x):
+    return np.array([x[0], 5*x[1]])
+
+fig = pt.figure()
+ax = fig.gca(projection="3d")
+
+xmesh, ymesh = np.mgrid[-2:2:50j,-2:2:50j]
+fmesh = f(np.array([xmesh, ymesh]))
+ax.plot_surface(xmesh, ymesh, fmesh)
+!ec
+And then as countor plot
+!bc pycod
+pt.axis("equal")
+pt.contour(xmesh, ymesh, fmesh)
+guesses = [np.array([2, 2./5])]
+!ec
+Find guesses
+!bc pycod
+x = guesses[-1]
+s = -df(x)
+!ec
+Run it!
+!bc pycod
+def f1d(alpha):
+    return f(x + alpha*s)
+
+alpha_opt = sopt.golden(f1d)
+next_guess = x + alpha_opt * s
+guesses.append(next_guess)
+print(next_guess)
+!ec
+What happened?
+!bc pycod
+pt.axis("equal")
+pt.contour(xmesh, ymesh, fmesh, 50)
+it_array = np.array(guesses)
+pt.plot(it_array.T[0], it_array.T[1], "x-")
+!ec
+
+!split
+===== Conjugate gradient method ===== 
+!bblock
+In the CG method we define so-called conjugate directions and two vectors 
+$\hat{s}$ and $\hat{t}$
+are said to be
+conjugate if
+!bt
+\begin{equation*}
+\hat{s}^T\hat{A}\hat{t}= 0.
+\end{equation*}
+!et
+The philosophy of the CG method is to perform searches in various conjugate directions
+of our vectors $\hat{x}_i$ obeying the above criterion, namely
+!bt
+\begin{equation*}
+\hat{x}_i^T\hat{A}\hat{x}_j= 0.
+\end{equation*}
+!et
+Two vectors are conjugate if they are orthogonal with respect to 
+this inner product. Being conjugate is a symmetric relation: if $\hat{s}$ is conjugate to $\hat{t}$, then $\hat{t}$ is conjugate to $\hat{s}$.
+!eblock
+
+!split
+===== Conjugate gradient method ===== 
+!bblock
+An example is given by the eigenvectors of the matrix
+!bt
+\begin{equation*}
+\hat{v}_i^T\hat{A}\hat{v}_j= \lambda\hat{v}_i^T\hat{v}_j,
+\end{equation*}
+!et
+which is zero unless $i=j$. 
+!eblock
 
 
-# Returns mean of data samples                                                                                                                                                     
-def stat(data):
-    return mean(data)
+!split
+===== Conjugate gradient method ===== 
+!bblock
+Assume now that we have a symmetric positive-definite matrix $\hat{A}$ of size
+$n\times n$. At each iteration $i+1$ we obtain the conjugate direction of a vector
+!bt
+\begin{equation*}
+\hat{x}_{i+1}=\hat{x}_{i}+\alpha_i\hat{p}_{i}. 
+\end{equation*}
+!et
+We assume that $\hat{p}_{i}$ is a sequence of $n$ mutually conjugate directions. 
+Then the $\hat{p}_{i}$  form a basis of $R^n$ and we can expand the solution 
+$  \hat{A}\hat{x} = \hat{b}$ in this basis, namely
+
+!bt
+\begin{equation*}
+  \hat{x}  = \sum^{n}_{i=1} \alpha_i \hat{p}_i.
+\end{equation*}
+!et
+!eblock
+
+!split
+===== Conjugate gradient method ===== 
+!bblock
+The coefficients are given by
+!bt
+\begin{equation*}
+    \mathbf{A}\mathbf{x} = \sum^{n}_{i=1} \alpha_i \mathbf{A} \mathbf{p}_i = \mathbf{b}.
+\end{equation*}
+!et
+Multiplying with $\hat{p}_k^T$  from the left gives
+
+!bt
+\begin{equation*}
+  \hat{p}_k^T \hat{A}\hat{x} = \sum^{n}_{i=1} \alpha_i\hat{p}_k^T \hat{A}\hat{p}_i= \hat{p}_k^T \hat{b},
+\end{equation*}
+!et
+and we can define the coefficients $\alpha_k$ as
+
+!bt
+\begin{equation*}
+    \alpha_k = \frac{\hat{p}_k^T \hat{b}}{\hat{p}_k^T \hat{A} \hat{p}_k}
+\end{equation*}
+!et 
+!eblock
+
+!split
+===== Conjugate gradient method and iterations ===== 
+!bblock
+
+If we choose the conjugate vectors $\hat{p}_k$ carefully, 
+then we may not need all of them to obtain a good approximation to the solution 
+$\hat{x}$. 
+We want to regard the conjugate gradient method as an iterative method. 
+This will us to solve systems where $n$ is so large that the direct 
+method would take too much time.
+
+We denote the initial guess for $\hat{x}$ as $\hat{x}_0$. 
+We can assume without loss of generality that
+!bt
+\begin{equation*}
+\hat{x}_0=0,
+\end{equation*}
+!et
+or consider the system
+!bt
+\begin{equation*}
+\hat{A}\hat{z} = \hat{b}-\hat{A}\hat{x}_0,
+\end{equation*}
+!et
+instead.
+!eblock
 
 
-mu, sigma = 100, 15
-datapoints = 10000
-x = mu + sigma*random.randn(datapoints)
-# jackknife returns the data sample                                                                                                                                                
-t = jackknife(x, stat)
+!split
+===== Conjugate gradient method ===== 
+!bblock
+One can show that the solution $\hat{x}$ is also the unique minimizer of the quadratic form
+!bt
+\begin{equation*}
+  f(\hat{x}) = \frac{1}{2}\hat{x}^T\hat{A}\hat{x} - \hat{x}^T \hat{x} , \quad \hat{x}\in\mathbf{R}^n. 
+\end{equation*}
+!et
+This suggests taking the first basis vector $\hat{p}_1$ 
+to be the gradient of $f$ at $\hat{x}=\hat{x}_0$, 
+which equals
+!bt
+\begin{equation*}
+\hat{A}\hat{x}_0-\hat{b},
+\end{equation*}
+!et
+and 
+$\hat{x}_0=0$ it is equal $-\hat{b}$.
+The other vectors in the basis will be conjugate to the gradient, 
+hence the name conjugate gradient method.
+!eblock
+
+
+!split
+===== Conjugate gradient method ===== 
+!bblock
+Let  $\hat{r}_k$ be the residual at the $k$-th step:
+!bt
+\begin{equation*}
+\hat{r}_k=\hat{b}-\hat{A}\hat{x}_k.
+\end{equation*}
+!et
+Note that $\hat{r}_k$ is the negative gradient of $f$ at 
+$\hat{x}=\hat{x}_k$, 
+so the gradient descent method would be to move in the direction $\hat{r}_k$. 
+Here, we insist that the directions $\hat{p}_k$ are conjugate to each other, 
+so we take the direction closest to the gradient $\hat{r}_k$  
+under the conjugacy constraint. 
+This gives the following expression
+!bt
+\begin{equation*}
+\hat{p}_{k+1}=\hat{r}_k-\frac{\hat{p}_k^T \hat{A}\hat{r}_k}{\hat{p}_k^T\hat{A}\hat{p}_k} \hat{p}_k.
+\end{equation*}
+!et
+!eblock
+
+!split
+===== Conjugate gradient method ===== 
+!bblock
+We can also  compute the residual iteratively as
+!bt
+\begin{equation*}
+\hat{r}_{k+1}=\hat{b}-\hat{A}\hat{x}_{k+1},
+ \end{equation*}
+!et
+which equals
+!bt
+\begin{equation*}
+\hat{b}-\hat{A}(\hat{x}_k+\alpha_k\hat{p}_k),
+ \end{equation*}
+!et
+or
+!bt
+\begin{equation*}
+(\hat{b}-\hat{A}\hat{x}_k)-\alpha_k\hat{A}\hat{p}_k,
+ \end{equation*}
+!et
+which gives
+
+!bt
+\begin{equation*}
+\hat{r}_{k+1}=\hat{r}_k-\hat{A}\hat{p}_{k},
+ \end{equation*}
+!et
+!eblock
+
+
+
+!split
+===== Simple implementation of the Conjugate gradient algorithm =====
+!bblock
+!bc pycod
+  Vector ConjugateGradient(Matrix A, Vector b, Vector x0){
+  int dim = x0.Dimension();
+  const double tolerance = 1.0e-14;
+  Vector x(dim),r(dim),v(dim),z(dim);
+  double c,t,d;
+
+  x = x0;
+  r = b - A*x;
+  v = r;
+  c = dot(r,r);
+  int i = 0; IterMax = dim;
+  while(i <= IterMax){
+    z = A*v;
+    t = c/dot(v,z);
+    x = x + t*v;
+    r = r - t*z;
+    d = dot(r,r);
+    if(sqrt(d) < tolerance)
+      break;
+    v = r + (d/c)*v;
+    c = d;  i++;
+  }
+  return x;
+} 
+!ec
+!eblock
+
+
+!split
+===== Broyden–Fletcher–Goldfarb–Shanno algorithm =====
+!bblock
+The optimization problem is to minimize $f(\mathbf {x} )$ where $\mathbf {x}$  is a vector in $R^{n}$, and $f$ is a differentiable scalar function. There are no constraints on the values that  $\mathbf {x}$  can take.
+
+The algorithm begins at an initial estimate for the optimal value $\mathbf {x}_{0}$ and proceeds iteratively to get a better estimate at each stage.
+
+The search direction $p_k$ at stage $k$ is given by the solution of the analogue of the Newton equation
+!bt
+\[
+B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
+\]
+!et
+
+where $B_{k}$ is an approximation to the Hessian matrix, which is
+updated iteratively at each stage, and $\nabla f(\mathbf {x} _{k})$
+is the gradient of the function
+evaluated at $x_k$. 
+A line search in the direction $p_k$ is then used to
+find the next point $x_{k+1}$ by minimising 
+!bt
+\[
+f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
+\]
+!et
+over the scalar $\alpha > 0$.
+
+!eblock
+
+
+!split
+===== Stochastic Gradient Descent =====
+
+Stochastic gradient descent (SGD) and variants thereof address some of
+the shortcomings of the Gradient descent method discussed above.
+
+The underlying idea of SGD comes from the observation that a given 
+function, which we want to minimize, can almost always be written as a
+sum over $n$ data points $\{\mathbf{x}_i\}_{i=1}^n$,
+!bt
+\[
+C(\mathbf{\beta}) = \sum_{i=1}^n c_i(\mathbf{x}_i,
+\mathbf{\beta}). 
+\]
+!et
+
+!split
+===== Computation of gradients =====
+
+This in turn means that the gradient can be
+computed as a sum over $i$-gradients 
+!bt
+\[
+\nabla_\beta C(\mathbf{\beta}) = \sum_i^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta}).
+\]
+!et
+
+Stochasticity/randomness is introduced by only taking the
+gradient on a subset of the data called minibatches.  If there are $n$
+data points and the size of each minibatch is $M$, there will be $n/M$
+minibatches. We denote these minibatches by $B_k$ where
+$k=1,\cdots,n/M$.
+
+!split
+===== SGD example =====
+As an example, suppose we have $10$ data points $(\mathbf{x}_1,\cdots, \mathbf{x}_{10})$ 
+and we choose to have $M=5$ minibathces,
+then each minibatch contains two data points. In particular we have
+$B_1 = (\mathbf{x}_1,\mathbf{x}_2), \cdots, B_5 =
+(\mathbf{x}_9,\mathbf{x}_{10})$. Note that if you choose $M=1$ you
+have only a single batch with all data points and on the other extreme,
+you may choose $M=n$ resulting in a minibatch for each datapoint, i.e
+$B_k = \mathbf{x}_k$.
+
+The idea is now to approximate the gradient by replacing the sum over
+all data points with a sum over the data points in one the minibatches
+picked at random in each gradient descent step 
+!bt
+\[
+\nabla_{\beta}
+C(\mathbf{\beta}) = \sum_{i=1}^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta}) \rightarrow \sum_{i \in B_k}^n \nabla_\beta
+c_i(\mathbf{x}_i, \mathbf{\beta}).
+\]
+!et
+
+!split
+===== The gradient step =====
+
+Thus a gradient descent step now looks like 
+!bt
+\[
+\beta_{j+1} = \beta_j - \gamma_j \sum_{i \in B_k}^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta})
+\]
+!et
+
+where $k$ is picked at random with equal
+probability from $[1,n/M]$. An iteration over the number of
+minibathces (n/M) is commonly referred to as an epoch. Thus it is
+typical to choose a number of epochs and for each epoch iterate over
+the number of minibatches, as exemplified in the code below.
+
+!split
+===== Simple example code =====
+
+!bc pycod
+import numpy as np 
+
+n = 100 #100 datapoints 
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+n_epochs = 10 #number of epochs
+
+j = 0
+for epoch in range(1,n_epochs+1):
+    for i in range(m):
+        k = np.random.randint(m) #Pick the k-th minibatch at random
+        #Compute the gradient using the data in minibatch Bk
+        #Compute new suggestion for 
+        j += 1
+!ec
+
+Taking the gradient only on a subset of the data has two important
+benefits. First, it introduces randomness which decreases the chance
+that our opmization scheme gets stuck in a local minima. Second, if
+the size of the minibatches are small relative to the number of
+datapoints ($M <  n$), the computation of the gradient is much
+cheaper since we sum over the datapoints in the $k-th$ minibatch and not
+all $n$ datapoints.
+
+!split
+===== When do we stop? =====
+
+A natural question is when do we stop the search for a new minimum?
+One possibility is to compute the full gradient after a given number
+of epochs and check if the norm of the gradient is smaller than some
+threshold and stop if true. However, the condition that the gradient
+is zero is valid also for local minima, so this would only tell us
+that we are close to a local/global minimum. However, we could also
+evaluate the cost function at this point, store the result and
+continue the search. If the test kicks in at a later stage we can
+compare the values of the cost function and keep the $\beta$ that
+gave the lowest value.
+
+!split
+===== Slightly different approach =====
+
+Another approach is to let the step length $\gamma_j$ depend on the
+number of epochs in such a way that it becomes very small after a
+reasonable time such that we do not move at all.
+
+As an example, let $e = 0,1,2,3,\cdots$ denote the current epoch and let $t_0, t_1 > 0$ be two fixed numbers. Furthermore, let $t = e \cdot m + i$ where $m$ is the number of minibatches and $i=0,\cdots,m-1$. Then the function $$\gamma_j(t; t_0, t_1) = \frac{t_0}{t+t_1} $$ goes to zero as the number of epochs gets large. I.e. we start with a step length $\gamma_j (0; t_0, t_1) = t_0/t_1$ which decays in *time* $t$.
+
+In this way we can fix the number of epochs, compute $\beta$ and
+evaluate the cost function at the end. Repeating the computation will
+give a different result since the scheme is random by design. Then we
+pick the final $\beta$ that gives the lowest value of the cost
+function.
+
+!bc pycod
+import numpy as np 
+
+def step_length(t,t0,t1):
+    return t0/(t+t1)
+
+n = 100 #100 datapoints 
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+n_epochs = 500 #number of epochs
+t0 = 1.0
+t1 = 10
+
+gamma_j = t0/t1
+j = 0
+for epoch in range(1,n_epochs+1):
+    for i in range(m):
+        k = np.random.randint(m) #Pick the k-th minibatch at random
+        #Compute the gradient using the data in minibatch Bk
+        #Compute new suggestion for beta
+        t = epoch*m+i
+        gamma_j = step_length(t,t0,t1)
+        j += 1
+
+print("gamma_j after %d epochs: %g" % (n_epochs,gamma_j))
+!ec
+
+
+
+
+
+!split
+=====  Program for stochastic gradient =====
+
+!bc pycod
+# Importing various packages
+from math import exp, sqrt
+from random import random, seed
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import SGDRegressor
+
+x = 2*np.random.rand(100,1)
+y = 4+3*x+np.random.randn(100,1)
+
+xb = np.c_[np.ones((100,1)), x]
+theta_linreg = np.linalg.inv(xb.T.dot(xb)).dot(xb.T).dot(y)
+print("Own inversion")
+print(theta_linreg)
+sgdreg = SGDRegressor(n_iter = 50, penalty=None, eta0=0.1)
+sgdreg.fit(x,y.ravel())
+print("sgdreg from scikit")
+print(sgdreg.intercept_, sgdreg.coef_)
+
+
+theta = np.random.randn(2,1)
+
+eta = 0.1
+Niterations = 1000
+m = 100
+
+for iter in range(Niterations):
+    gradients = 2.0/m*xb.T.dot(xb.dot(theta)-y)
+    theta -= eta*gradients
+print("theta frm own gd")
+print(theta)
+
+xnew = np.array([[0],[2]])
+xbnew = np.c_[np.ones((2,1)), xnew]
+ypredict = xbnew.dot(theta)
+ypredict2 = xbnew.dot(theta_linreg)
+
+
+n_epochs = 50
+t0, t1 = 5, 50
+m = 100
+def learning_schedule(t):
+    return t0/(t+t1)
+
+theta = np.random.randn(2,1)
+
+for epoch in range(n_epochs):
+    for i in range(m):
+        random_index = np.random.randint(m)
+        xi = xb[random_index:random_index+1]
+        yi = y[random_index:random_index+1]
+        gradients = 2 * xi.T.dot(xi.dot(theta)-yi)
+        eta = learning_schedule(epoch*m+i)
+        theta = theta - eta*gradients
+print("theta from own sdg")
+print(theta)
+
+
+plt.plot(xnew, ypredict, "r-")
+plt.plot(xnew, ypredict2, "b-")
+plt.plot(x, y ,'ro')
+plt.axis([0,2.0,0, 15.0])
+plt.xlabel(r'$x$')
+plt.ylabel(r'$y$')
+plt.title(r'Random numbers ')
+plt.show()
+
+!ec
+
+
+
+!split
+===== Using gradient descent methods, limitations =====
+
+* _Gradient descent (GD) finds local minima of our function_. Since the GD algorithm is deterministic, if it converges, it will converge to a local minimum of our energy function. Because in ML we are often dealing with extremely rugged landscapes with many local minima, this can lead to poor performance.
+
+* _GD is sensitive to initial conditions_. One consequence of the local nature of GD is that initial conditions matter. Depending on where one starts, one will end up at a different local minima. Therefore, it is very important to think about how one initializes the training process. This is true for GD as well as more complicated variants of GD.
+
+* _Gradients are computationally expensive to calculate for large datasets_. In many cases in statistics and ML, the energy function is a sum of terms, with one term for each data point. For example, in linear regression, $E \propto \sum_{i=1}^n (y_i - \mathbf{w}^T\cdot\mathbf{x}_i)^2$; for logistic regression, the square error is replaced by the cross entropy. To calculate the gradient we have to sum over *all* $n$ data points. Doing this at every GD step becomes extremely computationally expensive. An ingenious solution to this, is to calculate the gradients using small subsets of the data called ``mini batches''. This has the added benefit of introducing stochasticity into our algorithm.
+
+* _GD is very sensitive to choices of learning rates_. GD is extremely sensitive to the choice of learning rates. If the learning rate is very small, the training process take an extremely long time. For larger learning rates, GD can diverge and give poor results. Furthermore, depending on what the local landscape looks like, we have to modify the learning rates to ensure convergence. Ideally, we would *adaptively* choose the learning rates to match the landscape.
+
+* _GD treats all directions in parameter space uniformly._ Another major drawback of GD is that unlike Newton's method, the learning rate for GD is the same in all directions in parameter space. For this reason, the maximum learning rate is set by the behavior of the steepest direction and this can significantly slow down training. Ideally, we would like to take large steps in flat directions and small steps in steep directions. Since we are exploring rugged landscapes where curvatures change, this requires us to keep track of not only the gradient but second derivatives. The ideal scenario would be to calculate the Hessian but this proves to be too computationally expensive. 
+	
+* GD can take exponential time to escape saddle points, even with random initialization. As we mentioned, GD is extremely sensitive to initial condition since it determines the particular local minimum GD would eventually reach. However, even with a good initialization scheme, through the introduction of randomness, GD can still take exponential time to escape saddle points.
+	
+
+
+!split
+===== Codes from numerical recipes =====
+!bblock
+You can however use codes we have adapted from the text "Numerical Recipes in C++":"http://www.nr.com/", see chapter 10.7.  
+Here we present a program, which you also can find at the webpage of the course we use the functions _dfpmin_ and _lnsrch_.  This is a variant of the Broyden et al algorithm discussed in the previous slide.
+
+* The program uses the harmonic oscillator in one dimensions as example.
+* The program does not use armadillo to handle vectors and matrices, but employs rather my own vector-matrix class. These auxiliary functions, and the main program *model.cpp* can all be found under the "program link here":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/cg/programs/c%2B%2B".
+
+Below we show only excerpts from the main program. For the full program, see the above link.
+!eblock
+
+
+!split
+===== Finding the minimum of the harmonic oscillator model in one dimension =====
+!bblock
+!bc pycod
+//   Main function begins here
+int main()
+{
+     int n, iter;
+     double gtol, fret;
+     double alpha;
+     n = 1;
+//   reserve space in memory for vectors containing the variational
+//   parameters
+     Vector g(n), p(n);
+     cout << "Read in guess for alpha" << endl;
+     cin >> alpha;
+     gtol = 1.0e-5;
+//   now call dfmin and compute the minimum
+     p(0) = alpha;
+     dfpmin(p, n, gtol, &iter, &fret, Efunction, dEfunction);
+     cout << "Value of energy minimum = " << fret << endl;
+     cout << "Number of iterations = " << iter << endl;
+     cout << "Value of alpha at minimum = " << p(0) << endl;
+      return 0;
+}  // end of main program
+
+!ec
+!eblock
+
+
+
+!split
+===== Functions to observe =====
+!bblock
+The functions _Efunction_ and _dEfunction_ compute the expectation value of the energy and its derivative.
+They use the the quasi-Newton method of "Broyden, Fletcher, Goldfarb, and Shanno (BFGS)":"https://www.springer.com/it/book/9780387303031"
+It uses the first derivatives only. The BFGS algorithm has proven good performance even for non-smooth optimizations. 
+These functions need to be changed when you want to your own derivatives.
+!bc pycod
+//  this function defines the expectation value of the local energy
+double Efunction(Vector  &x)
+{
+  double value = x(0)*x(0)*0.5+1.0/(8*x(0)*x(0));
+  return value;
+} // end of function to evaluate
+
+//  this function defines the derivative of the energy 
+void dEfunction(Vector &x, Vector &g)
+{
+  g(0) = x(0)-1.0/(4*x(0)*x(0)*x(0));
+} // end of function to evaluate
+!ec
+You need to change these functions in order to compute the local energy for your system. I used 1000
+cycles per call to get a new value of $\langle E_L[\alpha]\rangle$.
+When I compute the local energy I also compute its derivative.
+After roughly 10-20 iterations I got a converged result in terms of $\alpha$.
+!eblock
+
+
+
+TITLE: Week 39: Optimization and  Gradient Methods
+
+!split 
+===== Example of gradient descent applications =====
+
+We will use linear regression as a case study for the gradient descent
+methods. Linear regression is a great test case for the gradient
+descent methods discussed in the lectures since it has several
+desirable properties such as:
+
+o An analytical solution.
+o The gradient can be computed analytically.
+o The cost function is convex which guarantees that gradient descent converges for small enough learning rates
+
+We have the following problem
+
+!bc pycod
+x = 2*np.random.rand(m,1)
+y = 4+3*x+np.random.randn(m,1)
+!ec
+with $x_i \in [0,1] $ is chosen randomly using a uniform distribution. Additionally we have a stochastic noise chosen according to a normal distribution $\cal {N}(0,1)$. 
+The linear regression model is given by 
+!bt
+\[
+h_\beta(x) = \bm{y} = \beta_0 + \beta_1 x,
+\] 
+!et
+such that 
+!bt
+\[
+\bm{y}_i = \beta_0 + \beta_1 x_i.
+\]
+!et
+
+!split 
+===== Gradient descent example =====
+
+Let $\mathbf{y} = (y_1,\cdots,y_n)^T$, $\mathbf{\bm{y}} = (\bm{y}_1,\cdots,\bm{y}_n)^T$ and $\beta = (\beta_0, \beta_1)^T$
+
+It is convenient to write $\mathbf{\bm{y}} = X\beta$ where $X \in \mathbb{R}^{100 \times 2} $ is the design matrix given by (we keep the intercept here)
+!bt
+\[
+X \equiv \begin{bmatrix}
+1 & x_1  \\
+\vdots & \vdots  \\
+1 & x_{100} &  \\
+\end{bmatrix}.
+\]
+!et
+The cost/loss/risk function is given by (
+!bt
+\[
+C(\beta) = \frac{1}{n}||X\beta-\mathbf{y}||_{2}^{2} = \frac{1}{n}\sum_{i=1}^{100}\left[ (\beta_0 + \beta_1 x_i)^2 - 2 y_i (\beta_0 + \beta_1 x_i) + y_i^2\right] 
+\]
+!et
+and we want to find $\beta$ such that $C(\beta)$ is minimized.
+
+!split
+===== The derivative of the mean-squared error function =====
+
+Computing $\partial C(\beta) / \partial \beta_0$ and $\partial C(\beta) / \partial \beta_1$ we can show  that the gradient can be written as
+!bt
+\[
+\nabla_{\beta} C(\beta) = \frac{2}{n}\begin{bmatrix} \sum_{i=1}^{100} \left(\beta_0+\beta_1x_i-y_i\right) \\
+\sum_{i=1}^{100}\left( x_i (\beta_0+\beta_1x_i)-y_ix_i\right) \\
+\end{bmatrix} = \frac{2}{n}X^T(X\beta - \mathbf{y}), 
+\]
+!et
+where $X$ is the design matrix defined above.
+
+!split
+===== The Hessian matrix =====
+The Hessian matrix of $C(\beta)$ is given by 
+!bt
+\[
+\bm{H} \equiv \begin{bmatrix}
+\frac{\partial^2 C(\beta)}{\partial \beta_0^2} & \frac{\partial^2 C(\beta)}{\partial \beta_0 \partial \beta_1}  \\
+\frac{\partial^2 C(\beta)}{\partial \beta_0 \partial \beta_1} & \frac{\partial^2 C(\beta)}{\partial \beta_1^2} &  \\
+\end{bmatrix} = \frac{2}{n}X^T X.
+\]
+!et
+This result implies that $C(\beta)$ is a convex function since the matrix $X^T X$ always is positive semi-definite.
+
+
+
+
+!split
+===== Simple program =====
+
+We can now write a program that minimizes $C(\beta)$ using the gradient descent method with a constant learning rate $\gamma$ according to 
+!bt
+\[
+\beta_{k+1} = \beta_k - \gamma \nabla_\beta C(\beta_k), \ k=0,1,\cdots 
+\]
+!et
+
+We can use the expression we computed for the gradient and let use a
+$\beta_0$ be chosen randomly and let $\gamma = 0.001$. Stop iterating
+when $||\nabla_\beta C(\beta_k) || \leq \epsilon = 10^{-8}$. _Note that the code below does not include the latter stop criterion_.
+
+And finally we can compare our solution for $\beta$ with the analytic result given by 
+$\beta= (X^TX)^{-1} X^T \mathbf{y}$.
+
+!split
+===== Gradient Descent Example =====
+
+Here our simple example
+!bc pycod
+
+# Importing various packages
+from random import random, seed
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import sys
+
+# the number of datapoints
+n = 100
+x = 2*np.random.rand(n,1)
+y = 4+3*x+np.random.randn(n,1)
+
+X = np.c_[np.ones((n,1)), x]
+# Hessian matrix
+H = (2.0/n)* X.T @ X
+# Get the eigenvalues
+EigValues, EigVectors = np.linalg.eig(H)
+print(f"Eigenvalues of Hessian Matrix:{EigValues}")
+
+beta_linreg = np.linalg.inv(X.T @ X) @ X.T @ y
+print(beta_linreg)
+beta = np.random.randn(2,1)
+
+eta = 1.0/np.max(EigValues)
+Niterations = 1000
+
+for iter in range(Niterations):
+    gradient = (2.0/n)*X.T @ (X @ beta-y)
+    beta -= eta*gradient
+
+print(beta)
+xnew = np.array([[0],[2]])
+xbnew = np.c_[np.ones((2,1)), xnew]
+ypredict = xbnew.dot(beta)
+ypredict2 = xbnew.dot(beta_linreg)
+plt.plot(xnew, ypredict, "r-")
+plt.plot(xnew, ypredict2, "b-")
+plt.plot(x, y ,'ro')
+plt.axis([0,2.0,0, 15.0])
+plt.xlabel(r'$x$')
+plt.ylabel(r'$y$')
+plt.title(r'Gradient descent example')
+plt.show()
+
+!ec
+
+!split
+===== Using gradient descent methods, limitations =====
+
+* _Gradient descent (GD) finds local minima of our function_. Since the GD algorithm is deterministic, if it converges, it will converge to a local minimum of our cost/loss/risk function. Because in ML we are often dealing with extremely rugged landscapes with many local minima, this can lead to poor performance.
+
+* _GD is sensitive to initial conditions_. One consequence of the local nature of GD is that initial conditions matter. Depending on where one starts, one will end up at a different local minima. Therefore, it is very important to think about how one initializes the training process. This is true for GD as well as more complicated variants of GD.
+
+* _Gradients are computationally expensive to calculate for large datasets_. In many cases in statistics and ML, the cost/loss/risk function is a sum of terms, with one term for each data point. For example, in linear regression, $E \propto \sum_{i=1}^n (y_i - \mathbf{w}^T\cdot\mathbf{x}_i)^2$; for logistic regression, the square error is replaced by the cross entropy. To calculate the gradient we have to sum over *all* $n$ data points. Doing this at every GD step becomes extremely computationally expensive. An ingenious solution to this, is to calculate the gradients using small subsets of the data called ``mini batches''. This has the added benefit of introducing stochasticity into our algorithm.
+
+* _GD is very sensitive to choices of learning rates_. GD is extremely sensitive to the choice of learning rates. If the learning rate is very small, the training process take an extremely long time. For larger learning rates, GD can diverge and give poor results. Furthermore, depending on what the local landscape looks like, we have to modify the learning rates to ensure convergence. Ideally, we would *adaptively* choose the learning rates to match the landscape.
+
+* _GD treats all directions in parameter space uniformly._ Another major drawback of GD is that unlike Newton's method, the learning rate for GD is the same in all directions in parameter space. For this reason, the maximum learning rate is set by the behavior of the steepest direction and this can significantly slow down training. Ideally, we would like to take large steps in flat directions and small steps in steep directions. Since we are exploring rugged landscapes where curvatures change, this requires us to keep track of not only the gradient but second derivatives. The ideal scenario would be to calculate the Hessian but this proves to be too computationally expensive. 
+	
+* GD can take exponential time to escape saddle points, even with random initialization. As we mentioned, GD is extremely sensitive to initial condition since it determines the particular local minimum GD would eventually reach. However, even with a good initialization scheme, through the introduction of randomness, GD can still take exponential time to escape saddle points.
+
+!split
+===== Improving gradient descent with momentum =====
+
+We discuss here some simple examples where we introduce what is called 'memory'about previous steps, or what is normally called momentum gradient descent. The mathematics is explained below in connection with Stochastic gradient descent.
+
+!bc pycod
+from numpy import asarray
+from numpy import arange
+from numpy.random import rand
+from numpy.random import seed
+from matplotlib import pyplot
+ 
+# objective function
+def objective(x):
+	return x**2.0
+ 
+# derivative of objective function
+def derivative(x):
+	return x * 2.0
+ 
+# gradient descent algorithm
+def gradient_descent(objective, derivative, bounds, n_iter, step_size):
+	# track all solutions
+	solutions, scores = list(), list()
+	# generate an initial point
+	solution = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
+	# run the gradient descent
+	for i in range(n_iter):
+		# calculate gradient
+		gradient = derivative(solution)
+		# take a step
+		solution = solution - step_size * gradient
+		# evaluate candidate point
+		solution_eval = objective(solution)
+		# store solution
+		solutions.append(solution)
+		scores.append(solution_eval)
+		# report progress
+		print('>%d f(%s) = %.5f' % (i, solution, solution_eval))
+	return [solutions, scores]
+ 
+# seed the pseudo random number generator
+seed(4)
+# define range for input
+bounds = asarray([[-1.0, 1.0]])
+# define the total iterations
+n_iter = 30
+# define the step size
+step_size = 0.1
+# perform the gradient descent search
+solutions, scores = gradient_descent(objective, derivative, bounds, n_iter, step_size)
+# sample input range uniformly at 0.1 increments
+inputs = arange(bounds[0,0], bounds[0,1]+0.1, 0.1)
+# compute targets
+results = objective(inputs)
+# create a line plot of input vs result
+pyplot.plot(inputs, results)
+# plot the solutions found
+pyplot.plot(solutions, scores, '.-', color='red')
+# show the plot
+pyplot.show()
 
 !ec
 
 
 !split
-===== Resampling methods: Bootstrap =====
-!bblock
-Bootstrapping is a nonparametric approach to statistical inference
-that substitutes computation for more traditional distributional
-assumptions and asymptotic results. Bootstrapping offers a number of
-advantages: 
-o The bootstrap is quite general, although there are some cases in which it fails.  
-o Because it does not require distributional assumptions (such as normally distributed errors), the bootstrap can provide more accurate inferences when the data are not well behaved or when the sample size is small.  
-o It is possible to apply the bootstrap to statistics with sampling distributions that are difficult to derive, even asymptotically. 
-o It is relatively simple to apply the bootstrap to complex data-collection plans (such as stratified and clustered samples).
-!eblock
+===== Same code but now with momentum gradient descent =====
 
-
-!split
-===== Resampling methods: Bootstrap background =====
-
-Since $\widehat{\theta} = \widehat{\theta}(\hat{X})$ is a function of random variables,
-$\widehat{\theta}$ itself must be a random variable. Thus it has
-a pdf, call this function $p(\hat{t})$. The aim of the bootstrap is to
-estimate $p(\hat{t})$ by the relative frequency of
-$\widehat{\theta}$. You can think of this as using a histogram
-in the place of $p(\hat{t})$. If the relative frequency closely
-resembles $p(\vec{t})$, then using numerics, it is straight forward to
-estimate all the interesting parameters of $p(\hat{t})$ using point
-estimators.  
-
-
-!split
-===== Resampling methods: More Bootstrap background =====
-
-In the case that $\widehat{\theta}$ has
-more than one component, and the components are independent, we use the
-same estimator on each component separately.  If the probability
-density function of $X_i$, $p(x)$, had been known, then it would have
-been straight forward to do this by: 
-o Drawing lots of numbers from $p(x)$, suppose we call one such set of numbers $(X_1^*, X_2^*, \cdots, X_n^*)$. 
-o Then using these numbers, we could compute a replica of $\widehat{\theta}$ called $\widehat{\theta}^*$. 
-
-By repeated use of (1) and (2), many
-estimates of $\widehat{\theta}$ could have been obtained. The
-idea is to use the relative frequency of $\widehat{\theta}^*$
-(think of a histogram) as an estimate of $p(\hat{t})$.
-
-!split
-===== Resampling methods: Bootstrap approach =====
-
-But
-unless there is enough information available about the process that
-generated $X_1,X_2,\cdots,X_n$, $p(x)$ is in general
-unknown. Therefore, "Efron in 1979":"https://projecteuclid.org/euclid.aos/1176344552"  asked the
-question: What if we replace $p(x)$ by the relative frequency
-of the observation $X_i$; if we draw observations in accordance with
-the relative frequency of the observations, will we obtain the same
-result in some asymptotic sense? The answer is yes.
-
-
-Instead of generating the histogram for the relative
-frequency of the observation $X_i$, just draw the values
-$(X_1^*,X_2^*,\cdots,X_n^*)$ with replacement from the vector
-$\hat{X}$. 
-
-!split
-===== Resampling methods: Bootstrap steps =====
-
-The independent bootstrap works like this: 
-
-o Draw with replacement $n$ numbers for the observed variables $\hat{x} = (x_1,x_2,\cdots,x_n)$. 
-o Define a vector $\hat{x}^*$ containing the values which were drawn from $\hat{x}$. 
-o Using the vector $\hat{x}^*$ compute $\widehat{\theta}^*$ by evaluating $\widehat \theta$ under the observations $\hat{x}^*$. 
-o Repeat this process $k$ times. 
-
-When you are done, you can draw a histogram of the relative frequency of $\widehat \theta^*$. This is your estimate of the probability distribution $p(t)$. Using this probability distribution you can estimate any statistics thereof. In principle you never draw the histogram of the relative frequency of $\widehat{\theta}^*$. Instead you use the estimators corresponding to the statistic of interest. For example, if you are interested in estimating the variance of $\widehat \theta$, apply the etsimator $\widehat \sigma^2$ to the values $\widehat \theta ^*$.
-
-
-!split
-===== Code example for the Bootstrap method =====
-
-The following code starts with a Gaussian distribution with mean value $\mu =100$ and variance $\sigma=15$. We use this to generate the data used in the bootstrap analysis. The bootstrap analysis returns a data set after a given number of bootstrap operations (as many as we have data points). This data set consists of estimated mean values for each bootstrap operation. The histogram generated by the bootstrap method shows that the distribution for these mean values is also a Gaussian, centered around the mean value $\mu=100$ but with standard deviation $\sigma/\sqrt{n}$, where $n$ is the number of bootstrap samples (in this case the same as the number of original data points). The value of the standard deviation is what we expect from the central limit theorem. 
 !bc pycod
+from numpy import asarray
+from numpy import arange
+from numpy.random import rand
+from numpy.random import seed
+from matplotlib import pyplot
+ 
+# objective function
+def objective(x):
+	return x**2.0
+ 
+# derivative of objective function
+def derivative(x):
+	return x * 2.0
+ 
+# gradient descent algorithm
+def gradient_descent(objective, derivative, bounds, n_iter, step_size, momentum):
+	# track all solutions
+	solutions, scores = list(), list()
+	# generate an initial point
+	solution = bounds[:, 0] + rand(len(bounds)) * (bounds[:, 1] - bounds[:, 0])
+	# keep track of the change
+	change = 0.0
+	# run the gradient descent
+	for i in range(n_iter):
+		# calculate gradient
+		gradient = derivative(solution)
+		# calculate update
+		new_change = step_size * gradient + momentum * change
+		# take a step
+		solution = solution - new_change
+		# save the change
+		change = new_change
+		# evaluate candidate point
+		solution_eval = objective(solution)
+		# store solution
+		solutions.append(solution)
+		scores.append(solution_eval)
+		# report progress
+		print('>%d f(%s) = %.5f' % (i, solution, solution_eval))
+	return [solutions, scores]
+ 
+# seed the pseudo random number generator
+seed(4)
+# define range for input
+bounds = asarray([[-1.0, 1.0]])
+# define the total iterations
+n_iter = 30
+# define the step size
+step_size = 0.1
+# define momentum
+momentum = 0.3
+# perform the gradient descent search with momentum
+solutions, scores = gradient_descent(objective, derivative, bounds, n_iter, step_size, momentum)
+# sample input range uniformly at 0.1 increments
+inputs = arange(bounds[0,0], bounds[0,1]+0.1, 0.1)
+# compute targets
+results = objective(inputs)
+# create a line plot of input vs result
+pyplot.plot(inputs, results)
+# plot the solutions found
+pyplot.plot(solutions, scores, '.-', color='red')
+# show the plot
+pyplot.show()
+!ec
 
-%matplotlib inline
 
-from numpy import *
-from numpy.random import randint, randn
-from time import time
-from scipy.stats import norm
+
+!split
+===== Overview video on Stochastic Gradient Descent =====
+
+"What is Stochastic Gradient Descent":"https://www.youtube.com/watch?v=vMh0zPT0tLI&ab_channel=StatQuestwithJoshStarmer"
+
+
+!split
+=====  Batches and mini-batches =====
+
+In gradient descent we compute the cost function and its gradient for all data points we have.
+
+In large-scale applications such as the "ILSVRC challenge":"https://www.image-net.org/challenges/LSVRC/", the
+training data can have on order of millions of examples. Hence, it
+seems wasteful to compute the full cost function over the entire
+training set in order to perform only a single parameter update. A
+very common approach to addressing this challenge is to compute the
+gradient over batches of the training data. For example, a typical batch could contain some thousand  examples from
+an  entire training set of several millions. This batch is then used to
+perform a parameter update.
+
+!split
+===== Stochastic Gradient Descent (SGD) =====
+
+In stochastic gradient descent, the extreme case is the case where we
+have only one batch, that is we include the whole data set.
+
+This process is called Stochastic Gradient
+Descent (SGD) (or also sometimes on-line gradient descent). This is
+relatively less common to see because in practice due to vectorized
+code optimizations it can be computationally much more efficient to
+evaluate the gradient for 100 examples, than the gradient for one
+example 100 times. Even though SGD technically refers to using a
+single example at a time to evaluate the gradient, you will hear
+people use the term SGD even when referring to mini-batch gradient
+descent (i.e. mentions of MGD for “Minibatch Gradient Descent”, or BGD
+for “Batch gradient descent” are rare to see), where it is usually
+assumed that mini-batches are used. The size of the mini-batch is a
+hyperparameter but it is not very common to cross-validate or bootstrap it. It is
+usually based on memory constraints (if any), or set to some value,
+e.g. 32, 64 or 128. We use powers of 2 in practice because many
+vectorized operation implementations work faster when their inputs are
+sized in powers of 2.
+
+In our notes with  SGD we mean stochastic gradient descent with mini-batches.
+
+
+!split
+===== Stochastic Gradient Descent =====
+
+Stochastic gradient descent (SGD) and variants thereof address some of
+the shortcomings of the Gradient descent method discussed above.
+
+The underlying idea of SGD comes from the observation that the cost
+function, which we want to minimize, can almost always be written as a
+sum over $n$ data points $\{\mathbf{x}_i\}_{i=1}^n$,
+!bt
+\[
+C(\mathbf{\beta}) = \sum_{i=1}^n c_i(\mathbf{x}_i,
+\mathbf{\beta}). 
+\]
+!et
+
+!split
+===== Computation of gradients =====
+
+This in turn means that the gradient can be
+computed as a sum over $i$-gradients 
+!bt
+\[
+\nabla_\beta C(\mathbf{\beta}) = \sum_i^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta}).
+\]
+!et
+
+Stochasticity/randomness is introduced by only taking the
+gradient on a subset of the data called minibatches.  If there are $n$
+data points and the size of each minibatch is $M$, there will be $n/M$
+minibatches. We denote these minibatches by $B_k$ where
+$k=1,\cdots,n/M$.
+
+
+
+!split
+===== SGD example =====
+As an example, suppose we have $10$ data points $(\mathbf{x}_1,\cdots, \mathbf{x}_{10})$ 
+and we choose to have $M=5$ minibathces,
+then each minibatch contains two data points. In particular we have
+$B_1 = (\mathbf{x}_1,\mathbf{x}_2), \cdots, B_5 =
+(\mathbf{x}_9,\mathbf{x}_{10})$. Note that if you choose $M=1$ you
+have only a single batch with all data points and on the other extreme,
+you may choose $M=n$ resulting in a minibatch for each datapoint, i.e
+$B_k = \mathbf{x}_k$.
+
+The idea is now to approximate the gradient by replacing the sum over
+all data points with a sum over the data points in one the minibatches
+picked at random in each gradient descent step 
+!bt
+\[
+\nabla_{\beta}
+C(\mathbf{\beta}) = \sum_{i=1}^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta}) \rightarrow \sum_{i \in B_k}^n \nabla_\beta
+c_i(\mathbf{x}_i, \mathbf{\beta}).
+\]
+!et
+
+!split
+===== The gradient step =====
+
+Thus a gradient descent step now looks like 
+!bt
+\[
+\beta_{j+1} = \beta_j - \gamma_j \sum_{i \in B_k}^n \nabla_\beta c_i(\mathbf{x}_i,
+\mathbf{\beta})
+\]
+!et
+
+where $k$ is picked at random with equal
+probability from $[1,n/M]$. An iteration over the number of
+minibathces (n/M) is commonly referred to as an epoch. Thus it is
+typical to choose a number of epochs and for each epoch iterate over
+the number of minibatches, as exemplified in the code below.
+
+!split
+===== Simple example code =====
+
+!bc pycod
+import numpy as np 
+
+n = 100 #100 datapoints 
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+n_epochs = 10 #number of epochs
+
+j = 0
+for epoch in range(1,n_epochs+1):
+    for i in range(m):
+        k = np.random.randint(m) #Pick the k-th minibatch at random
+        #Compute the gradient using the data in minibatch Bk
+        #Compute new suggestion for 
+        j += 1
+!ec
+
+Taking the gradient only on a subset of the data has two important
+benefits. First, it introduces randomness which decreases the chance
+that our opmization scheme gets stuck in a local minima. Second, if
+the size of the minibatches are small relative to the number of
+datapoints ($M <  n$), the computation of the gradient is much
+cheaper since we sum over the datapoints in the $k-th$ minibatch and not
+all $n$ datapoints.
+
+!split
+===== When do we stop? =====
+
+A natural question is when do we stop the search for a new minimum?
+One possibility is to compute the full gradient after a given number
+of epochs and check if the norm of the gradient is smaller than some
+threshold and stop if true. However, the condition that the gradient
+is zero is valid also for local minima, so this would only tell us
+that we are close to a local/global minimum. However, we could also
+evaluate the cost function at this point, store the result and
+continue the search. If the test kicks in at a later stage we can
+compare the values of the cost function and keep the $\beta$ that
+gave the lowest value.
+
+!split
+===== Slightly different approach =====
+
+Another approach is to let the step length $\gamma_j$ depend on the
+number of epochs in such a way that it becomes very small after a
+reasonable time such that we do not move at all. Such approaches are
+also called scaling. There are many such ways to "scale the learning
+rate":"https://towardsdatascience.com/gradient-descent-the-learning-rate-and-the-importance-of-feature-scaling-6c0b416596e1"
+and "discussions here":"https://www.jmlr.org/papers/volume23/20-1258/20-1258.pdf". See
+also
+URL:"https://towardsdatascience.com/learning-rate-schedules-and-adaptive-learning-rate-methods-for-deep-learning-2c8f433990d1"
+for a discussion of different scaling functions for the learning rate.
+
+!split
+===== Time decay rate =====
+
+As an example, let $e = 0,1,2,3,\cdots$ denote the current epoch and let $t_0, t_1 > 0$ be two fixed numbers. Furthermore, let $t = e \cdot m + i$ where $m$ is the number of minibatches and $i=0,\cdots,m-1$. Then the function $$\gamma_j(t; t_0, t_1) = \frac{t_0}{t+t_1} $$ goes to zero as the number of epochs gets large. I.e. we start with a step length $\gamma_j (0; t_0, t_1) = t_0/t_1$ which decays in *time* $t$.
+
+In this way we can fix the number of epochs, compute $\beta$ and
+evaluate the cost function at the end. Repeating the computation will
+give a different result since the scheme is random by design. Then we
+pick the final $\beta$ that gives the lowest value of the cost
+function.
+
+!bc pycod
+import numpy as np 
+
+def step_length(t,t0,t1):
+    return t0/(t+t1)
+
+n = 100 #100 datapoints 
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+n_epochs = 500 #number of epochs
+t0 = 1.0
+t1 = 10
+
+gamma_j = t0/t1
+j = 0
+for epoch in range(1,n_epochs+1):
+    for i in range(m):
+        k = np.random.randint(m) #Pick the k-th minibatch at random
+        #Compute the gradient using the data in minibatch Bk
+        #Compute new suggestion for beta
+        t = epoch*m+i
+        gamma_j = step_length(t,t0,t1)
+        j += 1
+
+print("gamma_j after %d epochs: %g" % (n_epochs,gamma_j))
+!ec
+
+
+
+
+
+
+!split
+===== Code with a Number of Minibatches which varies =====
+
+In the code here we vary the number of mini-batches.
+!bc pycode
+# Importing various packages
+from math import exp, sqrt
+from random import random, seed
+import numpy as np
 import matplotlib.pyplot as plt
 
-# Returns mean of bootstrap samples                                                                                                                                                
-def stat(data):
-    return mean(data)
+n = 100
+x = 2*np.random.rand(n,1)
+y = 4+3*x+np.random.randn(n,1)
 
-# Bootstrap algorithm                                                                                                                                                              
-def bootstrap(data, statistic, R):
-    t = zeros(R); n = len(data); inds = arange(n); t0 = time()
+X = np.c_[np.ones((n,1)), x]
+XT_X = X.T @ X
+theta_linreg = np.linalg.inv(X.T @ X) @ (X.T @ y)
+print("Own inversion")
+print(theta_linreg)
+# Hessian matrix
+H = (2.0/n)* XT_X
+EigValues, EigVectors = np.linalg.eig(H)
+print(f"Eigenvalues of Hessian Matrix:{EigValues}")
 
-    # non-parametric bootstrap                                                                                                                                                     
-    for i in range(R):
-        t[i] = statistic(data[randint(0,n,n)])
-
-    # analysis                                                                                                                                                                     
-    print("Runtime: %g sec" % (time()-t0)); print("Bootstrap Statistics :")
-    print("original           bias      std. error")
-    print("%8g %8g %14g %15g" % (statistic(data), std(data),\
-                             mean(t), \
-                             std(t)))
-    return t
+theta = np.random.randn(2,1)
+eta = 1.0/np.max(EigValues)
+Niterations = 1000
 
 
-mu, sigma = 100, 15
-datapoints = 10000
-x = mu + sigma*random.randn(datapoints)
-# bootstrap returns the data sample                                                                                                          t = bootstrap(x, stat, datapoints)
-# the histogram of the bootstrapped  data  
-t = bootstrap(x, stat, datapoints)
-# the histogram of the bootstrapped  data                                            
-n, binsboot, patches = plt.hist(t, bins=50, density='true',histtype='bar', color='red', alpha=0.75)
+for iter in range(Niterations):
+    gradients = 2.0/n*X.T @ ((X @ theta)-y)
+    theta -= eta*gradients
+print("theta from own gd")
+print(theta)
 
-# add a 'best fit' line                                                                                                                                                          
-y = norm.pdf( binsboot, mean(t), std(t))
-lt = plt.plot(binsboot, y, 'r--', linewidth=1)
-plt.xlabel('Smarts')
-plt.ylabel('Probability')
-plt.axis([99.5, 100.6, 0, 3.0])
-plt.grid(True)
+xnew = np.array([[0],[2]])
+Xnew = np.c_[np.ones((2,1)), xnew]
+ypredict = Xnew.dot(theta)
+ypredict2 = Xnew.dot(theta_linreg)
 
+n_epochs = 50
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+t0, t1 = 5, 50
+
+def learning_schedule(t):
+    return t0/(t+t1)
+
+theta = np.random.randn(2,1)
+
+for epoch in range(n_epochs):
+# Can you figure out a better way of setting up the contributions to each batch?
+    for i in range(m):
+        random_index = M*np.random.randint(m)
+        xi = X[random_index:random_index+M]
+        yi = y[random_index:random_index+M]
+        gradients = (2.0/M)* xi.T @ ((xi @ theta)-yi)
+        eta = learning_schedule(epoch*m+i)
+        theta = theta - eta*gradients
+print("theta from own sdg")
+print(theta)
+
+plt.plot(xnew, ypredict, "r-")
+plt.plot(xnew, ypredict2, "b-")
+plt.plot(x, y ,'ro')
+plt.axis([0,2.0,0, 15.0])
+plt.xlabel(r'$x$')
+plt.ylabel(r'$y$')
+plt.title(r'Random numbers ')
+plt.show()
+
+!ec
+
+
+
+!split
+===== Replace or not =====
+
+In the above code, we have use replacement in setting up the
+mini-batches. The discussion
+"here":"https://sebastianraschka.com/faq/docs/sgd-methods.html" may be
+useful.  
+
+
+!split
+===== Momentum based GD =====
+
+The stochastic gradient descent (SGD) is almost always used with a
+*momentum* or inertia term that serves as a memory of the direction we
+are moving in parameter space.  This is typically implemented as
+follows
+
+!bt
+\begin{align}
+\mathbf{v}_{t}&=\gamma \mathbf{v}_{t-1}+\eta_{t}\nabla_\theta E(\boldsymbol{\theta}_t) \nonumber \\
+\boldsymbol{\theta}_{t+1}&= \boldsymbol{\theta}_t -\mathbf{v}_{t},
+\end{align}
+!et
+
+where we have introduced a momentum parameter $\gamma$, with
+$0\le\gamma\le 1$, and for brevity we dropped the explicit notation to
+indicate the gradient is to be taken over a different mini-batch at
+each step. We call this algorithm gradient descent with momentum
+(GDM). From these equations, it is clear that $\mathbf{v}_t$ is a
+running average of recently encountered gradients and
+$(1-\gamma)^{-1}$ sets the characteristic time scale for the memory
+used in the averaging procedure. Consistent with this, when
+$\gamma=0$, this just reduces down to ordinary SGD as discussed
+earlier. An equivalent way of writing the updates is
+
+!bt
+\[
+\Delta \boldsymbol{\theta}_{t+1} = \gamma \Delta \boldsymbol{\theta}_t -\ \eta_{t}\nabla_\theta E(\boldsymbol{\theta}_t),
+\]
+!et
+where we have defined $\Delta \boldsymbol{\theta}_{t}= \boldsymbol{\theta}_t-\boldsymbol{\theta}_{t-1}$.
+
+!split
+===== More on momentum based approaches =====
+
+Let us try to get more intuition from these equations. It is helpful
+to consider a simple physical analogy with a particle of mass $m$
+moving in a viscous medium with drag coefficient $\mu$ and potential
+$E(\mathbf{w})$. If we denote the particle's position by $\mathbf{w}$,
+then its motion is described by
+
+!bt
+\[
+m {d^2 \mathbf{w} \over dt^2} + \mu {d \mathbf{w} \over dt }= -\nabla_w E(\mathbf{w}).
+\]
+!et
+
+We can discretize this equation in the usual way to get
+
+!bt
+\[
+m { \mathbf{w}_{t+\Delta t}-2 \mathbf{w}_{t} +\mathbf{w}_{t-\Delta t} \over (\Delta t)^2}+\mu {\mathbf{w}_{t+\Delta t}- \mathbf{w}_{t} \over \Delta t} = -\nabla_w E(\mathbf{w}).
+\]
+!et
+
+Rearranging this equation, we can rewrite this as
+
+!bt
+\[
+\Delta \mathbf{w}_{t +\Delta t}= - { (\Delta t)^2 \over m +\mu \Delta t} \nabla_w E(\mathbf{w})+ {m \over m +\mu \Delta t} \Delta \mathbf{w}_t.
+\]
+!et
+
+!split
+===== Momentum parameter =====
+
+Notice that this equation is identical to previous one if we identify
+the position of the particle, $\mathbf{w}$, with the parameters
+$\boldsymbol{\theta}$. This allows us to identify the momentum
+parameter and learning rate with the mass of the particle and the
+viscous drag as:
+
+!bt
+\[
+\gamma= {m \over m +\mu \Delta t }, \qquad \eta = {(\Delta t)^2 \over m +\mu \Delta t}.
+\]
+!et
+
+Thus, as the name suggests, the momentum parameter is proportional to
+the mass of the particle and effectively provides inertia.
+Furthermore, in the large viscosity/small learning rate limit, our
+memory time scales as $(1-\gamma)^{-1} \approx m/(\mu \Delta t)$.
+
+Why is momentum useful? SGD momentum helps the gradient descent
+algorithm gain speed in directions with persistent but small gradients
+even in the presence of stochasticity, while suppressing oscillations
+in high-curvature directions. This becomes especially important in
+situations where the landscape is shallow and flat in some directions
+and narrow and steep in others. It has been argued that first-order
+methods (with appropriate initial conditions) can perform comparable
+to more expensive second order methods, especially in the context of
+complex deep learning models.
+
+These beneficial properties of momentum can sometimes become even more
+pronounced by using a slight modification of the classical momentum
+algorithm called Nesterov Accelerated Gradient (NAG).
+
+In the NAG algorithm, rather than calculating the gradient at the
+current parameters, $\nabla_\theta E(\boldsymbol{\theta}_t)$, one
+calculates the gradient at the expected value of the parameters given
+our current momentum, $\nabla_\theta E(\boldsymbol{\theta}_t +\gamma
+\mathbf{v}_{t-1})$. This yields the NAG update rule
+
+!bt
+\begin{align}
+\mathbf{v}_{t}&=\gamma \mathbf{v}_{t-1}+\eta_{t}\nabla_\theta E(\boldsymbol{\theta}_t +\gamma \mathbf{v}_{t-1}) \nonumber \\
+\boldsymbol{\theta}_{t+1}&= \boldsymbol{\theta}_t -\mathbf{v}_{t}.
+\end{align}
+!et
+
+One of the major advantages of NAG is that it allows for the use of a larger learning rate than GDM for the same choice of $\gamma$.
+
+
+!split
+===== Second moment of the gradient =====
+
+
+In stochastic gradient descent, with and without momentum, we still
+have to specify a schedule for tuning the learning rates $\eta_t$
+as a function of time.  As discussed in the context of Newton's
+method, this presents a number of dilemmas. The learning rate is
+limited by the steepest direction which can change depending on the
+current position in the landscape. To circumvent this problem, ideally
+our algorithm would keep track of curvature and take large steps in
+shallow, flat directions and small steps in steep, narrow directions.
+Second-order methods accomplish this by calculating or approximating
+the Hessian and normalizing the learning rate by the
+curvature. However, this is very computationally expensive for
+extremely large models. Ideally, we would like to be able to
+adaptively change the step size to match the landscape without paying
+the steep computational price of calculating or approximating
+Hessians.
+
+Recently, a number of methods have been introduced that accomplish
+this by tracking not only the gradient, but also the second moment of
+the gradient. These methods include AdaGrad, AdaDelta, Root Mean Squared Propagation (RMS-Prop), and
+"ADAM":"https://arxiv.org/abs/1412.6980".
+
+!split
+===== RMS prop =====
+
+In RMS prop, in addition to keeping a running average of the first
+moment of the gradient, we also keep track of the second moment
+denoted by $\mathbf{s}_t=\mathbb{E}[\mathbf{g}_t^2]$. The update rule
+for RMS prop is given by
+
+!bt
+\begin{align}
+\mathbf{g}_t &= \nabla_\theta E(\boldsymbol{\theta}) \\
+\mathbf{s}_t &=\beta \mathbf{s}_{t-1} +(1-\beta)\mathbf{g}_t^2 \nonumber \\
+\boldsymbol{\theta}_{t+1}&=&\boldsymbol{\theta}_t - \eta_t { \mathbf{g}_t \over \sqrt{\mathbf{s}_t +\epsilon}}, \nonumber
+\end{align}
+!et
+
+where $\beta$ controls the averaging time of the second moment and is
+typically taken to be about $\beta=0.9$, $\eta_t$ is a learning rate
+typically chosen to be $10^{-3}$, and $\epsilon\sim 10^{-8} $ is a
+small regularization constant to prevent divergences. Multiplication
+and division by vectors is understood as an element-wise operation. It
+is clear from this formula that the learning rate is reduced in
+directions where the norm of the gradient is consistently large. This
+greatly speeds up the convergence by allowing us to use a larger
+learning rate for flat directions.
+
+
+!split
+===== "ADAM optimizer":"https://arxiv.org/abs/1412.6980" =====
+
+A related algorithm is the ADAM optimizer. In
+"ADAM":"https://arxiv.org/abs/1412.6980", we keep a running average of
+both the first and second moment of the gradient and use this
+information to adaptively change the learning rate for different
+parameters.  The method isefficient when working with large
+problems involving lots data and/or parameters.  It is a combination of the
+gradient descent with momentum algorithm and the RMSprop algorithm
+discussed above.
+
+In addition to keeping a running average of the first and
+second moments of the gradient
+(i.e. $\mathbf{m}_t=\mathbb{E}[\mathbf{g}_t]$ and
+$\mathbf{s}_t=\mathbb{E}[\mathbf{g}^2_t]$, respectively), ADAM
+performs an additional bias correction to account for the fact that we
+are estimating the first two moments of the gradient using a running
+average (denoted by the hats in the update rule below). The update
+rule for ADAM is given by (where multiplication and division are once
+again understood to be element-wise operations below)
+
+!bt
+\begin{align}
+\mathbf{g}_t &= \nabla_\theta E(\boldsymbol{\theta}) \\
+\mathbf{m}_t &= \beta_1 \mathbf{m}_{t-1} + (1-\beta_1) \mathbf{g}_t \nonumber \\
+\mathbf{s}_t &=\beta_2 \mathbf{s}_{t-1} +(1-\beta_2)\mathbf{g}_t^2 \nonumber \\
+\bm{\mathbf{m}}_t&={\mathbf{m}_t \over 1-\beta_1^t} \nonumber \\
+\bm{\mathbf{s}}_t &={\mathbf{s}_t \over1-\beta_2^t} \nonumber \\
+\boldsymbol{\theta}_{t+1}&=\boldsymbol{\theta}_t - \eta_t { \bm{\mathbf{m}}_t \over \sqrt{\bm{\mathbf{s}}_t} +\epsilon}, \nonumber \\
+\end{align}
+!et
+
+where $\beta_1$ and $\beta_2$ set the memory lifetime of the first and
+second moment and are typically taken to be $0.9$ and $0.99$
+respectively, and $\eta$ and $\epsilon$ are identical to RMSprop.
+
+Like in RMSprop, the effective step size of a parameter depends on the
+magnitude of its gradient squared.  To understand this better, let us
+rewrite this expression in terms of the variance
+$\boldsymbol{\sigma}_t^2 = \bm{\mathbf{s}}_t -
+(\bm{\mathbf{m}}_t)^2$. Consider a single parameter $\theta_t$. The
+update rule for this parameter is given by
+
+!bt
+\[
+\Delta \theta_{t+1}= -\eta_t { \bm{m}_t \over \sqrt{\sigma_t^2 +  m_t^2 }+\epsilon}.
+\]
+!et
+
+!split
+===== Algorithms and codes for Adagrad, RMSprop and Adam =====
+
+The algorithms we have implemented are well described in the text by "Goodfellow, Bengio and Courville, chapter 8":"https://www.deeplearningbook.org/contents/optimization.html".
+
+The codes which implement these algorithms are discussed after our presentation of automatic differentiation.
+
+
+!split
+===== Practical tips =====
+
+* _Randomize the data when making mini-batches_. It is always important to randomly shuffle the data when forming mini-batches. Otherwise, the gradient descent method can fit spurious correlations resulting from the order in which data is presented.
+
+* _Transform your inputs_. Learning becomes difficult when our landscape has a mixture of steep and flat directions. One simple trick for minimizing these situations is to standardize the data by subtracting the mean and normalizing the variance of input variables. Whenever possible, also decorrelate the inputs. To understand why this is helpful, consider the case of linear regression. It is easy to show that for the squared error cost function, the Hessian of the cost function is just the correlation matrix between the inputs. Thus, by standardizing the inputs, we are ensuring that the landscape looks homogeneous in all directions in parameter space. Since most deep networks can be viewed as linear transformations followed by a non-linearity at each layer, we expect this intuition to hold beyond the linear case.
+
+* _Monitor the out-of-sample performance._ Always monitor the performance of your model on a validation set (a small portion of the training data that is held out of the training process to serve as a proxy for the test set. If the validation error starts increasing, then the model is beginning to overfit. Terminate the learning process. This *early stopping* significantly improves performance in many settings.
+	
+* _Adaptive optimization methods don't always have good generalization._ Recent studies have shown that adaptive methods such as ADAM, RMSPorp, and AdaGrad tend to have poor generalization compared to SGD or SGD with momentum, particularly in the high-dimensional limit (i.e. the number of parameters exceeds the number of data points). Although it is not clear at this stage why these methods perform so well in training deep neural networks, simpler procedures like properly-tuned SGD may work as well or better in these applications.
+
+Geron's text, see chapter 11, has several interesting discussions.
+
+
+
+!split
+===== Automatic differentiation =====
+
+"Automatic differentiation (AD)":"https://en.wikipedia.org/wiki/Automatic_differentiation", 
+also called algorithmic
+differentiation or computational differentiation,is a set of
+techniques to numerically evaluate the derivative of a function
+specified by a computer program. AD exploits the fact that every
+computer program, no matter how complicated, executes a sequence of
+elementary arithmetic operations (addition, subtraction,
+multiplication, division, etc.) and elementary functions (exp, log,
+sin, cos, etc.). By applying the chain rule repeatedly to these
+operations, derivatives of arbitrary order can be computed
+automatically, accurately to working precision, and using at most a
+small constant factor more arithmetic operations than the original
+program.
+
+Automatic differentiation is neither:
+
+* Symbolic differentiation, nor
+* Numerical differentiation (the method of finite differences).
+
+Symbolic differentiation can lead to inefficient code and faces the
+difficulty of converting a computer program into a single expression,
+while numerical differentiation can introduce round-off errors in the
+discretization process and cancellation
+
+
+
+Python has tools for so-called _automatic differentiation_.
+Consider the following example
+!bt
+\[
+f(x) = \sin\left(2\pi x + x^2\right)
+\]
+!et
+which has the following derivative
+!bt
+\[
+f'(x) = \cos\left(2\pi x + x^2\right)\left(2\pi + 2x\right) 
+\]
+!et
+Using _autograd_ we have
+
+!bc pycod
+import autograd.numpy as np
+
+# To do elementwise differentiation:
+from autograd import elementwise_grad as egrad 
+
+# To plot:
+import matplotlib.pyplot as plt 
+
+
+def f(x):
+    return np.sin(2*np.pi*x + x**2)
+
+def f_grad_analytic(x):
+    return np.cos(2*np.pi*x + x**2)*(2*np.pi + 2*x)
+
+# Do the comparison:
+x = np.linspace(0,1,1000)
+
+f_grad = egrad(f)
+
+computed = f_grad(x)
+analytic = f_grad_analytic(x)
+
+plt.title('Derivative computed from Autograd compared with the analytical derivative')
+plt.plot(x,computed,label='autograd')
+plt.plot(x,analytic,label='analytic')
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+
+plt.show()
+
+print("The max absolute difference is: %g"%(np.max(np.abs(computed - analytic))))
+!ec
+
+!split 
+===== Using autograd =====
+
+Here we
+experiment with what kind of functions Autograd is capable
+of finding the gradient of. The following Python functions are just
+meant to illustrate what Autograd can do, but please feel free to
+experiment with other, possibly more complicated, functions as well.
+
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+
+def f1(x):
+    return x**3 + 1
+
+f1_grad = grad(f1)
+
+# Remember to send in float as argument to the computed gradient from Autograd!
+a = 1.0
+
+# See the evaluated gradient at a using autograd:
+print("The gradient of f1 evaluated at a = %g using autograd is: %g"%(a,f1_grad(a)))
+
+# Compare with the analytical derivative, that is f1'(x) = 3*x**2 
+grad_analytical = 3*a**2
+print("The gradient of f1 evaluated at a = %g by finding the analytic expression is: %g"%(a,grad_analytical))
+!ec
+
+
+!split
+===== Autograd with more complicated functions =====
+
+To differentiate with respect to two (or more) arguments of a Python
+function, Autograd need to know at which variable the function if
+being differentiated with respect to.
+
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+def f2(x1,x2):
+    return 3*x1**3 + x2*(x1 - 5) + 1
+
+# By sending the argument 0, Autograd will compute the derivative w.r.t the first variable, in this case x1
+f2_grad_x1 = grad(f2,0)
+
+# ... and differentiate w.r.t x2 by sending 1 as an additional arugment to grad
+f2_grad_x2 = grad(f2,1)
+
+x1 = 1.0
+x2 = 3.0 
+
+print("Evaluating at x1 = %g, x2 = %g"%(x1,x2))
+print("-"*30)
+
+# Compare with the analytical derivatives:
+
+# Derivative of f2 w.r.t x1 is: 9*x1**2 + x2:
+f2_grad_x1_analytical = 9*x1**2 + x2
+
+# Derivative of f2 w.r.t x2 is: x1 - 5:
+f2_grad_x2_analytical = x1 - 5
+
+# See the evaluated derivations:
+print("The derivative of f2 w.r.t x1: %g"%( f2_grad_x1(x1,x2) ))
+print("The analytical derivative of f2 w.r.t x1: %g"%( f2_grad_x1(x1,x2) ))
+
+print()
+
+print("The derivative of f2 w.r.t x2: %g"%( f2_grad_x2(x1,x2) ))
+print("The analytical derivative of f2 w.r.t x2: %g"%( f2_grad_x2(x1,x2) ))
+!ec
+
+Note that the grad function will not produce the true gradient of the function. The true gradient of a function with two or more variables will produce a vector, where each element is the function differentiated w.r.t a variable.
+
+
+!split
+=====  More complicated functions using the elements of their arguments directly =====
+
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+def f3(x): # Assumes x is an array of length 5 or higher
+    return 2*x[0] + 3*x[1] + 5*x[2] + 7*x[3] + 11*x[4]**2
+
+f3_grad = grad(f3)
+
+x = np.linspace(0,4,5)
+
+# Print the computed gradient:
+print("The computed gradient of f3 is: ", f3_grad(x))
+
+# The analytical gradient is: (2, 3, 5, 7, 22*x[4])
+f3_grad_analytical = np.array([2, 3, 5, 7, 22*x[4]])
+
+# Print the analytical gradient:
+print("The analytical gradient of f3 is: ", f3_grad_analytical)
+!ec
+
+Note that in this case, when sending an array as input argument, the
+output from Autograd is another array. This is the true gradient of
+the function, as opposed to the function in the previous example. By
+using arrays to represent the variables, the output from Autograd
+might be easier to work with, as the output is closer to what one
+could expect form a gradient-evaluting function.
+
+!split 
+===== Functions using mathematical functions from Numpy =====
+
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+def f4(x):
+    return np.sqrt(1+x**2) + np.exp(x) + np.sin(2*np.pi*x)
+
+f4_grad = grad(f4)
+
+x = 2.7
+
+# Print the computed derivative:
+print("The computed derivative of f4 at x = %g is: %g"%(x,f4_grad(x)))
+
+# The analytical derivative is: x/sqrt(1 + x**2) + exp(x) + cos(2*pi*x)*2*pi
+f4_grad_analytical = x/np.sqrt(1 + x**2) + np.exp(x) + np.cos(2*np.pi*x)*2*np.pi
+
+# Print the analytical gradient:
+print("The analytical gradient of f4 at x = %g is: %g"%(x,f4_grad_analytical))
+!ec
+
+
+!split
+===== More autograd =====
+
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+def f5(x):
+    if x >= 0:
+        return x**2
+    else:
+        return -3*x + 1
+
+f5_grad = grad(f5)
+
+x = 2.7
+
+# Print the computed derivative:
+print("The computed derivative of f5 at x = %g is: %g"%(x,f5_grad(x)))
+!ec
+
+
+!split
+===== And  with loops =====
+
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+def f6_for(x):
+    val = 0
+    for i in range(10):
+        val = val + x**i
+    return val
+
+def f6_while(x):
+    val = 0
+    i = 0
+    while i < 10:
+        val = val + x**i
+        i = i + 1
+    return val
+
+f6_for_grad = grad(f6_for)
+f6_while_grad = grad(f6_while)
+
+x = 0.5
+
+# Print the computed derivaties of f6_for and f6_while
+print("The computed derivative of f6_for at x = %g is: %g"%(x,f6_for_grad(x)))
+print("The computed derivative of f6_while at x = %g is: %g"%(x,f6_while_grad(x)))
+!ec
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+# Both of the functions are implementation of the sum: sum(x**i) for i = 0, ..., 9
+# The analytical derivative is: sum(i*x**(i-1)) 
+f6_grad_analytical = 0
+for i in range(10):
+    f6_grad_analytical += i*x**(i-1)
+
+print("The analytical derivative of f6 at x = %g is: %g"%(x,f6_grad_analytical))
+!ec
+
+!split
+===== Using recursion =====
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+
+def f7(n): # Assume that n is an integer
+    if n == 1 or n == 0:
+        return 1
+    else:
+        return n*f7(n-1)
+
+f7_grad = grad(f7)
+
+n = 2.0
+
+print("The computed derivative of f7 at n = %d is: %g"%(n,f7_grad(n)))
+
+# The function f7 is an implementation of the factorial of n.
+# By using the product rule, one can find that the derivative is:
+
+f7_grad_analytical = 0
+for i in range(int(n)-1):
+    tmp = 1
+    for k in range(int(n)-1):
+        if k != i:
+            tmp *= (n - k)
+    f7_grad_analytical += tmp
+
+print("The analytical derivative of f7 at n = %d is: %g"%(n,f7_grad_analytical))
+
+!ec
+Note that if n is equal to zero or one, Autograd will give an error message. This message appears when the output is independent on input.
+
+!split
+===== Unsupported functions =====
+Autograd supports many features. However, there are some functions that is not supported (yet) by Autograd.
+
+Assigning a value to the variable being differentiated with respect to
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+def f8(x): # Assume x is an array
+    x[2] = 3
+    return x*2
+
+f8_grad = grad(f8)
+
+x = 8.4
+
+print("The derivative of f8 is:",f8_grad(x))
+!ec
+Here, Autograd tells us that an 'ArrayBox' does not support item assignment. The item assignment is done when the program tries to assign x[2] to the value 3. However, Autograd has implemented the computation of the derivative such that this assignment is not possible.
+
+!split
+===== The syntax a.dot(b) when finding the dot product =====
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+def f9(a): # Assume a is an array with 2 elements
+    b = np.array([1.0,2.0])
+    return a.dot(b)
+
+f9_grad = grad(f9)
+
+x = np.array([1.0,0.0])
+
+print("The derivative of f9 is:",f9_grad(x))
+!ec
+
+Here we are told that the 'dot' function does not belong to Autograd's
+version of a Numpy array.  To overcome this, an alternative syntax
+which also computed the dot product can be used:
+
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+def f9_alternative(x): # Assume a is an array with 2 elements
+    b = np.array([1.0,2.0])
+    return np.dot(x,b) # The same as x_1*b_1 + x_2*b_2
+
+f9_alternative_grad = grad(f9_alternative)
+
+x = np.array([3.0,0.0])
+
+print("The gradient of f9 is:",f9_alternative_grad(x))
+
+# The analytical gradient of the dot product of vectors x and b with two elements (x_1,x_2) and (b_1, b_2) respectively
+# w.r.t x is (b_1, b_2).
+!ec
+
+!split
+===== Recommended to avoid =====
+The documentation recommends to avoid inplace operations such as
+!bc pycod
+a += b
+a -= b
+a*= b
+a /=b
+!ec
+
+
+!split
+=====  Using Autograd with OLS =====
+
+We conclude the part on optmization by showing how we can make codes
+for linear regression and logistic regression using _autograd_. The
+first example shows results with ordinary leats squares.
+
+!bc pycod
+# Using Autograd to calculate gradients for OLS
+from random import random, seed
+import numpy as np
+import autograd.numpy as np
+import matplotlib.pyplot as plt
+from autograd import grad
+
+def CostOLS(beta):
+    return (1.0/n)*np.sum((y-X @ beta)**2)
+
+n = 100
+x = 2*np.random.rand(n,1)
+y = 4+3*x+np.random.randn(n,1)
+
+X = np.c_[np.ones((n,1)), x]
+XT_X = X.T @ X
+theta_linreg = np.linalg.pinv(XT_X) @ (X.T @ y)
+print("Own inversion")
+print(theta_linreg)
+# Hessian matrix
+H = (2.0/n)* XT_X
+EigValues, EigVectors = np.linalg.eig(H)
+print(f"Eigenvalues of Hessian Matrix:{EigValues}")
+
+theta = np.random.randn(2,1)
+eta = 1.0/np.max(EigValues)
+Niterations = 1000
+# define the gradient
+training_gradient = grad(CostOLS)
+
+for iter in range(Niterations):
+    gradients = training_gradient(theta)
+    theta -= eta*gradients
+print("theta from own gd")
+print(theta)
+
+xnew = np.array([[0],[2]])
+Xnew = np.c_[np.ones((2,1)), xnew]
+ypredict = Xnew.dot(theta)
+ypredict2 = Xnew.dot(theta_linreg)
+
+plt.plot(xnew, ypredict, "r-")
+plt.plot(xnew, ypredict2, "b-")
+plt.plot(x, y ,'ro')
+plt.axis([0,2.0,0, 15.0])
+plt.xlabel(r'$x$')
+plt.ylabel(r'$y$')
+plt.title(r'Random numbers ')
 plt.show()
 
 !ec
 
 
 !split
-===== Resampling methods: Blocking  =====
+===== Same code but now with momentum gradient descent =====
+!bc pycod
+# Using Autograd to calculate gradients for OLS
+from random import random, seed
+import numpy as np
+import autograd.numpy as np
+import matplotlib.pyplot as plt
+from autograd import grad
 
-The blocking method was made popular by "Flyvbjerg and Pedersen (1989)":"https://aip.scitation.org/doi/10.1063/1.457480"
-and has become one of the standard ways to estimate
-$V(\widehat{\theta})$ for exactly one $\widehat{\theta}$, namely
-$\widehat{\theta} = \overline{X}$. 
+def CostOLS(beta):
+    return (1.0/n)*np.sum((y-X @ beta)**2)
 
-Assume $n = 2^d$ for some integer $d>1$ and $X_1,X_2,\cdots, X_n$ is a stationary time series to begin with. 
-Moreover, assume that the time series is asymptotically uncorrelated. We switch to vector notation by arranging $X_1,X_2,\cdots,X_n$ in an $n$-tuple. Define:
-!bt
-\begin{align*}
-\hat{X} = (X_1,X_2,\cdots,X_n).
-\end{align*}
-!et
+n = 100
+x = 2*np.random.rand(n,1)
+y = 4+3*x#+np.random.randn(n,1)
 
-The strength of the blocking method is when the number of
-observations, $n$ is large. For large $n$, the complexity of dependent
-bootstrapping scales poorly, but the blocking method does not,
-moreover, it becomes more accurate the larger $n$ is.
+X = np.c_[np.ones((n,1)), x]
+XT_X = X.T @ X
+theta_linreg = np.linalg.pinv(XT_X) @ (X.T @ y)
+print("Own inversion")
+print(theta_linreg)
+# Hessian matrix
+H = (2.0/n)* XT_X
+EigValues, EigVectors = np.linalg.eig(H)
+print(f"Eigenvalues of Hessian Matrix:{EigValues}")
 
-!split
-===== Blocking Transformations =====
- We now define
-blocking transformations. The idea is to take the mean of subsequent
-pair of elements from $\vec{X}$ and form a new vector
-$\vec{X}_1$. Continuing in the same way by taking the mean of
-subsequent pairs of elements of $\vec{X}_1$ we obtain $\vec{X}_2$, and
-so on. 
-Define $\vec{X}_i$ recursively by:
+theta = np.random.randn(2,1)
+eta = 1.0/np.max(EigValues)
+Niterations = 30
 
-!bt 
-\begin{align} 
-(\vec{X}_0)_k &\equiv (\vec{X})_k \nonumber \\
-(\vec{X}_{i+1})_k &\equiv \frac{1}{2}\Big( (\vec{X}_i)_{2k-1} +
-(\vec{X}_i)_{2k} \Big) \qquad \text{for all} \qquad 1 \leq i \leq d-1
-\end{align} 
-!et 
+# define the gradient
+training_gradient = grad(CostOLS)
 
-The quantity $\vec{X}_k$ is
-subject to $k$ _blocking transformations_.  We now have $d$ vectors
-$\vec{X}_0, \vec{X}_1,\cdots,\vec X_{d-1}$ containing the subsequent
-averages of observations. It turns out that if the components of
-$\vec{X}$ is a stationary time series, then the components of
-$\vec{X}_i$ is a stationary time series for all $0 \leq i \leq d-1$
+for iter in range(Niterations):
+    gradients = training_gradient(theta)
+    theta -= eta*gradients
+    print(iter,gradients[0],gradients[1])
+print("theta from own gd")
+print(theta)
 
-We can then compute the autocovariance, the variance, sample mean, and
-number of observations for each $i$. 
-Let $\gamma_i, \sigma_i^2,
-\overline{X}_i$ denote the autocovariance, variance and average of the
-elements of $\vec{X}_i$ and let $n_i$ be the number of elements of
-$\vec{X}_i$. It follows by induction that $n_i = n/2^i$. 
+# Now improve with momentum gradient descent
+change = 0.0
+delta_momentum = 0.3
+for iter in range(Niterations):
+    # calculate gradient
+    gradients = training_gradient(theta)
+    # calculate update
+    new_change = eta*gradients+delta_momentum*change
+    # take a step
+    theta -= new_change
+    # save the change
+    change = new_change
+    print(iter,gradients[0],gradients[1])
+print("theta from own gd wth momentum")
+print(theta)
 
-!split
-===== Blocking Transformations =====
-
-Using the
-definition of the blocking transformation and the distributive
-property of the covariance, it is clear that since $h =|i-j|$
-we can define
-!bt
-\begin{align}
-\gamma_{k+1}(h) &= cov\left( ({X}_{k+1})_{i}, ({X}_{k+1})_{j} \right) \nonumber \\
-&=  \frac{1}{4}cov\left( ({X}_{k})_{2i-1} + ({X}_{k})_{2i}, ({X}_{k})_{2j-1} + ({X}_{k})_{2j} \right) \nonumber \\
-&=  \frac{1}{2}\gamma_{k}(2h) + \frac{1}{2}\gamma_k(2h+1) \hspace{0.1cm} \mathrm{h = 0} \\
-&=\frac{1}{4}\gamma_k(2h-1) + \frac{1}{2}\gamma_k(2h) + \frac{1}{4}\gamma_k(2h+1) \quad \mathrm{else}
-\end{align}
-!et
-
-The quantity $\hat{X}$ is asymptotic uncorrelated by assumption, $\hat{X}_k$ is also asymptotic uncorrelated. Let's turn our attention to the variance of the sample mean $V(\overline{X})$. 
+!ec
 
 !split
-===== Blocking Transformations, getting there =====
-We have
-!bt
-\begin{align}
-V(\overline{X}_k) = \frac{\sigma_k^2}{n_k} + \underbrace{\frac{2}{n_k} \sum_{h=1}^{n_k-1}\left( 1 - \frac{h}{n_k} \right)\gamma_k(h)}_{\equiv e_k} = \frac{\sigma^2_k}{n_k} + e_k \quad \text{if} \quad \gamma_k(0) = \sigma_k^2. 
-\end{align}
-!et
-The term $e_k$ is called the _truncation error_: 
-!bt
-\begin{equation}
-e_k = \frac{2}{n_k} \sum_{h=1}^{n_k-1}\left( 1 - \frac{h}{n_k} \right)\gamma_k(h). 
-\end{equation}
-!et
-We can show that $V(\overline{X}_i) = V(\overline{X}_j)$ for all $0 \leq i \leq d-1$ and $0 \leq j \leq d-1$. 
+===== But noen of these can compete with Newton's method =====
+
+!bc pycod
+# Using Newton's method
+from random import random, seed
+import numpy as np
+import autograd.numpy as np
+import matplotlib.pyplot as plt
+from autograd import grad
+
+def CostOLS(beta):
+    return (1.0/n)*np.sum((y-X @ beta)**2)
+
+n = 100
+x = 2*np.random.rand(n,1)
+y = 4+3*x+np.random.randn(n,1)
+
+X = np.c_[np.ones((n,1)), x]
+XT_X = X.T @ X
+beta_linreg = np.linalg.pinv(XT_X) @ (X.T @ y)
+print("Own inversion")
+print(beta_linreg)
+# Hessian matrix
+H = (2.0/n)* XT_X
+# Note that here the Hessian does not depend on the parameters beta
+invH = np.linalg.pinv(H)
+EigValues, EigVectors = np.linalg.eig(H)
+print(f"Eigenvalues of Hessian Matrix:{EigValues}")
+
+beta = np.random.randn(2,1)
+Niterations = 5
+
+# define the gradient
+training_gradient = grad(CostOLS)
+
+for iter in range(Niterations):
+    gradients = training_gradient(beta)
+    beta -= invH @ gradients
+    print(iter,gradients[0],gradients[1])
+print("beta from own Newton code")
+print(beta)
+!ec
+
 
 !split
-===== Blocking Transformations, final expressions =====
+===== Including Stochastic Gradient Descent with Autograd =====
+In this code we include the stochastic gradient descent approach discussed above. Note here that we specify which argument we are taking the derivative with respect to when using _autograd_.
 
-We can then wrap up
-!bt
-\begin{align}
-n_{j+1} \overline{X}_{j+1}  &= \sum_{i=1}^{n_{j+1}} (\hat{X}_{j+1})_i =  \frac{1}{2}\sum_{i=1}^{n_{j}/2} (\hat{X}_{j})_{2i-1} + (\hat{X}_{j})_{2i} \nonumber \\
-&= \frac{1}{2}\left[ (\hat{X}_j)_1 + (\hat{X}_j)_2 + \cdots + (\hat{X}_j)_{n_j} \right] = \underbrace{\frac{n_j}{2}}_{=n_{j+1}} \overline{X}_j = n_{j+1}\overline{X}_j. 
-\end{align}
-!et
-By repeated use of this equation we get $V(\overline{X}_i) = V(\overline{X}_0) = V(\overline{X})$ for all $0 \leq i \leq d-1$. This has the consequence that
-!bt
-\begin{align}
-V(\overline{X}) = \frac{\sigma_k^2}{n_k} + e_k \qquad \text{for all} \qquad 0 \leq k \leq d-1. \label{eq:convergence}
-\end{align}
-!et
+!bc pycod
+# Using Autograd to calculate gradients using SGD
+# OLS example
+from random import random, seed
+import numpy as np
+import autograd.numpy as np
+import matplotlib.pyplot as plt
+from autograd import grad
 
-Flyvbjerg and Petersen demonstrated that the sequence
-$\{e_k\}_{k=0}^{d-1}$ is decreasing, and conjecture that the term
-$e_k$ can be made as small as we would like by making $k$ (and hence
-$d$) sufficiently large. The sequence is decreasing (Master of Science thesis by Marius Jonsson, UiO 2018).
-It means we can apply blocking transformations until
-$e_k$ is sufficiently small, and then estimate $V(\overline{X})$ by
-$\widehat{\sigma}^2_k/n_k$. 
+# Note change from previous example
+def CostOLS(y,X,theta):
+    return np.sum((y-X @ theta)**2)
+
+n = 100
+x = 2*np.random.rand(n,1)
+y = 4+3*x+np.random.randn(n,1)
+
+X = np.c_[np.ones((n,1)), x]
+XT_X = X.T @ X
+theta_linreg = np.linalg.pinv(XT_X) @ (X.T @ y)
+print("Own inversion")
+print(theta_linreg)
+# Hessian matrix
+H = (2.0/n)* XT_X
+EigValues, EigVectors = np.linalg.eig(H)
+print(f"Eigenvalues of Hessian Matrix:{EigValues}")
+
+theta = np.random.randn(2,1)
+eta = 1.0/np.max(EigValues)
+Niterations = 1000
+
+# Note that we request the derivative wrt third argument (theta, 2 here)
+training_gradient = grad(CostOLS,2)
+
+for iter in range(Niterations):
+    gradients = (1.0/n)*training_gradient(y, X, theta)
+    theta -= eta*gradients
+print("theta from own gd")
+print(theta)
+
+xnew = np.array([[0],[2]])
+Xnew = np.c_[np.ones((2,1)), xnew]
+ypredict = Xnew.dot(theta)
+ypredict2 = Xnew.dot(theta_linreg)
+
+plt.plot(xnew, ypredict, "r-")
+plt.plot(xnew, ypredict2, "b-")
+plt.plot(x, y ,'ro')
+plt.axis([0,2.0,0, 15.0])
+plt.xlabel(r'$x$')
+plt.ylabel(r'$y$')
+plt.title(r'Random numbers ')
+plt.show()
+
+n_epochs = 50
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+t0, t1 = 5, 50
+def learning_schedule(t):
+    return t0/(t+t1)
+
+theta = np.random.randn(2,1)
+
+for epoch in range(n_epochs):
+# Can you figure out a better way of setting up the contributions to each batch?
+    for i in range(m):
+        random_index = M*np.random.randint(m)
+        xi = X[random_index:random_index+M]
+        yi = y[random_index:random_index+M]
+        gradients = (1.0/M)*training_gradient(yi, xi, theta)
+        eta = learning_schedule(epoch*m+i)
+        theta = theta - eta*gradients
+print("theta from own sdg")
+print(theta)
 
 
-For an elegant solution and proof of the blocking method, see the recent article of "Marius Jonsson (former MSc student of the Computational Physics group)":"https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304".
+!ec
+
+
+!split
+===== Same code but now with momentum gradient descent =====
+!bc pycod
+# Using Autograd to calculate gradients using SGD
+# OLS example
+from random import random, seed
+import numpy as np
+import autograd.numpy as np
+import matplotlib.pyplot as plt
+from autograd import grad
+
+# Note change from previous example
+def CostOLS(y,X,theta):
+    return np.sum((y-X @ theta)**2)
+
+n = 100
+x = 2*np.random.rand(n,1)
+y = 4+3*x+np.random.randn(n,1)
+
+X = np.c_[np.ones((n,1)), x]
+XT_X = X.T @ X
+theta_linreg = np.linalg.pinv(XT_X) @ (X.T @ y)
+print("Own inversion")
+print(theta_linreg)
+# Hessian matrix
+H = (2.0/n)* XT_X
+EigValues, EigVectors = np.linalg.eig(H)
+print(f"Eigenvalues of Hessian Matrix:{EigValues}")
+
+theta = np.random.randn(2,1)
+eta = 1.0/np.max(EigValues)
+Niterations = 100
+
+# Note that we request the derivative wrt third argument (theta, 2 here)
+training_gradient = grad(CostOLS,2)
+
+for iter in range(Niterations):
+    gradients = (1.0/n)*training_gradient(y, X, theta)
+    theta -= eta*gradients
+print("theta from own gd")
+print(theta)
+
+
+n_epochs = 50
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+t0, t1 = 5, 50
+def learning_schedule(t):
+    return t0/(t+t1)
+
+theta = np.random.randn(2,1)
+
+change = 0.0
+delta_momentum = 0.3
+
+for epoch in range(n_epochs):
+    for i in range(m):
+        random_index = M*np.random.randint(m)
+        xi = X[random_index:random_index+M]
+        yi = y[random_index:random_index+M]
+        gradients = (1.0/M)*training_gradient(yi, xi, theta)
+        eta = learning_schedule(epoch*m+i)
+        # calculate update
+        new_change = eta*gradients+delta_momentum*change
+        # take a step
+        theta -= new_change
+        # save the change
+        change = new_change
+print("theta from own sdg with momentum")
+print(theta)
+!ec
+
+
+!split
+===== Similar (second order function now) problem but now with AdaGrad =====
+!bc pycod
+# Using Autograd to calculate gradients using AdaGrad and Stochastic Gradient descent
+# OLS example
+from random import random, seed
+import numpy as np
+import autograd.numpy as np
+import matplotlib.pyplot as plt
+from autograd import grad
+
+# Note change from previous example
+def CostOLS(y,X,theta):
+    return np.sum((y-X @ theta)**2)
+
+n = 1000
+x = np.random.rand(n,1)
+y = 2.0+3*x +4*x*x
+
+X = np.c_[np.ones((n,1)), x, x*x]
+XT_X = X.T @ X
+theta_linreg = np.linalg.pinv(XT_X) @ (X.T @ y)
+print("Own inversion")
+print(theta_linreg)
+
+
+# Note that we request the derivative wrt third argument (theta, 2 here)
+training_gradient = grad(CostOLS,2)
+# Define parameters for Stochastic Gradient Descent
+n_epochs = 50
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+# Guess for unknown parameters theta
+theta = np.random.randn(3,1)
+
+# Value for learning rate
+eta = 0.01
+# Including AdaGrad parameter to avoid possible division by zero
+delta  = 1e-8
+for epoch in range(n_epochs):
+    Giter = 0.0
+    for i in range(m):
+        random_index = M*np.random.randint(m)
+        xi = X[random_index:random_index+M]
+        yi = y[random_index:random_index+M]
+        gradients = (1.0/M)*training_gradient(yi, xi, theta)
+        Giter += gradients*gradients
+        update = gradients*eta/(delta+np.sqrt(Giter))
+        theta -= update
+print("theta from own AdaGrad")
+print(theta)
+
+
+!ec
+
+Running this code we note an almost perfect agreement with the results from matrix inversion.
+
+!split
+=====  RMSprop for adaptive learning rate with Stochastic Gradient Descent =====
+!bc pycod
+# Using Autograd to calculate gradients using RMSprop  and Stochastic Gradient descent
+# OLS example
+from random import random, seed
+import numpy as np
+import autograd.numpy as np
+import matplotlib.pyplot as plt
+from autograd import grad
+
+# Note change from previous example
+def CostOLS(y,X,theta):
+    return np.sum((y-X @ theta)**2)
+
+n = 1000
+x = np.random.rand(n,1)
+y = 2.0+3*x +4*x*x# +np.random.randn(n,1)
+
+X = np.c_[np.ones((n,1)), x, x*x]
+XT_X = X.T @ X
+theta_linreg = np.linalg.pinv(XT_X) @ (X.T @ y)
+print("Own inversion")
+print(theta_linreg)
+
+
+# Note that we request the derivative wrt third argument (theta, 2 here)
+training_gradient = grad(CostOLS,2)
+# Define parameters for Stochastic Gradient Descent
+n_epochs = 50
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+# Guess for unknown parameters theta
+theta = np.random.randn(3,1)
+
+# Value for learning rate
+eta = 0.01
+# Value for parameter rho
+rho = 0.99
+# Including AdaGrad parameter to avoid possible division by zero
+delta  = 1e-8
+for epoch in range(n_epochs):
+    Giter = 0.0
+    for i in range(m):
+        random_index = M*np.random.randint(m)
+        xi = X[random_index:random_index+M]
+        yi = y[random_index:random_index+M]
+        gradients = (1.0/M)*training_gradient(yi, xi, theta)
+	# Accumulated gradient
+	# Scaling with rho the new and the previous results
+        Giter = (rho*Giter+(1-rho)*gradients*gradients)
+	# Taking the diagonal only and inverting
+        update = gradients*eta/(delta+np.sqrt(Giter))
+	# Hadamard product
+        theta -= update
+print("theta from own RMSprop")
+print(theta)
+!ec
+
+!split
+===== And finally "ADAM":"https://arxiv.org/pdf/1412.6980.pdf" =====
+
+!bc pycod
+# Using Autograd to calculate gradients using RMSprop  and Stochastic Gradient descent
+# OLS example
+from random import random, seed
+import numpy as np
+import autograd.numpy as np
+import matplotlib.pyplot as plt
+from autograd import grad
+
+# Note change from previous example
+def CostOLS(y,X,theta):
+    return np.sum((y-X @ theta)**2)
+
+n = 1000
+x = np.random.rand(n,1)
+y = 2.0+3*x +4*x*x# +np.random.randn(n,1)
+
+X = np.c_[np.ones((n,1)), x, x*x]
+XT_X = X.T @ X
+theta_linreg = np.linalg.pinv(XT_X) @ (X.T @ y)
+print("Own inversion")
+print(theta_linreg)
+
+
+# Note that we request the derivative wrt third argument (theta, 2 here)
+training_gradient = grad(CostOLS,2)
+# Define parameters for Stochastic Gradient Descent
+n_epochs = 50
+M = 5   #size of each minibatch
+m = int(n/M) #number of minibatches
+# Guess for unknown parameters theta
+theta = np.random.randn(3,1)
+
+# Value for learning rate
+eta = 0.01
+# Value for parameters beta1 and beta2, see https://arxiv.org/abs/1412.6980
+beta1 = 0.9
+beta2 = 0.999
+# Including AdaGrad parameter to avoid possible division by zero
+delta  = 1e-7
+iter = 0
+for epoch in range(n_epochs):
+    first_moment = 0.0
+    second_moment = 0.0
+    iter += 1
+    for i in range(m):
+        random_index = M*np.random.randint(m)
+        xi = X[random_index:random_index+M]
+        yi = y[random_index:random_index+M]
+        gradients = (1.0/M)*training_gradient(yi, xi, theta)
+        # Computing moments first
+        first_moment = beta1*first_moment + (1-beta1)*gradients
+        second_moment = beta2*second_moment+(1-beta2)*gradients*gradients
+        first_term = first_moment/(1.0-beta1**iter)
+        second_term = second_moment/(1.0-beta2**iter)
+	# Scaling with rho the new and the previous results
+        update = eta*first_term/(np.sqrt(second_term)+delta)
+        theta -= update
+print("theta from own ADAM")
+print(theta)
+!ec
+
+!split
+===== And Logistic Regression =====
+
+!bc pycod
+import autograd.numpy as np
+from autograd import grad
+
+def sigmoid(x):
+    return 0.5 * (np.tanh(x / 2.) + 1)
+
+def logistic_predictions(weights, inputs):
+    # Outputs probability of a label being true according to logistic model.
+    return sigmoid(np.dot(inputs, weights))
+
+def training_loss(weights):
+    # Training loss is the negative log-likelihood of the training labels.
+    preds = logistic_predictions(weights, inputs)
+    label_probabilities = preds * targets + (1 - preds) * (1 - targets)
+    return -np.sum(np.log(label_probabilities))
+
+# Build a toy dataset.
+inputs = np.array([[0.52, 1.12,  0.77],
+                   [0.88, -1.08, 0.15],
+                   [0.52, 0.06, -1.30],
+                   [0.74, -2.49, 1.39]])
+targets = np.array([True, True, False, True])
+
+# Define a function that returns gradients of training loss using Autograd.
+training_gradient_fun = grad(training_loss)
+
+# Optimize weights using gradient descent.
+weights = np.array([0.0, 0.0, 0.0])
+print("Initial loss:", training_loss(weights))
+for i in range(100):
+    weights -= training_gradient_fun(weights) * 0.01
+
+print("Trained loss:", training_loss(weights))
+!ec
+
+
+!split
+===== Introducing "JAX":"https://jax.readthedocs.io/en/latest/" =====
+
+Presently, instead of using _autograd_, we recommend using "JAX":"https://jax.readthedocs.io/en/latest/"
+
+_JAX_ is Autograd and "XLA (Accelerated Linear Algebra))":"https://www.tensorflow.org/xla",
+brought together for high-performance numerical computing and machine learning research.
+It provides composable transformations of Python+NumPy programs: differentiate, vectorize, parallelize, Just-In-Time compile to GPU/TPU, and more.
+
+Here's a simple example on how you can use _JAX_ to compute the derivate of the logistic function.
+
+!bc pycod
+import jax.numpy as jnp
+from jax import grad, jit, vmap
+
+def sum_logistic(x):
+  return jnp.sum(1.0 / (1.0 + jnp.exp(-x)))
+
+x_small = jnp.arange(3.)
+derivative_fn = grad(sum_logistic)
+print(derivative_fn(x_small))
+
+!ec
+
 
 
