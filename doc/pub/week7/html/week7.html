@@ -180,20 +180,6 @@ div.toc p,a {
               ('Steepest descent  method', 2, None, 'steepest-descent-method'),
               ('Steepest descent  method', 2, None, 'steepest-descent-method'),
               ('Final expressions', 2, None, 'final-expressions'),
-              ('Code examples for steepest descent',
-               2,
-               None,
-               'code-examples-for-steepest-descent'),
-              ('Simple codes for  steepest descent and conjugate gradient '
-               'using a $2\\times 2$ matrix, in c++, Python code to come',
-               2,
-               None,
-               'simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come'),
-              ('The routine for the steepest descent method',
-               2,
-               None,
-               'the-routine-for-the-steepest-descent-method'),
-              ('Steepest descent example', 2, None, 'steepest-descent-example'),
               ('Conjugate gradient method',
                2,
                None,
@@ -226,31 +212,10 @@ div.toc p,a {
                2,
                None,
                'conjugate-gradient-method'),
-              ('Simple implementation of the Conjugate gradient algorithm',
-               2,
-               None,
-               'simple-implementation-of-the-conjugate-gradient-algorithm'),
               ('Broyden–Fletcher–Goldfarb–Shanno algorithm',
                2,
                None,
                'broyden-fletcher-goldfarb-shanno-algorithm'),
-              ('Stochastic Gradient Descent',
-               2,
-               None,
-               'stochastic-gradient-descent'),
-              ('Computation of gradients', 2, None, 'computation-of-gradients'),
-              ('SGD example', 2, None, 'sgd-example'),
-              ('The gradient step', 2, None, 'the-gradient-step'),
-              ('Simple example code', 2, None, 'simple-example-code'),
-              ('When do we stop?', 2, None, 'when-do-we-stop'),
-              ('Slightly different approach',
-               2,
-               None,
-               'slightly-different-approach'),
-              ('Program for stochastic gradient',
-               2,
-               None,
-               'program-for-stochastic-gradient'),
               ('Using gradient descent methods, limitations',
                2,
                None,
@@ -444,30 +409,25 @@ MathJax.Hub.Config({
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="overview-of-week-march-6-10">Overview of week March 6-10 </h2>
 <div class="alert alert-block alert-block alert-text-normal">
-<b>Topics</b>
+<b>Gradient methods:</b>
 <p>
-<ul>
-<li> Gradient methods:
-<dl>
-  <dt>%s<dd>
-<p>    Semi-Newton methods (Broyden's algorithm)</p>
-  <dt>%s<dd>
-<p>    Steepest descent and conjugate gradient descent</p>
-  <dt>%s<dd>
-<p>    Stochastic gradient descent</p>
-</dl></li>
-</ul>
+<ol>
+<li> Semi-Newton methods (Broyden's algorithm)</li>
+<li> Steepest descent and conjugate gradient descent</li>
+<li> Stochastic gradient descent and variants thereof</li>
+<li> Automatic differentiation</li>
+</ol>
 </div>
 
 
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Teaching Material, videos and written material</b>
 <p>
-<ul>
+<ol>
 <li> These lecture notes</li>
 <li> <a href="https://www.youtube.com/watch?v=eAYohMUpPMA&ab_channel=TomCarlone" target="_blank">Video on the Conjugate Gradient methods</a></li>
 <li> Recommended background literature, <a href="https://web.stanford.edu/~boyd/cvxbook/" target="_blank">Convex Optimization</a> by Boyd and Vandenberghe. Their <a href="https://web.stanford.edu/~boyd/cvxbook/bv_cvxslides.pdf" target="_blank">lecture slides</a> are very useful (warning, these are some 300 pages).</li>
-</ul>
+</ol>
 </div>
 
 
@@ -913,267 +873,6 @@ $$
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="code-examples-for-steepest-descent">Code examples for steepest descent </h2>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="simple-codes-for-steepest-descent-and-conjugate-gradient-using-a-2-times-2-matrix-in-c-python-code-to-come">Simple codes for  steepest descent and conjugate gradient using a \( 2\times 2 \) matrix, in c++, Python code to come </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic">#include &lt;cmath&gt;</span>
-<span style="color: #408080; font-style: italic">#include &lt;iostream&gt;</span>
-<span style="color: #408080; font-style: italic">#include &lt;fstream&gt;</span>
-<span style="color: #408080; font-style: italic">#include &lt;iomanip&gt;</span>
-<span style="color: #408080; font-style: italic">#include &quot;vectormatrixclass.h&quot;</span>
-using namespace  std;
-<span style="color: #666666">//</span>   Main function begins here
-<span style="color: #008000">int</span> main(<span style="color: #008000">int</span>  argc, char <span style="color: #666666">*</span> argv[]){
-  <span style="color: #008000">int</span> dim <span style="color: #666666">=</span> <span style="color: #666666">2</span>;
-  Vector x(dim),xsd(dim), b(dim),x0(dim);
-  Matrix A(dim,dim);
-
-  <span style="color: #666666">//</span> Set our initial guess
-  x0(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> x0(<span style="color: #666666">1</span>) <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
-  <span style="color: #666666">//</span> Set the matrix
-  A(<span style="color: #666666">0</span>,<span style="color: #666666">0</span>) <span style="color: #666666">=</span>  <span style="color: #666666">3</span>;    A(<span style="color: #666666">1</span>,<span style="color: #666666">0</span>) <span style="color: #666666">=</span>  <span style="color: #666666">2</span>;   A(<span style="color: #666666">0</span>,<span style="color: #666666">1</span>) <span style="color: #666666">=</span>  <span style="color: #666666">2</span>;   A(<span style="color: #666666">1</span>,<span style="color: #666666">1</span>) <span style="color: #666666">=</span>  <span style="color: #666666">6</span>;
-  b(<span style="color: #666666">0</span>) <span style="color: #666666">=</span> <span style="color: #666666">2</span>; b(<span style="color: #666666">1</span>) <span style="color: #666666">=</span> <span style="color: #666666">-8</span>;
-  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;The Matrix A that we are using: &quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
-  A<span style="color: #666666">.</span>Print();
-  cout <span style="color: #666666">&lt;&lt;</span> endl;
-  xsd <span style="color: #666666">=</span> SteepestDescent(A,b,x0);
-  cout <span style="color: #666666">&lt;&lt;</span> <span style="color: #BA2121">&quot;The approximate solution using Steepest Descent is: &quot;</span> <span style="color: #666666">&lt;&lt;</span> endl;
-  xsd<span style="color: #666666">.</span>Print();
-  cout <span style="color: #666666">&lt;&lt;</span> endl;
-}
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="the-routine-for-the-steepest-descent-method">The routine for the steepest descent method </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;">Vector SteepestDescent(Matrix A, Vector b, Vector x0){
-  <span style="color: #008000">int</span> IterMax, i;
-  <span style="color: #008000">int</span> dim <span style="color: #666666">=</span> x0<span style="color: #666666">.</span>Dimension();
-  const double tolerance <span style="color: #666666">=</span> <span style="color: #666666">1.0e-14</span>;
-  Vector x(dim),f(dim),z(dim);
-  double c,alpha,d;
-  IterMax <span style="color: #666666">=</span> <span style="color: #666666">30</span>;
-  x <span style="color: #666666">=</span> x0;
-  r <span style="color: #666666">=</span> A<span style="color: #666666">*</span>x<span style="color: #666666">-</span>b;
-  i <span style="color: #666666">=</span> <span style="color: #666666">0</span>;
-  <span style="color: #008000; font-weight: bold">while</span> (i <span style="color: #666666">&lt;=</span> IterMax){
-    z <span style="color: #666666">=</span> A<span style="color: #666666">*</span>r;
-    c <span style="color: #666666">=</span> dot(r,r);
-    alpha <span style="color: #666666">=</span> c<span style="color: #666666">/</span>dot(r,z);
-    x <span style="color: #666666">=</span> x <span style="color: #666666">-</span> alpha<span style="color: #666666">*</span>r;
-    r <span style="color: #666666">=</span>  A<span style="color: #666666">*</span>x<span style="color: #666666">-</span>b;
-    <span style="color: #008000; font-weight: bold">if</span>(sqrt(dot(r,r)) <span style="color: #666666">&lt;</span> tolerance) <span style="color: #008000; font-weight: bold">break</span>;
-    i<span style="color: #666666">++</span>;
-  }
-  <span style="color: #008000; font-weight: bold">return</span> x;
-}
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="steepest-descent-example">Steepest descent example </h2>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy.linalg</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">la</span>
-
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">scipy.optimize</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">sopt</span>
-
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">pt</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">mpl_toolkits.mplot3d</span> <span style="color: #008000; font-weight: bold">import</span> axes3d
-
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">f</span>(x):
-    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0.5*</span>x[<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> <span style="color: #666666">2.5*</span>x[<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
-
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">df</span>(x):
-    <span style="color: #008000; font-weight: bold">return</span> np<span style="color: #666666">.</span>array([x[<span style="color: #666666">0</span>], <span style="color: #666666">5*</span>x[<span style="color: #666666">1</span>]])
-
-fig <span style="color: #666666">=</span> pt<span style="color: #666666">.</span>figure()
-ax <span style="color: #666666">=</span> fig<span style="color: #666666">.</span>gca(projection<span style="color: #666666">=</span><span style="color: #BA2121">&quot;3d&quot;</span>)
-
-xmesh, ymesh <span style="color: #666666">=</span> np<span style="color: #666666">.</span>mgrid[<span style="color: #666666">-2</span>:<span style="color: #666666">2</span>:<span style="color: #666666">50</span>j,<span style="color: #666666">-2</span>:<span style="color: #666666">2</span>:<span style="color: #666666">50</span>j]
-fmesh <span style="color: #666666">=</span> f(np<span style="color: #666666">.</span>array([xmesh, ymesh]))
-ax<span style="color: #666666">.</span>plot_surface(xmesh, ymesh, fmesh)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>And then as countor plot</p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;">pt<span style="color: #666666">.</span>axis(<span style="color: #BA2121">&quot;equal&quot;</span>)
-pt<span style="color: #666666">.</span>contour(xmesh, ymesh, fmesh)
-guesses <span style="color: #666666">=</span> [np<span style="color: #666666">.</span>array([<span style="color: #666666">2</span>, <span style="color: #666666">2./5</span>])]
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>Find guesses</p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;">x <span style="color: #666666">=</span> guesses[<span style="color: #666666">-1</span>]
-s <span style="color: #666666">=</span> <span style="color: #666666">-</span>df(x)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>Run it!</p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">f1d</span>(alpha):
-    <span style="color: #008000; font-weight: bold">return</span> f(x <span style="color: #666666">+</span> alpha<span style="color: #666666">*</span>s)
-
-alpha_opt <span style="color: #666666">=</span> sopt<span style="color: #666666">.</span>golden(f1d)
-next_guess <span style="color: #666666">=</span> x <span style="color: #666666">+</span> alpha_opt <span style="color: #666666">*</span> s
-guesses<span style="color: #666666">.</span>append(next_guess)
-<span style="color: #008000">print</span>(next_guess)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>What happened?</p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;">pt<span style="color: #666666">.</span>axis(<span style="color: #BA2121">&quot;equal&quot;</span>)
-pt<span style="color: #666666">.</span>contour(xmesh, ymesh, fmesh, <span style="color: #666666">50</span>)
-it_array <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array(guesses)
-pt<span style="color: #666666">.</span>plot(it_array<span style="color: #666666">.</span>T[<span style="color: #666666">0</span>], it_array<span style="color: #666666">.</span>T[<span style="color: #666666">1</span>], <span style="color: #BA2121">&quot;x-&quot;</span>)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="conjugate-gradient-method">Conjugate gradient method </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
@@ -1406,59 +1105,6 @@ $$
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="simple-implementation-of-the-conjugate-gradient-algorithm">Simple implementation of the Conjugate gradient algorithm </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;">  Vector ConjugateGradient(Matrix A, Vector b, Vector x0){
-  <span style="color: #008000">int</span> dim <span style="color: #666666">=</span> x0<span style="color: #666666">.</span>Dimension();
-  const double tolerance <span style="color: #666666">=</span> <span style="color: #666666">1.0e-14</span>;
-  Vector x(dim),r(dim),v(dim),z(dim);
-  double c,t,d;
-
-  x <span style="color: #666666">=</span> x0;
-  r <span style="color: #666666">=</span> b <span style="color: #666666">-</span> A<span style="color: #666666">*</span>x;
-  v <span style="color: #666666">=</span> r;
-  c <span style="color: #666666">=</span> dot(r,r);
-  <span style="color: #008000">int</span> i <span style="color: #666666">=</span> <span style="color: #666666">0</span>; IterMax <span style="color: #666666">=</span> dim;
-  <span style="color: #008000; font-weight: bold">while</span>(i <span style="color: #666666">&lt;=</span> IterMax){
-    z <span style="color: #666666">=</span> A<span style="color: #666666">*</span>v;
-    t <span style="color: #666666">=</span> c<span style="color: #666666">/</span>dot(v,z);
-    x <span style="color: #666666">=</span> x <span style="color: #666666">+</span> t<span style="color: #666666">*</span>v;
-    r <span style="color: #666666">=</span> r <span style="color: #666666">-</span> t<span style="color: #666666">*</span>z;
-    d <span style="color: #666666">=</span> dot(r,r);
-    <span style="color: #008000; font-weight: bold">if</span>(sqrt(d) <span style="color: #666666">&lt;</span> tolerance)
-      <span style="color: #008000; font-weight: bold">break</span>;
-    v <span style="color: #666666">=</span> r <span style="color: #666666">+</span> (d<span style="color: #666666">/</span>c)<span style="color: #666666">*</span>v;
-    c <span style="color: #666666">=</span> d;  i<span style="color: #666666">++</span>;
-  }
-  <span style="color: #008000; font-weight: bold">return</span> x;
-} 
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="broyden-fletcher-goldfarb-shanno-algorithm">Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno algorithm </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
@@ -1488,306 +1134,12 @@ $$
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="stochastic-gradient-descent">Stochastic Gradient Descent </h2>
-
-<p>Stochastic gradient descent (SGD) and variants thereof address some of
-the shortcomings of the Gradient descent method discussed above.
-</p>
-
-<p>The underlying idea of SGD comes from the observation that a given 
-function, which we want to minimize, can almost always be written as a
-sum over \( n \) data points \( \{\mathbf{x}_i\}_{i=1}^n \),
-</p>
-$$
-C(\mathbf{\beta}) = \sum_{i=1}^n c_i(\mathbf{x}_i,
-\mathbf{\beta}). 
-$$
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="computation-of-gradients">Computation of gradients </h2>
-
-<p>This in turn means that the gradient can be
-computed as a sum over \( i \)-gradients 
-</p>
-$$
-\nabla_\beta C(\mathbf{\beta}) = \sum_i^n \nabla_\beta c_i(\mathbf{x}_i,
-\mathbf{\beta}).
-$$
-
-<p>Stochasticity/randomness is introduced by only taking the
-gradient on a subset of the data called minibatches.  If there are \( n \)
-data points and the size of each minibatch is \( M \), there will be \( n/M \)
-minibatches. We denote these minibatches by \( B_k \) where
-\( k=1,\cdots,n/M \).
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="sgd-example">SGD example </h2>
-<p>As an example, suppose we have \( 10 \) data points \( (\mathbf{x}_1,\cdots, \mathbf{x}_{10}) \) 
-and we choose to have \( M=5 \) minibathces,
-then each minibatch contains two data points. In particular we have
-\( B_1 = (\mathbf{x}_1,\mathbf{x}_2), \cdots, B_5 =
-(\mathbf{x}_9,\mathbf{x}_{10}) \). Note that if you choose \( M=1 \) you
-have only a single batch with all data points and on the other extreme,
-you may choose \( M=n \) resulting in a minibatch for each datapoint, i.e
-\( B_k = \mathbf{x}_k \).
-</p>
-
-<p>The idea is now to approximate the gradient by replacing the sum over
-all data points with a sum over the data points in one the minibatches
-picked at random in each gradient descent step 
-</p>
-$$
-\nabla_{\beta}
-C(\mathbf{\beta}) = \sum_{i=1}^n \nabla_\beta c_i(\mathbf{x}_i,
-\mathbf{\beta}) \rightarrow \sum_{i \in B_k}^n \nabla_\beta
-c_i(\mathbf{x}_i, \mathbf{\beta}).
-$$
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="the-gradient-step">The gradient step </h2>
-
-<p>Thus a gradient descent step now looks like </p>
-$$
-\beta_{j+1} = \beta_j - \gamma_j \sum_{i \in B_k}^n \nabla_\beta c_i(\mathbf{x}_i,
-\mathbf{\beta})
-$$
-
-<p>where \( k \) is picked at random with equal
-probability from \( [1,n/M] \). An iteration over the number of
-minibathces (n/M) is commonly referred to as an epoch. Thus it is
-typical to choose a number of epochs and for each epoch iterate over
-the number of minibatches, as exemplified in the code below.
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="simple-example-code">Simple example code </h2>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span> 
-
-n <span style="color: #666666">=</span> <span style="color: #666666">100</span> <span style="color: #408080; font-style: italic">#100 datapoints </span>
-M <span style="color: #666666">=</span> <span style="color: #666666">5</span>   <span style="color: #408080; font-style: italic">#size of each minibatch</span>
-m <span style="color: #666666">=</span> <span style="color: #008000">int</span>(n<span style="color: #666666">/</span>M) <span style="color: #408080; font-style: italic">#number of minibatches</span>
-n_epochs <span style="color: #666666">=</span> <span style="color: #666666">10</span> <span style="color: #408080; font-style: italic">#number of epochs</span>
-
-j <span style="color: #666666">=</span> <span style="color: #666666">0</span>
-<span style="color: #008000; font-weight: bold">for</span> epoch <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">1</span>,n_epochs<span style="color: #666666">+1</span>):
-    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(m):
-        k <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randint(m) <span style="color: #408080; font-style: italic">#Pick the k-th minibatch at random</span>
-        <span style="color: #408080; font-style: italic">#Compute the gradient using the data in minibatch Bk</span>
-        <span style="color: #408080; font-style: italic">#Compute new suggestion for </span>
-        j <span style="color: #666666">+=</span> <span style="color: #666666">1</span>
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>Taking the gradient only on a subset of the data has two important
-benefits. First, it introduces randomness which decreases the chance
-that our opmization scheme gets stuck in a local minima. Second, if
-the size of the minibatches are small relative to the number of
-datapoints (\( M <  n \)), the computation of the gradient is much
-cheaper since we sum over the datapoints in the \( k-th \) minibatch and not
-all \( n \) datapoints.
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="when-do-we-stop">When do we stop? </h2>
-
-<p>A natural question is when do we stop the search for a new minimum?
-One possibility is to compute the full gradient after a given number
-of epochs and check if the norm of the gradient is smaller than some
-threshold and stop if true. However, the condition that the gradient
-is zero is valid also for local minima, so this would only tell us
-that we are close to a local/global minimum. However, we could also
-evaluate the cost function at this point, store the result and
-continue the search. If the test kicks in at a later stage we can
-compare the values of the cost function and keep the \( \beta \) that
-gave the lowest value.
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="slightly-different-approach">Slightly different approach </h2>
-
-<p>Another approach is to let the step length \( \gamma_j \) depend on the
-number of epochs in such a way that it becomes very small after a
-reasonable time such that we do not move at all.
-</p>
-
-<p>As an example, let \( e = 0,1,2,3,\cdots \) denote the current epoch and let \( t_0, t_1 > 0 \) be two fixed numbers. Furthermore, let \( t = e \cdot m + i \) where \( m \) is the number of minibatches and \( i=0,\cdots,m-1 \). Then the function $$\gamma_j(t; t_0, t_1) = \frac{t_0}{t+t_1} $$ goes to zero as the number of epochs gets large. I.e. we start with a step length \( \gamma_j (0; t_0, t_1) = t_0/t_1 \) which decays in <em>time</em> \( t \).</p>
-
-<p>In this way we can fix the number of epochs, compute \( \beta \) and
-evaluate the cost function at the end. Repeating the computation will
-give a different result since the scheme is random by design. Then we
-pick the final \( \beta \) that gives the lowest value of the cost
-function.
-</p>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span> 
-
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">step_length</span>(t,t0,t1):
-    <span style="color: #008000; font-weight: bold">return</span> t0<span style="color: #666666">/</span>(t<span style="color: #666666">+</span>t1)
-
-n <span style="color: #666666">=</span> <span style="color: #666666">100</span> <span style="color: #408080; font-style: italic">#100 datapoints </span>
-M <span style="color: #666666">=</span> <span style="color: #666666">5</span>   <span style="color: #408080; font-style: italic">#size of each minibatch</span>
-m <span style="color: #666666">=</span> <span style="color: #008000">int</span>(n<span style="color: #666666">/</span>M) <span style="color: #408080; font-style: italic">#number of minibatches</span>
-n_epochs <span style="color: #666666">=</span> <span style="color: #666666">500</span> <span style="color: #408080; font-style: italic">#number of epochs</span>
-t0 <span style="color: #666666">=</span> <span style="color: #666666">1.0</span>
-t1 <span style="color: #666666">=</span> <span style="color: #666666">10</span>
-
-gamma_j <span style="color: #666666">=</span> t0<span style="color: #666666">/</span>t1
-j <span style="color: #666666">=</span> <span style="color: #666666">0</span>
-<span style="color: #008000; font-weight: bold">for</span> epoch <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(<span style="color: #666666">1</span>,n_epochs<span style="color: #666666">+1</span>):
-    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(m):
-        k <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randint(m) <span style="color: #408080; font-style: italic">#Pick the k-th minibatch at random</span>
-        <span style="color: #408080; font-style: italic">#Compute the gradient using the data in minibatch Bk</span>
-        <span style="color: #408080; font-style: italic">#Compute new suggestion for beta</span>
-        t <span style="color: #666666">=</span> epoch<span style="color: #666666">*</span>m<span style="color: #666666">+</span>i
-        gamma_j <span style="color: #666666">=</span> step_length(t,t0,t1)
-        j <span style="color: #666666">+=</span> <span style="color: #666666">1</span>
-
-<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;gamma_j after </span><span style="color: #BB6688; font-weight: bold">%d</span><span style="color: #BA2121"> epochs: </span><span style="color: #BB6688; font-weight: bold">%g</span><span style="color: #BA2121">&quot;</span> <span style="color: #666666">%</span> (n_epochs,gamma_j))
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="program-for-stochastic-gradient">Program for stochastic gradient </h2>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "default" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># Importing various packages</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> exp, sqrt
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">random</span> <span style="color: #008000; font-weight: bold">import</span> random, seed
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">sklearn.linear_model</span> <span style="color: #008000; font-weight: bold">import</span> SGDRegressor
-
-x <span style="color: #666666">=</span> <span style="color: #666666">2*</span>np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>rand(<span style="color: #666666">100</span>,<span style="color: #666666">1</span>)
-y <span style="color: #666666">=</span> <span style="color: #666666">4+3*</span>x<span style="color: #666666">+</span>np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randn(<span style="color: #666666">100</span>,<span style="color: #666666">1</span>)
-
-xb <span style="color: #666666">=</span> np<span style="color: #666666">.</span>c_[np<span style="color: #666666">.</span>ones((<span style="color: #666666">100</span>,<span style="color: #666666">1</span>)), x]
-theta_linreg <span style="color: #666666">=</span> np<span style="color: #666666">.</span>linalg<span style="color: #666666">.</span>inv(xb<span style="color: #666666">.</span>T<span style="color: #666666">.</span>dot(xb))<span style="color: #666666">.</span>dot(xb<span style="color: #666666">.</span>T)<span style="color: #666666">.</span>dot(y)
-<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;Own inversion&quot;</span>)
-<span style="color: #008000">print</span>(theta_linreg)
-sgdreg <span style="color: #666666">=</span> SGDRegressor(n_iter <span style="color: #666666">=</span> <span style="color: #666666">50</span>, penalty<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">None</span>, eta0<span style="color: #666666">=0.1</span>)
-sgdreg<span style="color: #666666">.</span>fit(x,y<span style="color: #666666">.</span>ravel())
-<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;sgdreg from scikit&quot;</span>)
-<span style="color: #008000">print</span>(sgdreg<span style="color: #666666">.</span>intercept_, sgdreg<span style="color: #666666">.</span>coef_)
-
-
-theta <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randn(<span style="color: #666666">2</span>,<span style="color: #666666">1</span>)
-
-eta <span style="color: #666666">=</span> <span style="color: #666666">0.1</span>
-Niterations <span style="color: #666666">=</span> <span style="color: #666666">1000</span>
-m <span style="color: #666666">=</span> <span style="color: #666666">100</span>
-
-<span style="color: #008000; font-weight: bold">for</span> <span style="color: #008000">iter</span> <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Niterations):
-    gradients <span style="color: #666666">=</span> <span style="color: #666666">2.0/</span>m<span style="color: #666666">*</span>xb<span style="color: #666666">.</span>T<span style="color: #666666">.</span>dot(xb<span style="color: #666666">.</span>dot(theta)<span style="color: #666666">-</span>y)
-    theta <span style="color: #666666">-=</span> eta<span style="color: #666666">*</span>gradients
-<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;theta frm own gd&quot;</span>)
-<span style="color: #008000">print</span>(theta)
-
-xnew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array([[<span style="color: #666666">0</span>],[<span style="color: #666666">2</span>]])
-xbnew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>c_[np<span style="color: #666666">.</span>ones((<span style="color: #666666">2</span>,<span style="color: #666666">1</span>)), xnew]
-ypredict <span style="color: #666666">=</span> xbnew<span style="color: #666666">.</span>dot(theta)
-ypredict2 <span style="color: #666666">=</span> xbnew<span style="color: #666666">.</span>dot(theta_linreg)
-
-
-n_epochs <span style="color: #666666">=</span> <span style="color: #666666">50</span>
-t0, t1 <span style="color: #666666">=</span> <span style="color: #666666">5</span>, <span style="color: #666666">50</span>
-m <span style="color: #666666">=</span> <span style="color: #666666">100</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">learning_schedule</span>(t):
-    <span style="color: #008000; font-weight: bold">return</span> t0<span style="color: #666666">/</span>(t<span style="color: #666666">+</span>t1)
-
-theta <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randn(<span style="color: #666666">2</span>,<span style="color: #666666">1</span>)
-
-<span style="color: #008000; font-weight: bold">for</span> epoch <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(n_epochs):
-    <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(m):
-        random_index <span style="color: #666666">=</span> np<span style="color: #666666">.</span>random<span style="color: #666666">.</span>randint(m)
-        xi <span style="color: #666666">=</span> xb[random_index:random_index<span style="color: #666666">+1</span>]
-        yi <span style="color: #666666">=</span> y[random_index:random_index<span style="color: #666666">+1</span>]
-        gradients <span style="color: #666666">=</span> <span style="color: #666666">2</span> <span style="color: #666666">*</span> xi<span style="color: #666666">.</span>T<span style="color: #666666">.</span>dot(xi<span style="color: #666666">.</span>dot(theta)<span style="color: #666666">-</span>yi)
-        eta <span style="color: #666666">=</span> learning_schedule(epoch<span style="color: #666666">*</span>m<span style="color: #666666">+</span>i)
-        theta <span style="color: #666666">=</span> theta <span style="color: #666666">-</span> eta<span style="color: #666666">*</span>gradients
-<span style="color: #008000">print</span>(<span style="color: #BA2121">&quot;theta from own sdg&quot;</span>)
-<span style="color: #008000">print</span>(theta)
-
-
-plt<span style="color: #666666">.</span>plot(xnew, ypredict, <span style="color: #BA2121">&quot;r-&quot;</span>)
-plt<span style="color: #666666">.</span>plot(xnew, ypredict2, <span style="color: #BA2121">&quot;b-&quot;</span>)
-plt<span style="color: #666666">.</span>plot(x, y ,<span style="color: #BA2121">&#39;ro&#39;</span>)
-plt<span style="color: #666666">.</span>axis([<span style="color: #666666">0</span>,<span style="color: #666666">2.0</span>,<span style="color: #666666">0</span>, <span style="color: #666666">15.0</span>])
-plt<span style="color: #666666">.</span>xlabel(<span style="color: #BA2121">r&#39;$x$&#39;</span>)
-plt<span style="color: #666666">.</span>ylabel(<span style="color: #BA2121">r&#39;$y$&#39;</span>)
-plt<span style="color: #666666">.</span>title(<span style="color: #BA2121">r&#39;Random numbers &#39;</span>)
-plt<span style="color: #666666">.</span>show()
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="using-gradient-descent-methods-limitations">Using gradient descent methods, limitations </h2>
 
 <ul>
 <li> <b>Gradient descent (GD) finds local minima of our function</b>. Since the GD algorithm is deterministic, if it converges, it will converge to a local minimum of our energy function. Because in ML we are often dealing with extremely rugged landscapes with many local minima, this can lead to poor performance.</li>
 <li> <b>GD is sensitive to initial conditions</b>. One consequence of the local nature of GD is that initial conditions matter. Depending on where one starts, one will end up at a different local minima. Therefore, it is very important to think about how one initializes the training process. This is true for GD as well as more complicated variants of GD.</li>
-<li> <b>Gradients are computationally expensive to calculate for large datasets</b>. In many cases in statistics and ML, the energy function is a sum of terms, with one term for each data point. For example, in linear regression, \( E \propto \sum_{i=1}^n (y_i - \mathbf{w}^T\cdot\mathbf{x}_i)^2 \); for logistic regression, the square error is replaced by the cross entropy. To calculate the gradient we have to sum over <em>all</em> \( n \) data points. Doing this at every GD step becomes extremely computationally expensive. An ingenious solution to this, is to calculate the gradients using small subsets of the data called &quot;mini batches&quot;. This has the added benefit of introducing stochasticity into our algorithm.</li>
+<li> <b>Gradients are computationally expensive to calculate for large datasets</b>. In many cases the energy function is a sum of terms, with one term for each data point. For example, in linear regression, \( E \propto \sum_{i=1}^n (y_i - \mathbf{w}^T\cdot\mathbf{x}_i)^2 \); for logistic regression, the square error is replaced by the cross entropy. To calculate the gradient we have to sum over <em>all</em> \( n \) data points. Doing this at every GD step becomes extremely computationally expensive. An ingenious solution to this, is to calculate the gradients using small subsets of the data called &quot;mini batches&quot;. This has the added benefit of introducing stochasticity into our algorithm.</li>
 <li> <b>GD is very sensitive to choices of learning rates</b>. GD is extremely sensitive to the choice of learning rates. If the learning rate is very small, the training process take an extremely long time. For larger learning rates, GD can diverge and give poor results. Furthermore, depending on what the local landscape looks like, we have to modify the learning rates to ensure convergence. Ideally, we would <em>adaptively</em> choose the learning rates to match the landscape.</li>
 <li> <b>GD treats all directions in parameter space uniformly.</b> Another major drawback of GD is that unlike Newton's method, the learning rate for GD is the same in all directions in parameter space. For this reason, the maximum learning rate is set by the behavior of the steepest direction and this can significantly slow down training. Ideally, we would like to take large steps in flat directions and small steps in steep directions. Since we are exploring rugged landscapes where curvatures change, this requires us to keep track of not only the gradient but second derivatives. The ideal scenario would be to calculate the Hessian but this proves to be too computationally expensive.</li> 
 <li> GD can take exponential time to escape saddle points, even with random initialization. As we mentioned, GD is extremely sensitive to initial condition since it determines the particular local minimum GD would eventually reach. However, even with a good initialization scheme, through the introduction of randomness, GD can still take exponential time to escape saddle points.</li>
@@ -1797,7 +1149,7 @@ plt<span style="color: #666666">.</span>show()
 <div class="alert alert-block alert-block alert-text-normal">
 <b></b>
 <p>
-<p>You can however use codes we have adapted from the text <a href="http://www.nr.com/" target="_blank">Numerical Recipes in C++</a>, see chapter 10.7.  
+<p>You can use codes we have adapted from the text <a href="http://www.nr.com/" target="_blank">Numerical Recipes in C++</a>, see chapter 10.7.  
 Here we present a program, which you also can find at the webpage of the course we use the functions <b>dfpmin</b> and <b>lnsrch</b>.  This is a variant of the Broyden et al algorithm discussed in the previous slide.
 </p>
 
@@ -1910,10 +1262,6 @@ After roughly 10-20 iterations I got a converged result in terms of \( \alpha \)
 </p>
 </div>
 
-
-<center>
-<h1>Week 39: Optimization and  Gradient Methods</h1>
-</center>  <!-- document title -->
 
 <!-- !split  -->
 <h2 id="example-of-gradient-descent-applications">Example of gradient descent applications </h2>
