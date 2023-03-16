@@ -55,7 +55,7 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 
 - Resampling methods, Blocking and Bootstrapping
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week8/html/week8.html
-
+- Video of lecture at https://youtu.be/0gk6wtdlh0g
 
 ### Week 12, March 20-24, 2023
 
