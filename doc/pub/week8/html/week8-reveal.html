@@ -9,8 +9,8 @@ doconce format html week8-reveal.html week8-reveal reveal --html_slide_theme=bei
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 10 March 6-10: Resampling Techniques, Bootstrap and Blocking">
-<title>Week 10 March 6-10: Resampling Techniques, Bootstrap and Blocking</title>
+<meta name="description" content="Week 11, March 13-17: Resampling Techniques, Bootstrap and Blocking">
+<title>Week 11, March 13-17: Resampling Techniques, Bootstrap and Blocking</title>
 
 <!-- reveal.js: https://lab.hakim.se/reveal-js/ -->
 
@@ -168,7 +168,7 @@ MathJax.Hub.Config({
 <section>
 <!-- ------------------- main content ---------------------- -->
 <center>
-<h1 style="text-align: center;">Week 10 March 6-10: Resampling Techniques, Bootstrap and Blocking</h1>
+<h1 style="text-align: center;">Week 11, March 13-17: Resampling Techniques, Bootstrap and Blocking</h1>
 </center>  <!-- document title -->
 
 <!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
@@ -180,30 +180,30 @@ MathJax.Hub.Config({
 [1] <b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b>
 </center>
 <center>
-[2] <b>Department of Physics and Astronomy and Facility for Rare Isotope Beams, Michigan State University, East Lansing, Michigan, USA</b>
+[2] <b>Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA</b>
 </center>
 <br>
 <center>
-<h4>Dec 25, 2022</h4>
+<h4>March 13-17</h4>
 </center> <!-- date -->
 <br>
 
 
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2022, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 1999-2023, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
 </center>
 </section>
 
 <section>
-<h2 id="overview-of-week-10-march-6-10">Overview of week 10, March 6-10 </h2>
+<h2 id="overview-of-week-11-march-13-17">Overview of week 11, March 13-17 </h2>
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Topics</b>
 <p>
 <ul>
-<p><li> Top down approach first, what we need to code</li>
+<p><li> Reminder from last week on optimization methods</li>
 <p><li> Resampling Techniques and statistics: Bootstrap and Blocking</li> 
-<p><li> <a href="https://youtu.be" target="_blank">Video of Lecture TBA</a></li>
-<p><li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/HandWrittenNotes/2023" target="_blank">Handwritten notes</a></li>
+<p><li> <a href="https://youtu.be/" target="_blank">Video of lecture TBA</a></li>
+<p><li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2023/NotesMarch16.pdf" target="_blank">Handwritten notes</a></li>
 </ul>
 </div>
 
@@ -213,679 +213,51 @@ MathJax.Hub.Config({
 <p>
 <ul>
 <p><li> Overview video on the <a href="https://www.youtube.com/watch?v=O_Fj4q8lgmc&ab_channel=MarinStatsLectures-RProgramming%26Statistics" target="_blank">Bootstrap method</a></li>
-<p><li> These Lecture notes</li>
 <p><li> <a href="https://www.duo.uio.no/bitstream/handle/10852/68360/PhysRevE.98.043304.pdf?sequence=2&isAllowed=y" target="_blank">Marius Johnson's Master thesis on the Blocking Method</a></li>
 </ul>
 </div>
 </section>
 
 <section>
-<h2 id="the-top-down-approach-part-1">The top-down approach, part 1 </h2>
-
-<p>Last week we discussed how to implement a gradient descent method like the simplest possible gradient descent with a simple learning rate as parameter to tune. We repeat the codes here.</p>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
-<span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
-<span style="color: #228B22"># Added energy minimization</span>
-<span style="color: #228B22"># Common imports</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed, normalvariate
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">mpl_toolkits.mplot3d</span> <span style="color: #8B008B; font-weight: bold">import</span> Axes3D
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib</span> <span style="color: #8B008B; font-weight: bold">import</span> cm
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.ticker</span> <span style="color: #8B008B; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">sys</span>
-
-
-
-<span style="color: #228B22"># Trial wave function for the 2-electron quantum dot in two dims</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">WaveFunction</span>(r,alpha,beta):
-    r1 = r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
-    r2 = r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
-    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
-    deno = r12/(<span style="color: #B452CD">1</span>+beta*r12)
-    <span style="color: #8B008B; font-weight: bold">return</span> exp(-<span style="color: #B452CD">0.5</span>*alpha*(r1+r2)+deno)
-
-<span style="color: #228B22"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">LocalEnergy</span>(r,alpha,beta):
-    
-    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
-    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
-    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
-    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
-    deno2 = deno*deno
-    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0.5</span>*(<span style="color: #B452CD">1</span>-alpha*alpha)*(r1 + r2) +<span style="color: #B452CD">2.0</span>*alpha + <span style="color: #B452CD">1.0</span>/r12+deno2*(alpha*r12-deno2+<span style="color: #B452CD">2</span>*beta*deno-<span style="color: #B452CD">1.0</span>/r12)
-
-<span style="color: #228B22"># Derivate of wave function ansatz as function of variational parameters</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">DerivativeWFansatz</span>(r,alpha,beta):
-    
-    WfDer  = np.zeros((<span style="color: #B452CD">2</span>), np.double)
-    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
-    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
-    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
-    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
-    deno2 = deno*deno
-    WfDer[<span style="color: #B452CD">0</span>] = -<span style="color: #B452CD">0.5</span>*(r1+r2)
-    WfDer[<span style="color: #B452CD">1</span>] = -r12*r12*deno2
-    <span style="color: #8B008B; font-weight: bold">return</span>  WfDer
-
-<span style="color: #228B22"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">QuantumForce</span>(r,alpha,beta):
-
-    qforce = np.zeros((NumberParticles,Dimension), np.double)
-    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
-    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
-    qforce[<span style="color: #B452CD">0</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">0</span>,:]*alpha*(r[<span style="color: #B452CD">0</span>,:]-r[<span style="color: #B452CD">1</span>,:])*deno*deno/r12
-    qforce[<span style="color: #B452CD">1</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">1</span>,:]*alpha*(r[<span style="color: #B452CD">1</span>,:]-r[<span style="color: #B452CD">0</span>,:])*deno*deno/r12
-    <span style="color: #8B008B; font-weight: bold">return</span> qforce
-    
-
-<span style="color: #228B22"># Computing the derivative of the energy and the energy </span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">EnergyMinimization</span>(alpha, beta):
-
-    NumberMCcycles= <span style="color: #B452CD">10000</span>
-    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
-    D = <span style="color: #B452CD">0.5</span>
-    TimeStep = <span style="color: #B452CD">0.05</span>
-    <span style="color: #228B22"># positions</span>
-    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
-    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
-    <span style="color: #228B22"># Quantum force</span>
-    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
-    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
-
-    <span style="color: #228B22"># seed for rng generator </span>
-    seed()
-    energy = <span style="color: #B452CD">0.0</span>
-    DeltaE = <span style="color: #B452CD">0.0</span>
-    EnergyDer = np.zeros((<span style="color: #B452CD">2</span>), np.double)
-    DeltaPsi = np.zeros((<span style="color: #B452CD">2</span>), np.double)
-    DerivativePsiE = np.zeros((<span style="color: #B452CD">2</span>), np.double)
-    <span style="color: #228B22">#Initial position</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
-        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
-    wfold = WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
-
-    <span style="color: #228B22">#Loop over MC MCcycles</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
-        <span style="color: #228B22">#Trial position moving one particle at the time</span>
-        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
-            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
-                                       QuantumForceOld[i,j]*TimeStep*D
-            wfnew = WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
-            GreensFunction = <span style="color: #B452CD">0.0</span>
-            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
-	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
-                                      PositionNew[i,j]+PositionOld[i,j])
-      
-            GreensFunction = exp(GreensFunction)
-            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
-            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
-            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
-                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                    PositionOld[i,j] = PositionNew[i,j]
-                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
-                wfold = wfnew
-        DeltaE = LocalEnergy(PositionOld,alpha,beta)
-        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
-        DeltaPsi += DerPsi
-        energy += DeltaE
-        DerivativePsiE += DerPsi*DeltaE
-            
-    <span style="color: #228B22"># We calculate mean values</span>
-    energy /= NumberMCcycles
-    DerivativePsiE /= NumberMCcycles
-    DeltaPsi /= NumberMCcycles
-    EnergyDer  = <span style="color: #B452CD">2</span>*(DerivativePsiE-DeltaPsi*energy)
-    <span style="color: #8B008B; font-weight: bold">return</span> energy, EnergyDer
-
-
-<span style="color: #228B22">#Here starts the main program with variable declarations</span>
-NumberParticles = <span style="color: #B452CD">2</span>
-Dimension = <span style="color: #B452CD">2</span>
-<span style="color: #228B22"># guess for variational parameters</span>
-alpha = <span style="color: #B452CD">0.95</span>
-beta = <span style="color: #B452CD">0.3</span>
-<span style="color: #228B22"># Set up iteration using stochastic gradient method</span>
-Energy = <span style="color: #B452CD">0</span>
-EDerivative = np.zeros((<span style="color: #B452CD">2</span>), np.double)
-<span style="color: #228B22"># Learning rate eta, max iterations, need to change to adaptive learning rate</span>
-eta = <span style="color: #B452CD">0.01</span>
-MaxIterations = <span style="color: #B452CD">50</span>
-<span style="color: #658b00">iter</span> = <span style="color: #B452CD">0</span>
-
-Energies = np.zeros(MaxIterations)
-EnergyDerivatives1 = np.zeros(MaxIterations)
-EnergyDerivatives2 = np.zeros(MaxIterations)
-AlphaValues = np.zeros(MaxIterations)
-BetaValues = np.zeros(MaxIterations)
-
-<span style="color: #8B008B; font-weight: bold">while</span> <span style="color: #658b00">iter</span> &lt; MaxIterations:
-    Energy, EDerivative = EnergyMinimization(alpha,beta)
-    alphagradient = EDerivative[<span style="color: #B452CD">0</span>]
-    betagradient = EDerivative[<span style="color: #B452CD">1</span>]
-    alpha -= eta*alphagradient
-    beta -= eta*betagradient 
-    Energies[<span style="color: #658b00">iter</span>] = Energy
-    EnergyDerivatives1[<span style="color: #658b00">iter</span>] = EDerivative[<span style="color: #B452CD">0</span>] 
-    EnergyDerivatives2[<span style="color: #658b00">iter</span>] = EDerivative[<span style="color: #B452CD">1</span>] 
-    AlphaValues[<span style="color: #658b00">iter</span>] = alpha
-    BetaValues[<span style="color: #658b00">iter</span>] = beta
-    <span style="color: #658b00">iter</span> += <span style="color: #B452CD">1</span>
-
-<span style="color: #228B22">#nice printout with Pandas</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">pd</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">import</span> DataFrame
-pd.set_option(<span style="color: #CD5555">&#39;max_columns&#39;</span>, <span style="color: #B452CD">6</span>)
-data ={<span style="color: #CD5555">&#39;Alpha&#39;</span>:AlphaValues,<span style="color: #CD5555">&#39;Beta&#39;</span>:BetaValues,<span style="color: #CD5555">&#39;Energy&#39;</span>:Energies,<span style="color: #CD5555">&#39;Alpha Derivative&#39;</span>:EnergyDerivatives1,<span style="color: #CD5555">&#39;Beta Derivative&#39;</span>:EnergyDerivatives2}
-
-frame = pd.DataFrame(data)
-<span style="color: #658b00">print</span>(frame)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
+<h2 id="resampling-methods">Resampling methods </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>Resampling methods are an indispensable tool in modern
+statistics. They involve repeatedly drawing samples from a training
+set and refitting a model of interest on each sample in order to
+obtain additional information about the fitted model. For example, in
+order to estimate the variability of a linear regression fit, we can
+repeatedly draw different samples from the training data, fit a linear
+regression to each new sample, and then examine the extent to which
+the resulting fits differ. Such an approach may allow us to obtain
+information that would not be available from fitting the model only
+once using the original training sample.
+</p>
 </div>
 </section>
 
 <section>
-<h2 id="what-have-we-done">What have we done? </h2>
-<p>The exact energy is \( 3.0 \) for an oscillator frequency \( \omega =1 \)
-(with \( \hbar =1 \)). We note however that with this learning rate and
-number of iterations, the energies and the derivatives are not yet
-converged.
+<h2 id="resampling-approaches-can-be-computationally-expensive">Resampling approaches can be computationally expensive </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>Resampling approaches can be computationally expensive, because they
+involve fitting the same statistical method multiple times using
+different subsets of the training data. However, due to recent
+advances in computing power, the computational requirements of
+resampling methods generally are not prohibitive. In this chapter, we
+discuss two of the most commonly used resampling methods,
+cross-validation and the bootstrap. Both methods are important tools
+in the practical application of many statistical learning
+procedures. For example, cross-validation can be used to estimate the
+test error associated with a given statistical learning method in
+order to evaluate its performance, or to select the appropriate level
+of flexibility. The process of evaluating a model&#8217;s performance is
+known as model assessment, whereas the process of selecting the proper
+level of flexibility for a model is known as model selection. The
+bootstrap is widely used.
 </p>
-
-<p>We can improve upon this by using the algorithms provided by the <b>optimize</b> package in Python.
-One of these algorithms is  Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno (BFGS) algorithm. 
-</p>
-
-<p>The optimization problem is to minimize \( f(\mathbf {x} ) \) where
-\( \mathbf {x} \) is a vector in \( R^{n} \), and \( f \) is a differentiable
-scalar function. There are no constraints on the values that \( \mathbf{x} \) can take.
-</p>
-
-<p>The algorithm begins at an initial estimate for the optimal value
-\( \mathbf {x}_{0} \) and proceeds iteratively to get a better estimate at
-each stage.
-</p>
-
-<p>The search direction \( p_k \) at stage \( k \) is given by the solution of the analogue of the Newton equation</p>
-
-<p>&nbsp;<br>
-$$
-B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
-$$
-<p>&nbsp;<br>
-
-<p>where \( B_{k} \) is an approximation to the Hessian matrix, which is
-updated iteratively at each stage, and \( \nabla f(\mathbf {x} _{k}) \)
-is the gradient of the function
-evaluated at \( x_k \). 
-A line search in the direction \( p_k \) is then used to
-find the next point \( x_{k+1} \) by minimising 
-</p>
-<p>&nbsp;<br>
-$$
-f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
-$$
-<p>&nbsp;<br>
-
-<p>over the scalar \( \alpha > 0 \).</p>
-</section>
-
-<section>
-<h2 id="code-part-2">Code part 2 </h2>
-<p>The modified code here uses the BFGS algorithm but performs now a
-production run and writes to file all average values of the
-energy. 
-</p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
-<span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
-<span style="color: #228B22"># Added energy minimization</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed, normalvariate
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">mpl_toolkits.mplot3d</span> <span style="color: #8B008B; font-weight: bold">import</span> Axes3D
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib</span> <span style="color: #8B008B; font-weight: bold">import</span> cm
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.ticker</span> <span style="color: #8B008B; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.optimize</span> <span style="color: #8B008B; font-weight: bold">import</span> minimize
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">sys</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">os</span>
-
-<span style="color: #228B22"># Where to save data files</span>
-PROJECT_ROOT_DIR = <span style="color: #CD5555">&quot;Results&quot;</span>
-DATA_ID = <span style="color: #CD5555">&quot;Results/EnergyMin&quot;</span>
-
-<span style="color: #8B008B; font-weight: bold">if</span> <span style="color: #8B008B">not</span> os.path.exists(PROJECT_ROOT_DIR):
-    os.mkdir(PROJECT_ROOT_DIR)
-
-<span style="color: #8B008B; font-weight: bold">if</span> <span style="color: #8B008B">not</span> os.path.exists(DATA_ID):
-    os.makedirs(DATA_ID)
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">data_path</span>(dat_id):
-    <span style="color: #8B008B; font-weight: bold">return</span> os.path.join(DATA_ID, dat_id)
-
-outfile = <span style="color: #658b00">open</span>(data_path(<span style="color: #CD5555">&quot;Energies.dat&quot;</span>),<span style="color: #CD5555">&#39;w&#39;</span>)
-
-
-<span style="color: #228B22"># Trial wave function for the 2-electron quantum dot in two dims</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">WaveFunction</span>(r,alpha,beta):
-    r1 = r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
-    r2 = r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
-    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
-    deno = r12/(<span style="color: #B452CD">1</span>+beta*r12)
-    <span style="color: #8B008B; font-weight: bold">return</span> exp(-<span style="color: #B452CD">0.5</span>*alpha*(r1+r2)+deno)
-
-<span style="color: #228B22"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">LocalEnergy</span>(r,alpha,beta):
-    
-    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
-    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
-    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
-    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
-    deno2 = deno*deno
-    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0.5</span>*(<span style="color: #B452CD">1</span>-alpha*alpha)*(r1 + r2) +<span style="color: #B452CD">2.0</span>*alpha + <span style="color: #B452CD">1.0</span>/r12+deno2*(alpha*r12-deno2+<span style="color: #B452CD">2</span>*beta*deno-<span style="color: #B452CD">1.0</span>/r12)
-
-<span style="color: #228B22"># Derivate of wave function ansatz as function of variational parameters</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">DerivativeWFansatz</span>(r,alpha,beta):
-    
-    WfDer  = np.zeros((<span style="color: #B452CD">2</span>), np.double)
-    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
-    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
-    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
-    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
-    deno2 = deno*deno
-    WfDer[<span style="color: #B452CD">0</span>] = -<span style="color: #B452CD">0.5</span>*(r1+r2)
-    WfDer[<span style="color: #B452CD">1</span>] = -r12*r12*deno2
-    <span style="color: #8B008B; font-weight: bold">return</span>  WfDer
-
-<span style="color: #228B22"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">QuantumForce</span>(r,alpha,beta):
-
-    qforce = np.zeros((NumberParticles,Dimension), np.double)
-    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
-    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
-    qforce[<span style="color: #B452CD">0</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">0</span>,:]*alpha*(r[<span style="color: #B452CD">0</span>,:]-r[<span style="color: #B452CD">1</span>,:])*deno*deno/r12
-    qforce[<span style="color: #B452CD">1</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">1</span>,:]*alpha*(r[<span style="color: #B452CD">1</span>,:]-r[<span style="color: #B452CD">0</span>,:])*deno*deno/r12
-    <span style="color: #8B008B; font-weight: bold">return</span> qforce
-    
-
-<span style="color: #228B22"># Computing the derivative of the energy and the energy </span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">EnergyDerivative</span>(x0):
-
-    
-    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
-    D = <span style="color: #B452CD">0.5</span>
-    TimeStep = <span style="color: #B452CD">0.05</span>
-    <span style="color: #228B22"># positions</span>
-    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
-    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
-    <span style="color: #228B22"># Quantum force</span>
-    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
-    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
-
-    energy = <span style="color: #B452CD">0.0</span>
-    DeltaE = <span style="color: #B452CD">0.0</span>
-    alpha = x0[<span style="color: #B452CD">0</span>]
-    beta = x0[<span style="color: #B452CD">1</span>]
-    EnergyDer = <span style="color: #B452CD">0.0</span>
-    DeltaPsi = <span style="color: #B452CD">0.0</span>
-    DerivativePsiE = <span style="color: #B452CD">0.0</span> 
-    <span style="color: #228B22">#Initial position</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
-        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
-    wfold = WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
-
-    <span style="color: #228B22">#Loop over MC MCcycles</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
-        <span style="color: #228B22">#Trial position moving one particle at the time</span>
-        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
-            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
-                                       QuantumForceOld[i,j]*TimeStep*D
-            wfnew = WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
-            GreensFunction = <span style="color: #B452CD">0.0</span>
-            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
-	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
-                                      PositionNew[i,j]+PositionOld[i,j])
-      
-            GreensFunction = exp(GreensFunction)
-            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
-            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
-            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
-                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                    PositionOld[i,j] = PositionNew[i,j]
-                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
-                wfold = wfnew
-        DeltaE = LocalEnergy(PositionOld,alpha,beta)
-        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
-        DeltaPsi += DerPsi
-        energy += DeltaE
-        DerivativePsiE += DerPsi*DeltaE
-            
-    <span style="color: #228B22"># We calculate mean values</span>
-    energy /= NumberMCcycles
-    DerivativePsiE /= NumberMCcycles
-    DeltaPsi /= NumberMCcycles
-    EnergyDer  = <span style="color: #B452CD">2</span>*(DerivativePsiE-DeltaPsi*energy)
-    <span style="color: #8B008B; font-weight: bold">return</span> EnergyDer
-
-
-<span style="color: #228B22"># Computing the expectation value of the local energy </span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">Energy</span>(x0):
-    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
-    D = <span style="color: #B452CD">0.5</span>
-    TimeStep = <span style="color: #B452CD">0.05</span>
-    <span style="color: #228B22"># positions</span>
-    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
-    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
-    <span style="color: #228B22"># Quantum force</span>
-    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
-    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
-
-    energy = <span style="color: #B452CD">0.0</span>
-    DeltaE = <span style="color: #B452CD">0.0</span>
-    alpha = x0[<span style="color: #B452CD">0</span>]
-    beta = x0[<span style="color: #B452CD">1</span>]
-    <span style="color: #228B22">#Initial position</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
-        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
-    wfold = WaveFunction(PositionOld,alpha,beta)
-    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
-
-    <span style="color: #228B22">#Loop over MC MCcycles</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
-        <span style="color: #228B22">#Trial position moving one particle at the time</span>
-        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
-            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
-                                       QuantumForceOld[i,j]*TimeStep*D
-            wfnew = WaveFunction(PositionNew,alpha,beta)
-            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
-            GreensFunction = <span style="color: #B452CD">0.0</span>
-            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
-	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
-                                      PositionNew[i,j]+PositionOld[i,j])
-      
-            GreensFunction = exp(GreensFunction)
-            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
-            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
-            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
-                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
-                    PositionOld[i,j] = PositionNew[i,j]
-                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
-                wfold = wfnew
-        DeltaE = LocalEnergy(PositionOld,alpha,beta)
-        energy += DeltaE
-        <span style="color: #8B008B; font-weight: bold">if</span> Printout: 
-           outfile.write(<span style="color: #CD5555">&#39;%f\n&#39;</span> %(DeltaE))<span style="color: #228B22">#  (&#39;%f\n&#39; %(energy/(MCcycle+1.0)))                      </span>
-    <span style="color: #228B22"># We calculate mean values</span>
-    energy /= NumberMCcycles
-    <span style="color: #8B008B; font-weight: bold">return</span> energy
-
-<span style="color: #228B22">#Here starts the main program with variable declarations</span>
-NumberParticles = <span style="color: #B452CD">2</span>
-Dimension = <span style="color: #B452CD">2</span>
-<span style="color: #228B22"># seed for rng generator </span>
-seed()
-<span style="color: #228B22"># Monte Carlo cycles for parameter optimization</span>
-Printout = <span style="color: #8B008B; font-weight: bold">False</span>
-NumberMCcycles= <span style="color: #B452CD">10000</span>
-<span style="color: #228B22"># guess for variational parameters</span>
-x0 = np.array([<span style="color: #B452CD">0.9</span>,<span style="color: #B452CD">0.2</span>])
-<span style="color: #228B22"># Using Broydens method to find optimal parameters</span>
-res = minimize(Energy, x0, method=<span style="color: #CD5555">&#39;BFGS&#39;</span>, jac=EnergyDerivative, options={<span style="color: #CD5555">&#39;gtol&#39;</span>: <span style="color: #B452CD">1e-4</span>,<span style="color: #CD5555">&#39;disp&#39;</span>: <span style="color: #8B008B; font-weight: bold">True</span>})
-x0 = res.x
-<span style="color: #228B22"># Compute the energy again with the optimal parameters and increased number of Monte Cycles</span>
-NumberMCcycles= <span style="color: #B452CD">2</span>**<span style="color: #B452CD">19</span>
-Printout = <span style="color: #8B008B; font-weight: bold">True</span>
-FinalEnergy = Energy(x0)
-EResult = np.array([FinalEnergy,FinalEnergy])
-outfile.close()
-<span style="color: #228B22">#nice printout with Pandas</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">pd</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">import</span> DataFrame
-data ={<span style="color: #CD5555">&#39;Optimal Parameters&#39;</span>:x0, <span style="color: #CD5555">&#39;Final Energy&#39;</span>:EResult}
-frame = pd.DataFrame(data)
-<span style="color: #658b00">print</span>(frame)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>Note that the <b>minimize</b> function returns the final values for the
-variable \( \alpha=x0[0] \) and \( \beta=x0[1] \) in the array \( x \).
-</p>
-
-<p>When we have found the minimum, we use these optimal parameters to perform a production run of energies.
-The output is in turn written to file and is used, together with resampling methods like the <b>blocking method</b>,
-to obtain the best possible estimate for the standard deviation.   The optimal minimum is, even with our guess, rather close to the exact value of \( 3.0 \) a.u.
-</p>
-
-<p>The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/Resampling" target="_blank">sampling
-functions</a>
-can be used to perform both a blocking analysis, or a standard
-bootstrap and jackknife analysis.
-</p>
-</section>
-
-<section>
-<h2 id="how-do-we-proceed">How do we proceed? </h2>
-
-<p>There are several paths which can be chosen. One is to extend the
-brute force gradient descent method with an adapative stochastic
-gradient. There are several examples of this. A recent approach based
-on <a href="https://arxiv.org/pdf/1805.09416.pdf" target="_blank">the Langevin equations</a>
-seems like a promising approach for general and possibly non-convex
-optimization problems.
-</p>
-
-<p>Here we would like to point out that our next step is now to use the
-optimal values for our variational parameters and use these as inputs
-to a production run. Here we would output values of the energy and
-perform for example a blocking analysis of the results in order to get
-a best possible estimate of the standard deviation.
-</p>
-</section>
-
-<section>
-<h2 id="resampling-analysis">Resampling analysis </h2>
-
-<p>The next step is then to use the above data sets and perform a
-resampling analysis, either using say the Bootstrap method or the
-Blocking method. Since the data will be correlated, we would recommend
-to use the non-iid Bootstrap code here. The theoretical background for these resampling methods is found in the <a href="http://compphysics.github.io/ComputationalPhysics2/doc/pub/statanalysis/html/statanalysis.html" target="_blank">statistical analysis lecture notes</a>
-</p>
-
-<p>Here we have tailored the codes to the output file from the previous example. We present first the bootstrap resampling with non-iid stochastic event.</p>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #228B22"># Common imports</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">os</span>
-
-<span style="color: #228B22"># Where to save the figures and data files</span>
-DATA_ID = <span style="color: #CD5555">&quot;Results/EnergyMin&quot;</span>
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">data_path</span>(dat_id):
-    <span style="color: #8B008B; font-weight: bold">return</span> os.path.join(DATA_ID, dat_id)
-
-infile = <span style="color: #658b00">open</span>(data_path(<span style="color: #CD5555">&quot;Energies.dat&quot;</span>),<span style="color: #CD5555">&#39;r&#39;</span>)
-
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> std, mean, concatenate, arange, loadtxt, zeros, ceil
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.random</span> <span style="color: #8B008B; font-weight: bold">import</span> randint
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
-
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">tsboot</span>(data,statistic,R,l):
-    t = zeros(R); n = <span style="color: #658b00">len</span>(data); k = <span style="color: #658b00">int</span>(ceil(<span style="color: #658b00">float</span>(n)/l));
-    inds = arange(n); t0 = time()
-    
-    <span style="color: #228B22"># time series bootstrap</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(R):
-        <span style="color: #228B22"># construct bootstrap sample from</span>
-        <span style="color: #228B22"># k chunks of data. The chunksize is l</span>
-        _data = concatenate([data[j:j+l] <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> randint(<span style="color: #B452CD">0</span>,n-l,k)])[<span style="color: #B452CD">0</span>:n];
-        t[i] = statistic(_data)
-
-    <span style="color: #228B22"># analysis</span>
-    <span style="color: #658b00">print</span> (<span style="color: #CD5555">&quot;Runtime: %g sec&quot;</span> % (time()-t0)); <span style="color: #658b00">print</span> (<span style="color: #CD5555">&quot;Bootstrap Statistics :&quot;</span>)
-    <span style="color: #658b00">print</span> (<span style="color: #CD5555">&quot;original           bias      std. error&quot;</span>)
-    <span style="color: #658b00">print</span> (<span style="color: #CD5555">&quot;%8g %14g %15g&quot;</span> % (statistic(data), \
-                             mean(t) - statistic(data), \
-                             std(t) ))
-    <span style="color: #8B008B; font-weight: bold">return</span> t
-<span style="color: #228B22"># Read in data</span>
-X = loadtxt(infile)
-<span style="color: #228B22"># statistic to be estimated. Takes two args.</span>
-<span style="color: #228B22"># arg1: the data</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">stat</span>(data):
-    <span style="color: #8B008B; font-weight: bold">return</span> mean(data)
-t = tsboot(X, stat, <span style="color: #B452CD">2</span>**<span style="color: #B452CD">12</span>, <span style="color: #B452CD">2</span>**<span style="color: #B452CD">10</span>)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>The blocking code, based on the article of <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" target="_blank">Marius Jonsson</a> is given here</p>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #228B22"># Common imports</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">os</span>
-
-<span style="color: #228B22"># Where to save the figures and data files</span>
-DATA_ID = <span style="color: #CD5555">&quot;Results/EnergyMin&quot;</span>
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">data_path</span>(dat_id):
-    <span style="color: #8B008B; font-weight: bold">return</span> os.path.join(DATA_ID, dat_id)
-
-infile = <span style="color: #658b00">open</span>(data_path(<span style="color: #CD5555">&quot;Energies.dat&quot;</span>),<span style="color: #CD5555">&#39;r&#39;</span>)
-
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> log2, zeros, mean, var, <span style="color: #658b00">sum</span>, loadtxt, arange, array, cumsum, dot, transpose, diagonal, sqrt
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.linalg</span> <span style="color: #8B008B; font-weight: bold">import</span> inv
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">block</span>(x):
-    <span style="color: #228B22"># preliminaries</span>
-    n = <span style="color: #658b00">len</span>(x)
-    d = <span style="color: #658b00">int</span>(log2(n))
-    s, gamma = zeros(d), zeros(d)
-    mu = mean(x)
-
-    <span style="color: #228B22"># estimate the auto-covariance and variances </span>
-    <span style="color: #228B22"># for each blocking transformation</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> arange(<span style="color: #B452CD">0</span>,d):
-        n = <span style="color: #658b00">len</span>(x)
-        <span style="color: #228B22"># estimate autocovariance of x</span>
-        gamma[i] = (n)**(-<span style="color: #B452CD">1</span>)*<span style="color: #658b00">sum</span>( (x[<span style="color: #B452CD">0</span>:(n-<span style="color: #B452CD">1</span>)]-mu)*(x[<span style="color: #B452CD">1</span>:n]-mu) )
-        <span style="color: #228B22"># estimate variance of x</span>
-        s[i] = var(x)
-        <span style="color: #228B22"># perform blocking transformation</span>
-        x = <span style="color: #B452CD">0.5</span>*(x[<span style="color: #B452CD">0</span>::<span style="color: #B452CD">2</span>] + x[<span style="color: #B452CD">1</span>::<span style="color: #B452CD">2</span>])
-   
-    <span style="color: #228B22"># generate the test observator M_k from the theorem</span>
-    M = (cumsum( ((gamma/s)**<span style="color: #B452CD">2</span>*<span style="color: #B452CD">2</span>**arange(<span style="color: #B452CD">1</span>,d+<span style="color: #B452CD">1</span>)[::-<span style="color: #B452CD">1</span>])[::-<span style="color: #B452CD">1</span>] )  )[::-<span style="color: #B452CD">1</span>]
-
-    <span style="color: #228B22"># we need a list of magic numbers</span>
-    q =array([<span style="color: #B452CD">6.634897</span>,<span style="color: #B452CD">9.210340</span>, <span style="color: #B452CD">11.344867</span>, <span style="color: #B452CD">13.276704</span>, <span style="color: #B452CD">15.086272</span>, <span style="color: #B452CD">16.811894</span>, <span style="color: #B452CD">18.475307</span>, <span style="color: #B452CD">20.090235</span>, <span style="color: #B452CD">21.665994</span>, <span style="color: #B452CD">23.209251</span>, <span style="color: #B452CD">24.724970</span>, <span style="color: #B452CD">26.216967</span>, <span style="color: #B452CD">27.688250</span>, <span style="color: #B452CD">29.141238</span>, <span style="color: #B452CD">30.577914</span>, <span style="color: #B452CD">31.999927</span>, <span style="color: #B452CD">33.408664</span>, <span style="color: #B452CD">34.805306</span>, <span style="color: #B452CD">36.190869</span>, <span style="color: #B452CD">37.566235</span>, <span style="color: #B452CD">38.932173</span>, <span style="color: #B452CD">40.289360</span>, <span style="color: #B452CD">41.638398</span>, <span style="color: #B452CD">42.979820</span>, <span style="color: #B452CD">44.314105</span>, <span style="color: #B452CD">45.641683</span>, <span style="color: #B452CD">46.962942</span>, <span style="color: #B452CD">48.278236</span>, <span style="color: #B452CD">49.587884</span>, <span style="color: #B452CD">50.892181</span>])
-
-    <span style="color: #228B22"># use magic to determine when we should have stopped blocking</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> k <span style="color: #8B008B">in</span> arange(<span style="color: #B452CD">0</span>,d):
-        <span style="color: #8B008B; font-weight: bold">if</span>(M[k] &lt; q[k]):
-            <span style="color: #8B008B; font-weight: bold">break</span>
-    <span style="color: #8B008B; font-weight: bold">if</span> (k &gt;= d-<span style="color: #B452CD">1</span>):
-        <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Warning: Use more data&quot;</span>)
-    <span style="color: #8B008B; font-weight: bold">return</span> mu, s[k]/<span style="color: #B452CD">2</span>**(d-k)
-
-
-x = loadtxt(infile)
-(mean, var) = block(x) 
-std = sqrt(var)
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">pd</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">import</span> DataFrame
-data ={<span style="color: #CD5555">&#39;Mean&#39;</span>:[mean], <span style="color: #CD5555">&#39;STDev&#39;</span>:[std]}
-frame = pd.DataFrame(data,index=[<span style="color: #CD5555">&#39;Values&#39;</span>])
-<span style="color: #658b00">print</span>(frame)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 </section>
 
@@ -1332,290 +704,28 @@ $$
 </section>
 
 <section>
-<h2 id="the-central-limit-theorem">The Central Limit Theorem </h2>
-
-<p>Suppose we have a PDF \( p(x) \) from which we generate  a series \( N \)
-of averages \( \mathbb{E}[x_i] \). Each mean value \( \mathbb{E}[x_i] \)
-is viewed as the average of a specific measurement, e.g., throwing 
-dice 100 times and then taking the average value, or producing a certain
-amount of random numbers. 
-For notational ease, we set \( \mathbb{E}[x_i]=x_i \) in the discussion
-which follows. We do the same for \( \mathbb{E}[z]=z \).
-</p>
-
-<p>If we compute the mean \( z \) of \( m \) such mean values \( x_i \)   </p>
-<p>&nbsp;<br>
-$$
-   z=\frac{x_1+x_2+\dots+x_m}{m},
-$$
-<p>&nbsp;<br>
-
-<p>the question we pose is which is the PDF of the new variable \( z \).</p>
-</section>
-
-<section>
-<h2 id="finding-the-limit">Finding the Limit </h2>
-
-<p>The probability of obtaining an average value \( z \) is the product of the 
-probabilities of obtaining arbitrary individual mean values \( x_i \),
-but with the constraint that the average is \( z \). We can express this through
-the following expression
-</p>
-<p>&nbsp;<br>
-$$
-    \tilde{p}(z)=\int dx_1p(x_1)\int dx_2p(x_2)\dots\int dx_mp(x_m)
-    \delta(z-\frac{x_1+x_2+\dots+x_m}{m}),
-$$
-<p>&nbsp;<br>
-
-<p>where the \( \delta \)-function enbodies the constraint that the mean is \( z \).
-All measurements that lead to each individual \( x_i \) are expected to
-be independent, which in turn means that we can express \( \tilde{p} \) as the 
-product of individual \( p(x_i) \).  The independence assumption is important in the derivation of the central limit theorem.
-</p>
-</section>
-
-<section>
-<h2 id="rewriting-the-delta-function">Rewriting the \( \delta \)-function </h2>
-
-<p>If we use the integral expression for the \( \delta \)-function</p>
-
-<p>&nbsp;<br>
-$$
-   \delta(z-\frac{x_1+x_2+\dots+x_m}{m})=\frac{1}{2\pi}\int_{-\infty}^{\infty}
-   dq\exp{\left(iq(z-\frac{x_1+x_2+\dots+x_m}{m})\right)},
-$$
-<p>&nbsp;<br>
-
-<p>and inserting \( e^{i\mu q-i\mu q} \) where \( \mu \) is the mean value
-we arrive at
-</p>
-<p>&nbsp;<br>
-$$
-   \tilde{p}(z)=\frac{1}{2\pi}\int_{-\infty}^{\infty}
-   dq\exp{\left(iq(z-\mu)\right)}\left[\int_{-\infty}^{\infty}
-   dxp(x)\exp{\left(iq(\mu-x)/m\right)}\right]^m,
-$$
-<p>&nbsp;<br>
-
-<p>with the integral over \( x \) resulting in</p>
-
-<p>&nbsp;<br>
-$$
-  \int_{-\infty}^{\infty}dxp(x)\exp{\left(iq(\mu-x)/m\right)}=
-  \int_{-\infty}^{\infty}dxp(x)
-   \left[1+\frac{iq(\mu-x)}{m}-\frac{q^2(\mu-x)^2}{2m^2}+\dots\right].
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
-<h2 id="identifying-terms">Identifying Terms </h2>
-
-<p>The second term on the rhs disappears since this is just the mean and 
-employing the definition of \( \sigma^2 \) we have 
-</p>
-<p>&nbsp;<br>
-$$
-  \int_{-\infty}^{\infty}dxp(x)e^{\left(iq(\mu-x)/m\right)}=
-  1-\frac{q^2\sigma^2}{2m^2}+\dots,
-$$
-<p>&nbsp;<br>
-
-<p>resulting in </p>
-
-<p>&nbsp;<br>
-$$
-  \left[\int_{-\infty}^{\infty}dxp(x)\exp{\left(iq(\mu-x)/m\right)}\right]^m\approx
-  \left[1-\frac{q^2\sigma^2}{2m^2}+\dots \right]^m,
-$$
-<p>&nbsp;<br>
-
-<p>and in the limit \( m\rightarrow \infty \) we obtain </p>
-
-<p>&nbsp;<br>
-$$
-   \tilde{p}(z)=\frac{1}{\sqrt{2\pi}(\sigma/\sqrt{m})}
-    \exp{\left(-\frac{(z-\mu)^2}{2(\sigma/\sqrt{m})^2}\right)},
-$$
-<p>&nbsp;<br>
-
-<p>which is the normal distribution with variance
-\( \sigma^2_m=\sigma^2/m \), where \( \sigma \) is the variance of the PDF \( p(x) \)
-and \( \mu \) is also the mean of the PDF \( p(x) \). 
-</p>
-</section>
-
-<section>
-<h2 id="wrapping-it-up">Wrapping it up </h2>
-
-<p>Thus, the central limit theorem states that the PDF \( \tilde{p}(z) \) of
-the average of \( m \) random values corresponding to a PDF \( p(x) \) 
-is a normal distribution whose mean is the 
-mean value of the PDF \( p(x) \) and whose variance is the variance
-of the PDF \( p(x) \) divided by \( m \), the number of values used to compute \( z \).
-</p>
-
-<p>The central limit theorem leads to the well-known expression for the
-standard deviation, given by 
-</p>
-
-<p>&nbsp;<br>
-$$
-    \sigma_m=
-\frac{\sigma}{\sqrt{m}}.
-$$
-<p>&nbsp;<br>
-
-<p>The latter is true only if the average value is known exactly. This is obtained in the limit
-\( m\rightarrow \infty \)  only. Because the mean and the variance are measured quantities we obtain 
-the familiar expression in statistics (the so-called Bessel correction)
-</p>
-<p>&nbsp;<br>
-$$
-    \sigma_m\approx 
-\frac{\sigma}{\sqrt{m-1}}.
-$$
-<p>&nbsp;<br>
-
-<p>In many cases however the above estimate for the standard deviation,
-in particular if correlations are strong, may be too simplistic. Keep
-in mind that we have assumed that the variables \( x \) are independent
-and identically distributed. This is obviously not always the
-case. For example, the random numbers (or better pseudorandom numbers)
-we generate in various calculations do always exhibit some
-correlations.
-</p>
-
-<p>The theorem is satisfied by a large class of PDFs. Note however that for a
-finite \( m \), it is not always possible to find a closed form /analytic expression for
-\( \tilde{p}(x) \).
-</p>
-</section>
-
-<section>
-<h2 id="resampling-methods-bootstrap-steps">Resampling methods: Bootstrap steps </h2>
-
-<p>The independent bootstrap works like this: </p>
-
-<ol>
-<p><li> Draw with replacement \( n \) numbers for the observed variables \( \boldsymbol{x} = (x_1,x_2,\cdots,x_n) \).</li> 
-<p><li> Define a vector \( \boldsymbol{x}^* \) containing the values which were drawn from \( \boldsymbol{x} \).</li> 
-<p><li> Using the vector \( \boldsymbol{x}^* \) compute \( \widehat{\beta}^* \) by evaluating \( \widehat \beta \) under the observations \( \boldsymbol{x}^* \).</li> 
-<p><li> Repeat this process \( k \) times.</li> 
-</ol>
+<h2 id="statistics-central-limit-theorem">Statistics, central limit theorem </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
 <p>
-<p>When you are done, you can draw a histogram of the relative frequency
-of \( \widehat \beta^* \). This is your estimate of the probability
-distribution \( p(t) \). Using this probability distribution you can
-estimate any statistics thereof. In principle you never draw the
-histogram of the relative frequency of \( \widehat{\beta}^* \). Instead
-you use the estimators corresponding to the statistic of interest. For
-example, if you are interested in estimating the variance of \( \widehat
-\beta \), apply the etsimator \( \widehat \sigma^2 \) to the values
-\( \widehat \beta^* \).
+<p>It is generally not possible to express \( p_{\overline X_n}(x) \) in a
+closed form given an arbitrary PDF \( p_X^{\phantom X} \) and a number
+\( n \). But for the limit \( n\to\infty \) it is possible to make an
+approximation. The very important result is called <em>the central limit theorem</em>. It tells us that as \( n \) goes to infinity,
+\( p_{\overline X_n}(x) \) approaches a Gaussian distribution whose mean
+and variance equal the true mean and variance, \( \mu_{X}^{\phantom X} \)
+and \( \sigma_{X}^{2} \), respectively:
 </p>
-</section>
-
-<section>
-<h2 id="code-example-for-the-bootstrap-method-and-demonstration-of-central-limit-theorem">Code example for the Bootstrap method and demonstration of central limit theorem </h2>
-
-<p>The following code starts with a Gaussian distribution with mean value
-\( \mu =100 \) and variance \( \sigma=15 \). We use this to generate the data
-used in the bootstrap analysis. The bootstrap analysis returns a data
-set after a given number of bootstrap operations (as many as we have
-data points). This data set consists of estimated mean values for each
-bootstrap operation. The histogram generated by the bootstrap method
-shows that the distribution for these mean values is also a Gaussian,
-centered around the mean value \( \mu=100 \) but with standard deviation
-\( \sigma/\sqrt{n} \), where \( n \) is the number of bootstrap samples (in
-this case the same as the number of original data points). The value
-of the standard deviation is what we expect from the central limit
-theorem.
-</p>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.stats</span> <span style="color: #8B008B; font-weight: bold">import</span> norm
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
-
-<span style="color: #228B22"># Returns mean of bootstrap samples </span>
-<span style="color: #228B22"># Bootstrap algorithm</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">bootstrap</span>(data, datapoints):
-    t = np.zeros(datapoints)
-    n = <span style="color: #658b00">len</span>(data)
-    <span style="color: #228B22"># non-parametric bootstrap         </span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(datapoints):
-        t[i] = np.mean(data[np.random.randint(<span style="color: #B452CD">0</span>,n,n)])
-    <span style="color: #228B22"># analysis    </span>
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Bootstrap Statistics :&quot;</span>)
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;original           bias      std. error&quot;</span>)
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;%8g %8g %14g %15g&quot;</span> % (np.mean(data), np.std(data),np.mean(t),np.std(t)))
-    <span style="color: #8B008B; font-weight: bold">return</span> t
-
-<span style="color: #228B22"># We set the mean value to 100 and the standard deviation to 15</span>
-mu, sigma = <span style="color: #B452CD">100</span>, <span style="color: #B452CD">15</span>
-datapoints = <span style="color: #B452CD">10000</span>
-<span style="color: #228B22"># We generate random numbers according to the normal distribution</span>
-x = mu + sigma*np.random.randn(datapoints)
-<span style="color: #228B22"># bootstrap returns the data sample                                    </span>
-t = bootstrap(x, datapoints)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>We see that our new variance and from that the standard deviation, agrees with the central limit theorem.</p>
-</section>
-
-<section>
-<h2 id="plotting-the-histogram">Plotting the Histogram </h2>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #228B22"># the histogram of the bootstrapped data (normalized data if density = True)</span>
-n, binsboot, patches = plt.hist(t, <span style="color: #B452CD">50</span>, density=<span style="color: #8B008B; font-weight: bold">True</span>, facecolor=<span style="color: #CD5555">&#39;red&#39;</span>, alpha=<span style="color: #B452CD">0.75</span>)
-<span style="color: #228B22"># add a &#39;best fit&#39; line  </span>
-y = norm.pdf(binsboot, np.mean(t), np.std(t))
-lt = plt.plot(binsboot, y, <span style="color: #CD5555">&#39;b&#39;</span>, linewidth=<span style="color: #B452CD">1</span>)
-plt.xlabel(<span style="color: #CD5555">&#39;x&#39;</span>)
-plt.ylabel(<span style="color: #CD5555">&#39;Probability&#39;</span>)
-plt.grid(<span style="color: #8B008B; font-weight: bold">True</span>)
-plt.show()
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\lim_{n\to\infty} p_{\overline X_n}(x) =
+\left(\frac{n}{2\pi\mathrm{var}(X)}\right)^{1/2}
+e^{-\frac{n(x-\bar x_n)^2}{2\mathrm{var}(X)}}
+\tag{12}
+\end{equation}
+$$
+<p>&nbsp;<br>
 </div>
 </section>
 
@@ -1633,7 +743,7 @@ $$
 \begin{equation}
 \mathrm{err}_X^2 = \mathrm{var}(\overline X_n) = \frac{1}{n^2}
 \sum_{ij} \mathrm{cov}(X_i, X_j)
-\tag{12}
+\tag{13}
 \end{equation}
 $$
 <p>&nbsp;<br>
@@ -1665,7 +775,7 @@ $$
 <p>&nbsp;<br>
 
 <p>Using \( \bar x \) in place of \( \mu_{X_i}^{\phantom X} \) we can give an
-<em>estimate</em> of the covariance in Eq.&nbsp;<a href="#mjx-eqn-12">(12)</a>
+<em>estimate</em> of the covariance in Eq.&nbsp;<a href="#mjx-eqn-13">(13)</a>
 </p>
 <p>&nbsp;<br>
 $$
@@ -1702,7 +812,7 @@ $$
 $$
 \begin{equation}
 \mathrm{var}(X_i)\approx \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)=\mathrm{var}(x)
-\tag{13}
+\tag{14}
 \end{equation}
 $$
 <p>&nbsp;<br>
@@ -1717,7 +827,7 @@ $$
 &=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) \nonumber \\
 &\approx&\frac{1}{n^2}\sum_{ij}\frac{1}{n}\mathrm{cov}(x) =\frac{1}{n^2}n^2\frac{1}{n}\mathrm{cov}(x)\nonumber\\
 &=\frac{1}{n}\mathrm{cov}(x)
-\tag{14}
+\tag{15}
 \end{align}
 $$
 <p>&nbsp;<br>
@@ -1751,12 +861,12 @@ $$
 $$
 \begin{equation}
 \mathrm{err}_X^2\approx \frac{1}{n^2} \sum_i \mathrm{var}(x)= \frac{1}{n}\mathrm{var}(x)
-\tag{15}
+\tag{16}
 \end{equation}
 $$
 <p>&nbsp;<br>
 
-<p>where in the second step we have used Eq.&nbsp;<a href="#mjx-eqn-13">(13)</a>.
+<p>where in the second step we have used Eq.&nbsp;<a href="#mjx-eqn-14">(14)</a>.
 The error of the sample is then just its standard deviation divided by
 the square root of the number of measurements the sample contains.
 This is a very useful formula which is easy to compute. It acts as a
@@ -1772,7 +882,7 @@ cannot overlook the always present correlations.
 <b></b>
 <p>
 <p>For computational purposes one usually splits up the estimate of
-\( \mathrm{err}_X^2 \), given by Eq.&nbsp;<a href="#mjx-eqn-14">(14)</a>, into two
+\( \mathrm{err}_X^2 \), given by Eq.&nbsp;<a href="#mjx-eqn-15">(15)</a>, into two
 parts
 </p>
 <p>&nbsp;<br>
@@ -1786,13 +896,13 @@ $$
 $$
 \begin{equation}
 \frac{1}{n^2}\sum_{k=1}^n (x_k - \bar x_n)^2 +\frac{2}{n^2}\sum_{k < l} (x_k - \bar x_n)(x_l - \bar x_n)
-\tag{16}
+\tag{17}
 \end{equation}
 $$
 <p>&nbsp;<br>
 
 <p>The first term is the same as the error in the uncorrelated case,
-Eq.&nbsp;<a href="#mjx-eqn-15">(15)</a>. This means that the second
+Eq.&nbsp;<a href="#mjx-eqn-16">(16)</a>. This means that the second
 term accounts for the error correction due to correlation between the
 measurements. For uncorrelated measurements this second term is zero.
 </p>
@@ -1821,6 +931,780 @@ measurements to calculate the cross terms. Therefore, all measurements
 have to be stored throughout the experiment.
 </p>
 </div>
+</section>
+
+<section>
+<h2 id="statistics-wrapping-up-1">Statistics, wrapping up 1 </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>Let us analyze the problem by splitting up the correlation term into
+partial sums of the form:
+</p>
+<p>&nbsp;<br>
+$$
+f_d = \frac{1}{n-d}\sum_{k=1}^{n-d}(x_k - \bar x_n)(x_{k+d} - \bar x_n)
+$$
+<p>&nbsp;<br>
+
+<p>The correlation term of the error can now be rewritten in terms of
+\( f_d \)
+</p>
+<p>&nbsp;<br>
+$$
+\frac{2}{n}\sum_{k < l} (x_k - \bar x_n)(x_l - \bar x_n) =
+2\sum_{d=1}^{n-1} f_d
+$$
+<p>&nbsp;<br>
+
+<p>The value of \( f_d \) reflects the correlation between measurements
+separated by the distance \( d \) in the sample samples.  Notice that for
+\( d=0 \), \( f \) is just the sample variance, \( \mathrm{var}(x) \). If we divide \( f_d \)
+by \( \mathrm{var}(x) \), we arrive at the so called <em>autocorrelation function</em>
+</p>
+<p>&nbsp;<br>
+$$
+\kappa_d = \frac{f_d}{\mathrm{var}(x)}
+$$
+<p>&nbsp;<br>
+
+<p>which gives us a useful measure of pairwise correlations
+starting always at \( 1 \) for \( d=0 \).
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-final-expression">Statistics, final expression </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>The sample error (see eq.&nbsp;<a href="#mjx-eqn-17">(17)</a>) can now be
+written in terms of the autocorrelation function:
+</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+\mathrm{err}_X^2 &=
+\frac{1}{n}\mathrm{var}(x)+\frac{2}{n}\cdot\mathrm{var}(x)\sum_{d=1}^{n-1}
+\frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
+\left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
+&=\frac{\tau}{n}\cdot\mathrm{var}(x)
+\tag{18}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>and we see that \( \mathrm{err}_X \) can be expressed in terms the
+uncorrelated sample variance times a correction factor \( \tau \) which
+accounts for the correlation between measurements. We call this
+correction factor the <em>autocorrelation time</em>:
+</p>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\tau = 1+2\sum_{d=1}^{n-1}\kappa_d
+\tag{19}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-effective-number-of-correlations">Statistics, effective number of correlations </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>For a correlation free experiment, \( \tau \)
+equals 1. From the point of view of
+eq.&nbsp;<a href="#mjx-eqn-18">(18)</a> we can interpret a sequential
+correlation as an effective reduction of the number of measurements by
+a factor \( \tau \). The effective number of measurements becomes:
+</p>
+<p>&nbsp;<br>
+$$
+n_\mathrm{eff} = \frac{n}{\tau}
+$$
+<p>&nbsp;<br>
+
+<p>To neglect the autocorrelation time \( \tau \) will always cause our
+simple uncorrelated estimate of \( \mathrm{err}_X^2\approx \mathrm{var}(x)/n \) to
+be less than the true sample error. The estimate of the error will be
+too <em>good</em>. On the other hand, the calculation of the full
+autocorrelation time poses an efficiency problem if the set of
+measurements is very large.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="can-we-understand-this-time-auto-correlation-function">Can we understand this? Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>The so-called time-displacement autocorrelation \( \phi(t) \) for a quantity \( \mathbf{M} \) is given by</p>
+<p>&nbsp;<br>
+$$
+\phi(t) = \int dt' \left[\mathbf{M}(t')-\langle \mathbf{M} \rangle\right]\left[\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle\right],
+$$
+<p>&nbsp;<br>
+
+<p>which can be rewritten as </p>
+<p>&nbsp;<br>
+$$
+\phi(t) = \int dt' \left[\mathbf{M}(t')\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle^2\right],
+$$
+<p>&nbsp;<br>
+
+<p>where \( \langle \mathbf{M} \rangle \) is the average value and
+\( \mathbf{M}(t) \) its instantaneous value. We can discretize this function as follows, where we used our
+set of computed values \( \mathbf{M}(t) \) for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
+</p>
+<p>&nbsp;<br>
+$$
+\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\mathbf{M}(t'+t)
+-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\times
+\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t'+t).
+\tag{20}
+$$
+<p>&nbsp;<br>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>One should be careful with times close to \( t_{\mathrm{max}} \), the upper limit of the sums 
+becomes small and we end up integrating over a rather small time interval. This means that the statistical
+error in \( \phi(t) \) due to the random nature of the fluctuations in \( \mathbf{M}(t) \) can become large.
+</p>
+
+<p>One should therefore choose \( t \ll t_{\mathrm{max}} \).</p>
+
+<p>Note that the variable \( \mathbf{M} \) can be any expectation values of interest.</p>
+
+<p>The time-correlation function gives a measure of the correlation between the various values of the variable 
+at a time \( t' \) and a time \( t'+t \). If we multiply the values of \( \mathbf{M} \) at these two different times,
+we will get a positive contribution if they are fluctuating in the same direction, or a negative value
+if they fluctuate in the opposite direction. If we then integrate over time, or use the discretized version of, the time correlation function \( \phi(t) \) should take a non-zero value if the fluctuations are 
+correlated, else it should gradually go to zero. For times a long way apart 
+the different values of \( \mathbf{M} \)  are most likely 
+uncorrelated and \( \phi(t) \) should be zero.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>We can derive the correlation time by observing that our Metropolis algorithm is based on a random
+walk in the space of all  possible spin configurations. 
+Our probability 
+distribution function \( \mathbf{\hat{w}}(t) \) after a given number of time steps \( t \) could be written as
+</p>
+<p>&nbsp;<br>
+$$
+   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}^t\hat{w}}(0),
+$$
+<p>&nbsp;<br>
+
+<p>with \( \mathbf{\hat{w}}(0) \) the distribution at \( t=0 \) and \( \mathbf{\hat{W}} \) representing the 
+transition probability matrix. 
+We can always expand \( \mathbf{\hat{w}}(0) \) in terms of the right eigenvectors of 
+\( \mathbf{\hat{v}} \) of \( \mathbf{\hat{W}} \) as 
+</p>
+<p>&nbsp;<br>
+$$
+    \mathbf{\hat{w}}(0)  = \sum_i\alpha_i\mathbf{\hat{v}}_i,
+$$
+<p>&nbsp;<br>
+
+<p>resulting in </p>
+<p>&nbsp;<br>
+$$
+   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}}^t\mathbf{\hat{w}}(0)=\mathbf{\hat{W}}^t\sum_i\alpha_i\mathbf{\hat{v}}_i=
+\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i,
+$$
+<p>&nbsp;<br>
+
+<p>with \( \lambda_i \) the \( i^{\mathrm{th}} \) eigenvalue corresponding to  
+the eigenvector \( \mathbf{\hat{v}}_i \). 
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>If we assume that \( \lambda_0 \) is the largest eigenvector we see that in the limit \( t\rightarrow \infty \),
+\( \mathbf{\hat{w}}(t) \) becomes proportional to the corresponding eigenvector 
+\( \mathbf{\hat{v}}_0 \). This is our steady state or final distribution. 
+</p>
+
+<p>We can relate this property to an observable like the mean energy.
+With the probabilty \( \mathbf{\hat{w}}(t) \) (which in our case is the squared trial wave function) we
+can write the expectation values as 
+</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}\mathbf{M}_{\mu},
+$$
+<p>&nbsp;<br>
+
+<p>or as the scalar of a  vector product</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
+$$
+<p>&nbsp;<br>
+
+<p>with \( \mathbf{m} \) being the vector whose elements are the values of \( \mathbf{M}_{\mu} \) in its 
+various microstates \( \mu \).
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>We rewrite this relation  as</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
+$$
+<p>&nbsp;<br>
+
+<p>If we define \( m_i=\mathbf{\hat{v}}_i\mathbf{m}_i \) as the expectation value of
+\( \mathbf{M} \) in the \( i^{\mathrm{th}} \) eigenstate we can rewrite the last equation as
+</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
+$$
+<p>&nbsp;<br>
+
+<p>Since we have that in the limit \( t\rightarrow \infty \) the mean value is dominated by the 
+the largest eigenvalue \( \lambda_0 \), we can rewrite the last equation as
+</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
+$$
+<p>&nbsp;<br>
+
+<p>We define the quantity</p>
+<p>&nbsp;<br>
+$$
+   \tau_i=-\frac{1}{log\lambda_i},
+$$
+<p>&nbsp;<br>
+
+<p>and rewrite the last expectation value as</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
+\tag{21}
+$$
+<p>&nbsp;<br>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>The quantities \( \tau_i \) are the correlation times for the system. They control also the auto-correlation function 
+discussed above.  The longest correlation time is obviously given by the second largest
+eigenvalue \( \tau_1 \), which normally defines the correlation time discussed above. For large times, this is the 
+only correlation time that survives. If higher eigenvalues of the transition matrix are well separated from 
+\( \lambda_1 \) and we simulate long enough,  \( \tau_1 \) may well define the correlation time. 
+In other cases we may not be able to extract a reliable result for \( \tau_1 \). 
+Coming back to the time correlation function \( \phi(t) \) we can present a more general definition in terms
+of the mean magnetizations $ \langle \mathbf{M}(t) \rangle$. Recalling that the mean value is equal 
+to $ \langle \mathbf{M}(\infty) \rangle$ we arrive at the expectation values
+</p>
+<p>&nbsp;<br>
+$$
+\phi(t) =\langle \mathbf{M}(0)-\mathbf{M}(\infty)\rangle \langle \mathbf{M}(t)-\mathbf{M}(\infty)\rangle,
+$$
+<p>&nbsp;<br>
+
+<p>resulting in</p>
+<p>&nbsp;<br>
+$$
+\phi(t) =\sum_{i,j\ne 0}m_i\alpha_im_j\alpha_je^{-t/\tau_i},
+$$
+<p>&nbsp;<br>
+
+<p>which is appropriate for all times.</p>
+</div>
+</section>
+
+<section>
+<h2 id="correlation-time">Correlation Time </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>If the correlation function decays exponentially</p>
+<p>&nbsp;<br>
+$$ \phi (t) \sim \exp{(-t/\tau)}$$
+<p>&nbsp;<br>
+
+<p>then the exponential correlation time can be computed as the average</p>
+<p>&nbsp;<br>
+$$   \tau_{\mathrm{exp}}  =  -\langle  \frac{t}{log|\frac{\phi(t)}{\phi(0)}|} \rangle. $$
+<p>&nbsp;<br>
+
+<p>If the decay is exponential, then</p>
+<p>&nbsp;<br>
+$$  \int_0^{\infty} dt \phi(t)  = \int_0^{\infty} dt \phi(0)\exp{(-t/\tau)}  = \tau \phi(0),$$
+<p>&nbsp;<br>
+
+<p>which  suggests another measure of correlation</p>
+<p>&nbsp;<br>
+$$   \tau_{\mathrm{int}} = \sum_k \frac{\phi(k)}{\phi(0)}, $$
+<p>&nbsp;<br>
+
+<p>called the integrated correlation time.</p>
+</div>
+</section>
+
+<section>
+<h2 id="resampling-methods-jackknife-and-bootstrap">Resampling methods: Jackknife and Bootstrap </h2>
+
+<p>Two famous
+resampling methods are the <b>independent bootstrap</b> and <b>the jackknife</b>. 
+</p>
+
+<p>The jackknife is a special case of the independent bootstrap. Still, the jackknife was made
+popular prior to the independent bootstrap. And as the popularity of
+the independent bootstrap soared, new variants, such as <b>the dependent bootstrap</b>.
+</p>
+
+<p>The Jackknife and independent bootstrap work for
+independent, identically distributed random variables.
+If these conditions are not
+satisfied, the methods will fail.  Yet, it should be said that if the data are
+independent, identically distributed, and we only want to estimate the
+variance of \( \overline{X} \) (which often is the case), then there is no
+need for bootstrapping. 
+</p>
+</section>
+
+<section>
+<h2 id="resampling-methods-jackknife">Resampling methods: Jackknife </h2>
+
+<p>The Jackknife works by making many replicas of the estimator \( \widehat{\theta} \). 
+The jackknife is a resampling method, we explained that this happens by scrambling the data in some way. When using the jackknife, this is done by systematically leaving out one observation from the vector of observed values \( \hat{x} = (x_1,x_2,\cdots,X_n) \). 
+Let \( \hat{x}_i \) denote the vector
+</p>
+<p>&nbsp;<br>
+$$
+\hat{x}_i = (x_1,x_2,\cdots,x_{i-1},x_{i+1},\cdots,x_n),
+$$
+<p>&nbsp;<br>
+
+<p>which equals the vector \( \hat{x} \) with the exception that observation
+number \( i \) is left out. Using this notation, define
+\( \widehat{\theta}_i \) to be the estimator
+\( \widehat{\theta} \) computed using \( \vec{X}_i \). 
+</p>
+</section>
+
+<section>
+<h2 id="resampling-methods-jackknife-estimator">Resampling methods: Jackknife estimator </h2>
+
+<p>To get an estimate for the bias and
+standard error of \( \widehat{\theta} \), use the following
+estimators for each component of \( \widehat{\theta} \)
+</p>
+
+<p>&nbsp;<br>
+$$
+\widehat{\mathrm{Bias}}(\widehat \theta,\theta) = (n-1)\left( - \widehat{\theta} + \frac{1}{n}\sum_{i=1}^{n} \widehat \theta_i \right) \qquad \text{and} \qquad \widehat{\sigma}^2_{\widehat{\theta} } = \frac{n-1}{n}\sum_{i=1}^{n}( \widehat{\theta}_i - \frac{1}{n}\sum_{j=1}^{n}\widehat \theta_j )^2.
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="jackknife-code-example">Jackknife code example </h2>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> *
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.random</span> <span style="color: #8B008B; font-weight: bold">import</span> randint, randn
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">jackknife</span>(data, stat):
+    n = <span style="color: #658b00">len</span>(data);t = zeros(n); inds = arange(n); t0 = time()
+    <span style="color: #228B22">## &#39;jackknifing&#39; by leaving out an observation for each i                                                                                                                      </span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(n):
+        t[i] = stat(delete(data,i) )
+
+    <span style="color: #228B22"># analysis                                                                                                                                                                     </span>
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Runtime: %g sec&quot;</span> % (time()-t0)); <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Jackknife Statistics :&quot;</span>)
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;original           bias      std. error&quot;</span>)
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;%8g %14g %15g&quot;</span> % (stat(data),(n-<span style="color: #B452CD">1</span>)*mean(t)/n, (n*var(t))**<span style="color: #B452CD">.5</span>))
+
+    <span style="color: #8B008B; font-weight: bold">return</span> t
+
+
+<span style="color: #228B22"># Returns mean of data samples                                                                                                                                                     </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">stat</span>(data):
+    <span style="color: #8B008B; font-weight: bold">return</span> mean(data)
+
+
+mu, sigma = <span style="color: #B452CD">100</span>, <span style="color: #B452CD">15</span>
+datapoints = <span style="color: #B452CD">10000</span>
+x = mu + sigma*random.randn(datapoints)
+<span style="color: #228B22"># jackknife returns the data sample                                                                                                                                                </span>
+t = jackknife(x, stat)
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section>
+<h2 id="resampling-methods-bootstrap">Resampling methods: Bootstrap </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>Bootstrapping is a nonparametric approach to statistical inference
+that substitutes computation for more traditional distributional
+assumptions and asymptotic results. Bootstrapping offers a number of
+advantages: 
+</p>
+<ol>
+<p><li> The bootstrap is quite general, although there are some cases in which it fails.</li>
+
+<p><li> Because it does not require distributional assumptions (such as normally distributed errors), the bootstrap can provide more accurate inferences when the data are not well behaved or when the sample size is small.</li>
+
+<p><li> It is possible to apply the bootstrap to statistics with sampling distributions that are difficult to derive, even asymptotically.</li> 
+<p><li> It is relatively simple to apply the bootstrap to complex data-collection plans (such as stratified and clustered samples).</li>
+</ol>
+</div>
+</section>
+
+<section>
+<h2 id="resampling-methods-bootstrap-background">Resampling methods: Bootstrap background </h2>
+
+<p>Since \( \widehat{\theta} = \widehat{\theta}(\hat{X}) \) is a function of random variables,
+\( \widehat{\theta} \) itself must be a random variable. Thus it has
+a pdf, call this function \( p(\hat{t}) \). The aim of the bootstrap is to
+estimate \( p(\hat{t}) \) by the relative frequency of
+\( \widehat{\theta} \). You can think of this as using a histogram
+in the place of \( p(\hat{t}) \). If the relative frequency closely
+resembles \( p(\vec{t}) \), then using numerics, it is straight forward to
+estimate all the interesting parameters of \( p(\hat{t}) \) using point
+estimators.  
+</p>
+</section>
+
+<section>
+<h2 id="resampling-methods-more-bootstrap-background">Resampling methods: More Bootstrap background </h2>
+
+<p>In the case that \( \widehat{\theta} \) has
+more than one component, and the components are independent, we use the
+same estimator on each component separately.  If the probability
+density function of \( X_i \), \( p(x) \), had been known, then it would have
+been straight forward to do this by: 
+</p>
+<ol>
+<p><li> Drawing lots of numbers from \( p(x) \), suppose we call one such set of numbers \( (X_1^*, X_2^*, \cdots, X_n^*) \).</li> 
+<p><li> Then using these numbers, we could compute a replica of \( \widehat{\theta} \) called \( \widehat{\theta}^* \).</li> 
+</ol>
+<p>
+<p>By repeated use of (1) and (2), many
+estimates of \( \widehat{\theta} \) could have been obtained. The
+idea is to use the relative frequency of \( \widehat{\theta}^* \)
+(think of a histogram) as an estimate of \( p(\hat{t}) \).
+</p>
+</section>
+
+<section>
+<h2 id="resampling-methods-bootstrap-approach">Resampling methods: Bootstrap approach </h2>
+
+<p>But
+unless there is enough information available about the process that
+generated \( X_1,X_2,\cdots,X_n \), \( p(x) \) is in general
+unknown. Therefore, <a href="https://projecteuclid.org/euclid.aos/1176344552" target="_blank">Efron in 1979</a>  asked the
+question: What if we replace \( p(x) \) by the relative frequency
+of the observation \( X_i \); if we draw observations in accordance with
+the relative frequency of the observations, will we obtain the same
+result in some asymptotic sense? The answer is yes.
+</p>
+
+<p>Instead of generating the histogram for the relative
+frequency of the observation \( X_i \), just draw the values
+\( (X_1^*,X_2^*,\cdots,X_n^*) \) with replacement from the vector
+\( \hat{X} \). 
+</p>
+</section>
+
+<section>
+<h2 id="resampling-methods-bootstrap-steps">Resampling methods: Bootstrap steps </h2>
+
+<p>The independent bootstrap works like this: </p>
+
+<ol>
+<p><li> Draw with replacement \( n \) numbers for the observed variables \( \hat{x} = (x_1,x_2,\cdots,x_n) \).</li> 
+<p><li> Define a vector \( \hat{x}^* \) containing the values which were drawn from \( \hat{x} \).</li> 
+<p><li> Using the vector \( \hat{x}^* \) compute \( \widehat{\theta}^* \) by evaluating \( \widehat \theta \) under the observations \( \hat{x}^* \).</li> 
+<p><li> Repeat this process \( k \) times.</li> 
+</ol>
+<p>
+<p>When you are done, you can draw a histogram of the relative frequency of \( \widehat \theta^* \). This is your estimate of the probability distribution \( p(t) \). Using this probability distribution you can estimate any statistics thereof. In principle you never draw the histogram of the relative frequency of \( \widehat{\theta}^* \). Instead you use the estimators corresponding to the statistic of interest. For example, if you are interested in estimating the variance of \( \widehat \theta \), apply the etsimator \( \widehat \sigma^2 \) to the values \( \widehat \theta ^* \).</p>
+</section>
+
+<section>
+<h2 id="code-example-for-the-bootstrap-method">Code example for the Bootstrap method </h2>
+
+<p>The following code starts with a Gaussian distribution with mean value \( \mu =100 \) and variance \( \sigma=15 \). We use this to generate the data used in the bootstrap analysis. The bootstrap analysis returns a data set after a given number of bootstrap operations (as many as we have data points). This data set consists of estimated mean values for each bootstrap operation. The histogram generated by the bootstrap method shows that the distribution for these mean values is also a Gaussian, centered around the mean value \( \mu=100 \) but with standard deviation \( \sigma/\sqrt{n} \), where \( n \) is the number of bootstrap samples (in this case the same as the number of original data points). The value of the standard deviation is what we expect from the central limit theorem. </p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="font-size: 80%; line-height: 125%;">%matplotlib inline
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> *
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.random</span> <span style="color: #8B008B; font-weight: bold">import</span> randint, randn
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.stats</span> <span style="color: #8B008B; font-weight: bold">import</span> norm
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+
+<span style="color: #228B22"># Returns mean of bootstrap samples                                                                                                                                                </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">stat</span>(data):
+    <span style="color: #8B008B; font-weight: bold">return</span> mean(data)
+
+<span style="color: #228B22"># Bootstrap algorithm                                                                                                                                                              </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">bootstrap</span>(data, statistic, R):
+    t = zeros(R); n = <span style="color: #658b00">len</span>(data); inds = arange(n); t0 = time()
+
+    <span style="color: #228B22"># non-parametric bootstrap                                                                                                                                                     </span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(R):
+        t[i] = statistic(data[randint(<span style="color: #B452CD">0</span>,n,n)])
+
+    <span style="color: #228B22"># analysis                                                                                                                                                                     </span>
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Runtime: %g sec&quot;</span> % (time()-t0)); <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Bootstrap Statistics :&quot;</span>)
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;original           bias      std. error&quot;</span>)
+    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;%8g %8g %14g %15g&quot;</span> % (statistic(data), std(data),\
+                             mean(t), \
+                             std(t)))
+    <span style="color: #8B008B; font-weight: bold">return</span> t
+
+
+mu, sigma = <span style="color: #B452CD">100</span>, <span style="color: #B452CD">15</span>
+datapoints = <span style="color: #B452CD">10000</span>
+x = mu + sigma*random.randn(datapoints)
+<span style="color: #228B22"># bootstrap returns the data sample                                                                                                          t = bootstrap(x, stat, datapoints)</span>
+<span style="color: #228B22"># the histogram of the bootstrapped  data  </span>
+t = bootstrap(x, stat, datapoints)
+<span style="color: #228B22"># the histogram of the bootstrapped  data                                            </span>
+n, binsboot, patches = plt.hist(t, bins=<span style="color: #B452CD">50</span>, density=<span style="color: #CD5555">&#39;true&#39;</span>,histtype=<span style="color: #CD5555">&#39;bar&#39;</span>, color=<span style="color: #CD5555">&#39;red&#39;</span>, alpha=<span style="color: #B452CD">0.75</span>)
+
+<span style="color: #228B22"># add a &#39;best fit&#39; line                                                                                                                                                          </span>
+y = norm.pdf( binsboot, mean(t), std(t))
+lt = plt.plot(binsboot, y, <span style="color: #CD5555">&#39;r--&#39;</span>, linewidth=<span style="color: #B452CD">1</span>)
+plt.xlabel(<span style="color: #CD5555">&#39;Smarts&#39;</span>)
+plt.ylabel(<span style="color: #CD5555">&#39;Probability&#39;</span>)
+plt.axis([<span style="color: #B452CD">99.5</span>, <span style="color: #B452CD">100.6</span>, <span style="color: #B452CD">0</span>, <span style="color: #B452CD">3.0</span>])
+plt.grid(<span style="color: #8B008B; font-weight: bold">True</span>)
+
+plt.show()
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section>
+<h2 id="resampling-methods-blocking">Resampling methods: Blocking  </h2>
+
+<p>The blocking method was made popular by <a href="https://aip.scitation.org/doi/10.1063/1.457480" target="_blank">Flyvbjerg and Pedersen (1989)</a>
+and has become one of the standard ways to estimate
+\( V(\widehat{\theta}) \) for exactly one \( \widehat{\theta} \), namely
+\( \widehat{\theta} = \overline{X} \). 
+</p>
+
+<p>Assume \( n = 2^d \) for some integer \( d>1 \) and \( X_1,X_2,\cdots, X_n \) is a stationary time series to begin with. 
+Moreover, assume that the time series is asymptotically uncorrelated. We switch to vector notation by arranging \( X_1,X_2,\cdots,X_n \) in an \( n \)-tuple. Define:
+</p>
+<p>&nbsp;<br>
+$$
+\begin{align*}
+\hat{X} = (X_1,X_2,\cdots,X_n).
+\end{align*}
+$$
+<p>&nbsp;<br>
+
+<p>The strength of the blocking method is when the number of
+observations, \( n \) is large. For large \( n \), the complexity of dependent
+bootstrapping scales poorly, but the blocking method does not,
+moreover, it becomes more accurate the larger \( n \) is.
+</p>
+</section>
+
+<section>
+<h2 id="blocking-transformations">Blocking Transformations </h2>
+<p> We now define
+blocking transformations. The idea is to take the mean of subsequent
+pair of elements from \( \vec{X} \) and form a new vector
+\( \vec{X}_1 \). Continuing in the same way by taking the mean of
+subsequent pairs of elements of \( \vec{X}_1 \) we obtain \( \vec{X}_2 \), and
+so on. 
+Define \( \vec{X}_i \) recursively by:
+</p>
+
+<p>&nbsp;<br>
+$$
+\begin{align} 
+(\vec{X}_0)_k &\equiv (\vec{X})_k \nonumber \\
+(\vec{X}_{i+1})_k &\equiv \frac{1}{2}\Big( (\vec{X}_i)_{2k-1} +
+(\vec{X}_i)_{2k} \Big) \qquad \text{for all} \qquad 1 \leq i \leq d-1
+\tag{22}
+\end{align} 
+$$
+<p>&nbsp;<br>
+
+<p>The quantity \( \vec{X}_k \) is
+subject to \( k \) <b>blocking transformations</b>.  We now have \( d \) vectors
+\( \vec{X}_0, \vec{X}_1,\cdots,\vec X_{d-1} \) containing the subsequent
+averages of observations. It turns out that if the components of
+\( \vec{X} \) is a stationary time series, then the components of
+\( \vec{X}_i \) is a stationary time series for all \( 0 \leq i \leq d-1 \)
+</p>
+
+<p>We can then compute the autocovariance, the variance, sample mean, and
+number of observations for each \( i \). 
+Let \( \gamma_i, \sigma_i^2,
+\overline{X}_i \) denote the autocovariance, variance and average of the
+elements of \( \vec{X}_i \) and let \( n_i \) be the number of elements of
+\( \vec{X}_i \). It follows by induction that \( n_i = n/2^i \). 
+</p>
+</section>
+
+<section>
+<h2 id="blocking-transformations">Blocking Transformations </h2>
+
+<p>Using the
+definition of the blocking transformation and the distributive
+property of the covariance, it is clear that since \( h =|i-j| \)
+we can define
+</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+\gamma_{k+1}(h) &= cov\left( ({X}_{k+1})_{i}, ({X}_{k+1})_{j} \right) \nonumber \\
+&=  \frac{1}{4}cov\left( ({X}_{k})_{2i-1} + ({X}_{k})_{2i}, ({X}_{k})_{2j-1} + ({X}_{k})_{2j} \right) \nonumber \\
+&=  \frac{1}{2}\gamma_{k}(2h) + \frac{1}{2}\gamma_k(2h+1) \hspace{0.1cm} \mathrm{h = 0} 
+\tag{23}\\
+&=\frac{1}{4}\gamma_k(2h-1) + \frac{1}{2}\gamma_k(2h) + \frac{1}{4}\gamma_k(2h+1) \quad \mathrm{else}
+\tag{24}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>The quantity \( \hat{X} \) is asymptotic uncorrelated by assumption, \( \hat{X}_k \) is also asymptotic uncorrelated. Let's turn our attention to the variance of the sample mean \( V(\overline{X}) \). </p>
+</section>
+
+<section>
+<h2 id="blocking-transformations-getting-there">Blocking Transformations, getting there </h2>
+<p>We have</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+V(\overline{X}_k) = \frac{\sigma_k^2}{n_k} + \underbrace{\frac{2}{n_k} \sum_{h=1}^{n_k-1}\left( 1 - \frac{h}{n_k} \right)\gamma_k(h)}_{\equiv e_k} = \frac{\sigma^2_k}{n_k} + e_k \quad \text{if} \quad \gamma_k(0) = \sigma_k^2. 
+\tag{25}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>The term \( e_k \) is called the <b>truncation error</b>: </p>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+e_k = \frac{2}{n_k} \sum_{h=1}^{n_k-1}\left( 1 - \frac{h}{n_k} \right)\gamma_k(h). 
+\tag{26}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+<p>We can show that \( V(\overline{X}_i) = V(\overline{X}_j) \) for all \( 0 \leq i \leq d-1 \) and \( 0 \leq j \leq d-1 \). </p>
+</section>
+
+<section>
+<h2 id="blocking-transformations-final-expressions">Blocking Transformations, final expressions </h2>
+
+<p>We can then wrap up</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+n_{j+1} \overline{X}_{j+1}  &= \sum_{i=1}^{n_{j+1}} (\hat{X}_{j+1})_i =  \frac{1}{2}\sum_{i=1}^{n_{j}/2} (\hat{X}_{j})_{2i-1} + (\hat{X}_{j})_{2i} \nonumber \\
+&= \frac{1}{2}\left[ (\hat{X}_j)_1 + (\hat{X}_j)_2 + \cdots + (\hat{X}_j)_{n_j} \right] = \underbrace{\frac{n_j}{2}}_{=n_{j+1}} \overline{X}_j = n_{j+1}\overline{X}_j. 
+\tag{27}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>By repeated use of this equation we get \( V(\overline{X}_i) = V(\overline{X}_0) = V(\overline{X}) \) for all \( 0 \leq i \leq d-1 \). This has the consequence that</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+V(\overline{X}) = \frac{\sigma_k^2}{n_k} + e_k \qquad \text{for all} \qquad 0 \leq k \leq d-1. \tag{28}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>Flyvbjerg and Petersen demonstrated that the sequence
+\( \{e_k\}_{k=0}^{d-1} \) is decreasing, and conjecture that the term
+\( e_k \) can be made as small as we would like by making \( k \) (and hence
+\( d \)) sufficiently large. The sequence is decreasing (Master of Science thesis by Marius Jonsson, UiO 2018).
+It means we can apply blocking transformations until
+\( e_k \) is sufficiently small, and then estimate \( V(\overline{X}) \) by
+\( \widehat{\sigma}^2_k/n_k \). 
+</p>
+
+<p>For an elegant solution and proof of the blocking method, see the recent article of <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" target="_blank">Marius Jonsson (former MSc student of the Computational Physics group)</a>.</p>
 </section>
 
 

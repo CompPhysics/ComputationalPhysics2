@@ -1,13 +1,13 @@
 TITLE: Week 11, March 13-17: Resampling Techniques, Bootstrap and Blocking
 AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA
-DATE: today
+DATE: March 13-17
 
 
 !split
 ===== Overview of week 11, March 13-17 =====
 !bblock  Topics
+* Reminder from last week on optimization methods
 * Resampling Techniques and statistics: Bootstrap and Blocking 
-* Discussion of onebody densities
 * "Video of lecture TBA":"https://youtu.be/"
 * "Handwritten notes":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2023/NotesMarch16.pdf"
 !eblock
@@ -18,6 +18,44 @@ DATE: today
 !eblock
 
 
+
+
+
+
+!split
+===== Resampling methods =====
+!bblock
+Resampling methods are an indispensable tool in modern
+statistics. They involve repeatedly drawing samples from a training
+set and refitting a model of interest on each sample in order to
+obtain additional information about the fitted model. For example, in
+order to estimate the variability of a linear regression fit, we can
+repeatedly draw different samples from the training data, fit a linear
+regression to each new sample, and then examine the extent to which
+the resulting fits differ. Such an approach may allow us to obtain
+information that would not be available from fitting the model only
+once using the original training sample.
+!eblock
+
+!split
+===== Resampling approaches can be computationally expensive =====
+!bblock
+Resampling approaches can be computationally expensive, because they
+involve fitting the same statistical method multiple times using
+different subsets of the training data. However, due to recent
+advances in computing power, the computational requirements of
+resampling methods generally are not prohibitive. In this chapter, we
+discuss two of the most commonly used resampling methods,
+cross-validation and the bootstrap. Both methods are important tools
+in the practical application of many statistical learning
+procedures. For example, cross-validation can be used to estimate the
+test error associated with a given statistical learning method in
+order to evaluate its performance, or to select the appropriate level
+of flexibility. The process of evaluating a model’s performance is
+known as model assessment, whereas the process of selecting the proper
+level of flexibility for a model is known as model selection. The
+bootstrap is widely used.
+!eblock
 
 !split
 ===== Why resampling methods ? ===== 
@@ -39,11 +77,496 @@ DATE: today
     * Systematical errors are method specific and must be treated differently from case to case. 
 !eblock    
 
+!split
+===== Statistics  ===== 
+!bblock
+The *probability distribution function (PDF)* is a function
+$p(x)$ on the domain which, in the discrete case, gives us the
+probability or relative frequency with which these values of $X$ occur:
+!bt
+\[
+p(x) = \mathrm{prob}(X=x)
+\]
+!et
+In the continuous case, the PDF does not directly depict the
+actual probability. Instead we define the probability for the
+stochastic variable to assume any value on an infinitesimal interval
+around $x$ to be $p(x)dx$. The continuous function $p(x)$ then gives us
+the *density* of the probability rather than the probability
+itself. The probability for a stochastic variable to assume any value
+on a non-infinitesimal interval $[a,\,b]$ is then just the integral:
+!bt
+\[
+\mathrm{prob}(a\leq X\leq b) = \int_a^b p(x)dx
+\]
+!et
+Qualitatively speaking, a stochastic variable represents the values of
+numbers chosen as if by chance from some specified PDF so that the
+selection of a large set of these numbers reproduces this PDF.
+!eblock
+
+
+!split
+===== Statistics, moments =====
+!bblock
+A particularly useful class of special expectation values are the
+*moments*. The $n$-th moment of the PDF $p$ is defined as
+follows:
+!bt
+\[
+\langle x^n\rangle \equiv \int\! x^n p(x)\,dx
+\]
+!et
+The zero-th moment $\langle 1\rangle$ is just the normalization condition of
+$p$. The first moment, $\langle x\rangle$, is called the *mean* of $p$
+and often denoted by the letter $\mu$:
+!bt
+\[
+\langle x\rangle = \mu \equiv \int\! x p(x)\,dx
+\]
+!et
+!eblock
+
+!split
+===== Statistics, central moments =====
+!bblock
+A special version of the moments is the set of *central moments*,
+the n-th central moment defined as:
+!bt
+\[
+\langle (x-\langle x \rangle )^n\rangle \equiv \int\! (x-\langle x\rangle)^n p(x)\,dx
+\]
+!et
+The zero-th and first central moments are both trivial, equal $1$ and
+$0$, respectively. But the second central moment, known as the
+*variance* of $p$, is of particular interest. For the stochastic
+variable $X$, the variance is denoted as $\sigma^2_X$ or $\mathrm{var}(X)$:
+!bt
+\begin{align}
+\sigma^2_X\ \ =\ \ \mathrm{var}(X) & =  \langle (x-\langle x\rangle)^2\rangle =
+\int\! (x-\langle x\rangle)^2 p(x)\,dx\\
+& =  \int\! \left(x^2 - 2 x \langle x\rangle^{2} +
+  \langle x\rangle^2\right)p(x)\,dx\\
+& =  \langle x^2\rangle - 2 \langle x\rangle\langle x\rangle + \langle x\rangle^2\\
+& =  \langle x^2\rangle - \langle x\rangle^2
+\end{align}
+!et
+The square root of the variance, $\sigma =\sqrt{\langle (x-\langle x\rangle)^2\rangle}$ is called the *standard deviation* of $p$. It is clearly just the RMS (root-mean-square)
+value of the deviation of the PDF from its mean value, interpreted
+qualitatively as the *spread* of $p$ around its mean.
+!eblock
+
+!split
+===== Statistics, covariance =====
+!bblock
+Another important quantity is the so called covariance, a variant of
+the above defined variance. Consider again the set $\{X_i\}$ of $n$
+stochastic variables (not necessarily uncorrelated) with the
+multivariate PDF $P(x_1,\dots,x_n)$. The *covariance* of two
+of the stochastic variables, $X_i$ and $X_j$, is defined as follows:
+!bt
+\begin{align}
+\mathrm{cov}(X_i,\,X_j) &\equiv \langle (x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle
+\nonumber\\
+&=
+\int\!\cdots\!\int\!(x_i-\langle x_i \rangle)(x_j-\langle x_j \rangle)\,
+P(x_1,\dots,x_n)\,dx_1\dots dx_n
+label{eq:def_covariance}
+\end{align}
+!et
+with
+!bt
+\[
+\langle x_i\rangle =
+\int\!\cdots\!\int\!x_i\,P(x_1,\dots,x_n)\,dx_1\dots dx_n
+\]
+!et
+!eblock
+
+!split
+===== Statistics, more covariance  =====
+!bblock
+If we consider the above covariance as a matrix $C_{ij}=\mathrm{cov}(X_i,\,X_j)$, then the diagonal elements are just the familiar
+variances, $C_{ii} = \mathrm{cov}(X_i,\,X_i) = \mathrm{var}(X_i)$. It turns out that
+all the off-diagonal elements are zero if the stochastic variables are
+uncorrelated. This is easy to show, keeping in mind the linearity of
+the expectation value. Consider the stochastic variables $X_i$ and
+$X_j$, ($i\neq j$):
+!bt
+\begin{align}
+\mathrm{cov}(X_i,\,X_j) &= \langle(x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle\\
+&=\langle x_i x_j - x_i\langle x_j\rangle - \langle x_i\rangle x_j + \langle x_i\rangle\langle x_j\rangle\rangle \\
+&=\langle x_i x_j\rangle - \langle x_i\langle x_j\rangle\rangle - \langle \langle x_i\rangle x_j\rangle +
+\langle \langle x_i\rangle\langle x_j\rangle\rangle\\
+&=\langle x_i x_j\rangle - \langle x_i\rangle\langle x_j\rangle - \langle x_i\rangle\langle x_j\rangle +
+\langle x_i\rangle\langle x_j\rangle\\
+&=\langle x_i x_j\rangle - \langle x_i\rangle\langle x_j\rangle
+\end{align}
+!et
+!eblock
 
 
 
 !split
-===== Statistics, wrapping up from last week =====
+===== Statistics, independent variables  =====
+!bblock
+If $X_i$ and $X_j$ are independent, we get 
+$\langle x_i x_j\rangle =\langle x_i\rangle\langle x_j\rangle$, resulting in $\mathrm{cov}(X_i, X_j) = 0\ \ (i\neq j)$.
+
+Also useful for us is the covariance of linear combinations of
+stochastic variables. Let $\{X_i\}$ and $\{Y_i\}$ be two sets of
+stochastic variables. Let also $\{a_i\}$ and $\{b_i\}$ be two sets of
+scalars. Consider the linear combination:
+!bt
+\[
+U = \sum_i a_i X_i \qquad V = \sum_j b_j Y_j
+\]
+!et
+By the linearity of the expectation value
+!bt
+\[
+\mathrm{cov}(U, V) = \sum_{i,j}a_i b_j \mathrm{cov}(X_i, Y_j)
+\]
+!et
+!eblock
+
+!split
+===== Statistics, more variance  =====
+!bblock
+Now, since the variance is just $\mathrm{var}(X_i) = \mathrm{cov}(X_i, X_i)$, we get
+the variance of the linear combination $U = \sum_i a_i X_i$:
+!bt
+\begin{equation}
+\mathrm{var}(U) = \sum_{i,j}a_i a_j \mathrm{cov}(X_i, X_j)
+label{eq:variance_linear_combination}
+\end{equation}
+!et
+And in the special case when the stochastic variables are
+uncorrelated, the off-diagonal elements of the covariance are as we
+know zero, resulting in:
+!bt
+\[
+\mathrm{var}(U) = \sum_i a_i^2 \mathrm{cov}(X_i, X_i) = \sum_i a_i^2 \mathrm{var}(X_i)
+\]
+!et
+!bt
+\[
+\mathrm{var}(\sum_i a_i X_i) = \sum_i a_i^2 \mathrm{var}(X_i)
+\]
+!et
+which will become very useful in our study of the error in the mean
+value of a set of measurements.
+!eblock
+
+!split
+===== Statistics and stochastic processes  =====
+!bblock
+A *stochastic process* is a process that produces sequentially a
+chain of values:
+!bt
+\[
+\{x_1, x_2,\dots\,x_k,\dots\}.
+\]
+!et
+We will call these
+values our *measurements* and the entire set as our measured
+*sample*.  The action of measuring all the elements of a sample
+we will call a stochastic *experiment* since, operationally,
+they are often associated with results of empirical observation of
+some physical or mathematical phenomena; precisely an experiment. We
+assume that these values are distributed according to some 
+PDF $p_X^{\phantom X}(x)$, where $X$ is just the formal symbol for the
+stochastic variable whose PDF is $p_X^{\phantom X}(x)$. Instead of
+trying to determine the full distribution $p$ we are often only
+interested in finding the few lowest moments, like the mean
+$\mu_X^{\phantom X}$ and the variance $\sigma_X^{\phantom X}$.
+!eblock
+
+
+!split 
+===== Statistics and sample variables  =====
+!bblock
+In practical situations a sample is always of finite size. Let that
+size be $n$. The expectation value of a sample, the *sample mean*, is then defined as follows:
+!bt
+\[
+\bar{x}_n \equiv \frac{1}{n}\sum_{k=1}^n x_k
+\]
+!et
+The *sample variance* is:
+!bt
+\[
+\mathrm{var}(x) \equiv \frac{1}{n}\sum_{k=1}^n (x_k - \bar{x}_n)^2
+\]
+!et
+its square root being the *standard deviation of the sample*. The
+*sample covariance* is:
+!bt
+\[
+\mathrm{cov}(x)\equiv\frac{1}{n}\sum_{kl}(x_k - \bar{x}_n)(x_l - \bar{x}_n)
+\]
+!et
+!eblock
+
+!split
+===== Statistics, sample variance and covariance =====
+!bblock
+Note that the sample variance is the sample covariance without the
+cross terms. In a similar manner as the covariance in Eq.~(ref{eq:def_covariance}) is a measure of the correlation between
+two stochastic variables, the above defined sample covariance is a
+measure of the sequential correlation between succeeding measurements
+of a sample.
+
+These quantities, being known experimental values, differ
+significantly from and must not be confused with the similarly named
+quantities for stochastic variables, mean $\mu_X$, variance $\mathrm{var}(X)$
+and covariance $\mathrm{cov}(X,Y)$.
+!eblock
+
+!split
+===== Statistics, law of large numbers =====
+!bblock
+The law of large numbers
+states that as the size of our sample grows to infinity, the sample
+mean approaches the true mean $\mu_X^{\phantom X}$ of the chosen PDF:
+!bt
+\[
+\lim_{n\to\infty}\bar{x}_n = \mu_X^{\phantom X}
+\]
+!et
+The sample mean $\bar{x}_n$ works therefore as an estimate of the true
+mean $\mu_X^{\phantom X}$.
+
+What we need to find out is how good an approximation $\bar{x}_n$ is to
+$\mu_X^{\phantom X}$. In any stochastic measurement, an estimated
+mean is of no use to us without a measure of its error. A quantity
+that tells us how well we can reproduce it in another experiment. We
+are therefore interested in the PDF of the sample mean itself. Its
+standard deviation will be a measure of the spread of sample means,
+and we will simply call it the *error* of the sample mean, or
+just sample error, and denote it by $\mathrm{err}_X^{\phantom X}$. In
+practice, we will only be able to produce an *estimate* of the
+sample error since the exact value would require the knowledge of the
+true PDFs behind, which we usually do not have.
+!eblock
+
+
+!split
+===== Statistics, more on sample error =====
+!bblock
+Let us first take a look at what happens to the sample error as the
+size of the sample grows. In a sample, each of the measurements $x_i$
+can be associated with its own stochastic variable $X_i$. The
+stochastic variable $\overline X_n$ for the sample mean $\bar{x}_n$ is
+then just a linear combination, already familiar to us:
+!bt
+\[
+\overline X_n = \frac{1}{n}\sum_{i=1}^n X_i
+\]
+!et
+All the coefficients are just equal $1/n$. The PDF of $\overline X_n$,
+denoted by $p_{\overline X_n}(x)$ is the desired PDF of the sample
+means. 
+!eblock
+
+!split
+===== Statistics  =====
+!bblock
+The probability density of obtaining a sample mean $\bar x_n$
+is the product of probabilities of obtaining arbitrary values $x_1,
+x_2,\dots,x_n$ with the constraint that the mean of the set $\{x_i\}$
+is $\bar x_n$:
+!bt
+\[
+p_{\overline X_n}(x) = \int p_X^{\phantom X}(x_1)\cdots
+\int p_X^{\phantom X}(x_n)\ 
+\delta\!\left(x - \frac{x_1+x_2+\dots+x_n}{n}\right)dx_n \cdots dx_1
+\]
+!et
+And in particular we are interested in its variance $\mathrm{var}(\overline X_n)$.
+!eblock
+
+
+
+!split
+===== Statistics, central limit theorem =====
+!bblock
+It is generally not possible to express $p_{\overline X_n}(x)$ in a
+closed form given an arbitrary PDF $p_X^{\phantom X}$ and a number
+$n$. But for the limit $n\to\infty$ it is possible to make an
+approximation. The very important result is called *the central limit theorem*. It tells us that as $n$ goes to infinity,
+$p_{\overline X_n}(x)$ approaches a Gaussian distribution whose mean
+and variance equal the true mean and variance, $\mu_{X}^{\phantom X}$
+and $\sigma_{X}^{2}$, respectively:
+!bt
+\begin{equation}
+\lim_{n\to\infty} p_{\overline X_n}(x) =
+\left(\frac{n}{2\pi\mathrm{var}(X)}\right)^{1/2}
+e^{-\frac{n(x-\bar x_n)^2}{2\mathrm{var}(X)}}
+label{eq:central_limit_gaussian}
+\end{equation}
+!et
+!eblock
+
+!split
+===== Statistics, more technicalities  =====
+!bblock
+The desired variance
+$\mathrm{var}(\overline X_n)$, i.e. the sample error squared
+$\mathrm{err}_X^2$, is given by:
+!bt
+\begin{equation}
+\mathrm{err}_X^2 = \mathrm{var}(\overline X_n) = \frac{1}{n^2}
+\sum_{ij} \mathrm{cov}(X_i, X_j)
+label{eq:error_exact}
+\end{equation}
+!et
+We see now that in order to calculate the exact error of the sample
+with the above expression, we would need the true means
+$\mu_{X_i}^{\phantom X}$ of the stochastic variables $X_i$. To
+calculate these requires that we know the true multivariate PDF of all
+the $X_i$. But this PDF is unknown to us, we have only got the measurements of
+one sample. The best we can do is to let the sample itself be an
+estimate of the PDF of each of the $X_i$, estimating all properties of
+$X_i$ through the measurements of the sample.
+!eblock
+
+
+!split
+===== Statistics =====
+!bblock
+Our estimate of $\mu_{X_i}^{\phantom X}$ is then the sample mean $\bar x$
+itself, in accordance with the the central limit theorem:
+!bt
+\[
+\mu_{X_i}^{\phantom X} = \langle x_i\rangle \approx \frac{1}{n}\sum_{k=1}^n x_k = \bar x
+\]
+!et
+Using $\bar x$ in place of $\mu_{X_i}^{\phantom X}$ we can give an
+*estimate* of the covariance in Eq.~(ref{eq:error_exact})
+!bt
+\[
+\mathrm{cov}(X_i, X_j) = \langle (x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle
+\approx\langle (x_i - \bar x)(x_j - \bar{x})\rangle,
+\]
+!et
+resulting in
+!bt
+\[ 
+\frac{1}{n} \sum_{l}^n \left(\frac{1}{n}\sum_{k}^n (x_k -\bar x_n)(x_l - \bar x_n)\right)=\frac{1}{n}\frac{1}{n} \sum_{kl} (x_k -\bar x_n)(x_l - \bar x_n)=\frac{1}{n}\mathrm{cov}(x)
+\]
+!et
+!eblock
+
+!split
+===== Statistics and sample variance  =====
+!bblock
+By the same procedure we can use the sample variance as an
+estimate of the variance of any of the stochastic variables $X_i$
+!bt
+\[
+\mathrm{var}(X_i)=\langle x_i - \langle x_i\rangle\rangle \approx \langle x_i - \bar x_n\rangle\nonumber,
+\]
+!et
+which is approximated as 
+!bt
+\begin{equation}
+\mathrm{var}(X_i)\approx \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)=\mathrm{var}(x)
+label{eq:var_estimate_i_think}
+\end{equation}
+!et
+
+Now we can calculate an estimate of the error
+$\mathrm{err}_X^{\phantom X}$ of the sample mean $\bar x_n$:
+!bt
+\begin{align}
+\mathrm{err}_X^2
+&=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) \nonumber \\
+&\approx&\frac{1}{n^2}\sum_{ij}\frac{1}{n}\mathrm{cov}(x) =\frac{1}{n^2}n^2\frac{1}{n}\mathrm{cov}(x)\nonumber\\
+&=\frac{1}{n}\mathrm{cov}(x)
+label{eq:error_estimate}
+\end{align}
+!et
+which is nothing but the sample covariance divided by the number of
+measurements in the sample.
+!eblock
+
+!split
+===== Statistics, uncorrelated results =====
+!bblock
+
+In the special case that the measurements of the sample are
+uncorrelated (equivalently the stochastic variables $X_i$ are
+uncorrelated) we have that the off-diagonal elements of the covariance
+are zero. This gives the following estimate of the sample error:
+!bt
+\[
+\mathrm{err}_X^2=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) =
+\frac{1}{n^2} \sum_i \mathrm{var}(X_i),
+\]
+!et
+resulting in
+!bt
+\begin{equation}
+\mathrm{err}_X^2\approx \frac{1}{n^2} \sum_i \mathrm{var}(x)= \frac{1}{n}\mathrm{var}(x)
+label{eq:error_estimate_uncorrel}
+\end{equation}
+!et
+where in the second step we have used Eq.~(ref{eq:var_estimate_i_think}).
+The error of the sample is then just its standard deviation divided by
+the square root of the number of measurements the sample contains.
+This is a very useful formula which is easy to compute. It acts as a
+first approximation to the error, but in numerical experiments, we
+cannot overlook the always present correlations.
+!eblock
+
+!split
+===== Statistics, computations =====
+!bblock
+For computational purposes one usually splits up the estimate of
+$\mathrm{err}_X^2$, given by Eq.~(ref{eq:error_estimate}), into two
+parts
+!bt
+\[
+\mathrm{err}_X^2 = \frac{1}{n}\mathrm{var}(x) + \frac{1}{n}(\mathrm{cov}(x)-\mathrm{var}(x)),
+\]
+!et
+which equals
+!bt
+\begin{equation}
+\frac{1}{n^2}\sum_{k=1}^n (x_k - \bar x_n)^2 +\frac{2}{n^2}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n)
+label{eq:error_estimate_split_up}
+\end{equation}
+!et
+The first term is the same as the error in the uncorrelated case,
+Eq.~(ref{eq:error_estimate_uncorrel}). This means that the second
+term accounts for the error correction due to correlation between the
+measurements. For uncorrelated measurements this second term is zero.
+!eblock
+
+!split
+===== Statistics, more on computations of errors =====
+!bblock
+Computationally the uncorrelated first term is much easier to treat
+efficiently than the second.
+!bt
+\[
+\mathrm{var}(x) = \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)^2 =
+\left(\frac{1}{n}\sum_{k=1}^n x_k^2\right) - \bar x_n^2
+\]
+!et
+We just accumulate separately the values $x^2$ and $x$ for every
+measurement $x$ we receive. The correlation term, though, has to be
+calculated at the end of the experiment since we need all the
+measurements to calculate the cross terms. Therefore, all measurements
+have to be stored throughout the experiment.
+!eblock
+
+
+
+
+!split
+===== Statistics, wrapping up 1 =====
 !bblock
 Let us analyze the problem by splitting up the correlation term into
 partial sums of the form:
@@ -77,9 +600,8 @@ starting always at $1$ for $d=0$.
 !split
 ===== Statistics, final expression =====
 !bblock
-The sample error can now be
+The sample error (see eq.~(ref{eq:error_estimate_split_up})) can now be
 written in terms of the autocorrelation function:
-
 !bt
 \begin{align}
 \mathrm{err}_X^2 &=
@@ -87,8 +609,8 @@ written in terms of the autocorrelation function:
 \frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
 \left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
 &=\frac{\tau}{n}\cdot\mathrm{var}(x)
+label{eq:error_estimate_corr_time}
 \end{align}
-
 !et
 and we see that $\mathrm{err}_X$ can be expressed in terms the
 uncorrelated sample variance times a correction factor $\tau$ which
@@ -106,9 +628,8 @@ label{eq:autocorrelation_time}
 ===== Statistics, effective number of correlations =====
 !bblock
 For a correlation free experiment, $\tau$
-equals 1.
-
-We can interpret a sequential
+equals 1. From the point of view of
+eq.~(ref{eq:error_estimate_corr_time}) we can interpret a sequential
 correlation as an effective reduction of the number of measurements by
 a factor $\tau$. The effective number of measurements becomes:
 !bt
@@ -132,7 +653,6 @@ measurements is very large.
 !split
 ===== Can we understand this? Time Auto-correlation Function =====
 !bblock
-
 The so-called time-displacement autocorrelation $\phi(t)$ for a quantity $\mathbf{M}$ is given by
 !bt
 \[
@@ -162,7 +682,6 @@ label{eq:phitf}
 !split
 ===== Time Auto-correlation Function =====
 !bblock
-
 One should be careful with times close to $t_{\mathrm{max}}$, the upper limit of the sums 
 becomes small and we end up integrating over a rather small time interval. This means that the statistical
 error in $\phi(t)$ due to the random nature of the fluctuations in $\mathbf{M}(t)$ can become large.
@@ -248,9 +767,7 @@ various microstates $\mu$.
 
 !split
 ===== Time Auto-correlation Function =====
-
 !bblock
-
 We rewrite this relation  as
 !bt
  \[
@@ -338,6 +855,8 @@ which  suggests another measure of correlation
 !et
 called the integrated correlation time.
 !eblock
+
+
 
 
 
