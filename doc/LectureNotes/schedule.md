@@ -1,4 +1,5 @@
-# Schedule
+
+1;95;0c# Schedule
 This course will be delivered in a hybrid mode, with online and on site lectures and on site and online laboratory sessions. 
 
 1. Two lectures per week, spring semester, 10 ECTS. The lectures will be fully online. The lectures will be recorded and linked to this site and the official University of Oslo website for the course;
@@ -69,6 +70,7 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 - High-performance computing
 - Final discussion of project 1 and summary of first part of semester
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week10/html/week10.html
+- Video of lecture at https://youtu.be/XqL8qhpKKQs
 
 ### Week 14, April 3-7, 2023
 
