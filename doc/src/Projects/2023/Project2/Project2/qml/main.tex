@@ -1,0 +1,168 @@
+%++++++++++++++++++++++++++++++++++++++++
+% Don't modify this section unless you know what you're doing!
+\documentclass[letterpaper,11pt]{article}
+\usepackage{natbib}
+\bibliographystyle{unsrtnat}
+\usepackage{tabularx} % extra features for tabular environment
+\usepackage{amsmath}  % improve math presentation
+\usepackage{graphicx} % takes care of graphic including machinery
+\usepackage{listings}
+\usepackage{braket}
+\usepackage[margin=1in,letterpaper]{geometry} % decreases margins
+%\usepackage{cite} % takes care of citations
+\usepackage[final]{hyperref} % adds hyper links inside the generated pdf file
+\hypersetup{
+	colorlinks=true,       % false: boxed links; true: colored links
+	linkcolor=blue,        % color of internal links
+	citecolor=blue,        % color of links to bibliography
+	filecolor=magenta,     % color of file links
+	urlcolor=blue         
+}
+%++++++++++++++++++++++++++++++++++++++++
+
+\usepackage[
+backend=biber,
+style=numeric,
+sorting=none
+]{biblatex}
+
+\addbibresource{bibliography.bib}
+
+\begin{document}
+
+\title{Quantum Machine Learning Project}
+\maketitle
+
+
+For this project, you will perform quantum machine learning on the Scikit learn breast cancer data set. The data can be obtained the following way
+\begin{lstlisting}[language=Python]
+from sklearn.datasets import load_breast_cancer
+
+data = load_breast_cancer()
+x = data.data #features
+y = data.target #targets
+
+\end{lstlisting}
+x is the feature matrix and y are the targets.
+
+\section*{a) Encoding the Data Into a Quantum State}
+For this task you will consider a simple way of encoding a randomly generated data set sample into a quantum state:
+
+\begin{lstlisting}[language=Python]
+import qiskit as qk
+import numpy as np
+np.random.seed(42)
+
+p = 2 #number of features
+data_register = qk.QuantumRegister(p)
+classical_register = qk.ClassicalRegister(1)
+
+circuit = qk.QuantumCircuit(data_register, classical_register) 
+
+sample = np.random.uniform(size=p)
+target = np.random.uniform(size=1)
+
+for feature_idx in range(p):
+    circuit.ry(2*np.pi*sample[feature_idx],data_register[feature_idx])
+
+print(circuit)
+\end{lstlisting}
+The above code shows how a randomly generated data sample of $p=2$ features are encoded into a quantum state on two qubits utilizing Qiskit. Each feature is encoded into a respective qubit utilizing a $R_y(\theta)$ gate. The features are scaled with $2\pi$ to represent rotation angles (the $R_y(\theta)$ gate performs a rotation). The classical register will be used later for storing the measured value of the circuit.  print(circuit) can be utilized at any point to see what the circuit looks like.
+
+\bigskip
+
+Your task is to get familiar with the functionality utilized in the above example and implement your own function to encode $p$ of the first features in the breast cancer data set to a quantum state.
+
+\section*{b) Processing the Encoded Data with Parameterized Gates}
+After the quantum state has been encoded with the information of a data set sample, one needs extend the circuit with operations that process the state in a way that allows us to infer the target data. This can be done by introducing quantum gates that are dependant on learnable parameters $\boldsymbol{\theta}$. We will do this in a similar fashion as for the encoding of the features:
+
+\begin{lstlisting}[language=Python]
+n_params = 4
+theta = 2*np.pi*np.random.uniform(size=n_params)
+
+circuit.rx(theta[0],data_register[0])
+circuit.ry(theta[1],data_register[1])
+circuit.cx(data_register[0],data_register[1])
+circuit.ry(theta[2],data_register[0])
+circuit.rx(theta[3],data_register[1])
+
+print(circuit)
+\end{lstlisting}
+The above parameterization of the quantum state is what we will refer to as the 'ansatz'. Your task is again to familiarize yourself with the functionality utilized in the above example and implement your own ansatz to be utilized together with the $p$ first features of the breast cancer data set. The number of learnable parameters 'theta' should be arbitrary.
+
+\section*{c) Measuring the Quantum State and Making Inference}
+The next step is to generate a prediction from our quantum machine learning model. This is done by performing a measurement on the quantum state:
+\begin{lstlisting}[language=Python]
+circuit.measure(data_register[-1],classical_register[0])
+shots=1000
+
+job = qk.execute(circuit,
+                backend=qk.Aer.get_backend('qasm_simulator'),
+                shots=shots,
+                seed_simulator=42
+                )
+results = job.result()
+results = results.get_counts(circuit)
+
+prediction = 0
+for key,value in results.items():
+    if key == '1':
+        prediction += value
+prediction/=shots
+print('Prediction:',prediction,'Target:',target[0])
+\end{lstlisting}
+\begin{verbatim}
+    Prediction: 0.285 Target: 0.7319939418114051
+\end{verbatim}
+In the above example, we are first applying a measurement operation on the final qubit in the circuit, and we are interpreting our prediction as the probability that this qubit is in the $\ket{1}$ state. Make sure all the steps in the example are understood.
+
+Implement your own function that generates a prediction by measuring one of the qubits.
+
+\section*{d) Putting it all together}
+Now it is time to put together all of the above steps. Ideally, you should make a class or a function that given a feature matrix of $n$ samples and an arbitrary number of model parameters, returns a vector of $n$ outputs. For example:
+\begin{lstlisting}[language=Python]
+n = 100 #number of samples
+p = 10 #number of features
+theta = np.random.uniform(size=20) #array of model parameters
+X = np.random.uniform(size=(n,p)) #design matrix
+y_pred = model(X,theta) #prediction, shape (n)
+\end{lstlisting}
+
+\bigskip
+
+We will now deal with how to train the model:
+
+\section*{e) Parameter Shift-Rule and Calculating the Analytical Gradient}
+Since the model with random initial parameters is no good for inference, we need to optimize the parameters in order to yield good results, as is the usual with machine learning. 
+
+Since we are dealing with classification, we will use cross-entropy as the loss function
+
+\begin{equation*}
+    L = -\sum_{i=1}^{n}{y_i \ln{f(x_i;\boldsymbol{\theta})}},
+\end{equation*}
+where $y_i$ are the target labels, and $f(\boldsymbol{x}_i;\boldsymbol{\theta})$ is the output of our model for a given sample $\boldsymbol{x}_i$ and parameterization $\boldsymbol{\theta})$. We calculate the gradiant by taking the derivative of the loss with respect to the parameters
+
+\begin{equation*}
+    \frac{\partial}{\partial \boldsymbol{\theta}_k}L = \sum_{i=1}^{n}{\frac{f_i - y_i}{f_i(1 - f_i)}} \frac{\partial}{\partial \boldsymbol{\theta}_k}f_i,
+\end{equation*}
+where $f_i = f(x_i;\boldsymbol{\theta})$ for clarity. The only term we do not know how to calculate is $\frac{\partial}{\partial \boldsymbol{\theta}_k}f(x_i;\boldsymbol{\theta})$, but it turns out there is a simple trick to do this, the so-called parameter shift-rule \cite{ParameterShift}. To calculate the derivative of the model output, we need to evaluate the model twice with the respective parameter shifted by a value $\frac{\pi}{2}$ up and down. The two resulting outputs are then put together to yield the derivative
+
+
+
+
+\begin{equation*}
+    \frac{\partial f(x_i; \theta_1, \theta_2, \dots, \theta_k)}{\partial \theta_j}  = \frac{f(x_i; \theta_1, \theta_2, \dots, \theta_j + \pi /2, \dots, \theta_k) -f(x_i; \theta_1, \theta_2, \dots, \theta_j - \pi /2, \dots, \theta_k)}{2}
+\end{equation*}
+
+Train your model by utilizing the Parameter Shift-Rule and some gradient descent algorithm. Compare your results with for example logistic regression.
+
+
+\section*{f) Adding Variations on the Data Encoding and Ansatz}
+Change the gates utilized for the encoding of the data samples and also make changes to the parameterized ansatz. Train these new models on the breast cancer data set. How do they compare?
+
+
+\newpage 
+
+\printbibliography
+
+\end{document}
