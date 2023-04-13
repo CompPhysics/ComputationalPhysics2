@@ -1,0 +1,416 @@
+%%
+%% Automatically generated file from DocOnce source
+%% (https://github.com/doconce/doconce/)
+%% doconce format latex Project2QC.do.txt --print_latex_style=trac --latex_admon=paragraph
+%%
+
+
+%-------------------- begin preamble ----------------------
+
+\documentclass[%
+oneside,                 % oneside: electronic viewing, twoside: printing
+final,                   % draft: marks overfull hboxes, figures with paths
+10pt]{article}
+
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{relsize,makeidx,color,setspace,amsmath,amsfonts,amssymb}
+\usepackage[table]{xcolor}
+\usepackage{bm,ltablex,microtype}
+
+\usepackage[pdftex]{graphicx}
+
+\usepackage{fancyvrb} % packages needed for verbatim environments
+
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{lmodern}         % Latin Modern fonts derived from Computer Modern
+
+% Hyperlinks in PDF:
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=black,
+    filecolor=black,
+    %filecolor=blue,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+    }
+%\hyperbaseurl{}   % hyperlinks are relative to this root
+
+\setcounter{tocdepth}{2}  % levels in table of contents
+
+% --- fancyhdr package for fancy headers ---
+\usepackage{fancyhdr}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[LE,RO]{\thepage}
+% Ensure copyright on titlepage (article style) and chapter pages (book style)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2023, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+%  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+% Ensure copyright on titlepages with \thispagestyle{empty}
+\fancypagestyle{empty}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2023, "Computational Physics II FYS4411/FYS9411":"http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html". Released under CC Attribution-NonCommercial 4.0 license}}
+  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+
+\pagestyle{fancy}
+
+
+% prevent orhpans and widows
+\clubpenalty = 10000
+\widowpenalty = 10000
+
+% --- end of standard preamble for documents ---
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+\usepackage[totoc]{idxlayout}   % for index in the toc
+\usepackage[nottoc]{tocbibind}  % for references/bibliography in the toc
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+% matching end for #ifdef PREAMBLE
+
+\newcommand{\exercisesection}[1]{\subsection*{#1}}
+
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\thispagestyle{empty}
+
+\begin{center}
+{\LARGE\bf
+\begin{spacing}{1.25}
+FYS4411/9411 Project 2, Quantum Computing. Deadline May 31
+\end{spacing}
+}
+\end{center}
+
+% ----------------- author(s) -------------------------
+
+\begin{center}
+{\bf \href{{http://www.uio.no/studier/emner/matnat/fys/FYS4411/index-eng.html}}{Computational Physics II FYS4411/FYS9411}}
+\end{center}
+
+    \begin{center}
+% List of all institutions:
+\centerline{{\small Department of Physics, University of Oslo, Norway}}
+\end{center}
+    
+% ----------------- end author(s) -------------------------
+
+% --- begin date ---
+\begin{center}
+Spring Semester 2023
+\end{center}
+% --- end date ---
+
+\vspace{1cm}
+
+
+\section*{Project suggestion}
+
+The aim of this project is to solve eigenvalue problems using the VQE algorithm.
+As background material we recommend the lectures from FYS5419, in particular week 10 and week 11 at
+\href{{https://github.com/CompPhysics/QuantumComputingMachineLearning/tree/gh-pages/doc/pub}}{\nolinkurl{https://github.com/CompPhysics/QuantumComputingMachineLearning/tree/gh-pages/doc/pub}}.
+
+The following articles are recommended as background literature
+\begin{enumerate}
+\item \href{{https://www.sciencedirect.com/science/article/pii/S0370157322003118?via%3Dihub}}{VQE review article}
+
+\item Gradients of Hamiltonians":"https://journals.aps.org/pra/abstract/10.1103/PhysRevA.99.032331"
+\end{enumerate}
+
+\noindent
+\subsection*{Part a)}
+
+Write a function which sets up a one-qubit basis and apply the various
+Pauli matrices to these basis states.  Apply the Hadamard and Phase
+gates to the same one-qubit basis states and study their actions on
+these states. Define also Bell states and write a code where you
+implement a Hadamard gate and thereafter a \textbf{CNOT} gate on one of the Bell
+states of your choice. Perform thereafter a measurement on the first qubit and
+thereafter on the second qubit. The measurements should be performed 
+several times and it is the average results of these measurements
+which should be discussed and presented.
+
+Compare your code with the results obtained using \textbf{Qiskit}, see the
+example at
+\href{{https://quantum-computing.ibm.com/composer/docs/iqx/first-circuit}}{\nolinkurl{https://quantum-computing.ibm.com/composer/docs/iqx/first-circuit}}.
+
+\subsection*{Part b)}
+
+We define a  symmetric matrix  $H\in {\mathbb{R}}^{2\times 2}$
+\[
+H = \begin{bmatrix} H_{11} & H_{12} \\ H_{21} & H_{22}
+\end{bmatrix},
+\]
+We  let $H = H_0 + H_I$, where
+\[
+H_0= \begin{bmatrix} E_1 & 0 \\ 0 & E_2\end{bmatrix},
+\]
+is a diagonal matrix. Similarly,
+\[
+H_I= \begin{bmatrix} V_{11} & V_{12} \\ V_{21} & V_{22}\end{bmatrix},
+\]
+where $V_{ij}$ represent various interaction matrix elements.
+We can view $H_0$ as the non-interacting solution
+\begin{equation}
+       H_0\vert 0 \rangle =E_1\vert 0 \rangle,
+\end{equation}
+and
+\begin{equation}
+       H_0\vert 1\rangle =E_2\vert 1\rangle,
+\end{equation}
+where we have defined the orthogonal computational one-qubit basis states $\vert 0\rangle$ and $\vert 1\rangle$.
+
+We rewrite $H$ (and $H_0$ and $H_I$)  via Pauli matrices
+\[
+H_0 = \mathcal{E} I + \Omega \sigma_z, \quad \mathcal{E} = \frac{E_1
+  + E_2}{2}, \; \Omega = \frac{E_1-E_2}{2},
+\]
+and
+\[
+H_I = c \bm{I} +\omega_z\sigma_z + \omega_x\sigma_x,
+\]
+with $c = (V_{11}+V_{22})/2$, $\omega_z = (V_{11}-V_{22})/2$ and $\omega_x = V_{12}=V_{21}$.
+We let our Hamiltonian depend linearly on a strength parameter $\lambda$
+
+\[
+H=H_0+\lambda H_\mathrm{I},
+\]
+
+with $\lambda \in [0,1]$, where the limits $\lambda=0$ and $\lambda=1$
+represent the non-interacting (or unperturbed) and fully interacting
+system, respectively.  The model is an eigenvalue problem with only
+two available states.
+
+Here we set the parameters $E_1=0$,
+$E_2=4$, $V_{11}=-V_{22}=3$ and $V_{12}=V_{21}=0.2$.
+
+The non-interacting solutions represent our computational basis.
+Pertinent to our choice of parameters, is that at $\lambda\geq 2/3$,
+the lowest eigenstate is dominated by $\vert 1\rangle$ while the upper
+is $\vert 0 \rangle$. At $\lambda=1$ the $\vert 0 \rangle$ mixing of
+the lowest eigenvalue is $1\%$ while for $\lambda\leq 2/3$ we have a
+$\vert 0 \rangle$ component of more than $90\%$.  The character of the
+eigenvectors has therefore been interchanged when passing $z=2/3$. The
+value of the parameter $V_{12}$ represents the strength of the coupling
+between the two states..
+
+Solve \textbf{by standard eigenvalue solvers} (either numerically or analytically) the above eigenvalue problem.
+Find the two eigenvalues as function of the interaction strength $\lambda$.
+Study the behavior of these eigenstates as functions of the interaction strength $\lambda$.
+Comment your results.
+
+\subsection*{Part c)}
+
+Implement now the variational quantum eigensolver (VQE) for the above
+Hamiltonian and set up the circuit(s) which is(are) needed in order to find
+the eigenvalues of this system. Discuss the results and compare these
+with those from part b). Feel free to use either \textbf{Qiskit} or your own
+code (based on the setup from part a)) or both approaches. Discuss
+your results.
+
+\subsection*{Part d)}
+
+Extend part c) to a two-qubit system with the following computational
+basis states and Hamiltonian matrix written out in terms of Pauli spin
+matrices.
+
+This system can be thought of as composed of two subsystems
+$A$ and $B$. Each subsystem has computational basis states
+
+\[
+\vert 0\rangle_{\mathrm{A,B}}=\begin{bmatrix} 1 & 0\end{bmatrix}^T \hspace{1cm} \vert 1\rangle_{\mathrm{A,B}}=\begin{bmatrix} 0 & 1\end{bmatrix}^T.
+\]
+The subsystems could represent single particles or composite many-particle systems of a given symmetry.
+This leads to the many-body computational basis states
+
+\[
+\vert 00\rangle = \vert 0\rangle_{\mathrm{A}}\otimes \vert 0\rangle_{\mathrm{B}}=\begin{bmatrix} 1 & 0 & 0 &0\end{bmatrix}^T,
+\]
+and
+\[
+\vert 01\rangle = \vert 0\rangle_{\mathrm{A}}\otimes \vert 1\rangle_{\mathrm{B}}=\begin{bmatrix} 0 & 1 & 0 &0\end{bmatrix}^T,
+\]
+and
+\[
+\vert 10\rangle = \vert 1\rangle_{\mathrm{A}}\otimes \vert 0\rangle_{\mathrm{B}}=\begin{bmatrix} 0 & 0 & 1 &0\end{bmatrix}^T,
+\]
+and finally
+\[
+\vert 11\rangle = \vert 1\rangle_{\mathrm{A}}\otimes \vert 1\rangle_{\mathrm{B}}=\begin{bmatrix} 0 & 0 & 0 &1\end{bmatrix}^T.
+\]
+
+These computational basis states define also the eigenstates of the non-interacting  Hamiltonian
+\[
+H_0\vert 00 \rangle = \epsilon_{00}\vert 00 \rangle,
+\]
+\[
+H_0\vert 10 \rangle = \epsilon_{10}\vert 10 \rangle,
+\]
+\[
+H_0\vert 01 \rangle = \epsilon_{01}\vert 01 \rangle,
+\]
+and
+\[
+H_0\vert 11 \rangle = \epsilon_{11}\vert 11 \rangle.
+\]
+The interacting part of the Hamiltonian $H_{\mathrm{I}}$ is given by the tensor product of two $\sigma_x$ and $\sigma_z$  matrices, respectively, that is
+\[
+H_{\mathrm{I}}=H_x\sigma_x\otimes\sigma_x+H_z\sigma_z\otimes\sigma_z,
+\]
+where $H_x$ and $H_z$ are interaction strength parameters. Our final Hamiltonian matrix is given by
+\[
+\bm{H}=\begin{bmatrix} \epsilon_{00}+H_z & 0 & 0 & H_x \\
+                       0  & \epsilon_{10}-H_z & H_x & 0 \\
+		       0 & H_x & \epsilon_{01}-H_z & 0 \\
+		       H_x & 0 & 0 & \epsilon_{11} +H_z \end{bmatrix}.
+\] 
+
+The four eigenstates of the above Hamiltonian matrix can in turn be used to
+define density matrices. As an example, the density matrix of the
+first eigenstate (lowest energy $E_0$) $\Psi_0$ is
+
+\[
+\rho_0=\left(\alpha_{00}\vert 00 \rangle\langle 00\vert+\alpha_{10}\vert 10 \rangle\langle 10\vert+\alpha_{01}\vert 01 \rangle\langle 01\vert+\alpha_{11}\vert 11 \rangle\langle 11\vert\right),
+\]
+
+where the coefficients $\alpha_{ij}$ are the eigenvector coefficients
+resulting from the solution of the above eigenvalue problem.
+
+We can
+then in turn define the density matrix for the subsets $A$ or $B$ as
+
+\[
+\rho_A=\mathrm{Tr}_B(\rho_{0})=\langle 0 \vert \rho_{0} \vert 0\rangle_{B}+\langle 1 \vert \rho_{0} \vert 1\rangle_{B},
+\]
+
+or
+
+\[
+\rho_B=\mathrm{Tr}_A(\rho_0)=\langle 0 \vert \rho_{0} \vert 0\rangle_{A}+\langle 1 \vert \rho_{0} \vert 1\rangle_{A}.
+\]
+
+The density matrices for these subsets can be used to compute the
+so-called von Neumann entropy, which is one of the possible measures
+of entanglement. A pure state has entropy equal zero while entangled
+state have an entropy larger than zero. The von-Neumann entropy is
+defined as
+
+\[
+S(A,B)=-\mathrm{Tr}\left(\rho_{A,B}\log_2 (\rho_{A,B})\right).
+\]
+
+You can select parameter values (or other of your choice)
+
+
+
+
+
+\begin{print}
+Hx = 2.0
+Hz = 3.0
+# H_0
+Energiesnoninteracting = [0.0, 2.5, 6.5, 7.0]
+
+\end{print}
+
+
+Compute the eigenvalues \textbf{using standard eigenvalue solvers} as functions of
+the interaction strength $\lambda$ and study the role of entanglement.
+Compute thereafter the Von Neumann entropy for one of the subsystems using the denisty matrix  of the lowest
+two-body state . Comment your results.
+
+The example here shows the above von Neumann entropy based on the
+density matrix for the lowest many-body state. We see clearly a jump
+in the entropy around the point where we have a level crossing. At
+interaction strenght $\lambda=0$ we have many-body states purely
+defined by their computational basis states. As we switch on the
+interaction strength, we obtain an increased degree of mixing and the
+entropy increases till we reach the level crossing point where we see
+an additional and sudden increase in entropy. Similar behaviors are
+observed for the other states. The most important result from this
+example is that entanglement is driven by the Hamiltonian itself and
+the strength of the interaction matrix elements and the
+non-interacting energies.
+
+\subsection*{Part e)}
+
+Compute now the eigenvalues of this system using the VQE method and
+set up the circuits needed to find the lowest state. Compare these
+results with those from the previous part. Feel free again to either
+use your own code for the circuit and your VQE code or use the
+functionality of \href{{https://qiskit.org/}}{Qiskit}, or both.
+
+\subsection*{Introduction to numerical projects}
+
+Here follows a brief recipe and recommendation on how to write a report for each
+project.
+
+\begin{itemize}
+  \item Give a short description of the nature of the problem and the eventual  numerical methods you have used.
+
+  \item Describe the algorithm you have used and/or developed. Here you may find it convenient to use pseudocoding. In many cases you can describe the algorithm in the program itself.
+
+  \item Include the source code of your program. Comment your program properly.
+
+  \item If possible, try to find analytic solutions, or known limits in order to test your program when developing the code.
+
+  \item Include your results either in figure form or in a table. Remember to        label your results. All tables and figures should have relevant captions        and labels on the axes.
+
+  \item Try to evaluate the reliabilty and numerical stability/precision of your results. If possible, include a qualitative and/or quantitative discussion of the numerical stability, eventual loss of precision etc.
+
+  \item Try to give an interpretation of you results in your answers to  the problems.
+
+  \item Critique: if possible include your comments and reflections about the  exercise, whether you felt you learnt something, ideas for improvements and  other thoughts you've made when solving the exercise. We wish to keep this course at the interactive level and your comments can help us improve it.
+
+  \item Try to establish a practice where you log your work at the  computerlab. You may find such a logbook very handy at later stages in your work, especially when you don't properly remember  what a previous test version  of your program did. Here you could also record  the time spent on solving the exercise, various algorithms you may have tested or other topics which you feel worthy of mentioning.
+\end{itemize}
+
+\noindent
+\subsection*{Format for electronic delivery of report and programs}
+
+The preferred format for the report is a PDF file. You can also use DOC or postscript formats or as an ipython notebook file.  As programming language we prefer that you choose between C/C++, Fortran2008 or Python. The following prescription should be followed when preparing the report:
+
+\begin{itemize}
+  \item Send us an email in order  to hand in your projects with a link to your GitHub/Gitlab repository.
+
+  \item In your GitHub/GitLab or similar repository, please include a folder which contains selected results. These can be in the form of output from your code for a selected set of runs and input parameters.
+\end{itemize}
+
+\noindent
+Finally, 
+we encourage you to collaborate. Optimal working groups consist of 
+2-3 students. You can then hand in a common report. 
+
+
+% ------------------- end of main content ---------------
+
+\end{document}
+
