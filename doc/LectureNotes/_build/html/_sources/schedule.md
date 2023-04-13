@@ -79,7 +79,8 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 ### Week 15, April 10-14, 2023
 
 - Discussions of project 2
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week11/html/week11.html
+- Video of lecture at https://youtu.be/z32jQkNLqxo
+- Project 2 descriptions  at http://compphysics.github.io/ComputationalPhysics2/doc/
 
 ### Week 16, April  17-21, 2023
 
