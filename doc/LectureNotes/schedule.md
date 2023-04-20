@@ -85,7 +85,8 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 ### Week 16, April  17-21, 2023
 
 - Deep learning and quantum many-body systems
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week14/html/week12.html
+- Video of lecture at https://youtu.be/SibaquLChg8
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week13/html/week13.html
 
 
 ### Week 17, April 24-28, 2023
