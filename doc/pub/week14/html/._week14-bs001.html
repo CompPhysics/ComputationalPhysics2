@@ -8,8 +8,8 @@ doconce format html week14.do.txt --html_style=bootstrap --pygments_html_style=d
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Week 16 April 18-22: Work in Groups on Project 2">
-<title>Week 16 April 18-22: Work in Groups on Project 2</title>
+<meta name="description" content="Week 17, April 24-28. Neural networks and project 2">
+<title>Week 17, April 24-28. Neural networks and project 2</title>
 <!-- Bootstrap style: bootstrap -->
 <!-- doconce format html week14.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week14-bs --no_mako -->
 <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
@@ -35,14 +35,82 @@ doconce format html week14.do.txt --html_style=bootstrap --pygments_html_style=d
 </head>
 
 <!-- tocinfo
-{'highest level': 2,
- 'sections': [('Overview of week 16, April 18-22',
+{'highest level': 1,
+ 'sections': [('Overview of week 17, April 24-28',
                2,
                None,
-               'overview-of-week-16-april-18-22')]}
+               'overview-of-week-17-april-24-28'),
+              ('Boltzmann Machines', 1, None, 'boltzmann-machines'),
+              ('The network', 2, None, 'the-network'),
+              ('Joint distribution', 3, None, 'joint-distribution'),
+              ('Network Elements, the energy function',
+               3,
+               None,
+               'network-elements-the-energy-function'),
+              ('Defining different types of RBMs',
+               3,
+               None,
+               'defining-different-types-of-rbms'),
+              ('Cost function', 3, None, 'cost-function'),
+              ('Optimization / Training', 3, None, 'optimization-training'),
+              ('Kullback-Leibler relative entropy',
+               3,
+               None,
+               'kullback-leibler-relative-entropy'),
+              ('Setting up for gradient descent calculations',
+               2,
+               None,
+               'setting-up-for-gradient-descent-calculations'),
+              ('Mathematical details', 3, None, 'mathematical-details'),
+              ('Marginal Probability Density Functions',
+               3,
+               None,
+               'marginal-probability-density-functions'),
+              ('Conditional Probability Density Functions',
+               3,
+               None,
+               'conditional-probability-density-functions'),
+              ('Gaussian-Binary Restricted Boltzmann Machines',
+               3,
+               None,
+               'gaussian-binary-restricted-boltzmann-machines'),
+              ('Joint Probability Density Function',
+               3,
+               None,
+               'joint-probability-density-function'),
+              ('Marginal Probability Density Functions',
+               3,
+               None,
+               'marginal-probability-density-functions'),
+              ('Conditional Probability Density Functions',
+               3,
+               None,
+               'conditional-probability-density-functions'),
+              ('Neural Quantum States', 2, None, 'neural-quantum-states'),
+              ('Cost function', 3, None, 'cost-function'),
+              ('Python version for the two non-interacting particles',
+               2,
+               None,
+               'python-version-for-the-two-non-interacting-particles')]}
 end of tocinfo -->
 
 <body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
 <!-- Bootstrap navigation bar -->
 <div class="navbar navbar-default navbar-fixed-top">
   <div class="navbar-header">
@@ -51,14 +119,33 @@ end of tocinfo -->
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="week14-bs.html">Week 16 April 18-22: Work in Groups on Project 2</a>
+    <a class="navbar-brand" href="week14-bs.html">Week 17, April 24-28. Neural networks and project 2</a>
   </div>
   <div class="navbar-collapse collapse navbar-responsive-collapse">
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
         <ul class="dropdown-menu">
-     <!-- navigation toc: --> <li><a href="#overview-of-week-16-april-18-22" style="font-size: 80%;">Overview of week 16, April 18-22</a></li>
+     <!-- navigation toc: --> <li><a href="#overview-of-week-17-april-24-28" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Overview of week 17, April 24-28</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#boltzmann-machines" style="font-size: 80%;"><b>Boltzmann Machines</b></a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#the-network" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;The network</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#joint-distribution" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Joint distribution</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#network-elements-the-energy-function" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Network Elements, the energy function</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#defining-different-types-of-rbms" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defining different types of RBMs</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#cost-function" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cost function</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#optimization-training" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Optimization / Training</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#kullback-leibler-relative-entropy" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kullback-Leibler relative entropy</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#setting-up-for-gradient-descent-calculations" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Setting up for gradient descent calculations</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#mathematical-details" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mathematical details</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#marginal-probability-density-functions" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Marginal Probability Density Functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#conditional-probability-density-functions" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conditional Probability Density Functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#gaussian-binary-restricted-boltzmann-machines" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gaussian-Binary Restricted Boltzmann Machines</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#joint-probability-density-function" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Joint Probability Density Function</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#marginal-probability-density-functions" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Marginal Probability Density Functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#conditional-probability-density-functions" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conditional Probability Density Functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#neural-quantum-states" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Neural Quantum States</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#cost-function" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cost function</a></li>
+     <!-- navigation toc: --> <li><a href="._week14-bs002.html#python-version-for-the-two-non-interacting-particles" style="font-size: 80%;">&nbsp;&nbsp;&nbsp;Python version for the two non-interacting particles</a></li>
 
         </ul>
       </li>
@@ -70,21 +157,29 @@ end of tocinfo -->
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
 <a name="part0001"></a>
 <!-- !split -->
-<h2 id="overview-of-week-16-april-18-22" class="anchor">Overview of week 16, April 18-22 </h2>
+<h2 id="overview-of-week-17-april-24-28" class="anchor">Overview of week 17, April 24-28 </h2>
+
+<div class="panel panel-default">
+<div class="panel-body">
+<!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
+<ol>
+<li> Neural Networks and Boltzmann Machines, introduction to Boltzmann machines</li>
+<li> Reading recommendation: Goodfellow et al chapters 17, 18 and  20.1-20.7</li>
+</ol>
+</div>
+</div>
+
+
 <div class="panel panel-default">
 <div class="panel-body">
 <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
 <ul>
-<li> We have two main project groups based on the selection below
-<ol type="a"></li>
- <li> Neural Networks and Boltzmann Machines with <a href="http://compphysics.github.io/ComputationalPhysics2/doc/LectureNotes/_build/html/boltzmannmachines.html" target="_self">material</a></li>
- <li> Quantum Path Integrals</li>
- <li> <a href="https://youtu.be/76aKChpUwOk" target="_self">Video of Lecture</a></li>
- <li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2022/NotesApril21.pdf" target="_self">Handwritten notes</a></li>
-</ol>
+<li> <a href="https://youtu.be/" target="_self">Video of lecture TBA</a></li>
+<li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2023/NotesApril27.pdf" target="_self">Handwritten notes</a></li>
 </ul>
 </div>
 </div>
+
 
 <p>
 <!-- navigation buttons at the bottom of the page -->
@@ -92,6 +187,8 @@ end of tocinfo -->
 <li><a href="._week14-bs000.html">&laquo;</a></li>
   <li><a href="._week14-bs000.html">1</a></li>
   <li class="active"><a href="._week14-bs001.html">2</a></li>
+  <li><a href="._week14-bs002.html">3</a></li>
+  <li><a href="._week14-bs002.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 </div>  <!-- end container -->
