@@ -84,27 +84,28 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 
 ### Week 16, April  17-21, 2023
 
-- Deep learning and quantum many-body systems
+- Deep learning and quantum many-body systems, Boltzmann machines
 - Video of lecture at https://youtu.be/SibaquLChg8
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week13/html/week13.html
 
 
 ### Week 17, April 24-28, 2023
 
-- Deep learning and quantum many-body systems
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week15/html/week13.html
+- Deep learning and Bolztmann Machines
+- Video of lecture at https://youtu.be/u20rSipMoyE
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week14/html/week14.html
 
 
 ### Week 18, May 1-5, 2023
 
-- Deep learning and quantum many-body systems
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week16/html/week14.html
+- Deep learning and quantum many-body systems, implementing neural networks
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week15/html/week15.html
 
 
 ### Week 19, May 9-13, 2023
 
 
 - Summary of course and last lecture and lab session
-- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week13/html/week15.html
+- Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week16/html/week16.html
 
 
