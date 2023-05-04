@@ -352,4 +352,134 @@ In particular we will review the material from weeks 40 and 41.
 !split
 ===== Developing a code for Neural Networks =====
 
-We have seen that Boltzmann machines are straightforward to implement
+We have seen that Boltzmann machines are straightforward to implement,
+however due to the ansatz made in the construction of the so-called
+energy function, they are at the end less flexible if we need to
+change the way we describe the visible and hidden layers. Computing
+the final marginal probability which defines the trial wave function
+grows extremely complicated with other ways of defining the variables
+of the hidden and visible layers.
+
+!split
+===== Neural networks as alternatives =====
+
+A neural network on the other hand offers much more flexibility in the
+training. The price we have to pay is however an additional
+computational cost due to the many more parameters to train (hidden
+layers and nodes) and the implementation of the back propagation
+algorithm and automatic differentiation.
+
+!split
+===== Basic elements in codes =====
+
+We consider an unpolarized gas of fermions in $d=3$ dimensions, whose dynamics is modeled by the nonrelativistic Hamiltonian
+
+!bt
+\begin{equation}
+H=-\frac{\hbar^2}{2m}\sum_i \nabla_i^2+\sum_{ij} v_{ij} \,,
+\end{equation}
+!et
+where the attractive two-body interaction could be a Coulomb interaction or any other type of interaction. A popular example is 
+
+!bt
+\begin{equation}
+v_{ij} = -2v_0 \frac{\hbar^2}{m} \frac{\mu^2}{\cosh^2(\mu r_{ij})},
+\end{equation}
+!et
+which  acts only between opposite-spin pairs. We will use $\bm{r}_i \in \mathbb{R}^d$ and $s_i \in \{-1,1\}$ to denote the spatial coordinates and spin projection on the $z$-axis of the $i$-th particle. The parameters $v_0$ and $\mu$ tune the scattering length $a$ and effective range $r_e$ of the potential. 
+The interaction above, called P\"oschl-Teller, has been employed in several previous QMC calculation.
+It provides an analytic solution of the two-body problem, and the unitary limit corresponding to the zero-energy ground state between two particles is with $v_0=1$ and $r_{e}=2/\mu$.
+
+!split
+===== Neural-network quantum states =====
+
+The codes we link to are tailored to problems with fermions only.
+
+We can solve the Schr\"odinger equation associated with the above
+Hamiltonian using various different families of neural-network quantum
+states that respect periodic boundary conditions  by construction. All ans"atzes have the
+general form
+
+!bt
+\begin{equation}
+\Psi (X) = e^{J(X)} \Phi(X),
+\end{equation}
+!et
+
+where the Jastrow correlator $J(X)$ is symmetric under particle
+exchange and $\Phi(X)$ is antisymmetric. In the above equation, we
+used $X=\{ \bm{x}_1, \dots, \bm{x}_N \} $ with $\bm{x}_i = (\bm{r}_i,
+s_i)$ to compactly represent the set of all single-particle positions
+and spins.
+
+The antisymmetric part of the Slater-Jastrow (SJ) family of states can be written as
+!bt
+\begin{equation}
+\Phi_{SJ}(X) = \det
+\begin{bmatrix}
+  \phi_1(\bm{x}_1) & \phi_1(\bm{x}_2) & \cdots & \phi_1(\bm{x}_N) \\
+  \phi_2(\bm{x}_1) & \phi_2(\bm{x}_2) & \cdots & \phi_2(\bm{x}_N) \\  
+   \vdots & \vdots & \ddots & \vdots \\
+ \phi_N(\bm{x}_1) & \phi_N(\bm{x}_2) & \cdots & \phi_N(\bm{x}_N) \\
+  \end{bmatrix}
+  .
+\end{equation}
+!et
+In the fixed-node approximation, we take the single-particle states to be products of spin eigenstates and plane wave (PW) orbitals
+!bt
+\begin{equation}
+\phi_i^{PW}(\bm{x}_j) = {\rm e}^{i\bm{k}_i\cdot\bm{r}_j} \delta_{s_i, s_j} \, ,
+\end{equation}
+!et
+with discrete momenta $\bm{k}=2\pi \bm{n} /L$,   $\bm{n}\in\mathbb{Z}^d$, and spin states $s_i \in \{-1, 1 \}$. 
+
+The nodal structure of the above Slater determinant can be improved by
+means of backflow (BF) transformations. For brevity, we will use the
+notation $\tilde{\bm{x}_i} \equiv ( \bm{x}_i, \{ \bm{x}_j \}_{j\neq
+i})$ to indicate dependency on a specific particle $i$, and
+permutation invariance over all other particles $j \neq i$.
+
+
+!split
+===== Inputs to neural networks =====
+
+It is possible to implement the aforementioned neural quantum state
+(NQS) using $X$ as direct inputs to the appropriate NN, but it is
+advantageous to devise new inputs that already capture a large portion
+of the correlations. One approach is to  employ a permutation-equivariant message-passing neural
+network (MPNN) to iteratively build correlations into new one-body and
+two-body features from the original “visible” features. The visible
+features are chosen to be
+
+!bt
+\begin{align}
+\bm{v}_i &= (s_i) \, ,\\
+\bm{v}_{ij} &= \left( \bm{r}_{ij}, \| \bm{r}_{ij} \| , s_i s_j \right) ,
+\end{align}
+!et
+
+with the separation vectors $\bm{r}_{ij} = \bm{r}_i - \bm{r}_j$ and distances $\| \bm{r}_{ij} \|=r_{ij}$ replaced by their $L$-periodic surrogates
+!bt
+\begin{align}
+\bm{r}_{ij} &\mapsto \left( \cos(2 \pi \bm{r}_{ij}/ L), \sin(2 \pi \bm{r}_{ij}/ L) \right)\, ,\\
+\| \bm{r}_{ij} \| &\mapsto \| \sin( \pi \bm{r}_{ij} / L) \|.
+\end{align}
+!et
+
+
+!split
+===== More information =====
+
+Note that we have excluded explicit dependence on the particle
+positions $\bm{r}_i$ in the visible one-body features, thereby
+enforcing translational invariance in the new features. Linear
+transformations are applied to and concatenated with each feature to
+obtain the initial hidden features
+
+!bt
+\begin{align}
+\bm{h}_i^{(0)} &= (\bm{v}_i, A \bm{v}_i),\\
+\bm{h}_{ij}^{(0)} &= (\bm{v}_{ij}, B \bm{v}_{ij}).
+\end{align}
+!et
+
