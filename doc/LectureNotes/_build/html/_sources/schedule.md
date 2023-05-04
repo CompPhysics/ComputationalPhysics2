@@ -100,7 +100,7 @@ This course will be delivered in a hybrid mode, with online and on site lectures
 
 - Deep learning and quantum many-body systems, implementing neural networks
 - Lecture Material at http://compphysics.github.io/ComputationalPhysics2/doc/pub/week15/html/week15.html
-
+- Video of lecture at https://youtu.be/KOIMlsSAt1E
 
 ### Week 19, May 9-13, 2023
 
