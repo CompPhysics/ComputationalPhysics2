@@ -8,7 +8,343 @@ DATE: today
 !bblock  
 * Neural networks and project 2
   o Discussions of neural network and solution of project 2
-  o Discussion of codes
+  o "Discussion of codes":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/NeuralNetworks". See also code for Boltzmann machine included in the notes here.
 !eblock
 
 
+!split
+===== Neural networks and Boltzmann machines =====
+
+!bblock 
+We have introduced Boltzmann machines as generative models where we
+train a neural network with a probability distribution, which in our
+case is the Boltzmann distribution. This distribution is used as an
+ansatz for the trial wave function to be used in a Variational Monte
+Carlo calculation
+!eblock
+
+!split
+===== Cost function =====
+
+!bblock But we do not optmize the maximum likelihod (log).
+The function we optimize is the expectation value of the energy which depends on the parameters that define the Boltzmann distribution.
+This is where we deviate from what is common in machine
+learning. Rather than defining a cost function based on some dataset,
+our cost function is the energy of the quantum mechanical system. From
+the variational principle we know that minizing this energy should
+lead to the ground state wavefunction. 
+That is
+!bt
+\begin{align}
+	\langle E_L\rangle  = \langle \frac{1}{\Psi} \hat{\mathbf{H}} \Psi\rangle.
+\end{align}
+!et
+!eblock 
+
+Irrespective of whether we use Boltzmann machines or neural networks, this is the function we end up optmizing.
+
+!split
+===== Calculating gradients =====
+
+And as was done in our VMC code, the gradient we need to evaluate is 
+!bt
+\begin{align}
+	g_i = \frac{\partial \langle E_L \rangle}{\partial \theta_i}
+	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle ),
+\end{align}
+!et
+where $\theta_i$ are the biases and weights of a neural network.
+
+
+In order to exploit that the trial wave function is often on an exponential form, it is convenient to use that
+
+!bt
+\[
+\frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} = \frac{\partial \ln{\Psi}}{\partial \theta_i}.
+\]
+!et
+
+
+===== Python version for the two non-interacting particles =====
+
+!bc pycod
+# 2-electron VMC code for 2dim quantum dot with importance sampling
+# Using gaussian rng for new positions and Metropolis- Hastings 
+# Added restricted boltzmann machine method for dealing with the wavefunction
+# RBM code based heavily off of:
+# https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/BoltzmannMachines/MLcpp/src/CppCode/ob
+from math import exp, sqrt
+from random import random, seed, normalvariate
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import sys
+
+
+
+# Trial wave function for the 2-electron quantum dot in two dims
+def WaveFunction(r,a,b,w):
+    sigma=1.0
+    sig2 = sigma**2
+    Psi1 = 0.0
+    Psi2 = 1.0
+    Q = Qfac(r,b,w)
+    
+    for iq in range(NumberParticles):
+        for ix in range(Dimension):
+            Psi1 += (r[iq,ix]-a[iq,ix])**2
+            
+    for ih in range(NumberHidden):
+        Psi2 *= (1.0 + np.exp(Q[ih]))
+        
+    Psi1 = np.exp(-Psi1/(2*sig2))
+
+    return Psi1*Psi2
+
+# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
+def LocalEnergy(r,a,b,w):
+    sigma=1.0
+    sig2 = sigma**2
+    locenergy = 0.0
+    
+    Q = Qfac(r,b,w)
+
+    for iq in range(NumberParticles):
+        for ix in range(Dimension):
+            sum1 = 0.0
+            sum2 = 0.0
+            for ih in range(NumberHidden):
+                sum1 += w[iq,ix,ih]/(1+np.exp(-Q[ih]))
+                sum2 += w[iq,ix,ih]**2 * np.exp(Q[ih]) / (1.0 + np.exp(Q[ih]))**2
+    
+            dlnpsi1 = -(r[iq,ix] - a[iq,ix]) /sig2 + sum1/sig2
+            dlnpsi2 = -1/sig2 + sum2/sig2**2
+            locenergy += 0.5*(-dlnpsi1*dlnpsi1 - dlnpsi2 + r[iq,ix]**2)
+            
+    if(interaction==True):
+        for iq1 in range(NumberParticles):
+            for iq2 in range(iq1):
+                distance = 0.0
+                for ix in range(Dimension):
+                    distance += (r[iq1,ix] - r[iq2,ix])**2
+                    
+                locenergy += 1/sqrt(distance)
+                
+    return locenergy
+
+# Derivate of wave function ansatz as function of variational parameters
+def DerivativeWFansatz(r,a,b,w):
+    
+    sigma=1.0
+    sig2 = sigma**2
+    
+    Q = Qfac(r,b,w)
+    
+    WfDer = np.empty((3,),dtype=object)
+    WfDer = [np.copy(a),np.copy(b),np.copy(w)]
+    
+    WfDer[0] = (r-a)/sig2
+    WfDer[1] = 1 / (1 + np.exp(-Q))
+    
+    for ih in range(NumberHidden):
+        WfDer[2][:,:,ih] = w[:,:,ih] / (sig2*(1+np.exp(-Q[ih])))
+            
+    return  WfDer
+
+# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
+def QuantumForce(r,a,b,w):
+
+    sigma=1.0
+    sig2 = sigma**2
+    
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    sum1 = np.zeros((NumberParticles,Dimension), np.double)
+    
+    Q = Qfac(r,b,w)
+    
+    for ih in range(NumberHidden):
+        sum1 += w[:,:,ih]/(1+np.exp(-Q[ih]))
+    
+    qforce = 2*(-(r-a)/sig2 + sum1/sig2)
+    
+    return qforce
+    
+def Qfac(r,b,w):
+    Q = np.zeros((NumberHidden), np.double)
+    temp = np.zeros((NumberHidden), np.double)
+    
+    for ih in range(NumberHidden):
+        temp[ih] = (r*w[:,:,ih]).sum()
+        
+    Q = b + temp
+    
+    return Q
+    
+# Computing the derivative of the energy and the energy 
+def EnergyMinimization(a,b,w):
+
+    NumberMCcycles= 10000
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    # seed for rng generator 
+    seed()
+    energy = 0.0
+    DeltaE = 0.0
+
+    EnergyDer = np.empty((3,),dtype=object)
+    DeltaPsi = np.empty((3,),dtype=object)
+    DerivativePsiE = np.empty((3,),dtype=object)
+    EnergyDer = [np.copy(a),np.copy(b),np.copy(w)]
+    DeltaPsi = [np.copy(a),np.copy(b),np.copy(w)]
+    DerivativePsiE = [np.copy(a),np.copy(b),np.copy(w)]
+    for i in range(3): EnergyDer[i].fill(0.0)
+    for i in range(3): DeltaPsi[i].fill(0.0)
+    for i in range(3): DerivativePsiE[i].fill(0.0)
+
+    
+    #Initial position
+    for i in range(NumberParticles):
+        for j in range(Dimension):
+            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,a,b,w)
+    QuantumForceOld = QuantumForce(PositionOld,a,b,w)
+
+    #Loop over MC MCcycles
+    for MCcycle in range(NumberMCcycles):
+        #Trial position moving one particle at the time
+        for i in range(NumberParticles):
+            for j in range(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,a,b,w)
+            QuantumForceNew = QuantumForce(PositionNew,a,b,w)
+            
+            GreensFunction = 0.0
+            for j in range(Dimension):
+                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+                                      (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+            #Metropolis-Hastings test to see whether we accept the move
+            if random() <= ProbabilityRatio:
+                for j in range(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        #print("wf new:        ", wfnew)
+        #print("force on 1 new:", QuantumForceNew[0,:])
+        #print("pos of 1 new:  ", PositionNew[0,:])
+        #print("force on 2 new:", QuantumForceNew[1,:])
+        #print("pos of 2 new:  ", PositionNew[1,:])
+        DeltaE = LocalEnergy(PositionOld,a,b,w)
+        DerPsi = DerivativeWFansatz(PositionOld,a,b,w)
+        
+        DeltaPsi[0] += DerPsi[0]
+        DeltaPsi[1] += DerPsi[1]
+        DeltaPsi[2] += DerPsi[2]
+        
+        energy += DeltaE
+
+        DerivativePsiE[0] += DerPsi[0]*DeltaE
+        DerivativePsiE[1] += DerPsi[1]*DeltaE
+        DerivativePsiE[2] += DerPsi[2]*DeltaE
+            
+    # We calculate mean values
+    energy /= NumberMCcycles
+    DerivativePsiE[0] /= NumberMCcycles
+    DerivativePsiE[1] /= NumberMCcycles
+    DerivativePsiE[2] /= NumberMCcycles
+    DeltaPsi[0] /= NumberMCcycles
+    DeltaPsi[1] /= NumberMCcycles
+    DeltaPsi[2] /= NumberMCcycles
+    EnergyDer[0]  = 2*(DerivativePsiE[0]-DeltaPsi[0]*energy)
+    EnergyDer[1]  = 2*(DerivativePsiE[1]-DeltaPsi[1]*energy)
+    EnergyDer[2]  = 2*(DerivativePsiE[2]-DeltaPsi[2]*energy)
+    return energy, EnergyDer
+
+
+#Here starts the main program with variable declarations
+NumberParticles = 2
+Dimension = 2
+NumberHidden = 2
+
+interaction=False
+
+# guess for parameters
+a=np.random.normal(loc=0.0, scale=0.001, size=(NumberParticles,Dimension))
+b=np.random.normal(loc=0.0, scale=0.001, size=(NumberHidden))
+w=np.random.normal(loc=0.0, scale=0.001, size=(NumberParticles,Dimension,NumberHidden))
+# Set up iteration using stochastic gradient method
+Energy = 0
+EDerivative = np.empty((3,),dtype=object)
+EDerivative = [np.copy(a),np.copy(b),np.copy(w)]
+# Learning rate eta, max iterations, need to change to adaptive learning rate
+eta = 0.001
+MaxIterations = 50
+iter = 0
+np.seterr(invalid='raise')
+Energies = np.zeros(MaxIterations)
+EnergyDerivatives1 = np.zeros(MaxIterations)
+EnergyDerivatives2 = np.zeros(MaxIterations)
+
+while iter < MaxIterations:
+    Energy, EDerivative = EnergyMinimization(a,b,w)
+    agradient = EDerivative[0]
+    bgradient = EDerivative[1]
+    wgradient = EDerivative[2]
+    a -= eta*agradient
+    b -= eta*bgradient 
+    w -= eta*wgradient 
+    Energies[iter] = Energy
+    print("Energy:",Energy)
+    #EnergyDerivatives1[iter] = EDerivative[0] 
+    #EnergyDerivatives2[iter] = EDerivative[1]
+    #EnergyDerivatives3[iter] = EDerivative[2] 
+
+
+    iter += 1
+
+#nice printout with Pandas
+import pandas as pd
+from pandas import DataFrame
+pd.set_option('max_columns', 6)
+data ={'Energy':Energies}#,'A Derivative':EnergyDerivatives1,'B Derivative':EnergyDerivatives2,'Weights Derivative':EnergyDerivatives3}
+
+frame = pd.DataFrame(data)
+print(frame)
+!ec
+
+
+!split
+===== Neural networks =====
+
+To implement a standard neural network (feed forward NN), the function
+we will optimize is the same as for Boltzmann machines, except that
+now the ansatz for the trial wave function is the neural network
+itself, with its parameters and architecture given by
+
+o Number of hidden layers and nodes in each layer;
+o Actitvation functions for the various nodes;
+o Hyperparamters of the type from an $l_2$-norm or #l_1$-norm or a mix of various norms;
+o Gradient algorithms for optimization with various ways to optimize  the _learning rate_;
+o Back propagation algorithm and automatic differentiation for computing the updates of the various parameters $\theta_i$;
+o The cost/loss function to be optimized;
+
+
+In this lecture we will review briefly the structure of neural
+networks. These notes are taken from the course on Machine Learning
+"FYS-STK4155":"https://compphysics.github.io/MachineLearning/doc/web/course.html".
+
+In particular we will review the material from weeks 40 and 41.
