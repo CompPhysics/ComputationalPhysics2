@@ -1,0 +1,1245 @@
+
+
+======= Boltzmann Machines =======
+
+Why use a generative model rather than the more well known discriminative deep neural networks (DNN)? 
+
+* Discriminitave methods have several limitations: They are mainly supervised learning methods, thus requiring labeled data. And there are tasks they cannot accomplish, like drawing new examples from an unknown probability distribution.
+
+* A generative model can learn to represent and sample from a probability distribution. The core idea is to learn a parametric model of the probability distribution from which the training data was drawn. As an example
+
+  o A model for images could learn to draw new examples of cats and dogs, given a training dataset of images of cats and dogs.
+  o Generate a sample of an ordered or disordered Ising model phase, having been given samples of such phases.
+  o Model the trial function for Monte Carlo calculations
+
+ o Both use gradient-descent based learning procedures for minimizing cost functions
+ o Energy based models don't use backpropagation and automatic differentiation for computing gradients, instead turning to Markov Chain Monte Carlo methods.
+ o DNNs often have several hidden layers. A restricted Boltzmann machine has only one hidden layer, however several RBMs can be stacked to make up Deep Belief Networks, of which they constitute the building blocks.
+
+History: The RBM was developed by amongst others Geoffrey Hinton, called by some the "Godfather of Deep Learning", working with the University of Toronto and Google.
+
+
+
+!bblock
+A BM is what we would call an undirected probabilistic graphical model
+with stochastic continuous or discrete units.
+!eblock
+!bblock
+It is interpreted as a stochastic recurrent neural network where the
+state of each unit(neurons/nodes) depends on the units it is connected
+to. The weights in the network represent thus the strength of the
+interaction between various units/nodes.
+!eblock
+!bblock
+It turns into a Hopfield network if we choose deterministic rather
+than stochastic units. In contrast to a Hopfield network, a BM is a
+so-called generative model. It allows us to generate new samples from
+the learned distribution.
+!eblock
+
+!bblock
+A standard BM network is divided into a set of observable and visible units $\hat{x}$ and a set of unknown hidden units/nodes $\hat{h}$.
+!eblock
+
+!bblock
+Additionally there can be bias nodes for the hidden and visible layers. These biases are normally set to $1$.
+!eblock
+
+!bblock
+BMs are stackable, meaning they cwe can train a BM which serves as input to another BM. We can construct deep networks for learning complex PDFs. The layers can be trained one after another, a feature which makes them popular in deep learning
+!eblock
+
+However, they are often hard to train. This leads to the introduction of so-called restricted BMs, or RBMS.
+Here we take away all lateral connections between nodes in the visible layer as well as connections between nodes in the hidden layer. The network is illustrated in the figure below.
+
+FIGURE: [figures/RBM.pdf, width=800 frac=1.0]
+
+
+
+
+===== The network =====
+
+_The network layers_:
+  o A function $\mathbf{x}$ that represents the visible layer, a vector of $M$ elements (nodes). This layer represents both what the RBM might be given as training input, and what we want it to be able to reconstruct. This might for example be the pixels of an image, the spin values of the Ising model, or coefficients representing speech.
+  o The function $\mathbf{h}$ represents the hidden, or latent, layer. A vector of $N$ elements (nodes). Also called "feature detectors".
+
+The goal of the hidden layer is to increase the model's expressive power. We encode complex interactions between visible variables by introducing additional, hidden variables that interact with visible degrees of freedom in a simple manner, yet still reproduce the complex correlations between visible degrees in the data once marginalized over (integrated out).
+
+Examples of this trick being employed in physics: 
+  o The Hubbard-Stratonovich transformation
+  o The introduction of ghost fields in gauge theory
+  o Shadow wave functions in Quantum Monte Carlo simulations
+_The network parameters, to be optimized/learned_:
+  o $\mathbf{a}$ represents the visible bias, a vector of same length as $\mathbf{x}$.
+  o $\mathbf{b}$ represents the hidden bias, a vector of same lenght as $\mathbf{h}$.
+  o $W$ represents the interaction weights, a matrix of size $M\times N$.
+
+
+
+=== Joint distribution ===
+The restricted Boltzmann machine is described by a Bolztmann distribution
+!bt
+\begin{align}
+	P_{rbm}(\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})},
+\end{align}
+!et
+where $Z$ is the normalization constant or partition function, defined as 
+!bt
+\begin{align}
+	Z = \int \int e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})} d\mathbf{x} d\mathbf{h}.
+\end{align}
+!et
+It is common to ignore $T_0$ by setting it to one. 
+
+
+=== Network Elements, the energy function  ===
+
+The function $E(\mathbf{x},\mathbf{h})$ gives the _energy_ of a
+configuration (pair of vectors) $(\mathbf{x}, \mathbf{h})$. The lower
+the energy of a configuration, the higher the probability of it. This
+function also depends on the parameters $\mathbf{a}$, $\mathbf{b}$ and
+$W$. Thus, when we adjust them during the learning procedure, we are
+adjusting the energy function to best fit our problem.
+
+
+
+=== Defining different types of RBMs ===
+
+There are different variants of RBMs, and the differences lie in the types of visible and hidden units we choose as well as in the implementation of the energy function $E(\mathbf{x},\mathbf{h})$. The connection between the nodes in the two layers is given by the weights $w_{ij}$. 
+
+!bblock Binary-Binary RBM:
+
+RBMs were first developed using binary units in both the visible and hidden layer. The corresponding energy function is defined as follows:
+!bt
+\begin{align}
+	E(\mathbf{x}, \mathbf{h}) = - \sum_i^M x_i a_i- \sum_j^N b_j h_j - \sum_{i,j}^{M,N} x_i w_{ij} h_j,
+\end{align}
+!et
+where the binary values taken on by the nodes are most commonly 0 and 1.
+!eblock
+!bblock Gaussian-Binary RBM:
+
+Another varient is the RBM where the visible units are Gaussian while the hidden units remain binary:
+!bt
+\begin{align}
+	E(\mathbf{x}, \mathbf{h}) = \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2} - \sum_j^N b_j h_j - \sum_{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2}. 
+\end{align}
+!et
+!eblock
+
+
+o RBMs are Useful when we model continuous data (i.e., we wish $\mathbf{x}$ to be continuous)
+o Requires a smaller learning rate, since there's no upper bound to the value a component might take in the reconstruction
+
+Other types of units include:
+ o Softmax and multinomial units
+ o Gaussian visible and hidden units
+ o Binomial units
+ o Rectified linear units
+
+
+=== Cost function ===
+
+When working with a training dataset, the most common training approach is maximizing the log-likelihood of the training data. The log likelihood characterizes the log-probability of generating the observed data using our generative model. Using this method our cost function is chosen as the negative log-likelihood. The learning then consists of trying to find parameters that maximize the probability of the dataset, and is known as Maximum Likelihood Estimation (MLE).
+Denoting the parameters as $\bm{\theta} = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{MN}$, the log-likelihood is given by
+!bt
+\begin{align}
+	\mathcal{L}(\{ \theta_i \}) &= \langle \text{log} P_\theta(\bm{x}) \rangle_{data} \\
+	&= - \langle E(\bm{x}; \{ \theta_i\}) \rangle_{data} - \text{log} Z(\{ \theta_i\}),
+\end{align}
+!et
+where we used that the normalization constant does not depend on the data, $\langle \text{log} Z(\{ \theta_i\}) \rangle = \text{log} Z(\{ \theta_i\})$
+Our cost function is the negative log-likelihood, $\mathcal{C}(\{ \theta_i \}) = - \mathcal{L}(\{ \theta_i \})$
+
+=== Optimization / Training ===
+
+The training procedure of choice often is Stochastic Gradient Descent (SGD). It consists of a series of iterations where we update the parameters according to the equation
+!bt
+\begin{align}
+	\bm{\theta}_{k+1} = \bm{\theta}_k - \eta \nabla \mathcal{C} (\bm{\theta}_k)
+\end{align}
+!et
+at each $k$-th iteration. There are a range of variants of the algorithm which aim at making the learning rate $\eta$ more adaptive so the method might be more efficient while remaining stable.
+
+We now need the gradient of the cost function in order to minimize it. We find that
+!bt
+\begin{align}
+	\frac{\partial \mathcal{C}(\{ \theta_i\})}{\partial \theta_i}
+	&= \langle \frac{\partial E(\bm{x}; \theta_i)}{\partial \theta_i} \rangle_{data}
+	+ \frac{\partial \text{log} Z(\{ \theta_i\})}{\partial \theta_i} \\
+	&= \langle O_i(\bm{x}) \rangle_{data} - \langle O_i(\bm{x}) \rangle_{model},
+\end{align}
+!et
+where in order to simplify notation we defined the "operator"
+!bt
+\begin{align}
+	O_i(\bm{x}) = \frac{\partial E(\bm{x}; \theta_i)}{\partial \theta_i}, 
+\end{align}
+!et
+and used the statistical mechanics relationship between expectation values and the log-partition function:
+!bt
+\begin{align}
+	\langle O_i(\bm{x}) \rangle_{model} = \text{Tr} P_\theta(\bm{x})O_i(\bm{x}) = - \frac{\partial \text{log} Z(\{ \theta_i\})}{\partial \theta_i}.
+\end{align}
+!et
+
+The data-dependent term in the gradient is known as the positive phase
+of the gradient, while the model-dependent term is known as the
+negative phase of the gradient. The aim of the training is to lower
+the energy of configurations that are near observed data points
+(increasing their probability), and raising the energy of
+configurations that are far from observed data points (decreasing
+their probability).
+
+The gradient of the negative log-likelihood cost function of a Binary-Binary RBM is then
+!bt
+\begin{align}
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial w_{ij}} =& \langle x_i h_j \rangle_{data} - \langle x_i h_j \rangle_{model} \\
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial a_{ij}} =& \langle x_i \rangle_{data} - \langle x_i \rangle_{model} \\
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial b_{ij}} =& \langle h_i \rangle_{data} - \langle h_i \rangle_{model}. \\
+\end{align}
+!et
+To get the expectation values with respect to the *data*, we set the visible units to each of the observed samples in the training data, then update the hidden units according to the conditional probability found before. We then average over all samples in the training data to calculate expectation values with respect to the data. 
+
+
+
+
+=== Kullback-Leibler relative entropy ===
+
+When the goal of the training is to approximate a probability
+distribution, as it is in generative modeling, another relevant
+measure is the _Kullback-Leibler divergence_, also known as the
+relative entropy or Shannon entropy. It is a non-symmetric measure of the
+dissimilarity between two probability density functions $p$ and
+$q$. If $p$ is the unkown probability which we approximate with $q$,
+we can measure the difference by
+!bt
+\begin{align}
+	\text{KL}(p||q) = \int_{-\infty}^{\infty} p (\bm{x}) \log \frac{p(\bm{x})}{q(\bm{x})}  d\bm{x}.
+\end{align}
+!et
+
+Thus, the Kullback-Leibler divergence between the distribution of the
+training data $f(\bm{x})$ and the model distribution $p(\bm{x}|
+\bm{\theta})$ is
+
+!bt
+\begin{align}
+	\text{KL} (f(\bm{x})|| p(\bm{x}| \bm{\theta})) =& \int_{-\infty}^{\infty}
+	f (\bm{x}) \log \frac{f(\bm{x})}{p(\bm{x}| \bm{\theta})} d\bm{x} \\
+	=& \int_{-\infty}^{\infty} f(\bm{x}) \log f(\bm{x}) d\bm{x} - \int_{-\infty}^{\infty} f(\bm{x}) \log
+	p(\bm{x}| \bm{\theta}) d\bm{x} \\
+	%=& \mathbb{E}_{f(\bm{x})} (\log f(\bm{x})) - \mathbb{E}_{f(\bm{x})} (\log p(\bm{x}| \bm{\theta}))
+	=& \langle \log f(\bm{x}) \rangle_{f(\bm{x})} - \langle \log p(\bm{x}| \bm{\theta}) \rangle_{f(\bm{x})} \\
+	=& \langle \log f(\bm{x}) \rangle_{data} + \langle E(\bm{x}) \rangle_{data} + \log Z \\
+	=& \langle \log f(\bm{x}) \rangle_{data} + \mathcal{C}_{LL} .
+\end{align}
+!et
+
+The first term is constant with respect to $\bm{\theta}$ since $f(\bm{x})$ is independent of $\bm{\theta}$. Thus the Kullback-Leibler Divergence is minimal when the second term is minimal. The second term is the log-likelihood cost function, hence minimizing the Kullback-Leibler divergence is equivalent to maximizing the log-likelihood.
+
+
+To further understand generative models it is useful to study the
+gradient of the cost function which is needed in order to minimize it
+using methods like stochastic gradient descent. 
+
+The partition function is the generating function of
+expectation values, in particular there are mathematical relationships
+between expectation values and the log-partition function. In this
+case we have
+!bt
+\begin{align}
+	\langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{model}
+	= \int p(\bm{x}| \bm{\theta}) \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} d\bm{x} 
+	= -\frac{\partial \log Z(\theta_i)}{ \partial  \theta_i} .
+\end{align}
+!et
+
+Here $\langle \cdot \rangle_{model}$ is the expectation value over the model probability distribution $p(\bm{x}| \bm{\theta})$.
+
+===== Setting up for gradient descent calculations =====
+
+Using the previous relationship we can express the gradient of the cost function as
+
+!bt
+\begin{align}
+	\frac{\partial \mathcal{C}_{LL}}{\partial \theta_i}
+	=& \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{data} + \frac{\partial \log Z(\theta_i)}{ \partial  \theta_i} \\
+	=& \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{data} - \langle \frac{ \partial E(\bm{x}; \theta_i) } { \partial \theta_i} \rangle_{model} \\
+	%=& \langle O_i(\bm{x}) \rangle_{data} - \langle O_i(\bm{x}) \rangle_{model}
+\end{align}
+!et
+
+This expression shows that the gradient of the log-likelihood cost
+function is a _difference of moments_, with one calculated from
+the data and one calculated from the model. The data-dependent term is
+called the _positive phase_ and the model-dependent term is
+called the _negative phase_ of the gradient. We see now that
+minimizing the cost function results in lowering the energy of
+configurations $\bm{x}$ near points in the training data and
+increasing the energy of configurations not observed in the training
+data. That means we increase the model's probability of configurations
+similar to those in the training data.
+
+
+The gradient of the cost function also demonstrates why gradients of
+unsupervised, generative models must be computed differently from for
+those of for example FNNs. While the data-dependent expectation value
+is easily calculated based on the samples $\bm{x}_i$ in the training
+data, we must sample from the model in order to generate samples from
+which to caclulate the model-dependent term. We sample from the model
+by using MCMC-based methods. We can not sample from the model directly
+because the partition function $Z$ is generally intractable.
+
+As in supervised machine learning problems, the goal is also here to
+perform well on _unseen_ data, that is to have good
+generalization from the training data. The distribution $f(x)$ we
+approximate is not the _true_ distribution we wish to estimate,
+it is limited to the training data. Hence, in unsupervised training as
+well it is important to prevent overfitting to the training data. Thus
+it is common to add regularizers to the cost function in the same
+manner as we discussed for say linear regression.
+
+
+
+===== RBMs for the quantum many body problem =====
+
+The idea of applying RBMs to quantum many body problems was presented by G. Carleo and M. Troyer, working with ETH Zurich and Microsoft Research.
+
+Some of their motivation included
+
+* The wave function $\Psi$ is a monolithic mathematical quantity that contains all the information on a quantum state, be it a single particle or a complex molecule. In principle, an exponential amount of information is needed to fully encode a generic many-body quantum state.
+* There are still interesting open problems, including fundamental questions ranging from the dynamical properties of high-dimensional systems to the exact ground-state properties of strongly interacting fermions.
+* The difficulty lies in finding a general strategy to reduce the exponential complexity of the full many-body wave function down to its most essential features. That is
+ o Dimensional reduction
+ o Feature extraction
+* Among the most successful techniques to attack these challenges, artifical neural networks play a prominent role.
+* Want to understand whether an artifical neural network may adapt to describe a quantum system.
+
+
+Carleo and Troyer applied the RBM to the quantum mechanical spin lattice systems of the Ising model and Heisenberg model, with encouraging results. Our goal is to test the method on systems of moving particles. For the spin lattice systems it was natural to use a binary-binary RBM, with the nodes taking values of 1 and -1. For moving particles, on the other hand, we want the visible nodes to be continuous, representing position coordinates. Thus, we start by choosing a Gaussian-binary RBM, where the visible nodes are continuous and hidden nodes take on values of 0 or 1. If eventually we would like the hidden nodes to be continuous as well the rectified linear units seem like the most relevant choice.
+
+
+
+
+===== Representing the wave function =====
+
+The wavefunction should be a probability amplitude depending on
+ $\bm{x}$. The RBM model is given by the joint distribution of
+ $\bm{x}$ and $\bm{h}$
+
+!bt
+\begin{align}
+        F_{rbm}(\mathbf{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\mathbf{x},\mathbf{h})}.
+\end{align}
+!et
+
+To find the marginal distribution of $\bm{x}$ we set:
+
+!bt
+\begin{align}
+        F_{rbm}(\mathbf{x}) &= \sum_\mathbf{h} F_{rbm}(\mathbf{x}, \mathbf{h}) \\
+                                &= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}.
+\end{align}
+!et
+
+Now this is what we use to represent the wave function, calling it a neural-network quantum state (NQS)
+!bt
+\begin{align}
+        \Psi (\mathbf{X}) &= F_{rbm}(\mathbf{x}) \\
+        &= \frac{1}{Z}\sum_{\bm{h}} e^{-E(\mathbf{x}, \mathbf{h})} \\
+        &= \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_\
+{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma^2}} \\
+        &= \frac{1}{Z} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{x\
+_i w_{ij}}{\sigma^2}}). \\
+\end{align}
+!et
+
+===== Choose the cost function =====
+
+Now we don't necessarily have training data (unless we generate it by using some other method). However, what we do have is the variational principle which allows us to obtain the ground state wave function by minimizing the expectation value of the energy of a trial wavefunction (corresponding to the untrained NQS). Similarly to the traditional variational Monte Carlo method then, it is the local energy we wish to minimize. The gradient to use for the stochastic gradient descent procedure is
+
+!bt
+\begin{align}
+	C_i = \frac{\partial \langle E_L \rangle}{\partial \theta_i}
+	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \theta_i} \rangle ),
+\end{align}
+!et
+where the local energy is given by
+!bt
+\begin{align}
+	E_L = \frac{1}{\Psi} \hat{\mathbf{H}} \Psi.
+\end{align}
+!et
+
+
+
+=== Mathematical details ===
+
+Because we are restricted to potential functions which are positive it
+is convenient to express them as exponentials, so that
+
+!bt
+\begin{align}
+	\phi_C (\bm{x}_C) = e^{-E_C(\bm{x}_C)}
+\end{align}
+!et
+
+where $E(\bm{x}_C)$ is called an *energy function*, and the
+exponential representation is the *Boltzmann distribution*. The
+joint distribution is defined as the product of potentials.
+
+The joint distribution of the random variables is then
+
+!bt
+\begin{align}
+	p(\bm{x}) =& \frac{1}{Z} \prod_C \phi_C (\bm{x}_C) \nonumber \\
+	=& \frac{1}{Z} \prod_C e^{-E_C(\bm{x}_C)} \nonumber \\
+	=& \frac{1}{Z} e^{-\sum_C E_C(\bm{x}_C)} \nonumber \\
+	=& \frac{1}{Z} e^{-E(\bm{x})}.
+\end{align} 
+!et
+!bt
+\begin{align}
+	p_{BM}(\bm{x}, \bm{h}) = \frac{1}{Z_{BM}} e^{-\frac{1}{T}E_{BM}(\bm{x}, \bm{h})} ,
+\end{align}
+!et
+
+with the partition function 
+!bt
+\begin{align}
+	Z_{BM} = \int \int e^{-\frac{1}{T} E_{BM}(\tilde{\bm{x}}, \tilde{\bm{h}})} d\tilde{\bm{x}} d\tilde{\bm{h}} .
+\end{align}
+!et
+
+$T$ is a physics-inspired parameter named temperature and will be assumed to be 1 unless otherwise stated. The energy function of the Boltzmann machine determines the interactions between the nodes and is defined  
+
+!bt
+\begin{align}
+	E_{BM}(\bm{x}, \bm{h}) =& - \sum_{i, k}^{M, K} a_i^k \alpha_i^k (x_i)
+	- \sum_{j, l}^{N, L} b_j^l \beta_j^l (h_j) 
+	- \sum_{i,j,k,l}^{M,N,K,L} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j) \nonumber \\
+	&- \sum_{i, m=i+1, k}^{M, M, K} \alpha_i^k (x_i) v_{im}^k \alpha_m^k (x_m)
+	- \sum_{j,n=j+1,l}^{N,N,L} \beta_j^l (h_j) u_{jn}^l \beta_n^l (h_n).
+\end{align}
+!et
+
+Here $\alpha_i^k (x_i)$ and $\beta_j^l (h_j)$ are one-dimensional
+transfer functions or mappings from the given input value to the
+desired feature value. They can be arbitrary functions of the input
+variables and are independent of the parameterization (parameters
+referring to weight and biases), meaning they are not affected by
+training of the model. The indices $k$ and $l$ indicate that there can
+be multiple transfer functions per variable.  Furthermore, $a_i^k$ and
+$b_j^l$ are the visible and hidden bias. $w_{ij}^{kl}$ are weights of
+the \textbf{inter-layer} connection terms which connect visible and
+hidden units. $ v_{im}^k$ and $u_{jn}^l$ are weights of the
+\textbf{intra-layer} connection terms which connect the visible units
+to each other and the hidden units to each other, respectively.
+
+
+
+We remove the intra-layer connections by setting $v_{im}$ and $u_{jn}$
+to zero. The expression for the energy of the RBM is then
+
+!bt
+\begin{align}
+	E_{RBM}(\bm{x}, \bm{h}) = - \sum_{i, k}^{M, K} a_i^k \alpha_i^k (x_i)
+	- \sum_{j, l}^{N, L} b_j^l \beta_j^l (h_j) 
+	- \sum_{i,j,k,l}^{M,N,K,L} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j). 
+\end{align}
+!et
+resulting in 
+!bt
+\begin{align}
+	P_{RBM} (\bm{x}) =& \int P_{RBM} (\bm{x}, \tilde{\bm{h}})  d \tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\bm{x}, \tilde{\bm{h}}) } d\tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} \int e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)
+	+ \sum_{j, l} b_j^l \beta_j^l (\tilde{h}_j) 
+	+ \sum_{i,j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} 
+	d\tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\int \prod_j^N e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) 
+	+ \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)} d\tilde{\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\biggl( \int e^{\sum_l b_1^l \beta_1^l (\tilde{h}_1) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i1}^{kl} \beta_1^l (\tilde{h}_1)} d \tilde{h}_1 \nonumber \\
+	& \times \int e^{\sum_l b_2^l \beta_2^l (\tilde{h}_2) + \sum_{i,k,l} \alpha_i^k (x_i) w_{i2}^{kl} \beta_2^l (\tilde{h}_2)} d \tilde{h}_2 \nonumber \\
+	& \times ... \nonumber \\
+	& \times \int e^{\sum_l b_N^l \beta_N^l (\tilde{h}_N) + \sum_{i,k,l} \alpha_i^k (x_i) w_{iN}^{kl} \beta_N^l (\tilde{h}_N)} d \tilde{h}_N \biggr) \nonumber \\
+	=& \frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j
+\end{align}
+!et
+
+Similarly
+
+!bt
+\begin{align}
+	P_{RBM} (\bm{h}) =& \frac{1}{Z_{RBM}} \int e^{-E_{RBM} (\tilde{\bm{x}}, \bm{h})} d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{RBM}} e^{\sum_{j, l} b_j^l \beta_j^l (h_j)}
+	\prod_i^M \int e^{\sum_k a_i^k \alpha_i^k (\tilde{x}_i)
+	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} d\tilde{x}_i
+\end{align}
+!et
+
+
+Using Bayes theorem
+
+!bt
+\begin{align}
+	P_{RBM} (\bm{h}|\bm{x}) =& \frac{P_{RBM} (\bm{x}, \bm{h})}{P_{RBM} (\bm{x})} \nonumber \\
+	=& \frac{\frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)
+	+ \sum_{j, l} b_j^l \beta_j^l (h_j) 
+	+ \sum_{i,j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)}}
+	{\frac{1}{Z_{RBM}} e^{\sum_{i, k} a_i^k \alpha_i^k (x_i)}
+	\prod_j^N \int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j} \nonumber \\
+	=& \prod_j^N \frac{e^{\sum_l b_j^l \beta_j^l (h_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)} }
+	{\int e^{\sum_l b_j^l \beta_j^l (\tilde{h}_j) + \sum_{i,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (\tilde{h}_j)}  d\tilde{h}_j}
+\end{align}
+!et
+
+Similarly
+
+!bt
+\begin{align}
+	P_{RBM} (\bm{x}|\bm{h}) =&  \frac{P_{RBM} (\bm{x}, \bm{h})}{P_{RBM} (\bm{h})} \nonumber \\
+	=& \prod_i^M \frac{e^{\sum_k a_i^k \alpha_i^k (x_i)
+	+ \sum_{j,k,l} \alpha_i^k (x_i) w_{ij}^{kl} \beta_j^l (h_j)}}
+	{\int e^{\sum_k a_i^k \alpha_i^k (\tilde{x}_i)
+	+ \sum_{j,k,l} \alpha_i^k (\tilde{x}_i) w_{ij}^{kl} \beta_j^l (h_j)} d\tilde{x}_i}
+\end{align}
+!et
+
+
+
+
+The original RBM had binary visible and hidden nodes. They were
+showned to be universal approximators of discrete distributions.
+It was also shown that adding hidden units yields
+strictly improved modelling power. The common choice of binary values
+are 0 and 1. However, in some physics applications, -1 and 1 might be
+a more natural choice. We will here use 0 and 1.
+
+
+!bt
+\begin{align}
+	E_{BB}(\bm{x}, \mathbf{h}) = - \sum_i^M x_i a_i- \sum_j^N b_j h_j - \sum_{i,j}^{M,N} x_i w_{ij} h_j.
+\end{align}
+!et
+
+
+
+!bt
+\begin{align}
+	p_{BB}(\bm{x}, \bm{h}) =& \frac{1}{Z_{BB}} e^{\sum_i^M a_i x_i + \sum_j^N b_j h_j + \sum_{ij}^{M,N} x_i w_{ij} h_j} \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}}
+\end{align}
+!et
+
+with the partition function
+
+!bt
+\begin{align}
+	Z_{BB} = \sum_{\bm{x}, \bm{h}} e^{\bm{x}^T \bm{a} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} .
+\end{align}
+!et
+
+=== Marginal Probability Density Functions ===
+
+In order to find the probability of any configuration of the visible units we derive the marginal probability density function.
+
+!bt
+\begin{align}
+	p_{BB} (\bm{x}) =& \sum_{\bm{h}} p_{BB} (\bm{x}, \bm{h}) \\
+	=& \frac{1}{Z_{BB}} \sum_{\bm{h}} e^{\bm{x}^T \bm{a} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \sum_{\bm{h}} e^{\sum_j^N (b_j + \bm{x}^T \bm{w}_{\ast j})h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \sum_{\bm{h}} \prod_j^N e^{ (b_j + \bm{x}^T \bm{w}_{\ast j})h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \bigg ( \sum_{h_1} e^{(b_1 + \bm{x}^T \bm{w}_{\ast 1})h_1}
+	\times \sum_{h_2} e^{(b_2 + \bm{x}^T \bm{w}_{\ast 2})h_2} \times \nonumber \\
+	& ... \times \sum_{h_2} e^{(b_N + \bm{x}^T \bm{w}_{\ast N})h_N} \bigg ) \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \prod_j^N \sum_{h_j} e^{(b_j + \bm{x}^T \bm{w}_{\ast j}) h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}) .
+\end{align}
+!et
+
+A similar derivation yields the marginal probability of the hidden units
+
+!bt
+\begin{align}
+	p_{BB} (\bm{h}) = \frac{1}{Z_{BB}} e^{\bm{b}^T \bm{h}} \prod_i^M (1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h}}) .
+\end{align}
+!et
+
+=== Conditional Probability Density Functions ===
+
+We derive the probability of the hidden units given the visible units using Bayes' rule
+
+!bt
+\begin{align}
+	p_{BB} (\bm{h}|\bm{x}) =& \frac{p_{BB} (\bm{x}, \bm{h})}{p_{BB} (\bm{x})} \nonumber \\
+	=& \frac{ \frac{1}{Z_{BB}}  e^{\bm{x}^T \bm{a} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} }
+	        {\frac{1}{Z_{BB}} e^{\bm{x}^T \bm{a}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}})} \nonumber \\
+	=& \frac{  e^{\bm{x}^T \bm{a}} e^{ \sum_j^N (b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j} }
+	        { e^{\bm{x}^T \bm{a}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}})} \nonumber \\
+	=& \prod_j^N \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \prod_j^N p_{BB} (h_j| \bm{x}) .
+\end{align}
+!et
+
+From this we find the probability of a hidden unit being "on" or "off":
+
+!bt
+\begin{align}
+	p_{BB} (h_j=1 | \bm{x}) =&   \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \\
+	=&  \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} )}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \\
+	=&  \frac{ 1 }{1 + e^{-(b_j + \bm{x}^T \bm{w}_{\ast j})} } ,
+\end{align}
+!et
+and
+
+!bt
+\begin{align}
+	p_{BB} (h_j=0 | \bm{x}) =\frac{ 1 }{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}} } .
+\end{align}
+!et
+
+
+Similarly we have that the conditional probability of the visible units given the hidden are
+
+!bt
+\begin{align}
+	p_{BB} (\bm{x}|\bm{h}) =& \prod_i^M \frac{ e^{ (a_i + \bm{w}_{i\ast}^T \bm{h}) x_i} }{ 1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h}} } \\
+	&= \prod_i^M p_{BB} (x_i | \bm{h}) .
+\end{align}
+!et
+
+
+!bt
+\begin{align}
+	p_{BB} (x_i=1 | \bm{h}) =& \frac{1}{1 + e^{-(a_i + \bm{w}_{i\ast}^T \bm{h} )}} \\
+	p_{BB} (x_i=0 | \bm{h}) =& \frac{1}{1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h} }} .
+\end{align}
+!et
+
+
+
+
+
+=== Gaussian-Binary Restricted Boltzmann Machines ===
+
+
+Inserting into the expression for $E_{RBM}(\bm{x},\bm{h})$ in equation  results in the energy
+
+!bt
+\begin{align}
+	E_{GB}(\bm{x}, \bm{h}) =& \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2}
+	- \sum_j^N b_j h_j 
+	-\sum_{ij}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2} \nonumber \\
+	=& \vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 - \bm{b}^T \bm{h} 
+	- (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h} . 
+\end{align}
+!et
+
+=== Joint Probability Density Function ===
+
+!bt
+\begin{align}
+	p_{GB} (\bm{x}, \bm{h}) =& \frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{- \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2}
+	+ \sum_j^N b_j h_j 
+	+\sum_{ij}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2}} \nonumber \\
+	=& \frac{1}{Z_{GB}} \prod_{ij}^{M,N} e^{-\frac{(x_i - a_i)^2}{2\sigma_i^2}
+	+ b_j h_j 
+	+\frac{x_i w_{ij} h_j}{\sigma_i^2}} ,
+\end{align}
+!et
+
+with the partition function given by
+
+!bt
+\begin{align}
+	Z_{GB} =& \int \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} e^{-\vert\vert\frac{\tilde{\bm{x}} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \tilde{\bm{h}} 
+	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\tilde{\bm{h}}} d\tilde{\bm{x}} .
+\end{align}
+!et
+
+=== Marginal Probability Density Functions ===
+
+We proceed to find the marginal probability densitites of the
+Gaussian-binary RBM. We first marginalize over the binary hidden units
+to find $p_{GB} (\bm{x})$
+
+!bt
+\begin{align}
+	p_{GB} (\bm{x}) =& \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} p_{GB} (\bm{x}, \tilde{\bm{h}}) \nonumber \\
+	=& \frac{1}{Z_{GB}} \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} 
+	e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \tilde{\bm{h}} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\tilde{\bm{h}}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2}
+	\prod_j^N (1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}} ) .
+\end{align}
+!et
+
+We next marginalize over the visible units. This is the first time we
+marginalize over continuous values. We rewrite the exponential factor
+dependent on $\bm{x}$ as a Gaussian function before we integrate in
+the last step.
+
+!bt
+\begin{align}
+	p_{GB} (\bm{h}) =& \int p_{GB} (\tilde{\bm{x}}, \bm{h}) d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} \int e^{-\vert\vert\frac{\tilde{\bm{x}} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\bm{h}} d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h} } \int \prod_i^M
+	e^{- \frac{(\tilde{x}_i - a_i)^2}{2\sigma_i^2} + \frac{\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{\sigma_i^2} } d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h} }
+	\biggl( \int e^{- \frac{(\tilde{x}_1 - a_1)^2}{2\sigma_1^2} + \frac{\tilde{x}_1 \bm{w}_{1\ast}^T \bm{h}}{\sigma_1^2} } d\tilde{x}_1 \nonumber \\
+	& \times \int e^{- \frac{(\tilde{x}_2 - a_2)^2}{2\sigma_2^2} + \frac{\tilde{x}_2 \bm{w}_{2\ast}^T \bm{h}}{\sigma_2^2} } d\tilde{x}_2 \nonumber \\
+	& \times ... \nonumber \\
+	&\times \int e^{- \frac{(\tilde{x}_M - a_M)^2}{2\sigma_M^2} + \frac{\tilde{x}_M \bm{w}_{M\ast}^T \bm{h}}{\sigma_M^2} } d\tilde{x}_M \biggr) \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{(\tilde{x}_i - a_i)^2 - 2\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \tilde{x}_i \bm{w}_{i\ast}^T \bm{h}) + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \bm{w}_{i\ast}^T \bm{h}) + (a_i + \bm{w}_{i\ast}^T \bm{h})^2 - (a_i + \bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{(\tilde{x}_i - (a_i + \bm{w}_{i\ast}^T \bm{h}))^2 - a_i^2 -2a_i \bm{w}_{i\ast}^T \bm{h} - (\bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}
+	\int e^{- \frac{(\tilde{x}_i - a_i - \bm{w}_{i\ast}^T \bm{h})^2}{2\sigma_i^2}}
+	d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\sqrt{2\pi \sigma_i^2}
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}} .
+\end{align}
+!et
+
+=== Conditional Probability Density Functions ===
+
+We finish by deriving the conditional probabilities.
+!bt 
+\begin{align}
+	p_{GB} (\bm{h}| \bm{x}) =& \frac{p_{GB} (\bm{x}, \bm{h})}{p_{GB} (\bm{x})} \nonumber \\
+	=& \frac{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}}}
+	{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2}
+	\prod_j^N (1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}} ) }
+	\nonumber \\
+	=& \prod_j^N \frac{e^{(b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j})h_j } }
+	{1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \prod_j^N p_{GB} (h_j|\bm{x}).
+\end{align}
+!et
+The conditional probability of a binary hidden unit $h_j$ being on or off again takes the form of a sigmoid function
+
+!bt
+\begin{align}
+	p_{GB} (h_j =1 | \bm{x}) =& \frac{e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j} } }
+	{1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \frac{1}{1 + e^{-b_j - (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \\
+	p_{GB} (h_j =0 | \bm{x}) =&
+	\frac{1}{1 + e^{b_j +(\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} .
+\end{align}
+!et
+
+The conditional probability of the continuous $\bm{x}$ now has another form, however.
+
+!bt
+\begin{align}
+	p_{GB} (\bm{x}|\bm{h})
+	=& \frac{p_{GB} (\bm{x}, \bm{h})}{p_{GB} (\bm{h})} \nonumber \\
+	=& \frac{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}}}
+	{\frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\sqrt{2\pi \sigma_i^2}
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	\frac{e^{- \frac{(x_i - a_i)^2}{2\sigma_i^2} + \frac{x_i \bm{w}_{i\ast}^T \bm{h}}{2\sigma_i^2} }}
+	{e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	\frac{e^{-\frac{x_i^2 - 2a_i x_i + a_i^2 - 2x_i \bm{w}_{i\ast}^T\bm{h} }{2\sigma_i^2} } }
+	{e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	e^{- \frac{x_i^2 - 2a_i x_i + a_i^2 - 2x_i \bm{w}_{i\ast}^T\bm{h}
+	+ 2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2}
+	{2\sigma_i^2} }
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	e^{ - \frac{(x_i - b_i - \bm{w}_{i\ast}^T \bm{h})^2}{2\sigma_i^2}} \nonumber \\
+	=& \prod_i^M \mathcal{N}
+	(x_i | b_i + \bm{w}_{i\ast}^T \bm{h}, \sigma_i^2) \\
+	\Rightarrow p_{GB} (x_i|\bm{h}) =& \mathcal{N}
+	(x_i | b_i + \bm{w}_{i\ast}^T \bm{h}, \sigma_i^2) .
+\end{align}
+!et
+
+
+The form of these conditional probabilities explains the name
+"Gaussian" and the form of the Gaussian-binary energy function. We see
+that the conditional probability of $x_i$ given $\bm{h}$ is a normal
+distribution with mean $b_i + \bm{w}_{i\ast}^T \bm{h}$ and variance
+$\sigma_i^2$.
+
+
+===== Neural Quantum States =====
+
+
+The wavefunction should be a probability amplitude depending on $\bm{x}$. The RBM model is given by the joint distribution of $\bm{x}$ and $\bm{h}$
+!bt
+\begin{align}
+	F_{rbm}(\bm{x},\mathbf{h}) = \frac{1}{Z} e^{-\frac{1}{T_0}E(\bm{x},\mathbf{h})}
+\end{align}
+!et
+To find the marginal distribution of $\bm{x}$ we set:
+
+!bt
+\begin{align}
+	F_{rbm}(\mathbf{x}) &= \sum_\mathbf{h} F_{rbm}(\mathbf{x}, \mathbf{h}) \\
+				&= \frac{1}{Z}\sum_\mathbf{h} e^{-E(\mathbf{x}, \mathbf{h})}
+\end{align}
+!et
+
+Now this is what we use to represent the wave function, calling it a neural-network quantum state (NQS)
+
+!bt
+\begin{align}
+	\Psi (\mathbf{X}) &= F_{rbm}(\mathbf{x}) \\
+	&= \frac{1}{Z}\sum_{\bm{h}} e^{-E(\mathbf{x}, \mathbf{h})} \\
+	&= \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma^2}} \\
+	&= \frac{1}{Z} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{x_i w_{ij}}{\sigma^2}}) \\
+\end{align}
+!et
+
+The above wavefunction is the most general one because it allows for
+complex valued wavefunctions. However it fundamentally changes the
+probabilistic foundation of the RBM, because what is usually a
+probability in the RBM framework is now a an amplitude. This means
+that a lot of the theoretical framework usually used to interpret the
+model, i.e. graphical models, conditional probabilities, and Markov
+random fields, breaks down. If we assume the wavefunction to be
+postive definite, however, we can use the RBM to represent the squared
+wavefunction, and thereby a probability. This also makes it possible
+to sample from the model using Gibbs sampling, because we can obtain
+the conditional probabilities.
+
+!bt
+\begin{align}
+	|\Psi (\mathbf{X})|^2 &= F_{rbm}(\mathbf{X}) \\
+	\Rightarrow \Psi (\mathbf{X}) &= \sqrt{F_{rbm}(\mathbf{X})} \\
+	&= \frac{1}{\sqrt{Z}}\sqrt{\sum_{\{h_j\}} e^{-E(\mathbf{X}, \mathbf{h})}} \\
+	&= \frac{1}{\sqrt{Z}} \sqrt{\sum_{\{h_j\}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{X_i w_{ij} h_j}{\sigma^2}} }\\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \sqrt{\sum_{\{h_j\}} \prod_j^N e^{b_j h_j + \sum_i^M \frac{X_i w_{ij} h_j}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \sqrt{\prod_j^N \sum_{h_j}  e^{b_j h_j + \sum_i^M \frac{X_i w_{ij} h_j}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \prod_j^N \sqrt{e^0 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \prod_j^N \sqrt{1 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}} \\
+\end{align}
+!et
+
+=== Cost function ===
+
+This is where we deviate from what is common in machine
+learning. Rather than defining a cost function based on some dataset,
+our cost function is the energy of the quantum mechanical system. From
+the variational principle we know that minizing this energy should
+lead to the ground state wavefunction. As stated previously the local
+energy is given by
+
+!bt
+\begin{align}
+	E_L = \frac{1}{\Psi} \hat{\mathbf{H}} \Psi,
+\end{align}
+!et
+and the gradient is
+
+!bt
+\begin{align}
+	G_i = \frac{\partial \langle E_L \rangle}{\partial \alpha_i}
+	= 2(\langle E_L \frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} \rangle - \langle E_L \rangle \langle \frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} \rangle ),
+\end{align}
+!et
+where $\alpha_i = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{MN}$.
+
+
+We use that $\frac{1}{\Psi}\frac{\partial \Psi}{\partial \alpha_i} 
+	= \frac{\partial \ln{\Psi}}{\partial \alpha_i}$,
+and find
+
+!bt
+\begin{align}
+	\ln{\Psi({\mathbf{X}})} &= -\ln{Z} - \sum_m^M \frac{(X_m - a_m)^2}{2\sigma^2}
+	+ \sum_n^N \ln({1 + e^{b_n + \sum_i^M \frac{X_i w_{in}}{\sigma^2}})}.
+\end{align}
+!et
+
+This gives
+
+!bt
+\begin{align}
+	\frac{\partial }{\partial a_m} \ln\Psi
+	&= 	\frac{1}{\sigma^2} (X_m - a_m) \\
+	\frac{\partial }{\partial b_n} \ln\Psi
+	&=
+	\frac{1}{e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1} \\
+	\frac{\partial }{\partial w_{mn}} \ln\Psi
+	&= \frac{X_m}{\sigma^2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)}.
+\end{align}
+!et
+
+If $\Psi = \sqrt{F_{rbm}}$ we have
+
+!bt
+\begin{align}
+	\ln{\Psi({\mathbf{X}})} &= -\frac{1}{2}\ln{Z} - \sum_m^M \frac{(X_m - a_m)^2}{4\sigma^2}
+	+ \frac{1}{2}\sum_n^N \ln({1 + e^{b_n + \sum_i^M \frac{X_i w_{in}}{\sigma^2}})},
+\end{align}
+!et
+which results in
+
+!bt
+\begin{align}
+	\frac{\partial }{\partial a_m} \ln\Psi
+	&= 	\frac{1}{2\sigma^2} (X_m - a_m) \\
+	\frac{\partial }{\partial b_n} \ln\Psi
+	&=
+	\frac{1}{2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)} \\
+	\frac{\partial }{\partial w_{mn}} \ln\Psi
+	&= \frac{X_m}{2\sigma^2(e^{-b_n-\frac{1}{\sigma^2}\sum_i^M X_i w_{in}} + 1)}.
+\end{align}
+!et
+
+
+Let us assume again that our Hamiltonian is 
+!bt
+\begin{align}
+	\hat{\mathbf{H}} = \sum_p^P (-\frac{1}{2}\nabla_p^2 + \frac{1}{2}\omega^2 r_p^2 ) + \sum_{p<q} \frac{1}{r_{pq}},
+\end{align}
+!et
+
+
+where the first summation term represents the standard harmonic
+oscillator part and the latter the repulsive interaction between two
+electrons. Natural units ($\hbar=c=e=m_e=1$) are used, and $P$ is the
+number of particles. This gives us the following expression for the
+local energy ($D$ being the number of dimensions)
+
+!bt
+\begin{align}
+	E_L &= \frac{1}{\Psi} \mathbf{H} \Psi \\
+	&= \frac{1}{\Psi} (\sum_p^P (-\frac{1}{2}\nabla_p^2 + \frac{1}{2}\omega^2 r_p^2 ) + \sum_{p<q} \frac{1}{r_{pq}}) \Psi \\
+	&= -\frac{1}{2}\frac{1}{\Psi} \sum_p^P \nabla_p^2 \Psi 
+	+ \frac{1}{2}\omega^2 \sum_p^P  r_p^2  + \sum_{p<q} \frac{1}{r_{pq}} \\
+	&= -\frac{1}{2}\frac{1}{\Psi} \sum_p^P \sum_d^D \frac{\partial^2 \Psi}{\partial x_{pd}^2} + \frac{1}{2}\omega^2 \sum_p^P  r_p^2  + \sum_{p<q} \frac{1}{r_{pq}} \\
+	&= \frac{1}{2} \sum_p^P \sum_d^D (-(\frac{\partial}{\partial x_{pd}} \ln\Psi)^2 -\frac{\partial^2}{\partial x_{pd}^2} \ln\Psi + \omega^2 x_{pd}^2)  + \sum_{p<q} \frac{1}{r_{pq}}. \\
+\end{align}
+!et
+
+
+Letting each visible node in the Boltzmann machine 
+represent one coordinate of one particle, we obtain
+
+!bt
+\begin{align}
+	E_L &=
+	\frac{1}{2} \sum_m^M (-(\frac{\partial}{\partial v_m} \ln\Psi)^2 -\frac{\partial^2}{\partial v_m^2} \ln\Psi + \omega^2 v_m^2)  + \sum_{p<q} \frac{1}{r_{pq}},
+\end{align}
+!et
+where we have that
+
+!bt
+\begin{align}
+	\frac{\partial}{\partial x_m} \ln\Psi
+	&= - \frac{1}{\sigma^2}(x_m - a_m) + \frac{1}{\sigma^2} \sum_n^N \frac{w_{mn}}{e^{-b_n - \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1} \\
+	\frac{\partial^2}{\partial x_m^2} \ln\Psi
+	&= - \frac{1}{\sigma^2} + \frac{1}{\sigma^4}\sum_n^N \omega_{mn}^2 \frac{e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}}}{(e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1)^2}.
+\end{align}
+!et
+
+We now have all the expressions neeeded to calculate the gradient of
+the expected local energy with respect to the RBM parameters
+$\frac{\partial \langle E_L \rangle}{\partial \alpha_i}$.
+
+If we use $\Psi = \sqrt{F_{rbm}}$ we obtain
+!bt
+\begin{align}
+	\frac{\partial}{\partial x_m} \ln\Psi
+	&= - \frac{1}{2\sigma^2}(x_m - a_m) + \frac{1}{2\sigma^2} \sum_n^N
+ 	\frac{w_{mn}}{e^{-b_n-\frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1}
+	\\
+	\frac{\partial^2}{\partial x_m^2} \ln\Psi
+	&= - \frac{1}{2\sigma^2} + \frac{1}{2\sigma^4}\sum_n^N \omega_{mn}^2 \frac{e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}}}{(e^{b_n + \frac{1}{\sigma^2}\sum_i^M x_i w_{in}} + 1)^2}.
+\end{align}
+!et
+The difference between this equation and the previous one is that we multiply by a factor $1/2$.
+
+
+
+
+
+===== Python version for the two non-interacting particles =====
+
+!bc pycod
+# 2-electron VMC code for 2dim quantum dot with importance sampling
+# Using gaussian rng for new positions and Metropolis- Hastings 
+# Added restricted boltzmann machine method for dealing with the wavefunction
+# RBM code based heavily off of:
+# https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/BoltzmannMachines/MLcpp/src/CppCode/ob
+from math import exp, sqrt
+from random import random, seed, normalvariate
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import sys
+
+
+
+# Trial wave function for the 2-electron quantum dot in two dims
+def WaveFunction(r,a,b,w):
+    sigma=1.0
+    sig2 = sigma**2
+    Psi1 = 0.0
+    Psi2 = 1.0
+    Q = Qfac(r,b,w)
+    
+    for iq in range(NumberParticles):
+        for ix in range(Dimension):
+            Psi1 += (r[iq,ix]-a[iq,ix])**2
+            
+    for ih in range(NumberHidden):
+        Psi2 *= (1.0 + np.exp(Q[ih]))
+        
+    Psi1 = np.exp(-Psi1/(2*sig2))
+
+    return Psi1*Psi2
+
+# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
+def LocalEnergy(r,a,b,w):
+    sigma=1.0
+    sig2 = sigma**2
+    locenergy = 0.0
+    
+    Q = Qfac(r,b,w)
+
+    for iq in range(NumberParticles):
+        for ix in range(Dimension):
+            sum1 = 0.0
+            sum2 = 0.0
+            for ih in range(NumberHidden):
+                sum1 += w[iq,ix,ih]/(1+np.exp(-Q[ih]))
+                sum2 += w[iq,ix,ih]**2 * np.exp(Q[ih]) / (1.0 + np.exp(Q[ih]))**2
+    
+            dlnpsi1 = -(r[iq,ix] - a[iq,ix]) /sig2 + sum1/sig2
+            dlnpsi2 = -1/sig2 + sum2/sig2**2
+            locenergy += 0.5*(-dlnpsi1*dlnpsi1 - dlnpsi2 + r[iq,ix]**2)
+            
+    if(interaction==True):
+        for iq1 in range(NumberParticles):
+            for iq2 in range(iq1):
+                distance = 0.0
+                for ix in range(Dimension):
+                    distance += (r[iq1,ix] - r[iq2,ix])**2
+                    
+                locenergy += 1/sqrt(distance)
+                
+    return locenergy
+
+# Derivate of wave function ansatz as function of variational parameters
+def DerivativeWFansatz(r,a,b,w):
+    
+    sigma=1.0
+    sig2 = sigma**2
+    
+    Q = Qfac(r,b,w)
+    
+    WfDer = np.empty((3,),dtype=object)
+    WfDer = [np.copy(a),np.copy(b),np.copy(w)]
+    
+    WfDer[0] = (r-a)/sig2
+    WfDer[1] = 1 / (1 + np.exp(-Q))
+    
+    for ih in range(NumberHidden):
+        WfDer[2][:,:,ih] = w[:,:,ih] / (sig2*(1+np.exp(-Q[ih])))
+            
+    return  WfDer
+
+# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
+def QuantumForce(r,a,b,w):
+
+    sigma=1.0
+    sig2 = sigma**2
+    
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    sum1 = np.zeros((NumberParticles,Dimension), np.double)
+    
+    Q = Qfac(r,b,w)
+    
+    for ih in range(NumberHidden):
+        sum1 += w[:,:,ih]/(1+np.exp(-Q[ih]))
+    
+    qforce = 2*(-(r-a)/sig2 + sum1/sig2)
+    
+    return qforce
+    
+def Qfac(r,b,w):
+    Q = np.zeros((NumberHidden), np.double)
+    temp = np.zeros((NumberHidden), np.double)
+    
+    for ih in range(NumberHidden):
+        temp[ih] = (r*w[:,:,ih]).sum()
+        
+    Q = b + temp
+    
+    return Q
+    
+# Computing the derivative of the energy and the energy 
+def EnergyMinimization(a,b,w):
+
+    NumberMCcycles= 10000
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    # seed for rng generator 
+    seed()
+    energy = 0.0
+    DeltaE = 0.0
+
+    EnergyDer = np.empty((3,),dtype=object)
+    DeltaPsi = np.empty((3,),dtype=object)
+    DerivativePsiE = np.empty((3,),dtype=object)
+    EnergyDer = [np.copy(a),np.copy(b),np.copy(w)]
+    DeltaPsi = [np.copy(a),np.copy(b),np.copy(w)]
+    DerivativePsiE = [np.copy(a),np.copy(b),np.copy(w)]
+    for i in range(3): EnergyDer[i].fill(0.0)
+    for i in range(3): DeltaPsi[i].fill(0.0)
+    for i in range(3): DerivativePsiE[i].fill(0.0)
+
+    
+    #Initial position
+    for i in range(NumberParticles):
+        for j in range(Dimension):
+            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,a,b,w)
+    QuantumForceOld = QuantumForce(PositionOld,a,b,w)
+
+    #Loop over MC MCcycles
+    for MCcycle in range(NumberMCcycles):
+        #Trial position moving one particle at the time
+        for i in range(NumberParticles):
+            for j in range(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,a,b,w)
+            QuantumForceNew = QuantumForce(PositionNew,a,b,w)
+            
+            GreensFunction = 0.0
+            for j in range(Dimension):
+                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+                                      (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+            #Metropolis-Hastings test to see whether we accept the move
+            if random() <= ProbabilityRatio:
+                for j in range(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        #print("wf new:        ", wfnew)
+        #print("force on 1 new:", QuantumForceNew[0,:])
+        #print("pos of 1 new:  ", PositionNew[0,:])
+        #print("force on 2 new:", QuantumForceNew[1,:])
+        #print("pos of 2 new:  ", PositionNew[1,:])
+        DeltaE = LocalEnergy(PositionOld,a,b,w)
+        DerPsi = DerivativeWFansatz(PositionOld,a,b,w)
+        
+        DeltaPsi[0] += DerPsi[0]
+        DeltaPsi[1] += DerPsi[1]
+        DeltaPsi[2] += DerPsi[2]
+        
+        energy += DeltaE
+
+        DerivativePsiE[0] += DerPsi[0]*DeltaE
+        DerivativePsiE[1] += DerPsi[1]*DeltaE
+        DerivativePsiE[2] += DerPsi[2]*DeltaE
+            
+    # We calculate mean values
+    energy /= NumberMCcycles
+    DerivativePsiE[0] /= NumberMCcycles
+    DerivativePsiE[1] /= NumberMCcycles
+    DerivativePsiE[2] /= NumberMCcycles
+    DeltaPsi[0] /= NumberMCcycles
+    DeltaPsi[1] /= NumberMCcycles
+    DeltaPsi[2] /= NumberMCcycles
+    EnergyDer[0]  = 2*(DerivativePsiE[0]-DeltaPsi[0]*energy)
+    EnergyDer[1]  = 2*(DerivativePsiE[1]-DeltaPsi[1]*energy)
+    EnergyDer[2]  = 2*(DerivativePsiE[2]-DeltaPsi[2]*energy)
+    return energy, EnergyDer
+
+
+#Here starts the main program with variable declarations
+NumberParticles = 2
+Dimension = 2
+NumberHidden = 2
+
+interaction=False
+
+# guess for parameters
+a=np.random.normal(loc=0.0, scale=0.001, size=(NumberParticles,Dimension))
+b=np.random.normal(loc=0.0, scale=0.001, size=(NumberHidden))
+w=np.random.normal(loc=0.0, scale=0.001, size=(NumberParticles,Dimension,NumberHidden))
+# Set up iteration using stochastic gradient method
+Energy = 0
+EDerivative = np.empty((3,),dtype=object)
+EDerivative = [np.copy(a),np.copy(b),np.copy(w)]
+# Learning rate eta, max iterations, need to change to adaptive learning rate
+eta = 0.001
+MaxIterations = 50
+iter = 0
+np.seterr(invalid='raise')
+Energies = np.zeros(MaxIterations)
+EnergyDerivatives1 = np.zeros(MaxIterations)
+EnergyDerivatives2 = np.zeros(MaxIterations)
+
+while iter < MaxIterations:
+    Energy, EDerivative = EnergyMinimization(a,b,w)
+    agradient = EDerivative[0]
+    bgradient = EDerivative[1]
+    wgradient = EDerivative[2]
+    a -= eta*agradient
+    b -= eta*bgradient 
+    w -= eta*wgradient 
+    Energies[iter] = Energy
+    print("Energy:",Energy)
+    #EnergyDerivatives1[iter] = EDerivative[0] 
+    #EnergyDerivatives2[iter] = EDerivative[1]
+    #EnergyDerivatives3[iter] = EDerivative[2] 
+
+
+    iter += 1
+
+#nice printout with Pandas
+import pandas as pd
+from pandas import DataFrame
+pd.set_option('max_columns', 6)
+data ={'Energy':Energies}#,'A Derivative':EnergyDerivatives1,'B Derivative':EnergyDerivatives2,'Weights Derivative':EnergyDerivatives3}
+
+frame = pd.DataFrame(data)
+print(frame)
+!ec

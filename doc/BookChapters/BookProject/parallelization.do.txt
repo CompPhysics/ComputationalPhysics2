@@ -1,0 +1,1885 @@
+======= Parallelization with MPI and OpenMPI =======
+
+
+=====  How much is parallelizable =====
+!bblock
+If any non-parallel code slips into the
+application, the parallel
+performance is limited. 
+
+In many simulations, however, the fraction of non-parallelizable work
+is $10^{-6}$ or less due to large arrays or objects that are perfectly parallelizable.
+
+!eblock
+
+
+
+
+=====    Today's situation of parallel computing  =====
+!bblock
+
+* Distributed memory is the dominant hardware configuration. There is a large diversity in these machines, from  MPP (massively parallel processing) systems to clusters of off-the-shelf PCs, which are very cost-effective.
+* Message-passing is a mature programming paradigm and widely accepted. It often provides an efficient match to the hardware. It is primarily used for the distributed memory systems, but can also be used on shared memory systems.
+
+* Modern nodes have nowadays several cores, which makes it interesting to use both shared memory (the given node) and distributed memory (several nodes with communication). This leads often to codes which use both MPI and OpenMP.
+
+Our lectures will focus on both MPI and OpenMP.
+
+!eblock
+
+
+=====  Overhead present in parallel computing =====
+!bblock
+
+* _Uneven load balance_:  not all the processors can perform useful work at all time.
+* _Overhead of synchronization_
+* _Overhead of communication_
+* _Extra computation due to parallelization_
+
+Due to the above overhead and that certain parts of a sequential
+algorithm cannot be parallelized we may not achieve an optimal parallelization.
+!eblock
+
+
+
+=====    Parallelizing a sequential algorithm  =====
+!bblock
+
+* Identify the part(s) of a sequential algorithm that can be  executed in parallel. This is the difficult part,
+* Distribute the global work and data among $P$ processors.
+
+!eblock
+
+
+
+
+
+===== Strategies =====
+!bblock
+* Develop codes locally, run with some few processes and test your codes.  Do benchmarking, timing and so forth on local nodes, for example your laptop or PC. 
+* When you are convinced that your codes run correctly, you can start your production runs on available supercomputers.
+
+!eblock
+
+
+===== How do I run MPI on a PC/Laptop? MPI  =====
+!bblock
+To install MPI is rather easy on hardware running unix/linux as operating systems, follow simply the instructions from the "OpenMPI website":"https://www.open-mpi.org/". See also subsequent slides.
+When you have made sure you have installed MPI on your PC/laptop, 
+* Compile with mpicxx/mpic++ or mpif90
+!bc cppcod
+  # Compile and link
+  mpic++ -O3 -o nameofprog.x nameofprog.cpp
+  #  run code with for example 8 processes using mpirun/mpiexec
+  mpiexec -n 8 ./nameofprog.x
+!ec
+!eblock
+
+
+===== Can I do it on my own PC/laptop? OpenMP installation =====
+!bblock
+If you wish to install MPI and OpenMP 
+on your laptop/PC, we recommend the following:
+
+
+* For OpenMP, the compile option _-fopenmp_ is included automatically in recent versions of the C++ compiler and Fortran compilers. For users of different Linux distributions, simply use the available C++ or Fortran compilers and add the above compiler instructions, see also code examples below.
+* For OS X users however, install _libomp_
+!bc cppcod
+  brew install libomp
+!ec
+and compile and link as
+!bc cppcod
+c++ -o <name executable> <name program.cpp>  -lomp
+!ec
+
+!eblock
+
+
+
+
+===== Installing MPI =====
+!bblock
+For linux/ubuntu users, you need to install two packages (alternatively use the synaptic package manager)
+!bc cppcod
+  sudo apt-get install libopenmpi-dev
+  sudo apt-get install openmpi-bin
+!ec
+For OS X users, install brew (after having installed xcode and gcc, needed for the 
+gfortran compiler of openmpi) and then install with brew
+!bc cppcod
+   brew install openmpi
+!ec
+When running an executable (code.x), run as
+!bc cppcod
+  mpirun -n 10 ./code.x
+!ec
+where we indicate that we want  the number of processes to be 10.
+
+
+!eblock
+
+
+
+===== Installing MPI and using Qt =====
+!bblock
+With openmpi installed, when using Qt, add to your .pro file the instructions "here":"http://dragly.org/2012/03/14/developing-mpi-applications-in-qt-creator/"
+
+You may need to tell Qt where openmpi is stored.
+
+!eblock
+
+
+
+
+===== What is Message Passing Interface (MPI)?  =====
+!bblock
+
+_MPI_ is a library, not a language. It specifies the names, calling sequences and results of functions
+or subroutines to be called from C/C++ or Fortran programs, and the classes and methods that make up the MPI C++
+library. The programs that users write in Fortran, C or C++ are compiled with ordinary compilers and linked
+with the MPI library.
+
+MPI programs should be able to run
+on all possible machines and run all MPI implementetations without change.
+
+An MPI computation is a collection of processes communicating with messages.
+
+
+!eblock
+
+===== Going Parallel with MPI =====
+!bblock
+_Task parallelism_: the work of a global problem can be divided
+into a number of independent tasks, which rarely need to synchronize. 
+Monte Carlo simulations or numerical integration are examples of this.
+
+
+MPI is a message-passing library where all the routines
+have corresponding C/C++-binding
+!bc cppcod
+   MPI_Command_name
+!ec
+and Fortran-binding (routine names are in uppercase, but can also be in lower case)
+!bc forcod
+   MPI_COMMAND_NAME
+!ec
+!eblock
+
+
+
+===== MPI is a library  =====
+!bblock
+MPI is a library specification for the message passing interface,
+proposed as a standard.
+
+* independent of hardware;
+* not a language or compiler specification;
+* not a specific implementation or product.
+
+
+A message passing standard for portability and ease-of-use. 
+Designed for high performance.
+
+Insert communication and synchronization functions where necessary.
+
+
+!eblock
+
+
+
+
+=====    Bindings to MPI routines  =====
+!bblock
+
+
+MPI is a message-passing library where all the routines
+have corresponding C/C++-binding
+!bc cppcod
+   MPI_Command_name
+!ec
+and Fortran-binding (routine names are in uppercase, but can also be in lower case)
+!bc forcod
+   MPI_COMMAND_NAME
+!ec
+The discussion in these slides focuses on the C++ binding.
+
+!eblock
+
+
+
+===== Communicator  =====
+!bblock
+* A group of MPI processes with a name (context).
+* Any process is identified by its rank. The rank is only meaningful within a particular communicator.
+* By default the communicator contains all the MPI processes.
+!bc cppcod
+  MPI_COMM_WORLD 
+!ec
+* Mechanism to identify subset of processes.
+* Promotes modular design of parallel libraries.
+
+
+!eblock
+
+
+
+=====  Some of the most  important MPI functions =====
+!bblock
+
+
+
+* $MPI\_Init$ - initiate an MPI computation
+* $MPI\_Finalize$ - terminate the MPI computation and clean up
+* $MPI\_Comm\_size$ - how many processes participate in a given MPI communicator?
+* $MPI\_Comm\_rank$ - which one am I? (A number between 0 and size-1.)
+* $MPI\_Send$ - send a message to a particular process within an MPI communicator
+* $MPI\_Recv$ - receive a message from a particular process within an MPI communicator
+* $MPI\_reduce$  or $MPI\_Allreduce$, send and receive messages
+
+!eblock
+
+
+
+=====    "The first MPI C/C++ program":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program2.cpp"  =====
+!bblock
+
+
+Let every process write "Hello world" (oh not this program again!!) on the standard output. 
+!bc cppcod
+using namespace std;
+#include <mpi.h>
+#include <iostream>
+int main (int nargs, char* args[])
+{
+int numprocs, my_rank;
+//   MPI initializations
+MPI_Init (&nargs, &args);
+MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+cout << "Hello world, I have  rank " << my_rank << " out of " 
+     << numprocs << endl;
+//  End MPI
+MPI_Finalize ();
+!ec
+
+!eblock
+
+
+
+=====    The Fortran program =====
+!bblock
+!bc forcod
+PROGRAM hello
+INCLUDE "mpif.h"
+INTEGER:: size, my_rank, ierr
+
+CALL  MPI_INIT(ierr)
+CALL MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierr)
+CALL MPI_COMM_RANK(MPI_COMM_WORLD, my_rank, ierr)
+WRITE(*,*)"Hello world, I've rank ",my_rank," out of ",size
+CALL MPI_FINALIZE(ierr)
+
+END PROGRAM hello
+!ec
+
+
+!eblock
+
+
+
+=====    Note 1  =====
+!bblock
+
+* The output to screen is not ordered since all processes are trying to write  to screen simultaneously.
+* It is the operating system which opts for an ordering.  
+* If we wish to have an organized output, starting from the first process, we may rewrite our program as in the next example.
+
+!eblock
+
+
+
+=====    "Ordered output with MPIBarrier":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program3.cpp"  =====
+!bblock
+
+!bc cppcod
+int main (int nargs, char* args[])
+{
+ int numprocs, my_rank, i;
+ MPI_Init (&nargs, &args);
+ MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+ MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+ for (i = 0; i < numprocs; i++) {}
+ MPI_Barrier (MPI_COMM_WORLD);
+ if (i == my_rank) {
+ cout << "Hello world, I have  rank " << my_rank << 
+        " out of " << numprocs << endl;}
+      MPI_Finalize ();
+!ec
+
+!eblock
+
+
+
+=====    Note 2 =====
+!bblock
+* Here we have used the $MPI\_Barrier$ function to ensure that that every process has completed  its set of instructions in  a particular order.
+* A barrier is a special collective operation that does not allow the processes to continue until all processes in the communicator (here $MPI\_COMM\_WORLD$) have called $MPI\_Barrier$. 
+* The barriers make sure that all processes have reached the same point in the code. Many of the collective operations like $MPI\_ALLREDUCE$ to be discussed later, have the same property; that is, no process can exit the operation until all processes have started. 
+
+However, this is slightly more time-consuming since the processes synchronize between themselves as many times as there
+are processes.  In the next Hello world example we use the send and receive functions in order to a have a synchronized
+action.
+
+
+!eblock
+
+
+
+=====    "Ordered output":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program4.cpp"  =====
+!bblock
+
+
+!bc ccpcod
+.....
+int numprocs, my_rank, flag;
+MPI_Status status;
+MPI_Init (&nargs, &args);
+MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+if (my_rank > 0)
+MPI_Recv (&flag, 1, MPI_INT, my_rank-1, 100, 
+           MPI_COMM_WORLD, &status);
+cout << "Hello world, I have  rank " << my_rank << " out of " 
+<< numprocs << endl;
+if (my_rank < numprocs-1)
+MPI_Send (&my_rank, 1, MPI_INT, my_rank+1, 
+          100, MPI_COMM_WORLD);
+MPI_Finalize ();
+!ec
+
+!eblock
+
+
+
+=====    Note 3  =====
+!bblock
+
+
+The basic sending of messages is given by the function $MPI\_SEND$, which in C/C++
+is defined as 
+!bc cppcod
+int MPI_Send(void *buf, int count, 
+             MPI_Datatype datatype, 
+             int dest, int tag, MPI_Comm comm)}
+!ec
+This single command allows the passing of any kind of variable, even a large array, to any group of tasks. 
+The variable _buf_ is the variable we wish to send while _count_
+is the  number of variables we are passing. If we are passing only a single value, this should be 1. 
+
+If we transfer an array, it is  the overall size of the array. 
+For example, if we want to send a 10 by 10 array, count would be $10\times 10=100$ 
+since we are  actually passing 100 values.  
+
+
+!eblock
+
+
+
+=====    Note 4  =====
+!bblock
+
+Once you have  sent a message, you must receive it on another task. The function $MPI\_RECV$
+is similar to the send call.
+!bc cppcod
+int MPI_Recv( void *buf, int count, MPI_Datatype datatype, 
+            int source, 
+            int tag, MPI_Comm comm, MPI_Status *status )
+!ec
+
+The arguments that are different from those in MPI\_SEND are
+_buf_ which  is the name of the variable where you will  be storing the received data, 
+_source_ which  replaces the destination in the send command. This is the return ID of the sender.
+
+Finally,  we have used  $MPI\_Status\_status$,  
+where one can check if the receive was completed.
+
+The output of this code is the same as the previous example, but now
+process 0 sends a message to process 1, which forwards it further
+to process 2, and so forth.
+
+
+!eblock
+
+
+===== "Numerical integration in parallel":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp" =====
+!bblock    Integrating $\pi$
+
+* The code example computes $\pi$ using the trapezoidal rules.
+* The trapezoidal rule
+!bt
+\[
+   I=\int_a^bf(x) dx\approx h\left(f(a)/2 + f(a+h) +f(a+2h)+\dots +f(b-h)+ f(b)/2\right).
+\]
+!et
+Click "on this link":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/Programs/LecturePrograms/programs/MPI/chapter07/program6.cpp" for the full program.
+
+!eblock
+
+
+=====    Dissection of trapezoidal rule with $MPI\_reduce$ =====
+!bblock
+
+!bc cppcod
+//    Trapezoidal rule and numerical integration usign MPI
+using namespace std;
+#include <mpi.h>
+#include <iostream>
+
+//     Here we define various functions called by the main program
+
+double int_function(double );
+double trapezoidal_rule(double , double , int , double (*)(double));
+
+//   Main function begins here
+int main (int nargs, char* args[])
+{
+  int n, local_n, numprocs, my_rank; 
+  double a, b, h, local_a, local_b, total_sum, local_sum;   
+  double  time_start, time_end, total_time;
+!ec
+
+
+!eblock
+
+
+=====    Dissection of trapezoidal rule  =====
+!bblock
+
+!bc cppcod
+  //  MPI initializations
+  MPI_Init (&nargs, &args);
+  MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+  MPI_Comm_rank (MPI_COMM_WORLD, &my_rank);
+  time_start = MPI_Wtime();
+  //  Fixed values for a, b and n 
+  a = 0.0 ; b = 1.0;  n = 1000;
+  h = (b-a)/n;    // h is the same for all processes 
+  local_n = n/numprocs;  
+  // make sure n > numprocs, else integer division gives zero
+  // Length of each process' interval of
+  // integration = local_n*h.  
+  local_a = a + my_rank*local_n*h;
+  local_b = local_a + local_n*h;
+!ec
+
+
+!eblock
+
+
+===== Integrating with _MPI_ =====
+!bblock
+
+!bc cppcod
+  total_sum = 0.0;
+  local_sum = trapezoidal_rule(local_a, local_b, local_n, 
+                               &int_function); 
+  MPI_Reduce(&local_sum, &total_sum, 1, MPI_DOUBLE, 
+              MPI_SUM, 0, MPI_COMM_WORLD);
+  time_end = MPI_Wtime();
+  total_time = time_end-time_start;
+  if ( my_rank == 0) {
+    cout << "Trapezoidal rule = " <<  total_sum << endl;
+    cout << "Time = " <<  total_time  
+         << " on number of processors: "  << numprocs  << endl;
+  }
+  // End MPI
+  MPI_Finalize ();  
+  return 0;
+}  // end of main program
+!ec
+
+!eblock
+
+
+===== How do I use $MPI\_reduce$? =====
+!bblock
+
+Here we have used
+!bc cppcod
+MPI_reduce( void *senddata, void* resultdata, int count, 
+     MPI_Datatype datatype, MPI_Op, int root, MPI_Comm comm)
+!ec
+
+The two variables $senddata$ and $resultdata$ are obvious, besides the fact that one sends the address
+of the variable or the first element of an array.  If they are arrays they need to have the same size. 
+The variable $count$ represents the total dimensionality, 1 in case of just one variable, 
+while $MPI\_Datatype$ 
+defines the type of variable which is sent and received.  
+
+The new feature is $MPI\_Op$. It defines the type
+of operation we want to do. 
+!eblock
+
+
+===== More on $MPI\_Reduce$ =====
+!bblock
+In our case, since we are summing
+the rectangle  contributions from every process we define  $MPI\_Op = MPI\_SUM$.
+If we have an array or matrix we can search for the largest og smallest element by sending either $MPI\_MAX$ or 
+$MPI\_MIN$.  If we want the location as well (which array element) we simply transfer 
+$MPI\_MAXLOC$ or $MPI\_MINOC$. If we want the product we write $MPI\_PROD$. 
+
+$MPI\_Allreduce$ is defined as
+!bc cppcod     
+MPI_Allreduce( void *senddata, void* resultdata, int count, 
+          MPI_Datatype datatype, MPI_Op, MPI_Comm comm)        
+!ec 
+
+
+!eblock
+
+
+=====     Dissection of trapezoidal rule  =====
+!bblock
+
+We use $MPI\_reduce$ to collect data from each process. Note also the use of the function 
+$MPI\_Wtime$. 
+!bc cppcod
+//  this function defines the function to integrate
+double int_function(double x)
+{
+  double value = 4./(1.+x*x);
+  return value;
+} // end of function to evaluate
+
+!ec
+
+
+!eblock
+
+
+=====    Dissection of trapezoidal rule  =====
+!bblock
+!bc cppcod
+//  this function defines the trapezoidal rule
+double trapezoidal_rule(double a, double b, int n, 
+                         double (*func)(double))
+{
+  double trapez_sum;
+  double fa, fb, x, step;
+  int    j;
+  step=(b-a)/((double) n);
+  fa=(*func)(a)/2. ;
+  fb=(*func)(b)/2. ;
+  trapez_sum=0.;
+  for (j=1; j <= n-1; j++){
+    x=j*step+a;
+    trapez_sum+=(*func)(x);
+  }
+  trapez_sum=(trapez_sum+fb+fa)*step;
+  return trapez_sum;
+}  // end trapezoidal_rule 
+!ec
+
+
+!eblock
+
+
+
+
+=====   "The quantum dot program for two electrons":"https://github.com/CompPhysics/ComputationalPhysics2/blob/master/doc/Programs/ParallelizationMPI/MPIvmcqdot.cpp"  =====
+!bblock
+!bc cppcod
+// Variational Monte Carlo for atoms with importance sampling, slater det
+// Test case for 2-electron quantum dot, no classes using Mersenne-Twister RNG
+#include "mpi.h"
+#include <cmath>
+#include <random>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include "vectormatrixclass.h"
+
+using namespace  std;
+// output file as global variable
+ofstream ofile;  
+// the step length and its squared inverse for the second derivative 
+//  Here we define global variables  used in various functions
+//  These can be changed by using classes
+int Dimension = 2; 
+int NumberParticles  = 2;  //  we fix also the number of electrons to be 2
+
+// declaration of functions 
+
+// The Mc sampling for the variational Monte Carlo 
+void  MonteCarloSampling(int, double &, double &, Vector &);
+
+// The variational wave function
+double  WaveFunction(Matrix &, Vector &);
+
+// The local energy 
+double  LocalEnergy(Matrix &, Vector &);
+
+// The quantum force
+void  QuantumForce(Matrix &, Matrix &, Vector &);
+
+
+// inline function for single-particle wave function
+inline double SPwavefunction(double r, double alpha) { 
+   return exp(-alpha*r*0.5);
+}
+
+// inline function for derivative of single-particle wave function
+inline double DerivativeSPwavefunction(double r, double alpha) { 
+  return -r*alpha;
+}
+
+// function for absolute value of relative distance
+double RelativeDistance(Matrix &r, int i, int j) { 
+      double r_ij = 0;  
+      for (int k = 0; k < Dimension; k++) { 
+	r_ij += (r(i,k)-r(j,k))*(r(i,k)-r(j,k));
+      }
+      return sqrt(r_ij); 
+}
+
+// inline function for derivative of Jastrow factor
+inline double JastrowDerivative(Matrix &r, double beta, int i, int j, int k){
+  return (r(i,k)-r(j,k))/(RelativeDistance(r, i, j)*pow(1.0+beta*RelativeDistance(r, i, j),2));
+}
+
+// function for square of position of single particle
+double singleparticle_pos2(Matrix &r, int i) { 
+    double r_single_particle = 0;
+    for (int j = 0; j < Dimension; j++) { 
+      r_single_particle  += r(i,j)*r(i,j);
+    }
+    return r_single_particle;
+}
+
+void lnsrch(int n, Vector &xold, double fold, Vector &g, Vector &p, Vector &x,
+		 double *f, double stpmax, int *check, double (*func)(Vector &p));
+
+void dfpmin(Vector &p, int n, double gtol, int *iter, double *fret,
+	    double(*func)(Vector &p), void (*dfunc)(Vector &p, Vector &g));
+
+static double sqrarg;
+#define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg)
+
+
+static double maxarg1,maxarg2;
+#define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1) > (maxarg2) ?\
+        (maxarg1) : (maxarg2))
+
+
+// Begin of main program   
+
+int main(int argc, char* argv[])
+{
+
+  //  MPI initializations
+  int NumberProcesses, MyRank, NumberMCsamples;
+  MPI_Init (&argc, &argv);
+  MPI_Comm_size (MPI_COMM_WORLD, &NumberProcesses);
+  MPI_Comm_rank (MPI_COMM_WORLD, &MyRank);
+  double StartTime = MPI_Wtime();
+  if (MyRank == 0 && argc <= 1) {
+    cout << "Bad Usage: " << argv[0] << 
+      " Read also output file on same line and number of Monte Carlo cycles" << endl;
+  }
+  // Read filename and number of Monte Carlo cycles from the command line
+  if (MyRank == 0 && argc > 2) {
+    string filename = argv[1]; // first command line argument after name of program
+    NumberMCsamples  = atoi(argv[2]);
+    string fileout = filename;
+    string argument = to_string(NumberMCsamples);
+    // Final filename as filename+NumberMCsamples
+    fileout.append(argument);
+    ofile.open(fileout);
+  }
+  // broadcast the number of  Monte Carlo samples
+  MPI_Bcast (&NumberMCsamples, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  // Two variational parameters only
+  Vector VariationalParameters(2);
+  int TotalNumberMCsamples = NumberMCsamples*NumberProcesses; 
+  // Loop over variational parameters
+  for (double alpha = 0.5; alpha <= 1.5; alpha +=0.1){
+    for (double beta = 0.1; beta <= 0.5; beta +=0.05){
+      VariationalParameters(0) = alpha;  // value of alpha
+      VariationalParameters(1) = beta;  // value of beta
+      //  Do the mc sampling  and accumulate data with MPI_Reduce
+      double TotalEnergy, TotalEnergySquared, LocalProcessEnergy, LocalProcessEnergy2;
+      LocalProcessEnergy = LocalProcessEnergy2 = 0.0;
+      MonteCarloSampling(NumberMCsamples, LocalProcessEnergy, LocalProcessEnergy2, VariationalParameters);
+      //  Collect data in total averages
+      MPI_Reduce(&LocalProcessEnergy, &TotalEnergy, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      MPI_Reduce(&LocalProcessEnergy2, &TotalEnergySquared, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+      // Print out results  in case of Master node, set to MyRank = 0
+      if ( MyRank == 0) {
+	double Energy = TotalEnergy/( (double)NumberProcesses);
+	double Variance = TotalEnergySquared/( (double)NumberProcesses)-Energy*Energy;
+	double StandardDeviation = sqrt(Variance/((double)TotalNumberMCsamples)); // over optimistic error
+	ofile << setiosflags(ios::showpoint | ios::uppercase);
+	ofile << setw(15) << setprecision(8) << VariationalParameters(0);
+	ofile << setw(15) << setprecision(8) << VariationalParameters(1);
+	ofile << setw(15) << setprecision(8) << Energy;
+	ofile << setw(15) << setprecision(8) << Variance;
+	ofile << setw(15) << setprecision(8) << StandardDeviation << endl;
+      }
+    }
+  }
+  double EndTime = MPI_Wtime();
+  double TotalTime = EndTime-StartTime;
+  if ( MyRank == 0 )  cout << "Time = " <<  TotalTime  << " on number of processors: "  << NumberProcesses  << endl;
+  if (MyRank == 0)  ofile.close();  // close output file
+  // End MPI
+  MPI_Finalize ();  
+  return 0;
+}  //  end of main function
+
+
+// Monte Carlo sampling with the Metropolis algorithm  
+
+void MonteCarloSampling(int NumberMCsamples, double &cumulative_e, double &cumulative_e2, Vector &VariationalParameters)
+{
+
+ // Initialize the seed and call the Mersienne algo
+  std::random_device rd;
+  std::mt19937_64 gen(rd());
+  // Set up the uniform distribution for x \in [[0, 1]
+  std::uniform_real_distribution<double> UniformNumberGenerator(0.0,1.0);
+  std::normal_distribution<double> Normaldistribution(0.0,1.0);
+  // diffusion constant from Schroedinger equation
+  double D = 0.5; 
+  double timestep = 0.05;  //  we fix the time step  for the gaussian deviate
+  // allocate matrices which contain the position of the particles  
+  Matrix OldPosition( NumberParticles, Dimension), NewPosition( NumberParticles, Dimension);
+  Matrix OldQuantumForce(NumberParticles, Dimension), NewQuantumForce(NumberParticles, Dimension);
+  double Energy = 0.0; double EnergySquared = 0.0; double DeltaE = 0.0;
+  //  initial trial positions
+  for (int i = 0; i < NumberParticles; i++) { 
+    for (int j = 0; j < Dimension; j++) {
+      OldPosition(i,j) = Normaldistribution(gen)*sqrt(timestep);
+    }
+  }
+  double OldWaveFunction = WaveFunction(OldPosition, VariationalParameters);
+  QuantumForce(OldPosition, OldQuantumForce, VariationalParameters);
+  // loop over monte carlo cycles 
+  for (int cycles = 1; cycles <= NumberMCsamples; cycles++){ 
+    // new position 
+    for (int i = 0; i < NumberParticles; i++) { 
+      for (int j = 0; j < Dimension; j++) {
+	// gaussian deviate to compute new positions using a given timestep
+	NewPosition(i,j) = OldPosition(i,j) + Normaldistribution(gen)*sqrt(timestep)+OldQuantumForce(i,j)*timestep*D;
+	//	NewPosition(i,j) = OldPosition(i,j) + gaussian_deviate(&idum)*sqrt(timestep)+OldQuantumForce(i,j)*timestep*D;
+      }  
+      //  for the other particles we need to set the position to the old position since
+      //  we move only one particle at the time
+      for (int k = 0; k < NumberParticles; k++) {
+	if ( k != i) {
+	  for (int j = 0; j < Dimension; j++) {
+	    NewPosition(k,j) = OldPosition(k,j);
+	  }
+	} 
+      }
+      double NewWaveFunction = WaveFunction(NewPosition, VariationalParameters); 
+      QuantumForce(NewPosition, NewQuantumForce, VariationalParameters);
+      //  we compute the log of the ratio of the greens functions to be used in the 
+      //  Metropolis-Hastings algorithm
+      double GreensFunction = 0.0;            
+      for (int j = 0; j < Dimension; j++) {
+	GreensFunction += 0.5*(OldQuantumForce(i,j)+NewQuantumForce(i,j))*
+	  (D*timestep*0.5*(OldQuantumForce(i,j)-NewQuantumForce(i,j))-NewPosition(i,j)+OldPosition(i,j));
+      }
+      GreensFunction = exp(GreensFunction);
+      // The Metropolis test is performed by moving one particle at the time
+      if(UniformNumberGenerator(gen) <= GreensFunction*NewWaveFunction*NewWaveFunction/OldWaveFunction/OldWaveFunction ) { 
+	for (int  j = 0; j < Dimension; j++) {
+	  OldPosition(i,j) = NewPosition(i,j);
+	  OldQuantumForce(i,j) = NewQuantumForce(i,j);
+	}
+	OldWaveFunction = NewWaveFunction;
+      }
+    }  //  end of loop over particles
+    // compute local energy  
+    double DeltaE = LocalEnergy(OldPosition, VariationalParameters);
+    // update energies
+    Energy += DeltaE;
+    EnergySquared += DeltaE*DeltaE;
+  }   // end of loop over MC trials   
+  // update the energy average and its squared 
+  cumulative_e = Energy/NumberMCsamples;
+  cumulative_e2 = EnergySquared/NumberMCsamples;
+}   // end MonteCarloSampling function  
+
+
+// Function to compute the squared wave function and the quantum force
+
+double  WaveFunction(Matrix &r, Vector &VariationalParameters)
+{
+  double wf = 0.0;
+  // full Slater determinant for two particles, replace with Slater det for more particles 
+  wf  = SPwavefunction(singleparticle_pos2(r, 0), VariationalParameters(0))*SPwavefunction(singleparticle_pos2(r, 1),VariationalParameters(0));
+  // contribution from Jastrow factor
+  for (int i = 0; i < NumberParticles-1; i++) { 
+    for (int j = i+1; j < NumberParticles; j++) {
+      wf *= exp(RelativeDistance(r, i, j)/((1.0+VariationalParameters(1)*RelativeDistance(r, i, j))));
+    }
+  }
+  return wf;
+}
+
+// Function to calculate the local energy without numerical derivation of kinetic energy
+
+double  LocalEnergy(Matrix &r, Vector &VariationalParameters)
+{
+
+  // compute the kinetic and potential energy from the single-particle part
+  // for a many-electron system this has to be replaced by a Slater determinant
+  // The absolute value of the interparticle length
+  Matrix length( NumberParticles, NumberParticles);
+  // Set up interparticle distance
+  for (int i = 0; i < NumberParticles-1; i++) { 
+    for(int j = i+1; j < NumberParticles; j++){
+      length(i,j) = RelativeDistance(r, i, j);
+      length(j,i) =  length(i,j);
+    }
+  }
+  double KineticEnergy = 0.0;
+  // Set up kinetic energy from Slater and Jastrow terms
+  for (int i = 0; i < NumberParticles; i++) { 
+    for (int k = 0; k < Dimension; k++) {
+      double sum1 = 0.0; 
+      for(int j = 0; j < NumberParticles; j++){
+	if ( j != i) {
+	  sum1 += JastrowDerivative(r, VariationalParameters(1), i, j, k);
+	}
+      }
+      KineticEnergy += (sum1+DerivativeSPwavefunction(r(i,k),VariationalParameters(0)))*(sum1+DerivativeSPwavefunction(r(i,k),VariationalParameters(0)));
+    }
+  }
+  KineticEnergy += -2*VariationalParameters(0)*NumberParticles;
+  for (int i = 0; i < NumberParticles-1; i++) {
+      for (int j = i+1; j < NumberParticles; j++) {
+        KineticEnergy += 2.0/(pow(1.0 + VariationalParameters(1)*length(i,j),2))*(1.0/length(i,j)-2*VariationalParameters(1)/(1+VariationalParameters(1)*length(i,j)) );
+      }
+  }
+  KineticEnergy *= -0.5;
+  // Set up potential energy, external potential + eventual electron-electron repulsion
+  double PotentialEnergy = 0;
+  for (int i = 0; i < NumberParticles; i++) { 
+    double DistanceSquared = singleparticle_pos2(r, i);
+    PotentialEnergy += 0.5*DistanceSquared;  // sp energy HO part, note it has the oscillator frequency set to 1!
+  }
+  // Add the electron-electron repulsion
+  for (int i = 0; i < NumberParticles-1; i++) { 
+    for (int j = i+1; j < NumberParticles; j++) {
+      PotentialEnergy += 1.0/length(i,j);          
+    }
+  }
+  double LocalE = KineticEnergy+PotentialEnergy;
+  return LocalE;
+}
+
+// Compute the analytical expression for the quantum force
+void  QuantumForce(Matrix &r, Matrix &qforce, Vector &VariationalParameters)
+{
+  // compute the first derivative 
+  for (int i = 0; i < NumberParticles; i++) {
+    for (int k = 0; k < Dimension; k++) {
+      // single-particle part, replace with Slater det for larger systems
+      double sppart = DerivativeSPwavefunction(r(i,k),VariationalParameters(0));
+      //  Jastrow factor contribution
+      double Jsum = 0.0;
+      for (int j = 0; j < NumberParticles; j++) {
+	if ( j != i) {
+	  Jsum += JastrowDerivative(r, VariationalParameters(1), i, j, k);
+	}
+      }
+      qforce(i,k) = 2.0*(Jsum+sppart);
+    }
+  }
+} // end of QuantumForce function
+
+
+#define ITMAX 200
+#define EPS 3.0e-8
+#define TOLX (4*EPS)
+#define STPMX 100.0
+
+void dfpmin(Vector &p, int n, double gtol, int *iter, double *fret,
+	    double(*func)(Vector &p), void (*dfunc)(Vector &p, Vector &g))
+{
+
+  int check,i,its,j;
+  double den,fac,fad,fae,fp,stpmax,sum=0.0,sumdg,sumxi,temp,test;
+  Vector dg(n), g(n), hdg(n), pnew(n), xi(n);
+  Matrix hessian(n,n);
+
+  fp=(*func)(p);
+  (*dfunc)(p,g);
+  for (i = 0;i < n;i++) {
+    for (j = 0; j< n;j++) hessian(i,j)=0.0;
+    hessian(i,i)=1.0;
+    xi(i) = -g(i);
+    sum += p(i)*p(i);
+  }
+  stpmax=STPMX*FMAX(sqrt(sum),(double)n);
+  for (its=1;its<=ITMAX;its++) {
+    *iter=its;
+    lnsrch(n,p,fp,g,xi,pnew,fret,stpmax,&check,func);
+    fp = *fret;
+    for (i = 0; i< n;i++) {
+      xi(i)=pnew(i)-p(i);
+      p(i)=pnew(i);
+    }
+    test=0.0;
+    for (i = 0;i< n;i++) {
+      temp=fabs(xi(i))/FMAX(fabs(p(i)),1.0);
+      if (temp > test) test=temp;
+    }
+    if (test < TOLX) {
+      return;
+    }
+    for (i=0;i<n;i++) dg(i)=g(i);
+    (*dfunc)(p,g);
+    test=0.0;
+    den=FMAX(*fret,1.0);
+    for (i=0;i<n;i++) {
+      temp=fabs(g(i))*FMAX(fabs(p(i)),1.0)/den;
+      if (temp > test) test=temp;
+    }
+    if (test < gtol) {
+      return;
+    }
+    for (i=0;i<n;i++) dg(i)=g(i)-dg(i);
+    for (i=0;i<n;i++) {
+      hdg(i)=0.0;
+      for (j=0;j<n;j++) hdg(i) += hessian(i,j)*dg(j);
+    }
+    fac=fae=sumdg=sumxi=0.0;
+    for (i=0;i<n;i++) {
+      fac += dg(i)*xi(i);
+      fae += dg(i)*hdg(i);
+      sumdg += SQR(dg(i));
+      sumxi += SQR(xi(i));
+    }
+    if (fac*fac > EPS*sumdg*sumxi) {
+      fac=1.0/fac;
+      fad=1.0/fae;
+      for (i=0;i<n;i++) dg(i)=fac*xi(i)-fad*hdg(i);
+      for (i=0;i<n;i++) {
+	for (j=0;j<n;j++) {
+	  hessian(i,j) += fac*xi(i)*xi(j)
+	    -fad*hdg(i)*hdg(j)+fae*dg(i)*dg(j);
+	}
+      }
+    }
+    for (i=0;i<n;i++) {
+      xi(i)=0.0;
+      for (j=0;j<n;j++) xi(i) -= hessian(i,j)*g(j);
+    }
+  }
+  cout << "too many iterations in dfpmin" << endl;
+}
+#undef ITMAX
+#undef EPS
+#undef TOLX
+#undef STPMX
+
+#define ALF 1.0e-4
+#define TOLX 1.0e-7
+
+void lnsrch(int n, Vector &xold, double fold, Vector &g, Vector &p, Vector &x,
+	    double *f, double stpmax, int *check, double (*func)(Vector &p))
+{
+  int i;
+  double a,alam,alam2,alamin,b,disc,f2,fold2,rhs1,rhs2,slope,sum,temp,
+    test,tmplam;
+
+  *check=0;
+  for (sum=0.0,i=0;i<n;i++) sum += p(i)*p(i);
+  sum=sqrt(sum);
+  if (sum > stpmax)
+    for (i=0;i<n;i++) p(i) *= stpmax/sum;
+  for (slope=0.0,i=0;i<n;i++)
+    slope += g(i)*p(i);
+  test=0.0;
+  for (i=0;i<n;i++) {
+    temp=fabs(p(i))/FMAX(fabs(xold(i)),1.0);
+    if (temp > test) test=temp;
+  }
+  alamin=TOLX/test;
+  alam=1.0;
+  for (;;) {
+    for (i=0;i<n;i++) x(i)=xold(i)+alam*p(i);
+    *f=(*func)(x);
+    if (alam < alamin) {
+      for (i=0;i<n;i++) x(i)=xold(i);
+      *check=1;
+      return;
+    } else if (*f <= fold+ALF*alam*slope) return;
+    else {
+      if (alam == 1.0)
+	tmplam = -slope/(2.0*(*f-fold-slope));
+      else {
+	rhs1 = *f-fold-alam*slope;
+	rhs2=f2-fold2-alam2*slope;
+	a=(rhs1/(alam*alam)-rhs2/(alam2*alam2))/(alam-alam2);
+	b=(-alam2*rhs1/(alam*alam)+alam*rhs2/(alam2*alam2))/(alam-alam2);
+	if (a == 0.0) tmplam = -slope/(2.0*b);
+	else {
+	  disc=b*b-3.0*a*slope;
+	  if (disc<0.0) cout << "Roundoff problem in lnsrch." << endl;
+	  else tmplam=(-b+sqrt(disc))/(3.0*a);
+	}
+	if (tmplam>0.5*alam)
+	  tmplam=0.5*alam;
+      }
+    }
+    alam2=alam;
+    f2 = *f;
+    fold2=fold;
+    alam=FMAX(tmplam,0.1*alam);
+  }
+}
+#undef ALF
+#undef TOLX
+
+!ec
+
+
+!eblock
+
+
+
+
+=====    What is OpenMP =====
+!bblock
+* OpenMP provides high-level thread programming
+* Multiple cooperating threads are allowed to run simultaneously
+* Threads are created and destroyed dynamically in a fork-join pattern
+  *  An OpenMP program consists of a number of parallel regions
+  *  Between two parallel regions there is only one master thread
+  *  In the beginning of a parallel region, a team of new threads is spawned
+  * The newly spawned threads work simultaneously with the master thread
+  * At the end of a parallel region, the new threads are destroyed
+
+Many good tutorials online and excellent textbook
+o  "Using OpenMP, by B. Chapman, G. Jost, and A. van der Pas":"http://mitpress.mit.edu/books/using-openmp"
+o  Many tutorials online like "OpenMP official site":"http://www.openmp.org"
+
+!eblock
+
+
+=====    Getting started, things to remember =====
+!bblock
+*  Remember the header file 
+!bc cppcod
+#include <omp.h>
+!ec
+*  Insert compiler directives in C++ syntax as 
+!bc cppcod
+#pragma omp...
+!ec
+* Compile with for example *c++ -fopenmp code.cpp*
+* Execute
+  * Remember to assign the environment variable _OMP NUM THREADS_
+  * It specifies the total number of threads inside a parallel region, if not otherwise overwritten
+
+!eblock
+
+
+===== OpenMP syntax =====
+* Mostly directives
+!bc cppcod
+#pragma omp construct [ clause ...]
+!ec
+*  Some functions and types 
+!bc cppcod
+#include <omp.h>
+!ec
+*  Most apply to a block of code
+ * Specifically, a _structured block_
+ * Enter at top, exit at bottom only, exit(), abort() permitted
+
+
+
+===== Different OpenMP styles of parallelism =====
+OpenMP supports several different ways to specify thread parallelism
+
+* General parallel regions: All threads execute the code, roughly as if you made a routine of that region and created a thread to run that code
+* Parallel loops: Special case for loops, simplifies data parallel code
+* Task parallelism, new in OpenMP 3
+* Several ways to manage thread coordination, including Master regions and Locks
+* Memory model for shared data
+
+
+
+=====    General code structure  =====
+!bblock
+!bc cppcod
+#include <omp.h>
+main ()
+{
+int var1, var2, var3;
+/* serial code */
+/* ... */
+/* start of a parallel region */
+#pragma omp parallel private(var1, var2) shared(var3)
+{
+/* ... */
+}
+/* more serial code */
+/* ... */
+/* another parallel region */
+#pragma omp parallel
+{
+/* ... */
+}
+}
+!ec
+!eblock
+
+
+=====    Parallel region =====
+!bblock
+* A parallel region is a block of code that is executed by a team of threads
+* The following compiler directive creates a parallel region
+!bc cppcod
+#pragma omp parallel { ... }
+!ec
+* Clauses can be added at the end of the directive
+* Most often used clauses:
+ * _default(shared)_ or _default(none)_
+ * _public(list of variables)_
+ * _private(list of variables)_
+
+
+!eblock
+
+
+=====    Hello world, not again, please! =====
+!bblock
+!bc cppcod
+#include <omp.h>
+#include <cstdio>
+int main (int argc, char *argv[])
+{
+int th_id, nthreads;
+#pragma omp parallel private(th_id) shared(nthreads)
+{
+th_id = omp_get_thread_num();
+printf("Hello World from thread %d\n", th_id);
+#pragma omp barrier
+if ( th_id == 0 ) {
+nthreads = omp_get_num_threads();
+printf("There are %d threads\n",nthreads);
+}
+}
+return 0;
+}
+!ec
+
+!eblock
+
+
+
+=====    Hello world, yet another variant =====
+!bblock
+!bc cppcod
+#include <cstdio>
+#include <omp.h>
+int main(int argc, char *argv[]) 
+{
+ omp_set_num_threads(4); 
+#pragma omp parallel
+ {
+   int id = omp_get_thread_num();
+   int nproc = omp_get_num_threads(); 
+   cout << "Hello world with id number and processes " <<  id <<  nproc << endl;
+ } 
+return 0;
+}
+!ec
+Variables declared outside of the parallel region are shared by all threads
+If a variable like _id_ is  declared outside of the 
+!bc cppcod
+#pragma omp parallel, 
+!ec
+it would have been shared by various the threads, possibly causing erroneous output
+*  Why? What would go wrong? Why do we add  possibly?
+!eblock
+
+
+=====    Important OpenMP library routines =====
+!bblock
+
+* _int omp get num threads ()_, returns the number of threads inside a parallel region
+* _int omp get thread num ()_,  returns the  a thread for each thread inside a parallel region
+* _void omp set num threads (int)_, sets the number of threads to be used
+* _void omp set nested (int)_,  turns nested parallelism on/off
+
+!eblock
+
+
+===== Private variables =====
+!bblock
+Private clause can be used to make thread- private versions of such variables: 
+!bc cppcod
+#pragma omp parallel private(id)
+{
+ int id = omp_get_thread_num();
+ cout << "My thread num" << id << endl; 
+}
+!ec
+* What is their value on entry? Exit?
+* OpenMP provides ways to control that
+* Can use default(none) to require the sharing of each variable to be described
+
+!eblock
+
+
+===== Master region =====
+!bblock
+It is often useful to have only one thread execute some of the code in a parallel region. I/O statements are a common example
+!bc cppcod
+#pragma omp parallel 
+{
+  #pragma omp master
+   {
+      int id = omp_get_thread_num();
+      cout << "My thread num" << id << endl; 
+   } 
+}
+!ec
+
+
+!eblock
+
+
+=====    Parallel for loop =====
+!bblock
+*  Inside a parallel region, the following compiler directive can be used to parallelize a for-loop:
+!bc cppcod
+#pragma omp for
+!ec
+* Clauses can be added, such as
+ *  _schedule(static, chunk size)_
+ *  _schedule(dynamic, chunk size)_ 
+ *  _schedule(guided, chunk size)_ (non-deterministic allocation)
+ *  _schedule(runtime)_
+ *  _private(list of variables)_
+ *  _reduction(operator:variable)_
+ *  _nowait_
+
+!eblock
+
+
+
+===== Parallel computations and loops =====
+
+!bblock
+OpenMP provides an easy way to parallelize a loop
+!bc cppcod
+#pragma omp parallel for
+  for (i=0; i<n; i++) c[i] = a[i];
+!ec
+OpenMP handles index variable (no need to declare in for loop or make private)
+
+Which thread does which values?  Several options. 
+!eblock
+
+
+===== Scheduling of  loop computations =====
+
+!bblock
+We can let  the OpenMP runtime decide. The decision is about how the loop iterates are scheduled
+and  OpenMP defines three choices of loop scheduling:
+o Static: Predefined at compile time. Lowest overhead, predictable
+o Dynamic: Selection made at runtime 
+o Guided: Special case of dynamic; attempts to reduce overhead
+!eblock
+
+
+===== Example code for loop scheduling =====
+!bblock
+!bc cppcod
+#include <omp.h>
+#define CHUNKSIZE 100
+#define N 1000
+int main (int argc, char *argv[])
+{
+int i, chunk;
+float a[N], b[N], c[N];
+for (i=0; i < N; i++) a[i] = b[i] = i * 1.0;
+chunk = CHUNKSIZE;
+#pragma omp parallel shared(a,b,c,chunk) private(i)
+{
+#pragma omp for schedule(dynamic,chunk)
+for (i=0; i < N; i++) c[i] = a[i] + b[i];
+} /* end of parallel region */
+}
+!ec
+
+
+!eblock
+
+
+===== Example code for loop scheduling, guided instead of dynamic =====
+!bblock
+!bc cppcod
+#include <omp.h>
+#define CHUNKSIZE 100
+#define N 1000
+int main (int argc, char *argv[])
+{
+int i, chunk;
+float a[N], b[N], c[N];
+for (i=0; i < N; i++) a[i] = b[i] = i * 1.0;
+chunk = CHUNKSIZE;
+#pragma omp parallel shared(a,b,c,chunk) private(i)
+{
+#pragma omp for schedule(guided,chunk)
+for (i=0; i < N; i++) c[i] = a[i] + b[i];
+} /* end of parallel region */
+}
+!ec
+
+
+!eblock
+
+
+
+=====    More on Parallel for loop =====
+!bblock
+* The number of loop iterations cannot be non-deterministic; break, return, exit, goto not allowed inside the for-loop
+* The loop index is private to each thread
+* A reduction variable is special
+  * During the for-loop there is a local private copy in each thread
+  * At the end of the for-loop, all the local copies are combined together by the reduction operation
+* Unless the nowait clause is used, an implicit barrier synchronization will be added at the end by the compiler
+!bc cppcod
+// #pragma omp parallel and #pragma omp for
+!ec
+can be combined into
+!bc cppcod
+#pragma omp parallel for
+!ec
+!eblock
+
+
+
+===== What can happen with this loop? =====
+
+!bblock
+What happens with code like this 
+!bc cppcod
+#pragma omp parallel for
+for (i=0; i<n; i++) sum += a[i]*a[i];
+!ec  
+All threads can access the _sum_ variable, but the addition is not atomic! It is important to avoid race between threads. So-called reductions in OpenMP are thus important for performance and for obtaining correct results.  OpenMP lets us indicate that a variable is used for a reduction with a particular operator. The above code becomes
+!bc cppcod
+sum = 0.0;
+#pragma omp parallel for reduction(+:sum)
+for (i=0; i<n; i++) sum += a[i]*a[i];
+!ec  
+
+
+!eblock
+
+
+
+=====    Inner product =====
+!bblock
+!bt
+\[
+\sum_{i=0}^{n-1} a_ib_i
+\]
+!et
+!bc cppcod
+int i;
+double sum = 0.;
+/* allocating and initializing arrays */
+/* ... */
+#pragma omp parallel for default(shared) private(i) reduction(+:sum)
+ for (i=0; i<N; i++) sum += a[i]*b[i];
+}
+!ec
+
+
+!eblock
+
+
+===== Different threads do different tasks =====
+!bblock
+
+Different threads do different tasks independently, each section is executed by one thread.
+!bc cppcod
+#pragma omp parallel
+{
+#pragma omp sections
+{
+#pragma omp section
+funcA ();
+#pragma omp section
+funcB ();
+#pragma omp section
+funcC ();
+}
+}
+!ec
+
+!eblock
+
+
+=====     Single execution  =====
+!bblock
+!bc cppcod
+#pragma omp single { ... }
+!ec
+The code is executed by one thread only, no guarantee which thread
+
+Can introduce an implicit barrier at the end
+!bc cppcod
+#pragma omp master { ... }
+!ec
+Code executed by the master thread, guaranteed and no implicit barrier at the end.
+!eblock
+
+
+
+=====    Coordination and synchronization  =====
+!bblock
+!bc cppcod
+#pragma omp barrier
+!ec 
+Synchronization, must be encountered by all threads in a team (or none)
+!bc cppcod
+#pragma omp ordered { a block of codes }
+!ec
+is another form of synchronization (in sequential order).
+The form
+!bc cppcod
+#pragma omp critical { a block of codes }
+!ec
+and 
+!bc cppcod
+#pragma omp atomic { single assignment statement }
+!ec
+is  more efficient than 
+!bc cppcod
+#pragma omp critical
+!ec
+
+
+!eblock
+
+
+
+=====    Data scope  =====
+!bblock
+* OpenMP data scope attribute clauses:
+ * _shared_
+ * _private_
+ * _firstprivate_
+ * _lastprivate_
+ * _reduction_
+
+What are the purposes of these attributes
+* define how and which variables are transferred to a parallel region (and back)
+* define which variables are visible to all threads in a parallel region, and which variables are privately allocated to each thread
+
+
+!eblock
+
+
+
+=====    Some remarks  =====
+!bblock
+
+* When entering a parallel region, the _private_ clause ensures each thread having its own new variable instances. The new variables are assumed to be uninitialized.
+* A shared variable exists in only one memory location and all threads can read and write to that address. It is the programmer's responsibility to ensure that multiple threads properly access a shared variable.
+* The _firstprivate_ clause combines the behavior of the private clause with automatic initialization.
+* The _lastprivate_ clause combines the behavior of the private clause with a copy back (from the last loop iteration or section) to the original variable outside the parallel region.
+
+
+!eblock
+
+
+
+=====    Parallelizing nested for-loops =====
+!bblock
+
+*  Serial code
+!bc cppcod
+for (i=0; i<100; i++)
+    for (j=0; j<100; j++)
+        a[i][j] = b[i][j] + c[i][j];
+    }
+}
+!ec
+
+* Parallelization
+!bc cppcod
+#pragma omp parallel for private(j)
+for (i=0; i<100; i++)
+    for (j=0; j<100; j++)
+       a[i][j] = b[i][j] + c[i][j];
+    }
+}
+!ec
+
+* Why not parallelize the inner loop? to save overhead of repeated thread forks-joins
+
+* Why must _j_ be private? To avoid race condition among the threads
+
+!eblock
+
+
+
+=====    Nested parallelism  =====
+!bblock
+When a thread in a parallel region encounters another parallel construct, it
+may create a new team of threads and become the master of the new
+team.
+!bc cppcod
+#pragma omp parallel num_threads(4)
+{
+/* .... */
+#pragma omp parallel num_threads(2)
+{
+//  
+}
+}
+!ec
+!eblock
+
+
+
+=====    Parallel tasks =====
+!bblock
+!bc cppcod
+#pragma omp task 
+#pragma omp parallel shared(p_vec) private(i)
+{
+#pragma omp single
+{
+for (i=0; i<N; i++) {
+  double r = random_number();
+  if (p_vec[i] > r) {
+#pragma omp task
+   do_work (p_vec[i]);
+!ec
+
+!eblock
+
+
+
+=====    Common mistakes =====
+!bblock
+Race condition
+!bc cppcod
+int nthreads;
+#pragma omp parallel shared(nthreads)
+{
+nthreads = omp_get_num_threads();
+}
+!ec
+Deadlock
+!bc cppcod
+#pragma omp parallel
+{
+...
+#pragma omp critical
+{
+...
+#pragma omp barrier
+}
+}
+!ec
+!eblock
+
+
+ 
+===== Not all computations are simple =====
+!bblock
+Not all computations are simple loops where the data can be evenly 
+divided among threads without any dependencies between threads
+
+An example is finding the location and value of the largest element in an array
+!bc cppcod
+for (i=0; i<n; i++) { 
+   if (x[i] > maxval) {
+      maxval = x[i];
+      maxloc = i; 
+   }
+}
+!ec
+!eblock
+
+ 
+===== Not all computations are simple, competing threads =====
+!bblock
+All threads are potentially accessing and changing the same values, _maxloc_ and _maxval_.
+o OpenMP provides several ways to coordinate access to shared values
+!bc cppcod
+#pragma omp atomic
+!ec
+o Only one thread at a time can execute the following statement (not block). We can use the critical option
+!bc cppcod
+#pragma omp critical
+!ec
+o Only one thread at a time can execute the following block
+
+Atomic may be faster than critical but depends on hardware
+!eblock
+
+
+===== How to find the max value using OpenMP =====
+!bblock 
+Write down the simplest algorithm and look carefully for race conditions. How would you handle them? 
+The first step would be to parallelize as 
+!bc cppcod
+#pragma omp parallel for
+ for (i=0; i<n; i++) {
+    if (x[i] > maxval) {
+      maxval = x[i];
+      maxloc = i; 
+    }
+}
+!ec
+!eblock
+
+
+===== Then deal with the race conditions  =====
+!bblock 
+Write down the simplest algorithm and look carefully for race conditions. How would you handle them? 
+The first step would be to parallelize as 
+!bc cppcod
+#pragma omp parallel for
+ for (i=0; i<n; i++) {
+#pragma omp critical
+  {
+     if (x[i] > maxval) {
+       maxval = x[i];
+       maxloc = i; 
+     }
+  }
+} 
+!ec
+
+Exercise: write a code which implements this and give an estimate on performance. Perform several runs,
+with a serial code only with and without vectorization and compare the serial code with the one that  uses OpenMP. Run on different archictectures if you can. 
+!eblock
+
+===== What can slow down OpenMP performance?   =====
+Give it a thought!
+
+
+===== What can slow down OpenMP performance?   =====
+!bblock
+Performance poor because we insisted on keeping track of the maxval and location during the execution of the loop.
+*  We do not care about the value during the execution of the loop, just the value at the end.
+
+This is a common source of performance issues, namely the description of the method used to compute a value imposes additional, unnecessary requirements or properties
+
+_Idea: Have each thread find the maxloc in its own data, then combine and use temporary arrays indexed by thread number to hold the values found by each thread_
+!eblock
+
+
+===== Find the max location for each thread =====
+!bblock
+!bc cppcod
+int maxloc[MAX_THREADS], mloc;
+double maxval[MAX_THREADS], mval; 
+#pragma omp parallel shared(maxval,maxloc)
+{
+  int id = omp_get_thread_num(); 
+  maxval[id] = -1.0e30;
+#pragma omp for
+   for (int i=0; i<n; i++) {
+       if (x[i] > maxval[id]) { 
+           maxloc[id] = i;
+           maxval[id] = x[i]; 
+       }
+    }
+}
+!ec
+!eblock
+
+
+===== Combine the values from each thread =====
+!bblock
+!bc cppcod
+#pragma omp flush (maxloc,maxval)
+#pragma omp master
+  {
+    int nt = omp_get_num_threads(); 
+    mloc = maxloc[0]; 
+    mval = maxval[0]; 
+    for (int i=1; i<nt; i++) {
+        if (maxval[i] > mval) { 
+           mval = maxval[i]; 
+           mloc = maxloc[i];
+        } 
+     }
+   }
+!ec
+Note that we let the master process perform the last operation.
+!eblock
+
+=====  "Matrix-matrix multiplication":"https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPvectornorm.cpp" =====
+This code computes the norm of a vector using OpenMp
+!bc
+//  OpenMP program to compute vector norm by adding two other vectors
+#include <cstdlib>
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include  <omp.h>
+# include <ctime>
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+{
+  // read in dimension of vector
+  int n = atoi(argv[1]);
+  double *a, *b, *c;
+  int i;
+  int thread_num;
+  double wtime, Norm2, s, angle;
+  cout << "  Perform addition of two vectors and compute the norm-2." << endl;
+  omp_set_num_threads(4);
+  thread_num = omp_get_max_threads ();
+  cout << "  The number of processors available = " << omp_get_num_procs () << endl ;
+  cout << "  The number of threads available    = " << thread_num <<  endl;
+  cout << "  The matrix order n                 = " << n << endl;
+
+  s = 1.0/sqrt( (double) n);
+  wtime = omp_get_wtime ( );
+  // Allocate space for the vectors to be used
+  a = new double [n]; b = new double [n]; c = new double [n];
+  // Define parallel region
+# pragma omp parallel for default(shared) private (angle, i) reduction(+:Norm2)
+  // Set up values for vectors  a and b
+  for (i = 0; i < n; i++){
+      angle = 2.0*M_PI*i/ (( double ) n);
+      a[i] = s*(sin(angle) + cos(angle));
+      b[i] =  s*sin(2.0*angle);
+      c[i] = 0.0;
+  }
+  // Then perform the vector addition
+  for (i = 0; i < n; i++){
+     c[i] += a[i]+b[i];
+  }
+  // Compute now the norm-2
+  Norm2 = 0.0;
+  for (i = 0; i < n; i++){
+     Norm2  += c[i]*c[i];
+  }
+// end parallel region
+  wtime = omp_get_wtime ( ) - wtime;
+  cout << setiosflags(ios::showpoint | ios::uppercase);
+  cout << setprecision(10) << setw(20) << "Time used  for norm-2 computation=" << wtime  << endl;
+  cout << " Norm-2  = " << Norm2 << endl;
+  // Free up space
+  delete[] a;
+  delete[] b;
+  delete[] c;
+  return 0;
+}
+!ec
+
+
+=====  "Matrix-matrix multiplication":"https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPmatrixmatrixmult.cpp" =====
+This the matrix-matrix multiplication code with plain c++ memory allocation using OpenMP
+
+!bc
+//  Matrix-matrix multiplication and Frobenius norm of a matrix with OpenMP
+#include <cstdlib>
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include  <omp.h>
+# include <ctime>
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+{
+  // read in dimension of square matrix
+  int n = atoi(argv[1]);
+  double **A, **B, **C;
+  int i, j, k;
+  int thread_num;
+  double wtime, Fsum, s, angle;
+  cout << "  Compute matrix product C = A * B and Frobenius norm." << endl;
+  omp_set_num_threads(4);
+  thread_num = omp_get_max_threads ();
+  cout << "  The number of processors available = " << omp_get_num_procs () << endl ;
+  cout << "  The number of threads available    = " << thread_num <<  endl;
+  cout << "  The matrix order n                 = " << n << endl;
+
+  s = 1.0/sqrt( (double) n);
+  wtime = omp_get_wtime ( );
+  // Allocate space for the two matrices
+  A = new double*[n]; B = new double*[n]; C = new double*[n];
+  for (i = 0; i < n; i++){
+    A[i] = new double[n];
+    B[i] = new double[n];
+    C[i] = new double[n];
+  }
+  // Define parallel region
+# pragma omp parallel for default(shared) private (angle, i, j, k) reduction(+:Fsum)
+  // Set up values for matrix A and B and zero matrix C
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++) {
+      angle = 2.0*M_PI*i*j/ (( double ) n);
+      A[i][j] = s * ( sin ( angle ) + cos ( angle ) );
+      B[j][i] =  A[i][j];
+    }
+  }
+  // Then perform the matrix-matrix multiplication
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++) {
+       C[i][j] =  0.0;    
+       for (k = 0; k < n; k++) {
+            C[i][j] += A[i][k]*B[k][j];
+       }
+    }
+  }
+  // Compute now the Frobenius norm
+  Fsum = 0.0;
+  for (i = 0; i < n; i++){
+    for (j = 0; j < n; j++) {
+      Fsum += C[i][j]*C[i][j];
+    }
+  }
+  Fsum = sqrt(Fsum);
+// end parallel region and letting only one thread perform I/O
+  wtime = omp_get_wtime ( ) - wtime;
+  cout << setiosflags(ios::showpoint | ios::uppercase);
+  cout << setprecision(10) << setw(20) << "Time used  for matrix-matrix multiplication=" << wtime  << endl;
+  cout << "  Frobenius norm  = " << Fsum << endl;
+  // Free up space
+  for (int i = 0; i < n; i++){
+    delete[] A[i];
+    delete[] B[i];
+    delete[] C[i];
+  }
+  delete[] A;
+  delete[] B;
+  delete[] C;
+  return 0;
+}
+
+
+!ec
+
+
+
+
+
+
+
