@@ -80,7 +80,7 @@ Here we list several useful Python libraries we strongly recommend (if you use a
 
 
 
-### How do I run MPI/OpneMP on a PC/Laptop? MPI  =====
+### How do I run MPI/OpneMP on a PC/Laptop? MPI
 To install MPI is rather easy on hardware running unix/linux as operating systems, follow simply the instructions from the "OpenMPI website":"https://www.open-mpi.org/". See also subsequent slides.
 When you have made sure you have installed MPI on your PC/laptop, 
 - Compile with mpicxx/mpic++ or mpif90
@@ -113,39 +113,6 @@ When running an executable (code.x), run as
   mpirun -n 10 ./code.x
 
 where we indicate that we want  the number of processes to be 10.
-
-
-
-
-## Face coverings. 
-As of now this is not required, but the situation may change. If face covering will be required during the semester, we will fill in more details. 
-
-## Physical distancing 
-We will be practicing physical distancing in the classroom dedicated to the lab sessions. Thus, everybody should maintain at least one meter distance between themselves and others (excluding those with whom they live). This applies to all aspects of the classroom setting, including seating arrangements, informal conversations, and dialogue between teachers and students.
-
-
-## Personal Hygiene
-All participants attending the laboratory sessions must maintain proper hygiene and health practices, including:
-* frequently wash with soap and water or, if soap is unavailable, using hand sanitizer with at least 60% alcohol;
-* Routinely cleaning and sanitizing living spaces and/or workspace;
-* Using the bend of the elbow or shoulder to shield a cough or sneeze;
-* Refraining from shaking hands;
-
-## Adherence to Signage and Instructions 
-Course participants  will (a) look for instructional signs posted by UiO or public health authorities, (b) observe instructions from UiO or public health authorities that are emailed to my “uio.no” account, and (c) follow those instructions.
-The relevant links are https://www.uio.no/om/hms/korona/index.html and https://www.uio.no/om/hms/korona/retningslinjer/veileder-smittevern.html
-
-## Self-Monitoring
-Students will self-monitor for flu-like symptoms (for example, cough, shortness of breath, difficulty breathing, fever, sore throat or loss of taste or smell). If a student experiences any flu-like symptoms, they will stay home and contact a health care provider to determine what steps should be taken.
-## Exposure to COVID-19 
-If a student is exposed to someone who is ill or has tested positive for the COVID-19 virus, they will stay home, contact a health care provider and follow all public health recommendations. You may also contact the study administration of the department where you are registered as student. 
-## Compliance and reporting 
-Those who come to UiO facilities must commit to the personal responsibility necessary for us to remain as safe as possible, including following the specific guidelines outlined in this syllabus and provided by UiO more broadly (see links below here). 
-
-## Additional information
-See https://www.uio.no/om/hms/korona/index.html and https://www.uio.no/om/hms/korona/retningslinjer/veileder-smittevern.html. For English version, click on the relevant link.
-
-
 
 
 
