@@ -94,17 +94,14 @@ to form small project groups of 2-3 participants, if possible.
 * _Name_:  Øyvind Sigmundson Schøyen, 
 * _Email_: oyvinssc@student.matnat.uio.no 	 
 * _Office_: Department of Physics, University of Oslo, Eastern wing, room FØ452
-* _Office hours_: TBA
 
 ## Practicalities
-This course will be delivered in a hybrid mode, with online lectures and on site and online laboratory sessions. The first two weeks (January 17-28) is fully digital and the computer lab and the lectures will be done via zoom. 
 
-1. Two lectures per week, spring semester, 10 ECTS. The lectures are presented in a hybrid mode. The lectures will be recorded and linked to this site and the official University of Oslo website for the course;
+1. Two lectures per week, spring semester, 10 ECTS. The lectures are recorded and linked to this site and the official University of Oslo website for the course;
 2. Thre hours of laboratory sessions for work on computational projects and exercises. There will  also be fully digital laboratory sessions for those who cannot attend in person;
 3. Two projects which are graded and count 1/2 each of the final grade;
 4. The course is offered as a FYS4411 (Master of Science level) and a FYS9411 (PhD level) course;
-5. Videos of teaching material are available via the links at https://www.uio.no/studier/emner/matnat/fys/FYS4411/v21/timeplan/index.html#FOR;
-6. Weekly emails with summary of activities will be mailed to all participants;
+5. Weekly emails with summary of activities will be mailed to all participants;
 
 ## Grading
 Grading scale: Grades are awarded on a scale from A to F, where A is the best grade and F is a fail. There are two projects which are graded and each project counts 1/2 of the final grade. The total score is thus the average from the two  projects.
