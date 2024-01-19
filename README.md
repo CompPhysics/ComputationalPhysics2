@@ -90,10 +90,14 @@ to form small project groups of 2-3 participants, if possible.
 * _Office hours_: *Anytime*! 
 
 
-##  Teaching Assistants Spring Semester 2022
-* _Name_:  Øyvind Sigmundson Schøyen, 
-* _Email_: oyvinssc@student.matnat.uio.no 	 
-* _Office_: Department of Physics, University of Oslo, Eastern wing, room FØ452
+##  Teaching Assistants Spring Semester 2024
+* _Name_:  Ruben Guevara, 
+* _Email_: ruben.guevara@fys.uio.no
+* _Name_:  Daniel Haas Lima Beccatini, 
+* _Email_: d.h.b.lima@fys.uio.no
+* _Name_:  Håkon Kvernmoen, 
+* _Email_: hakon.kvernmoen@fys.uio.no
+
 
 ## Practicalities
 
