@@ -224,7 +224,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week2-bs008.html#linking-with-standard-statistical-expressions-for-expectation-values" style="font-size: 80%;">Linking with standard statistical expressions for expectation values</a></li>
      <!-- navigation toc: --> <li><a href="._week2-bs009.html#the-local-energy" style="font-size: 80%;">The local energy</a></li>
      <!-- navigation toc: --> <li><a href="._week2-bs010.html#the-monte-carlo-algorithm" style="font-size: 80%;">The Monte Carlo algorithm</a></li>
-     <!-- navigation toc: --> <li><a href="#example-from-last-week-the-harmonic-oscillator-in-one-dimension-best-seen-with-jupyter-notebook" style="font-size: 80%;">Example from last week, the harmonic oscillator in one dimension (best seen with jupyter-notebook)</a></li>
+     <!-- navigation toc: --> <li><a href="._week2-bs011.html#example-from-last-week-the-harmonic-oscillator-in-one-dimension-best-seen-with-jupyter-notebook" style="font-size: 80%;">Example from last week, the harmonic oscillator in one dimension (best seen with jupyter-notebook)</a></li>
      <!-- navigation toc: --> <li><a href="._week2-bs012.html#why-markov-chains-brownian-motion-and-the-metropolis-algorithm" style="font-size: 80%;">Why Markov chains, Brownian motion and the Metropolis algorithm</a></li>
      <!-- navigation toc: --> <li><a href="._week2-bs013.html#brownian-motion-and-markov-processes" style="font-size: 80%;">Brownian motion and Markov processes</a></li>
      <!-- navigation toc: --> <li><a href="._week2-bs014.html#brownian-motion-and-markov-processes-ergodicity-and-detailed-balance" style="font-size: 80%;">Brownian motion and Markov processes, Ergodicity and Detailed balance</a></li>
@@ -262,7 +262,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week2-bs046.html#the-system-two-particles-fermions-normally-in-a-harmonic-oscillator-trap-in-two-dimensions" style="font-size: 80%;">The system: two particles (fermions normally) in a harmonic oscillator trap in two dimensions</a></li>
      <!-- navigation toc: --> <li><a href="._week2-bs047.html#separating-the-degrees-of-freedom" style="font-size: 80%;">Separating the degrees of freedom</a></li>
      <!-- navigation toc: --> <li><a href="._week2-bs048.html#variational-monte-carlo-code-best-seen-with-jupyter-notebook" style="font-size: 80%;">Variational Monte Carlo code (best seen with jupyter-notebook)</a></li>
-     <!-- navigation toc: --> <li><a href="._week2-bs049.html#first-code-attempt-for-the-two-electron-case" style="font-size: 80%;">First code attempt for the two-electron case</a></li>
+     <!-- navigation toc: --> <li><a href="#first-code-attempt-for-the-two-electron-case" style="font-size: 80%;">First code attempt for the two-electron case</a></li>
 
         </ul>
       </li>
@@ -272,41 +272,11 @@ MathJax.Hub.Config({
 </div> <!-- end of navigation bar -->
 <div class="container">
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
-<a name="part0011"></a>
+<a name="part0049"></a>
 <!-- !split -->
-<h2 id="example-from-last-week-the-harmonic-oscillator-in-one-dimension-best-seen-with-jupyter-notebook" class="anchor">Example from last week, the harmonic oscillator in one dimension (best seen with jupyter-notebook) </h2>
+<h2 id="first-code-attempt-for-the-two-electron-case" class="anchor">First code attempt for the two-electron case </h2>
 
-<p>We present here a well-known example, the harmonic oscillator in
-one dimension for one particle. This will also serve the aim of
-introducing our next model, namely that of interacting electrons in a
-harmonic oscillator trap.
-</p>
-
-<p>Here as well, we do have analytical solutions and the energy of the
-ground state, with \( \hbar=1 \), is \( 1/2\omega \), with \( \omega \) being the
-oscillator frequency. We use the following trial wave function
-</p>
-
-$$
-\psi_T(x;\alpha) = \exp{-(\frac{1}{2}\alpha^2x^2)},
-$$
-
-<p>which results in a local energy </p>
-$$
-\frac{1}{2}\left(\alpha^2+x^2(1-\alpha^4)\right).
-$$
-
-<p>We can compare our numerically calculated energies with the exact energy as function of \( \alpha \)</p>
-$$
-\overline{E}[\alpha] = \frac{1}{4}\left(\alpha^2+\frac{1}{\alpha^2}\right).
-$$
-
-<p>Similarly, with the above ansatz, we can also compute the exact variance which reads</p>
-$$
-\sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}.
-$$
-
-<p>Our code for computing the energy of the ground state of the harmonic oscillator follows here. We start by defining directories where we store various outputs.</p>
+<p>First, as with the hydrogen case, we declare where to store files.</p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
@@ -320,7 +290,7 @@ $$
 <span style="color: #408080; font-style: italic"># Where to save the figures and data files</span>
 PROJECT_ROOT_DIR <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;Results&quot;</span>
 FIGURE_ID <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;Results/FigureFiles&quot;</span>
-DATA_ID <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;Results/VMCHarmonic&quot;</span>
+DATA_ID <span style="color: #666666">=</span> <span style="color: #BA2121">&quot;Results/VMCQdotMetropolis&quot;</span>
 
 <span style="color: #008000; font-weight: bold">if</span> <span style="color: #AA22FF; font-weight: bold">not</span> os<span style="color: #666666">.</span>path<span style="color: #666666">.</span>exists(PROJECT_ROOT_DIR):
     os<span style="color: #666666">.</span>mkdir(PROJECT_ROOT_DIR)
@@ -340,7 +310,7 @@ DATA_ID <span style="color: #666666">=</span> <span style="color: #BA2121">&quot
 <span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">save_fig</span>(fig_id):
     plt<span style="color: #666666">.</span>savefig(image_path(fig_id) <span style="color: #666666">+</span> <span style="color: #BA2121">&quot;.png&quot;</span>, <span style="color: #008000">format</span><span style="color: #666666">=</span><span style="color: #BA2121">&#39;png&#39;</span>)
 
-outfile <span style="color: #666666">=</span> <span style="color: #008000">open</span>(data_path(<span style="color: #BA2121">&quot;VMCHarmonic.dat&quot;</span>),<span style="color: #BA2121">&#39;w&#39;</span>)
+outfile <span style="color: #666666">=</span> <span style="color: #008000">open</span>(data_path(<span style="color: #BA2121">&quot;VMCQdotMetropolis.dat&quot;</span>),<span style="color: #BA2121">&#39;w&#39;</span>)
 </pre>
 </div>
       </div>
@@ -356,7 +326,8 @@ outfile <span style="color: #666666">=</span> <span style="color: #008000">open<
   </div>
 </div>
 
-<p>We proceed with the implementation of the Monte Carlo algorithm but list first the ansatz for the wave function and the expression for the local energy</p>
+<p>Thereafter we set up the analytical expressions for the wave functions and the local energy</p>
+
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
@@ -364,20 +335,35 @@ outfile <span style="color: #666666">=</span> <span style="color: #008000">open<
     <div class="inner_cell">
       <div class="input_area">
         <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># VMC for the one-dimensional harmonic oscillator</span>
+  <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># 2-electron VMC for quantum dot system in two dimensions</span>
 <span style="color: #408080; font-style: italic"># Brute force Metropolis, no importance sampling and no energy minimization</span>
 <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">math</span> <span style="color: #008000; font-weight: bold">import</span> exp, sqrt
 <span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">random</span> <span style="color: #008000; font-weight: bold">import</span> random, seed
 <span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">numpy</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">np</span>
 <span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">matplotlib.pyplot</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">plt</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">decimal</span> <span style="color: #008000; font-weight: bold">import</span> <span style="color: #666666">*</span>
-<span style="color: #408080; font-style: italic"># Trial wave function for the Harmonic oscillator in one dimension</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">WaveFunction</span>(r,alpha):
-    <span style="color: #008000; font-weight: bold">return</span> exp(<span style="color: #666666">-0.5*</span>alpha<span style="color: #666666">*</span>alpha<span style="color: #666666">*</span>r<span style="color: #666666">*</span>r)
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">mpl_toolkits.mplot3d</span> <span style="color: #008000; font-weight: bold">import</span> Axes3D
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib</span> <span style="color: #008000; font-weight: bold">import</span> cm
+<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">matplotlib.ticker</span> <span style="color: #008000; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
+<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">sys</span>
 
-<span style="color: #408080; font-style: italic"># Local energy  for the Harmonic oscillator in one dimension</span>
-<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">LocalEnergy</span>(r,alpha):
-    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0.5*</span>r<span style="color: #666666">*</span>r<span style="color: #666666">*</span>(<span style="color: #666666">1-</span>alpha<span style="color: #666666">**4</span>) <span style="color: #666666">+</span> <span style="color: #666666">0.5*</span>alpha<span style="color: #666666">*</span>alpha
+
+<span style="color: #408080; font-style: italic"># Trial wave function for the 2-electron quantum dot in two dims</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">WaveFunction</span>(r,alpha,beta):
+    r1 <span style="color: #666666">=</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
+    r2 <span style="color: #666666">=</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>
+    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
+    deno <span style="color: #666666">=</span> r12<span style="color: #666666">/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
+    <span style="color: #008000; font-weight: bold">return</span> exp(<span style="color: #666666">-0.5*</span>alpha<span style="color: #666666">*</span>(r1<span style="color: #666666">+</span>r2)<span style="color: #666666">+</span>deno)
+
+<span style="color: #408080; font-style: italic"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
+<span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">LocalEnergy</span>(r,alpha,beta):
+    
+    r1 <span style="color: #666666">=</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
+    r2 <span style="color: #666666">=</span> (r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>]<span style="color: #666666">**2</span> <span style="color: #666666">+</span> r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>]<span style="color: #666666">**2</span>)
+    r12 <span style="color: #666666">=</span> sqrt((r[<span style="color: #666666">0</span>,<span style="color: #666666">0</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">0</span>])<span style="color: #666666">**2</span> <span style="color: #666666">+</span> (r[<span style="color: #666666">0</span>,<span style="color: #666666">1</span>]<span style="color: #666666">-</span>r[<span style="color: #666666">1</span>,<span style="color: #666666">1</span>])<span style="color: #666666">**2</span>)
+    deno <span style="color: #666666">=</span> <span style="color: #666666">1.0/</span>(<span style="color: #666666">1+</span>beta<span style="color: #666666">*</span>r12)
+    deno2 <span style="color: #666666">=</span> deno<span style="color: #666666">*</span>deno
+    <span style="color: #008000; font-weight: bold">return</span> <span style="color: #666666">0.5*</span>(<span style="color: #666666">1-</span>alpha<span style="color: #666666">*</span>alpha)<span style="color: #666666">*</span>(r1 <span style="color: #666666">+</span> r2) <span style="color: #666666">+2.0*</span>alpha <span style="color: #666666">+</span> <span style="color: #666666">1.0/</span>r12<span style="color: #666666">+</span>deno2<span style="color: #666666">*</span>(alpha<span style="color: #666666">*</span>r12<span style="color: #666666">-</span>deno2<span style="color: #666666">+2*</span>beta<span style="color: #666666">*</span>deno<span style="color: #666666">-1.0/</span>r12)
 </pre>
 </div>
       </div>
@@ -393,14 +379,7 @@ outfile <span style="color: #666666">=</span> <span style="color: #008000">open<
   </div>
 </div>
 
-<p>Note that in the Metropolis algorithm there is no need to compute the
-trial wave function, mainly since we are just taking the ratio of two
-exponentials. It is then from a computational point view, more
-convenient to compute the argument from the ratio and then calculate
-the exponential. Here we have refrained from this purely of
-pedagogical reasons.
-</p>
-
+<p>The Monte Carlo sampling without importance sampling is set up here.</p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
@@ -411,44 +390,56 @@ pedagogical reasons.
   <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic"># The Monte Carlo sampling with the Metropolis algo</span>
 <span style="color: #008000; font-weight: bold">def</span> <span style="color: #0000FF">MonteCarloSampling</span>():
 
-    NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">100000</span>
+    NumberMCcycles<span style="color: #666666">=</span> <span style="color: #666666">10000</span>
     StepSize <span style="color: #666666">=</span> <span style="color: #666666">1.0</span>
     <span style="color: #408080; font-style: italic"># positions</span>
-    PositionOld <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-    PositionNew <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+    PositionOld <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
+    PositionNew <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((NumberParticles,Dimension), np<span style="color: #666666">.</span>double)
 
     <span style="color: #408080; font-style: italic"># seed for rng generator</span>
     seed()
     <span style="color: #408080; font-style: italic"># start variational parameter</span>
-    alpha <span style="color: #666666">=</span> <span style="color: #666666">0.4</span>
+    alpha <span style="color: #666666">=</span> <span style="color: #666666">0.9</span>
     <span style="color: #008000; font-weight: bold">for</span> ia <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(MaxVariations):
-        alpha <span style="color: #666666">+=</span> <span style="color: #666666">.05</span>
+        alpha <span style="color: #666666">+=</span> <span style="color: #666666">.025</span>
         AlphaValues[ia] <span style="color: #666666">=</span> alpha
-        energy <span style="color: #666666">=</span> energy2 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
-        <span style="color: #408080; font-style: italic">#Initial position</span>
-        PositionOld <span style="color: #666666">=</span> StepSize <span style="color: #666666">*</span> (random() <span style="color: #666666">-</span> <span style="color: #666666">.5</span>)
-        wfold <span style="color: #666666">=</span> WaveFunction(PositionOld,alpha)
-        <span style="color: #408080; font-style: italic">#Loop over MC MCcycles</span>
-        <span style="color: #008000; font-weight: bold">for</span> MCcycle <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberMCcycles):
-            <span style="color: #408080; font-style: italic">#Trial position </span>
-            PositionNew <span style="color: #666666">=</span> PositionOld <span style="color: #666666">+</span> StepSize<span style="color: #666666">*</span>(random() <span style="color: #666666">-</span> <span style="color: #666666">.5</span>)
-            wfnew <span style="color: #666666">=</span> WaveFunction(PositionNew,alpha)
-            <span style="color: #408080; font-style: italic">#Metropolis test to see whether we accept the move</span>
-            <span style="color: #008000; font-weight: bold">if</span> random() <span style="color: #666666">&lt;=</span> wfnew<span style="color: #666666">**2</span> <span style="color: #666666">/</span> wfold<span style="color: #666666">**2</span>:
-                PositionOld <span style="color: #666666">=</span> PositionNew
-                wfold <span style="color: #666666">=</span> wfnew
-            DeltaE <span style="color: #666666">=</span> LocalEnergy(PositionOld,alpha)
-            energy <span style="color: #666666">+=</span> DeltaE
-            energy2 <span style="color: #666666">+=</span> DeltaE<span style="color: #666666">**2</span>
-        <span style="color: #408080; font-style: italic">#We calculate mean, variance and error</span>
-        energy <span style="color: #666666">/=</span> NumberMCcycles
-        energy2 <span style="color: #666666">/=</span> NumberMCcycles
-        variance <span style="color: #666666">=</span> energy2 <span style="color: #666666">-</span> energy<span style="color: #666666">**2</span>
-        error <span style="color: #666666">=</span> sqrt(variance<span style="color: #666666">/</span>NumberMCcycles)
-        Energies[ia] <span style="color: #666666">=</span> energy    
-        Variances[ia] <span style="color: #666666">=</span> variance    
-        outfile<span style="color: #666666">.</span>write(<span style="color: #BA2121">&#39;</span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&#39;</span> <span style="color: #666666">%</span>(alpha,energy,variance,error))
-    <span style="color: #008000; font-weight: bold">return</span> Energies, AlphaValues, Variances
+        beta <span style="color: #666666">=</span> <span style="color: #666666">0.2</span> 
+        <span style="color: #008000; font-weight: bold">for</span> jb <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(MaxVariations):
+            beta <span style="color: #666666">+=</span> <span style="color: #666666">.01</span>
+            BetaValues[jb] <span style="color: #666666">=</span> beta
+            energy <span style="color: #666666">=</span> energy2 <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+            DeltaE <span style="color: #666666">=</span> <span style="color: #666666">0.0</span>
+            <span style="color: #408080; font-style: italic">#Initial position</span>
+            <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
+                <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+                    PositionOld[i,j] <span style="color: #666666">=</span> StepSize <span style="color: #666666">*</span> (random() <span style="color: #666666">-</span> <span style="color: #666666">.5</span>)
+            wfold <span style="color: #666666">=</span> WaveFunction(PositionOld,alpha,beta)
+
+            <span style="color: #408080; font-style: italic">#Loop over MC MCcycles</span>
+            <span style="color: #008000; font-weight: bold">for</span> MCcycle <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberMCcycles):
+                <span style="color: #408080; font-style: italic">#Trial position moving one particle at the time</span>
+                <span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(NumberParticles):
+                    <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+                        PositionNew[i,j] <span style="color: #666666">=</span> PositionOld[i,j] <span style="color: #666666">+</span> StepSize <span style="color: #666666">*</span> (random() <span style="color: #666666">-</span> <span style="color: #666666">.5</span>)
+                    wfnew <span style="color: #666666">=</span> WaveFunction(PositionNew,alpha,beta)
+
+                    <span style="color: #408080; font-style: italic">#Metropolis test to see whether we accept the move</span>
+                    <span style="color: #008000; font-weight: bold">if</span> random() <span style="color: #666666">&lt;</span> wfnew<span style="color: #666666">**2</span> <span style="color: #666666">/</span> wfold<span style="color: #666666">**2</span>:
+                       <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(Dimension):
+                           PositionOld[i,j] <span style="color: #666666">=</span> PositionNew[i,j]
+                       wfold <span style="color: #666666">=</span> wfnew
+                DeltaE <span style="color: #666666">=</span> LocalEnergy(PositionOld,alpha,beta)
+                energy <span style="color: #666666">+=</span> DeltaE
+                energy2 <span style="color: #666666">+=</span> DeltaE<span style="color: #666666">**2</span>
+            <span style="color: #408080; font-style: italic">#We calculate mean, variance and error ...</span>
+            energy <span style="color: #666666">/=</span> NumberMCcycles
+            energy2 <span style="color: #666666">/=</span> NumberMCcycles
+            variance <span style="color: #666666">=</span> energy2 <span style="color: #666666">-</span> energy<span style="color: #666666">**2</span>
+            error <span style="color: #666666">=</span> sqrt(variance<span style="color: #666666">/</span>NumberMCcycles)
+            Energies[ia,jb] <span style="color: #666666">=</span> energy    
+            Variances[ia,jb] <span style="color: #666666">=</span> variance    
+            outfile<span style="color: #666666">.</span>write(<span style="color: #BA2121">&#39;</span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BA2121"> </span><span style="color: #BB6688; font-weight: bold">%f</span><span style="color: #BB6622; font-weight: bold">\n</span><span style="color: #BA2121">&#39;</span> <span style="color: #666666">%</span>(alpha,beta,energy,variance,error))
+    <span style="color: #008000; font-weight: bold">return</span> Energies, Variances, AlphaValues, BetaValues
 </pre>
 </div>
       </div>
@@ -464,7 +455,7 @@ pedagogical reasons.
   </div>
 </div>
 
-<p>Finally, the results are presented here with the exact energies and variances as well.</p>
+<p>And finally comes the main part with the plots as well.</p>
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
@@ -473,34 +464,35 @@ pedagogical reasons.
       <div class="input_area">
         <div class="highlight" style="background: #f8f8f8">
   <pre style="line-height: 125%;"><span style="color: #408080; font-style: italic">#Here starts the main program with variable declarations</span>
-MaxVariations <span style="color: #666666">=</span> <span style="color: #666666">20</span>
-Energies <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((MaxVariations))
-ExactEnergies <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((MaxVariations))
-ExactVariance <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((MaxVariations))
-Variances <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((MaxVariations))
+NumberParticles <span style="color: #666666">=</span> <span style="color: #666666">2</span>
+Dimension <span style="color: #666666">=</span> <span style="color: #666666">2</span>
+MaxVariations <span style="color: #666666">=</span> <span style="color: #666666">10</span>
+Energies <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((MaxVariations,MaxVariations))
+Variances <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((MaxVariations,MaxVariations))
 AlphaValues <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(MaxVariations)
-(Energies, AlphaValues, Variances) <span style="color: #666666">=</span> MonteCarloSampling()
+BetaValues <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros(MaxVariations)
+(Energies, Variances, AlphaValues, BetaValues) <span style="color: #666666">=</span> MonteCarloSampling()
 outfile<span style="color: #666666">.</span>close()
-ExactEnergies <span style="color: #666666">=</span> <span style="color: #666666">0.25*</span>(AlphaValues<span style="color: #666666">*</span>AlphaValues<span style="color: #666666">+1.0/</span>(AlphaValues<span style="color: #666666">*</span>AlphaValues))
-ExactVariance <span style="color: #666666">=</span> <span style="color: #666666">0.25*</span>(<span style="color: #666666">1.0+</span>((<span style="color: #666666">1.0-</span>AlphaValues<span style="color: #666666">**4</span>)<span style="color: #666666">**2</span>)<span style="color: #666666">*3.0/</span>(<span style="color: #666666">4*</span>(AlphaValues<span style="color: #666666">**4</span>)))<span style="color: #666666">-</span>ExactEnergies<span style="color: #666666">*</span>ExactEnergies
 
-<span style="color: #408080; font-style: italic">#simple subplot</span>
-plt<span style="color: #666666">.</span>subplot(<span style="color: #666666">2</span>, <span style="color: #666666">1</span>, <span style="color: #666666">1</span>)
-plt<span style="color: #666666">.</span>plot(AlphaValues, Energies, <span style="color: #BA2121">&#39;o-&#39;</span>,AlphaValues, ExactEnergies,<span style="color: #BA2121">&#39;r-&#39;</span>)
-plt<span style="color: #666666">.</span>title(<span style="color: #BA2121">&#39;Energy and variance&#39;</span>)
-plt<span style="color: #666666">.</span>ylabel(<span style="color: #BA2121">&#39;Dimensionless energy&#39;</span>)
-plt<span style="color: #666666">.</span>subplot(<span style="color: #666666">2</span>, <span style="color: #666666">1</span>, <span style="color: #666666">2</span>)
-plt<span style="color: #666666">.</span>plot(AlphaValues, Variances, <span style="color: #BA2121">&#39;.-&#39;</span>,AlphaValues, ExactVariance,<span style="color: #BA2121">&#39;r-&#39;</span>)
-plt<span style="color: #666666">.</span>xlabel(<span style="color: #BA2121">r&#39;$\alpha$&#39;</span>, fontsize<span style="color: #666666">=15</span>)
-plt<span style="color: #666666">.</span>ylabel(<span style="color: #BA2121">&#39;Variance&#39;</span>)
-save_fig(<span style="color: #BA2121">&quot;VMCHarmonic&quot;</span>)
+<span style="color: #408080; font-style: italic"># Prepare for plots</span>
+fig <span style="color: #666666">=</span> plt<span style="color: #666666">.</span>figure()
+ax <span style="color: #666666">=</span> fig<span style="color: #666666">.</span>gca(projection<span style="color: #666666">=</span><span style="color: #BA2121">&#39;3d&#39;</span>)
+<span style="color: #408080; font-style: italic"># Plot the surface.</span>
+X, Y <span style="color: #666666">=</span> np<span style="color: #666666">.</span>meshgrid(AlphaValues, BetaValues)
+surf <span style="color: #666666">=</span> ax<span style="color: #666666">.</span>plot_surface(X, Y, Energies,cmap<span style="color: #666666">=</span>cm<span style="color: #666666">.</span>coolwarm,linewidth<span style="color: #666666">=0</span>, antialiased<span style="color: #666666">=</span><span style="color: #008000; font-weight: bold">False</span>)
+<span style="color: #408080; font-style: italic"># Customize the z axis.</span>
+zmin <span style="color: #666666">=</span> np<span style="color: #666666">.</span>matrix(Energies)<span style="color: #666666">.</span>min()
+zmax <span style="color: #666666">=</span> np<span style="color: #666666">.</span>matrix(Energies)<span style="color: #666666">.</span>max()
+ax<span style="color: #666666">.</span>set_zlim(zmin, zmax)
+ax<span style="color: #666666">.</span>set_xlabel(<span style="color: #BA2121">r&#39;$\alpha$&#39;</span>)
+ax<span style="color: #666666">.</span>set_ylabel(<span style="color: #BA2121">r&#39;$\beta$&#39;</span>)
+ax<span style="color: #666666">.</span>set_zlabel(<span style="color: #BA2121">r&#39;$\langle E \rangle$&#39;</span>)
+ax<span style="color: #666666">.</span>zaxis<span style="color: #666666">.</span>set_major_locator(LinearLocator(<span style="color: #666666">10</span>))
+ax<span style="color: #666666">.</span>zaxis<span style="color: #666666">.</span>set_major_formatter(FormatStrFormatter(<span style="color: #BA2121">&#39;</span><span style="color: #BB6688; font-weight: bold">%.02f</span><span style="color: #BA2121">&#39;</span>))
+<span style="color: #408080; font-style: italic"># Add a color bar which maps values to colors.</span>
+fig<span style="color: #666666">.</span>colorbar(surf, shrink<span style="color: #666666">=0.5</span>, aspect<span style="color: #666666">=5</span>)
+save_fig(<span style="color: #BA2121">&quot;QdotMetropolis&quot;</span>)
 plt<span style="color: #666666">.</span>show()
-<span style="color: #408080; font-style: italic">#nice printout with Pandas</span>
-<span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">pandas</span> <span style="color: #008000; font-weight: bold">as</span> <span style="color: #0000FF; font-weight: bold">pd</span>
-<span style="color: #008000; font-weight: bold">from</span> <span style="color: #0000FF; font-weight: bold">pandas</span> <span style="color: #008000; font-weight: bold">import</span> DataFrame
-data <span style="color: #666666">=</span>{<span style="color: #BA2121">&#39;Alpha&#39;</span>:AlphaValues, <span style="color: #BA2121">&#39;Energy&#39;</span>:Energies,<span style="color: #BA2121">&#39;Exact Energy&#39;</span>:ExactEnergies,<span style="color: #BA2121">&#39;Variance&#39;</span>:Variances,<span style="color: #BA2121">&#39;Exact Variance&#39;</span>:ExactVariance,}
-frame <span style="color: #666666">=</span> pd<span style="color: #666666">.</span>DataFrame(data)
-<span style="color: #008000">print</span>(frame)
 </pre>
 </div>
       </div>
@@ -516,61 +508,22 @@ frame <span style="color: #666666">=</span> pd<span style="color: #666666">.</sp
   </div>
 </div>
 
-<p>For \( \alpha=1 \) we have the exact eigenpairs, as can be deduced from the
-table here. With \( \omega=1 \), the exact energy is \( 1/2 \) a.u. with zero
-variance, as it should. We see also that our computed variance follows rather well the exact variance.
-Increasing the number of Monte Carlo cycles will improve our statistics (try to increase the number of Monte Carlo cycles).
-</p>
-
-<p>The fact that the variance is exactly equal to zero when \( \alpha=1 \) is that 
-we then have the exact wave function, and the action of the hamiltionan
-on the wave function
-</p>
-$$
-   H\psi = \mathrm{constant}\times \psi,
-$$
-
-<p>yields just a constant. The integral which defines various 
-expectation values involving moments of the hamiltonian becomes then
-</p>
-$$
-   \langle H^n \rangle =
-   \frac{\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})H^n(\boldsymbol{R})\Psi_T(\boldsymbol{R})}
-        {\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})\Psi_T(\boldsymbol{R})}=
-\mathrm{constant}\times\frac{\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})\Psi_T(\boldsymbol{R})}
-        {\int d\boldsymbol{R}\Psi^{\ast}_T(\boldsymbol{R})\Psi_T(\boldsymbol{R})}=\mathrm{constant}.
-$$
-
-<b>This gives an important information: the exact wave function leads to zero variance!</b>
-<p>As we will see below, many practitioners perform a minimization on both the energy and the variance.</p>
 
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-<li><a href="._week2-bs010.html">&laquo;</a></li>
+<li><a href="._week2-bs048.html">&laquo;</a></li>
   <li><a href="._week2-bs000.html">1</a></li>
   <li><a href="">...</a></li>
-  <li><a href="._week2-bs003.html">4</a></li>
-  <li><a href="._week2-bs004.html">5</a></li>
-  <li><a href="._week2-bs005.html">6</a></li>
-  <li><a href="._week2-bs006.html">7</a></li>
-  <li><a href="._week2-bs007.html">8</a></li>
-  <li><a href="._week2-bs008.html">9</a></li>
-  <li><a href="._week2-bs009.html">10</a></li>
-  <li><a href="._week2-bs010.html">11</a></li>
-  <li class="active"><a href="._week2-bs011.html">12</a></li>
-  <li><a href="._week2-bs012.html">13</a></li>
-  <li><a href="._week2-bs013.html">14</a></li>
-  <li><a href="._week2-bs014.html">15</a></li>
-  <li><a href="._week2-bs015.html">16</a></li>
-  <li><a href="._week2-bs016.html">17</a></li>
-  <li><a href="._week2-bs017.html">18</a></li>
-  <li><a href="._week2-bs018.html">19</a></li>
-  <li><a href="._week2-bs019.html">20</a></li>
-  <li><a href="._week2-bs020.html">21</a></li>
-  <li><a href="">...</a></li>
-  <li><a href="._week2-bs049.html">50</a></li>
-  <li><a href="._week2-bs012.html">&raquo;</a></li>
+  <li><a href="._week2-bs041.html">42</a></li>
+  <li><a href="._week2-bs042.html">43</a></li>
+  <li><a href="._week2-bs043.html">44</a></li>
+  <li><a href="._week2-bs044.html">45</a></li>
+  <li><a href="._week2-bs045.html">46</a></li>
+  <li><a href="._week2-bs046.html">47</a></li>
+  <li><a href="._week2-bs047.html">48</a></li>
+  <li><a href="._week2-bs048.html">49</a></li>
+  <li class="active"><a href="._week2-bs049.html">50</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 </div>  <!-- end container -->

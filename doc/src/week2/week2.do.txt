@@ -12,9 +12,9 @@ DATE: January 26
 
 
 !bblock Teaching Material, videos and written material
+* These notes
 * "Video of lecture tba":"https://www.youtube.com/"
 * "Handwritten note tba":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2024/NotesJanuary26.pdf"
-* See also "Lectures from FYS3150/4150 on the Metropolis Algorithm":"http://compphysics.github.io/ComputationalPhysics/doc/pub/rw/html/rw-bs.html"
 !eblock
 
 
@@ -721,6 +721,44 @@ time steps. After  twelve iterations we have reached the exact value with six le
 Write a small code which diagonalized the matrix $\bm{W}$ and find the eigenpairs anc ompare the coefficients $w_i$.
 _Note:_ You may need to normalize the eigenvectors from the diagonalization procedure. What is the largest eigenvalue?
 
+
+!split
+===== Solution =====
+!bc pycod
+from  matplotlib import pyplot as plt
+import numpy as np
+
+# Define dimension of matrix and vectors
+Dim = 4
+#Setting up a transition probability matrix
+TransitionMatrix = np.matrix('0.25 0.1111 0.375 0.3333; 0.5 0.2222 0.0 0.3333; 0.0 0.1111 0.375 0.0; 0.25 0.5556 0.25 0.3334')
+# Making a copy of the transition matrix
+W = TransitionMatrix
+print(W)
+# our first state
+wold = np.zeros(Dim)
+wold[0] = 1.0
+wnew = np.zeros(Dim)
+
+# diagonalize and obtain eigenvalues, not necessarily sorted
+EigValues, EigVectors = np.linalg.eig(TransitionMatrix)
+# sort eigenvectors and eigenvalues
+permute = EigValues.argsort()
+EigValues = EigValues[permute]
+EigVectors = EigVectors[:,permute]
+for i in range(Dim):
+    print(EigValues[i])
+
+
+count = 0
+while count < 20:
+      for i in range(Dim):
+          wnew[i] = W[i,:] @ wold
+      count = count + 1
+      print(count, wnew)
+      wold = wnew
+
+!ec
 
 !split
 ===== An Illustrative Example, what does it mean? =====

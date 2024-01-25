@@ -148,6 +148,7 @@ div.toc p,a {
                None,
                'an-illustrative-example-iterative-steps'),
               ('Small exercise', 2, None, 'small-exercise'),
+              ('Solution', 2, None, 'solution'),
               ('An Illustrative Example, what does it mean?',
                2,
                None,
@@ -263,9 +264,9 @@ MathJax.Hub.Config({
 <b>Teaching Material, videos and written material</b>
 <p>
 <ul>
+<li> These notes</li>
 <li> <a href="https://www.youtube.com/" target="_blank">Video of lecture tba</a></li>
 <li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2024/NotesJanuary26.pdf" target="_blank">Handwritten note tba</a></li>
-<li> See also <a href="http://compphysics.github.io/ComputationalPhysics/doc/pub/rw/html/rw-bs.html" target="_blank">Lectures from FYS3150/4150 on the Metropolis Algorithm</a></li>
 </ul>
 </div>
 
@@ -1114,6 +1115,63 @@ time steps. After  twelve iterations we have reached the exact value with six le
 <p>Write a small code which diagonalized the matrix \( \boldsymbol{W} \) and find the eigenpairs anc ompare the coefficients \( w_i \).
 <b>Note:</b> You may need to normalize the eigenvectors from the diagonalization procedure. What is the largest eigenvalue?
 </p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="solution">Solution </h2>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="line-height: 125%;"><span style="color: #8B008B; font-weight: bold">from</span>  <span style="color: #008b45; text-decoration: underline">matplotlib</span> <span style="color: #8B008B; font-weight: bold">import</span> pyplot <span style="color: #8B008B; font-weight: bold">as</span> plt
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+
+<span style="color: #228B22"># Define dimension of matrix and vectors</span>
+Dim = <span style="color: #B452CD">4</span>
+<span style="color: #228B22">#Setting up a transition probability matrix</span>
+TransitionMatrix = np.matrix(<span style="color: #CD5555">&#39;0.25 0.1111 0.375 0.3333; 0.5 0.2222 0.0 0.3333; 0.0 0.1111 0.375 0.0; 0.25 0.5556 0.25 0.3334&#39;</span>)
+<span style="color: #228B22"># Making a copy of the transition matrix</span>
+W = TransitionMatrix
+<span style="color: #658b00">print</span>(W)
+<span style="color: #228B22"># our first state</span>
+wold = np.zeros(Dim)
+wold[<span style="color: #B452CD">0</span>] = <span style="color: #B452CD">1.0</span>
+wnew = np.zeros(Dim)
+
+<span style="color: #228B22"># diagonalize and obtain eigenvalues, not necessarily sorted</span>
+EigValues, EigVectors = np.linalg.eig(TransitionMatrix)
+<span style="color: #228B22"># sort eigenvectors and eigenvalues</span>
+permute = EigValues.argsort()
+EigValues = EigValues[permute]
+EigVectors = EigVectors[:,permute]
+<span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dim):
+    <span style="color: #658b00">print</span>(EigValues[i])
+
+
+count = <span style="color: #B452CD">0</span>
+<span style="color: #8B008B; font-weight: bold">while</span> count &lt; <span style="color: #B452CD">20</span>:
+      <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dim):
+          wnew[i] = W[i,:] @ wold
+      count = count + <span style="color: #B452CD">1</span>
+      <span style="color: #658b00">print</span>(count, wnew)
+      wold = wnew
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="an-illustrative-example-what-does-it-mean">An Illustrative Example, what does it mean? </h2>
