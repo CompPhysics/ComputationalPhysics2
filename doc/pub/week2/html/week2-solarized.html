@@ -71,7 +71,6 @@ div.toc p,a {
                2,
                None,
                'code-templates-for-first-project'),
-              ('Setting up a VMC code', 2, None, 'setting-up-a-vmc-code'),
               ('Basic Quantum Monte Carlo, repetition from last week',
                2,
                None,
@@ -80,7 +79,12 @@ div.toc p,a {
                2,
                None,
                'multi-dimensional-integrals'),
+              ('Trail functions', 2, None, 'trail-functions'),
               ('Variational principle', 2, None, 'variational-principle'),
+              ('Tedious parts of VMC calculations',
+               2,
+               None,
+               'tedious-parts-of-vmc-calculations'),
               ("Bird's eye view  on Variational MC",
                2,
                None,
@@ -143,20 +147,16 @@ div.toc p,a {
                2,
                None,
                'an-illustrative-example-the-steady-state'),
-              ('An Illustrative Example, iterative steps',
+              ('Code for the iterative process',
                2,
                None,
-               'an-illustrative-example-iterative-steps'),
+               'code-for-the-iterative-process'),
               ('Small exercise', 2, None, 'small-exercise'),
-              ('Solution', 2, None, 'solution'),
-              ('An Illustrative Example, what does it mean?',
+              ('What do the results mean?',
                2,
                None,
-               'an-illustrative-example-what-does-it-mean'),
-              ('An Illustrative Example, understanding the basics',
-               2,
-               None,
-               'an-illustrative-example-understanding-the-basics'),
+               'what-do-the-results-mean'),
+              ('Understanding the basics', 2, None, 'understanding-the-basics'),
               ('Basics of the Metropolis Algorithm',
                2,
                None,
@@ -254,6 +254,7 @@ MathJax.Hub.Config({
 <b>Topics</b>
 <p>
 <ul>
+<li> Repetition from last week and links to code templates in python and C++</li>
 <li> Essential ingredients: Variational Monte Carlo methods, Metropolis Algorithm, statistics and Markov Chain theory</li>
 <li> How to structure the VMC code</li>
 </ul>
@@ -278,15 +279,6 @@ MathJax.Hub.Config({
 <li> <a href="https://github.com/mortele/variational-monte-carlo-fys4411" target="_blank">The C++ template</a></li>
 <li> <a href="https://github.com/Daniel-Haas-B/FYS4411-Template" target="_blank">The python template, using JAX</a></li>
 </ol>
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="setting-up-a-vmc-code">Setting up a VMC code </h2>
-
-<p>In setting up a C++ or Python code for variational Monte Carlo calculations, we will use an excellent framework developed by a former Computational Physics student, Morten Ledum, now PhD student at the Hylleraas center for Quantum Chemistry.
-The GitHub repository is at <a href="https://github.com/mortele/variational-monte-carlo-fys4411" target="_blank"><tt>https://github.com/mortele/variational-monte-carlo-fys4411</tt></a>.
-</p>
-
-<p>We will discuss this both in our forthcoming lectures and during our lab sessions.</p>
-
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="basic-quantum-monte-carlo-repetition-from-last-week">Basic Quantum Monte Carlo, repetition from last week  </h2>
 
@@ -315,6 +307,9 @@ computation of the energy of a many-body system.
 </p>
 
 <p>Here we have defined the vector \( \boldsymbol{R} = [\boldsymbol{r}_1,\boldsymbol{r}_2,\dots,\boldsymbol{r}_n] \)  as an array that contains the positions of all particles \( n \) while the vector \( \boldsymbol{\alpha} = [\alpha_1,\alpha_2,\dots,\alpha_m] \) contains the variational parameters of the model, \( m \) in total. </p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="trail-functions">Trail functions </h2>
 
 <p>The trial wave function can be expanded in the eigenstates \( \Psi_i(\boldsymbol{R}) \) 
 of the hamiltonian since they form a complete set, viz.,
@@ -346,6 +341,9 @@ The hope is then that those regions of configurations space where
 the wave function assumes appreciable values are sampled more 
 efficiently. 
 </p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="tedious-parts-of-vmc-calculations">Tedious parts of VMC calculations </h2>
 
 <p>The tedious part in a VMC calculation is the search for the variational
 minimum. A good knowledge of the system is required in order to carry out
@@ -755,6 +753,8 @@ simulations and the understanding of it rests within
 the interpretation of random walks and Markov processes.
 </p>
 
+<p>For a proof the ergodic theorem see <a href="https://www.pnas.org/doi/10.1073/pnas.17.2.656" target="_blank"><tt>https://www.pnas.org/doi/10.1073/pnas.17.2.656</tt></a>.</p>
+
 <!-- !split  -->
 <h2 id="brownian-motion-and-markov-processes-jargon">Brownian motion and Markov processes, jargon </h2>
 
@@ -1076,48 +1076,7 @@ $$
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="an-illustrative-example-iterative-steps">An Illustrative Example, iterative steps </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-
-<p>The table here  demonstrates the convergence as a function of the number of iterations or
-time steps. After  twelve iterations we have reached the exact value with six leading digits. 
-</p>
-
-<table class="dotable" border="1">
-<thead>
-<tr><th align="center">       Iteration       </th> <td align="center">\( w_1 \)</td> <td align="center">\( w_2 \)</td> <td align="center">\( w_3 \)</td> <td align="center">\( w_4 \)</td> </tr>
-</thead>
-<tbody>
-<tr><td align="right">   0                          </td> <td align="left">   1.000000     </td> <td align="left">   0.000000     </td> <td align="left">   0.000000     </td> <td align="left">   0.000000     </td> </tr>
-<tr><td align="right">   1                          </td> <td align="left">   0.250000     </td> <td align="left">   0.500000     </td> <td align="left">   0.000000     </td> <td align="left">   0.250000     </td> </tr>
-<tr><td align="right">   2                          </td> <td align="left">   0.201389     </td> <td align="left">   0.319444     </td> <td align="left">   0.055556     </td> <td align="left">   0.423611     </td> </tr>
-<tr><td align="right">   3                          </td> <td align="left">   0.247878     </td> <td align="left">   0.312886     </td> <td align="left">   0.056327     </td> <td align="left">   0.382909     </td> </tr>
-<tr><td align="right">   4                          </td> <td align="left">   0.245494     </td> <td align="left">   0.321106     </td> <td align="left">   0.055888     </td> <td align="left">   0.377513     </td> </tr>
-<tr><td align="right">   5                          </td> <td align="left">   0.243847     </td> <td align="left">   0.319941     </td> <td align="left">   0.056636     </td> <td align="left">   0.379575     </td> </tr>
-<tr><td align="right">   6                          </td> <td align="left">   0.244274     </td> <td align="left">   0.319547     </td> <td align="left">   0.056788     </td> <td align="left">   0.379391     </td> </tr>
-<tr><td align="right">   7                          </td> <td align="left">   0.244333     </td> <td align="left">   0.319611     </td> <td align="left">   0.056801     </td> <td align="left">   0.379255     </td> </tr>
-<tr><td align="right">   8                          </td> <td align="left">   0.244314     </td> <td align="left">   0.319610     </td> <td align="left">   0.056813     </td> <td align="left">   0.379264     </td> </tr>
-<tr><td align="right">   9                          </td> <td align="left">   0.244317     </td> <td align="left">   0.319603     </td> <td align="left">   0.056817     </td> <td align="left">   0.379264     </td> </tr>
-<tr><td align="right">   10                         </td> <td align="left">   0.244318     </td> <td align="left">   0.319602     </td> <td align="left">   0.056818     </td> <td align="left">   0.379262     </td> </tr>
-<tr><td align="right">   11                         </td> <td align="left">   0.244318     </td> <td align="left">   0.319602     </td> <td align="left">   0.056818     </td> <td align="left">   0.379261     </td> </tr>
-<tr><td align="right">   12                         </td> <td align="left">   0.244318     </td> <td align="left">   0.319602     </td> <td align="left">   0.056818     </td> <td align="left">   0.379261     </td> </tr>
-<tr><td align="right">   \( \hat{w}(t=\infty) \)    </td> <td align="left">   0.244318     </td> <td align="left">   0.319602     </td> <td align="left">   0.056818     </td> <td align="left">   0.379261     </td> </tr>
-</tbody>
-</table>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="small-exercise">Small exercise </h2>
-
-<p>Write a small code which diagonalized the matrix \( \boldsymbol{W} \) and find the eigenpairs anc ompare the coefficients \( w_i \).
-<b>Note:</b> You may need to normalize the eigenvectors from the diagonalization procedure. What is the largest eigenvalue?
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="solution">Solution </h2>
+<h2 id="code-for-the-iterative-process">Code for the iterative process </h2>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
 <div class="cell border-box-sizing code_cell rendered">
@@ -1172,12 +1131,15 @@ count = <span style="color: #B452CD">0</span>
   </div>
 </div>
 
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="small-exercise">Small exercise </h2>
+
+<p>Write a small code which diagonalized the matrix \( \boldsymbol{W} \) and find the eigenpairs anc ompare the coefficients \( w_i \).
+<b>Note:</b> You may need to normalize the eigenvectors from the diagonalization procedure. What is the largest eigenvalue?
+</p>
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="an-illustrative-example-what-does-it-mean">An Illustrative Example, what does it mean? </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+<h2 id="what-do-the-results-mean">What do the results mean? </h2>
 
 <p>We have after \( t \)-steps</p>
 
@@ -1190,14 +1152,9 @@ $$
 <p>with \( \hat{w}(0) \) the distribution at \( t=0 \) and \( \hat{W} \) representing the 
 transition probability matrix. 
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="an-illustrative-example-understanding-the-basics">An Illustrative Example, understanding the basics </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+<h2 id="understanding-the-basics">Understanding the basics </h2>
 
 <p>We can always expand \( \hat{w}(0) \) in terms of the right eigenvectors 
 \( \hat{v} \) of \( \hat{W} \) as
@@ -1226,16 +1183,12 @@ the eigenvector \( \hat{v}_i \).
 \( \hat{w}(t) \) becomes proportional to the corresponding eigenvector 
 \( \hat{v}_0 \). This is our steady state or final distribution. 
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="basics-of-the-metropolis-algorithm">Basics of the Metropolis Algorithm </h2>
 
-<p>The Metropolis et al.
-algorithm was invented by Metropolis et al.
-and is often simply called the Metropolis algorithm.
-It is a method to sample a normalized probability
+<p>The Metropolis
+algorithm is a method to sample a normalized probability
 distribution by a stochastic process. We define \( {\cal w}_i^{(n)} \) to
 be the probability for finding the system in the state \( i \) at step \( n \).
 </p>
@@ -1338,6 +1291,7 @@ $$
 \end{equation}
 $$
 
+<p>This is the <a href="https://cims.nyu.edu/~holmes/teaching/asa19/handout_Lecture3_2019.pdf" target="_blank">detailed balance requirement</a></p>
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="more-on-detailed-balance">More on Detailed Balance </h2>

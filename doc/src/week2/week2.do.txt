@@ -6,6 +6,7 @@ DATE: January 26
 !split
 ===== Overview of week 4, January 22-26 =====
 !bblock  Topics
+* Repetition from last week and links to code templates in python and C++
 * Essential ingredients: Variational Monte Carlo methods, Metropolis Algorithm, statistics and Markov Chain theory
 * How to structure the VMC code
 !eblock
@@ -24,13 +25,6 @@ DATE: January 26
 o "The C++ template":"https://github.com/mortele/variational-monte-carlo-fys4411"
 o "The python template, using JAX":"https://github.com/Daniel-Haas-B/FYS4411-Template"
 
-!split
-=====  Setting up a VMC code =====
-
-In setting up a C++ or Python code for variational Monte Carlo calculations, we will use an excellent framework developed by a former Computational Physics student, Morten Ledum, now PhD student at the Hylleraas center for Quantum Chemistry.
-The GitHub repository is at URL:"https://github.com/mortele/variational-monte-carlo-fys4411".
-
-We will discuss this both in our forthcoming lectures and during our lab sessions.
 
 
 !split
@@ -61,6 +55,10 @@ methods such as Gauss-Legendre quadrature will not be adequate for say the
 computation of the energy of a many-body system.
 
 Here we have defined the vector $\bm{R} = [\bm{r}_1,\bm{r}_2,\dots,\bm{r}_n]$  as an array that contains the positions of all particles $n$ while the vector $\bm{\alpha} = [\alpha_1,\alpha_2,\dots,\alpha_m]$ contains the variational parameters of the model, $m$ in total. 
+
+
+!split
+===== Trail functions =====
 
 The trial wave function can be expanded in the eigenstates $\Psi_i(\bm{R})$ 
 of the hamiltonian since they form a complete set, viz.,
@@ -95,6 +93,10 @@ may be  a more efficient way of obtaining the ground state energy.
 The hope is then that those regions of configurations space where
 the wave function assumes appreciable values are sampled more 
 efficiently. 
+
+
+!split
+===== Tedious parts of VMC calculations =====
 
 The tedious part in a VMC calculation is the search for the variational
 minimum. A good knowledge of the system is required in order to carry out
@@ -420,6 +422,8 @@ The Metropolis algorithm is widely used in Monte Carlo
 simulations and the understanding of it rests within
 the interpretation of random walks and Markov processes.
 
+For a proof the ergodic theorem see URL:"https://www.pnas.org/doi/10.1073/pnas.17.2.656".
+
 !split 
 ===== Brownian motion and Markov processes, jargon =====
 
@@ -687,43 +691,11 @@ yielding as solution
 !et
 !eblock
 
-!split
-===== An Illustrative Example, iterative steps =====
-!bblock
 
-The table here  demonstrates the convergence as a function of the number of iterations or
-time steps. After  twelve iterations we have reached the exact value with six leading digits. 
-
-|-------------------------------------------------------------------------------------------------------------|
-| Iteration           | $w_1$               | $w_2$               | $w_3$               | $w_4$               |
-|---------r--------------------l--------------------l--------------------l--------------------l---------------|
-| 0                   | 1.000000            | 0.000000            | 0.000000            | 0.000000            |
-| 1                   | 0.250000            | 0.500000            | 0.000000            | 0.250000            |
-| 2                   | 0.201389            | 0.319444            | 0.055556            | 0.423611            |
-| 3                   | 0.247878            | 0.312886            | 0.056327            | 0.382909            |
-| 4                   | 0.245494            | 0.321106            | 0.055888            | 0.377513            |
-| 5                   | 0.243847            | 0.319941            | 0.056636            | 0.379575            |
-| 6                   | 0.244274            | 0.319547            | 0.056788            | 0.379391            |
-| 7                   | 0.244333            | 0.319611            | 0.056801            | 0.379255            |
-| 8                   | 0.244314            | 0.319610            | 0.056813            | 0.379264            |
-| 9                   | 0.244317            | 0.319603            | 0.056817            | 0.379264            |
-| 10                  | 0.244318            | 0.319602            | 0.056818            | 0.379262            |
-| 11                  | 0.244318            | 0.319602            | 0.056818            | 0.379261            |
-| 12                  | 0.244318            | 0.319602            | 0.056818            | 0.379261            |
-| $\hat{w}(t=\infty)$ | 0.244318            | 0.319602            | 0.056818            | 0.379261            |
-|-------------------------------------------------------------------------------------------------------------|
-
-!eblock
-
-!split
-===== Small exercise =====
-
-Write a small code which diagonalized the matrix $\bm{W}$ and find the eigenpairs anc ompare the coefficients $w_i$.
-_Note:_ You may need to normalize the eigenvectors from the diagonalization procedure. What is the largest eigenvalue?
 
 
 !split
-===== Solution =====
+===== Code for the iterative process =====
 !bc pycod
 from  matplotlib import pyplot as plt
 import numpy as np
@@ -759,10 +731,16 @@ while count < 20:
       wold = wnew
 
 !ec
+!split
+===== Small exercise =====
+
+Write a small code which diagonalized the matrix $\bm{W}$ and find the eigenpairs anc ompare the coefficients $w_i$.
+_Note:_ You may need to normalize the eigenvectors from the diagonalization procedure. What is the largest eigenvalue?
+
 
 !split
-===== An Illustrative Example, what does it mean? =====
-!bblock
+===== What do the results mean? =====
+
 
 We have after $t$-steps
 
@@ -774,11 +752,11 @@ We have after $t$-steps
 with $\hat{w}(0)$ the distribution at $t=0$ and $\hat{W}$ representing the 
 transition probability matrix. 
 
-!eblock
+
 
 !split
-===== An Illustrative Example, understanding the basics =====
-!bblock
+===== Understanding the basics =====
+
 
 We can always expand $\hat{w}(0)$ in terms of the right eigenvectors 
 $\hat{v}$ of $\hat{W}$ as
@@ -803,7 +781,6 @@ If we assume that $\lambda_0$ is the largest eigenvector we see that in the limi
 $\hat{w}(t)$ becomes proportional to the corresponding eigenvector 
 $\hat{v}_0$. This is our steady state or final distribution. 
 
-!eblock
 
 
 
@@ -812,10 +789,8 @@ $\hat{v}_0$. This is our steady state or final distribution.
 ===== Basics of the Metropolis Algorithm =====
 
 
-The Metropolis et al.
-algorithm was invented by Metropolis et al.
-and is often simply called the Metropolis algorithm.
-It is a method to sample a normalized probability
+The Metropolis
+algorithm is a method to sample a normalized probability
 distribution by a stochastic process. We define ${\cal w}_i^{(n)}$ to
 be the probability for finding the system in the state $i$ at step $n$.
 
@@ -908,6 +883,8 @@ to determine the acceptance probabilities. Rearranging, the result is
 = \frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}} \,.
 \end{equation}
 !et
+
+This is the "detailed balance requirement":"https://cims.nyu.edu/~holmes/teaching/asa19/handout_Lecture3_2019.pdf"
 
 !split
 ===== More on Detailed Balance =====
