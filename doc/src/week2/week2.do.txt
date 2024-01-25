@@ -13,7 +13,7 @@ DATE: January 26
 
 !bblock Teaching Material, videos and written material
 * "Video of lecture tba":"https://www.youtube.com/"
-* "Handwritten note tbas":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2024/NotesJanuary26.pdf"
+* "Handwritten note tba":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2024/NotesJanuary26.pdf"
 * See also "Lectures from FYS3150/4150 on the Metropolis Algorithm":"http://compphysics.github.io/ComputationalPhysics/doc/pub/rw/html/rw-bs.html"
 !eblock
 
@@ -33,47 +33,8 @@ The GitHub repository is at URL:"https://github.com/mortele/variational-monte-ca
 We will discuss this both in our forthcoming lectures and during our lab sessions.
 
 
-
-===== Introduction =====
-
-In this notebook the aim is to give you an introduction as well as an
-understanding of the basic elements that are needed in order to
-develop a professional variational Monte Carlo code. We will focus on
-a simple system of two particles in an oscillator trap (or
-alternatively two fermions moving in a Coulombic potential). The particles can
-interact via a repulsive or an attrative force.  It is thus similar to the system described in project 1.
-
-The advantage of these systems is that for two particles (boson or
-fermions) we have analytical solutions for the eigenpairs of the
-non-interacting case. Furthermore, for a two- or three-dimensional
-system of two electrons moving in a harmonic oscillator trap, we have
-"analytical solutions for the interacting case as well":"https://iopscience.iop.org/article/10.1088/0305-4470/27/3/040/meta".  
-
-Having analytical eigenpairs is an invaluable feature that allows us 
-to assess the physical relevance of the trial wave functions, be
-these either from a standard VMC procedure, from Boltzmann Machines or
-from Shadow Wave functions.
-
-In this notebook we start with the basics of a VMC calculation and
-introduce concepts like Markov Chain Monte Carlo methods and the
-Metropolis algorithm, importance sampling and Metropolis-Hastings
-algorithm, resampling methods to obtain better estimates of the
-statistical errors and minimization of the expectation values of the
-energy and the variance. The latter is done in order to obtain the
-best possible variational parameters. Furthermore it will define the
-so-called _cost_ function, a commonly encountered quantity in Machine
-Learning algorithms. Minimizing the latter is the one which leads to
-the determination of the optimal parameters in basically all Machine Learning algorithms.
-This is a possible topic for project 2.
-
-
-Topics like Markov Chain Monte Carlo and various resampling techniques
-are also central to Machine Learning methods. Presenting them in the
-context of VMC approaches leads hopefully to an easier starting point
-for the understanding of these methods.
-
-
-===== Basic Quantum Monte Carlo  =====
+!split
+===== Basic Quantum Monte Carlo, repetition from last week  =====
 
 We start with the variational principle.
 Given a hamiltonian $H$ and a trial wave function $\Psi_T(\bm{R};\bm{\alpha})$, the variational principle states that the expectation value of $\cal{E}[H]$, defined through 
@@ -90,6 +51,9 @@ is an upper bound to the ground state energy $E_0$ of the hamiltonian $H$, that 
     E_0 \le {\cal E}[H].
 \]
 !et
+
+!split
+===== Multi-dimensional integrals =====
 
 In general, the integrals involved in the calculation of various
 expectation values are multi-dimensional ones. Traditional integration
@@ -114,8 +78,12 @@ and assuming that the set of eigenfunctions are normalized, one obtains
 \]
 !et
 where we used that $H(\bm{R})\Psi_n(\bm{R})=E_n\Psi_n(\bm{R})$.
-In general, the integrals involved in the calculation of various  expectation
-values  are multi-dimensional ones. 
+
+
+
+
+!split
+===== Variational principle =====
 The variational principle yields the lowest energy of states with a  given symmetry.
 
 In most cases, a wave function has only small values in large parts of 
@@ -140,6 +108,9 @@ and its wave function is however necessary.
 A carefully performed VMC calculation can aid in this context. 
 
 
+!split
+===== Bird's eye view  on Variational MC =====
+
 The basic procedure of a Variational Monte Carlo calculations consists thus of 
 
 o Construct first a trial wave function $\psi_T(\bm{R};\bm{\alpha})$,  for a many-body system consisting of $n$ particles located at positions  $\bm{R}=(\bm{R}_1,\dots ,\bm{R}_n)$. The trial wave function depends on $\alpha$ variational parameters $\bm{\alpha}=(\alpha_1,\dots ,\alpha_M)$.
@@ -154,7 +125,8 @@ o Thereafter we vary $\bm{\alpha}$ according to some minimization algorithm and 
 
 Here we have used the notation $\overline{E}$ to label the expectation value of the energy. 
 
-=== Linking with standard statistical expressions for expectation values ===
+!split
+===== Linking with standard statistical expressions for expectation values =====
 
 In order to bring in the Monte Carlo machinery, we define first a likelihood distribution, or probability density distribution (PDF). Using our ansatz for the trial wave function $\psi_T(\bm{R};\bm{\alpha})$ we define a PDF
 !bt
@@ -172,6 +144,8 @@ The approximation to the expectation value of the Hamiltonian is now
 \]
 !et
 
+!split
+===== The local energy =====
 We define a new quantity
 !bt
 \[
@@ -188,6 +162,9 @@ called the local energy, which, together with our trial PDF yields a new express
 !et
 with $N$ being the number of Monte Carlo samples. The expression on the right hand side follows from Bernoulli's law of large numbers, which states that the sample mean, in the limit $N\rightarrow \infty$ approaches the true mean 
 
+!split
+===== The Monte Carlo algorithm =====
+
 The Algorithm for performing a variational Monte Carlo calculations runs as this
        
   *  Initialisation: Fix the number of Monte Carlo steps. Choose an initial $\bm{R}$ and variational parameters $\alpha$ and calculate $\left|\psi_T^{\alpha}(\bm{R})\right|^2$. 
@@ -201,73 +178,12 @@ The Algorithm for performing a variational Monte Carlo calculations runs as this
 Observe that the jumping in space is governed by the variable *step*. This is often referred to as the  _brute-force_ sampling and is normally replaced by what is called _importance sampling_, discussed in more detail next week.. 
 
 
-=== Simple example, the hydrogen atom ===
-The radial Schroedinger equation for the hydrogen atom can be
-written as (when we have gotten rid of the first derivative term in the kinetic energy and used $rR(r)=u(r)$)
-!bt
-\[
--\frac{\hbar^2}{2m}\frac{d^2 u(r)}{d r^2}-
-\left(\frac{ke^2}{r}-\frac{\hbar^2l(l+1)}{2mr^2}\right)u(r)=Eu(r).
-\]
-!et
-We will specialize to the case with $l=0$ and end up with 
-!bt
-\[
--\frac{\hbar^2}{2m}\frac{d^2 u(r)}{d r^2}-
-\left(\frac{ke^2}{r}\right)u(r)=Eu(r).
-\]
-!et
-Then we introduce a dimensionless variable $\rho=r/a$ where $a$ is a constant with dimension length.
-Multiplying with $ma^2/\hbar^2$ we can rewrite our equations as
-!bt
-\[
--\frac{1}{2}\frac{d^2 u(\rho)}{d \rho^2}-
-\frac{ke^2ma}{\hbar^2}\frac{u(\rho)}{\rho}-\lambda u(\rho)=0.
-\]
-!et
-Since $a$ is just a parameter we choose to set
-!bt 
-\[
-\frac{ke^2ma}{\hbar^2}=1,
-\]
-!et
-which leads to $a=\hbar^2/mke^2$, better known as the Bohr radius with value $0.053$ nm. Scaling the equations this way does not only render our numerical treatment simpler since we avoid carrying with us all physical parameters, but we obtain also a _natural_ length scale. We will see this again and again. In our discussions below with a harmonic oscillator trap, the _natural_ lentgh scale with be determined by the oscillator frequency, the mass of the particle and $\hbar$. We have also defined a dimensionless 'energy' $\lambda = Ema^2/\hbar^2$. 
-With the rescaled quantities, the ground state energy of the hydrogen atom is $1/2$. 
-The equation we want to solve is now defined by the Hamiltonian
-!bt
-\[
-H=-\frac{1}{2}\frac{d^2 }{d \rho^2}-\frac{1}{\rho}.
-\]
-!et
-
-As trial wave function we peep now into the analytical solution for
-the hydrogen atom and use (with $\alpha$ as a variational parameter)
-
-!bt
-\[
-   u_T^{\alpha}(\rho)=\alpha\rho \exp{-(\alpha\rho)}. 
-\]
-!et
-
-Inserting this wave function into the expression for the
-local energy $E_L$ gives
-!bt
-\[
-   E_L(\rho)=-\frac{1}{\rho}-
-              \frac{\alpha}{2}\left(\alpha-\frac{2}{\rho}\right).
-\]
-!et
-
-To have analytical local energies saves us from computing numerically
-the second derivative, a feature which often increases our numerical
-expenditure with a factor of three or more. Integratng up the local energy (recall to bring back the PDF in the integration) gives  $\overline{E}[\bm{\alpha}]=\alpha(\alpha/2-1)$. 
 
 
+!split
+===== Example from last week, the harmonic oscillator in one dimension (best seen with jupyter-notebook) =====
 
-
-=== Second example, the harmonic oscillator in one dimension ===
-
-We present here another well-known example, the harmonic oscillator in
+We present here a well-known example, the harmonic oscillator in
 one dimension for one particle. This will also serve the aim of
 introducing our next model, namely that of interacting electrons in a
 harmonic oscillator trap.
@@ -458,113 +374,553 @@ expectation values involving moments of the hamiltonian becomes then
 _This gives an important information: the exact wave function leads to zero variance!_
 As we will see below, many practitioners perform a minimization on both the energy and the variance.
 
+!split
+=====  Why Markov chains, Brownian motion and the Metropolis algorithm =====
+
+* We want to study a physical system which evolves towards equilibrium, from given  initial conditions.
+* We start with a PDF $w(x_0,t_0)$  and we want to understand how the system evolves with time.
+* We want to reach a situation where after a given number of time steps we obtain a steady state. This means that the system reaches its most likely state (equilibrium situation)
+* Our PDF is normally a multidimensional object whose normalization constant is impossible to find.
+* Analytical calculations from $w(x,t)$ are not possible.
+* To sample directly from from $w(x,t)$ is not possible/difficult.
+* The transition probability $W$ is also not  known.
+* How can we establish that we have reached a steady state?   Sounds impossible!
+
+_Use Markov chain Monte Carlo_
+
+!split 
+===== Brownian motion and Markov processes =====
+A Markov process is a random walk with a selected probability for making a
+move. The new move is independent of the previous history of the system.
+
+The Markov process is used repeatedly in Monte Carlo simulations in order to generate
+new random states.
+
+The reason for choosing a Markov process is that when it is run for a
+long enough time starting with a random state, we will eventually reach the most likely state of the system.
+
+In thermodynamics, this means that after a certain number of Markov processes
+we reach an equilibrium distribution.
+
+This mimicks the way a real system reaches
+its most likely state at a given temperature of the surroundings.
+
+!split 
+===== Brownian motion and Markov processes, Ergodicity and Detailed balance =====
+
+To reach this distribution, the Markov process needs to obey two important conditions, that of
+_ergodicity_ and _detailed balance_. These conditions impose then constraints on our algorithms
+for accepting or rejecting new random states.
 
 
-===== The Metropolis algorithm =====
+The Metropolis algorithm discussed here
+abides to both these constraints.
 
-Till now we have not yet discussed the derivation of the Metropolis algorithm. We assume the reader has some familiarity with the mathematics of Markov chains. 
+The Metropolis algorithm is widely used in Monte Carlo
+simulations and the understanding of it rests within
+the interpretation of random walks and Markov processes.
 
-The Metropolis algorithm , see "the original article": "http://scitation.aip.org/content/aip/journal/jcp/21/6/10.1063/1.1699114", was invented by Metropolis et. al
+!split 
+===== Brownian motion and Markov processes, jargon =====
+
+In a random walk one defines a mathematical entity called a _walker_, 
+whose  attributes
+completely define the state of the system in question. 
+
+The state of the system  can refer to any physical quantities,
+from the vibrational state of a molecule specified by a set of quantum numbers, 
+to the brands of coffee in your favourite supermarket.
+
+
+The walker moves in an appropriate state space by a combination of 
+deterministic and random displacements from its previous
+position.
+
+This sequence of steps forms a _chain_.
+
+!split 
+===== Brownian motion and Markov processes, sequence of ingredients =====
+
+* We want to study a physical system which evolves towards equilibrium, from given  initial conditions.
+* Markov chains are intimately linked with the physical process of diffusion. 
+* From a Markov chain we can then derive the conditions for detailed balance and ergodicity. These are the conditions needed for obtaining a steady state.
+* The widely used algorithm for doing this is the so-called Metropolis algorithm, in its refined form the Metropolis-Hastings algorithm.
+
+!split
+===== Applications: almost every field in science =====
+
+* Financial engineering, see for example Patriarca *et al*, Physica _340_, "page 334 (2004)":"http://www.sciencedirect.com/science/article/pii/S0378437104004327".
+* Neuroscience, see for example Lipinski, Physics Medical Biology _35_, "page 441 (1990)":"http://iopscience.iop.org/article/10.1088/0031-9155/35/3/012/meta;jsessionid=FA91B191036E1F10948F7C42B6A6D295.c1" or Farnell and Gibson, Journal of Computational Physics _208_, "page 253 (2005)":"http://www.sciencedirect.com/science/article/pii/S0021999105001087"
+* Tons of applications in physics
+* and chemistry
+* and biology, medicine
+* Nobel prize in economy to Black and Scholes
+!bt
+\[
+\frac{\partial V}{\partial t}+\frac{1}{2}\sigma^{2}S^{2}\frac{\partial^{2} V}{\partial S^{2}}+rS\frac{\partial V}{\partial S}-rV=0.
+\]
+!et
+The Black and Scholes equation is a partial differential equation, which describes the price
+of the option over time. It is a diffusion equation with a random term.
+
+The list of applications is endless
+
+!split
+===== Markov processes =====
+!bblock
+A Markov process allows in principle for a microscopic description of Brownian motion.
+As with the random walk studied in the previous section, we consider a particle 
+which moves along the  $x$-axis in the form of a series of jumps with step length 
+$\Delta x = l$. Time and space are discretized and the subsequent moves are
+statistically independent, i.e., the new move depends only on the previous step
+and not on the results from earlier trials. 
+We start at a position $x=jl=j\Delta x$ and move to 
+a new position $x =i\Delta x$ during a step $\Delta t=\epsilon$, where 
+$i\ge  0$ and $j\ge 0$ are integers. 
+The original probability distribution function (PDF) of the particles is given by  
+$w_i(t=0)$ where $i$ refers to a specific position on the grid in 
+!eblock
+The function $w_i(t=0)$ is now the discretized version of $w(x,t)$.
+We can regard the discretized PDF as a vector.
+
+!split
+===== Markov processes =====
+!bblock
+For the Markov process we have a transition probability from a position
+$x=jl$ to a position $x=il$ given by
+!bt
+\begin{equation*}
+   W_{ij}(\epsilon)=W(il-jl,\epsilon)=\left\{\begin{array}{cc}\frac{1}{2} & |i-j| = 1\\
+             0 & \mathrm{else} \end{array} \right. ,
+\end{equation*}
+!et
+where $W_{ij}$ is normally called 
+the transition probability and we can represent it, see below,
+as a matrix. 
+_Here we have specialized to a case where the transition probability is known_.
+
+Our new PDF $w_i(t=\epsilon)$ is now related to the PDF at
+$t=0$ through the relation
+
+!bt
+\begin{equation*} 
+   w_i(t=\epsilon) =\sum_{j} W(j\rightarrow i)w_j(t=0).
+\end{equation*}
+!et
+ 
+This equation represents the discretized time-development of an original 
+PDF with equal probability of jumping left or right.
+!eblock
+
+!split
+===== Markov processes, the probabilities =====
+!bblock
+
+Since both $W$ and $w$ represent probabilities, they have to be normalized, i.e., we require
+that at each time step we have
+
+!bt
+\begin{equation*} 
+   \sum_i w_i(t) = 1, 
+\end{equation*}
+!et
+and
+
+!bt
+\begin{equation*} 
+   \sum_j W(j\rightarrow i) = 1,
+\end{equation*}
+!et
+which applies for all $j$-values.
+The further constraints are
+$0 \le W_{ij} \le 1$  and  $0 \le w_{j} \le 1$.
+Note that the probability for remaining at the same place is in general 
+not necessarily equal zero. 
+!eblock
+
+!split
+===== Markov processes =====
+!bblock
+The time development of our initial PDF can now be represented through the action of
+the transition probability matrix applied $n$ times. At a 
+time  $t_n=n\epsilon$ our initial distribution has developed into
+
+!bt
+\begin{equation*}
+   w_i(t_n) = \sum_jW_{ij}(t_n)w_j(0),
+\end{equation*}
+!et
+and defining
+
+!bt
+\begin{equation*}
+   W(il-jl,n\epsilon)=(W^n(\epsilon))_{ij}
+\end{equation*}
+!et
+we obtain
+
+!bt
+\begin{equation*}
+   w_i(n\epsilon) = \sum_j(W^n(\epsilon))_{ij}w_j(0),
+\end{equation*}
+!et
+or in matrix form
+!bt
+\begin{equation} label{eq:wfinal}
+   \hat{w}(n\epsilon) = \hat{W}^n(\epsilon)\hat{w}(0).
+\end{equation}
+!et
+!eblock
+
+!split
+===== An Illustrative Example =====
+!bblock
+
+The following simple example may help in understanding the meaning of 
+the transition matrix $\hat{W}$ and the vector $\hat{w}$.
+Consider the $4\times 4$ matrix $\hat{W}$
+
+!bt
+\begin{equation*}
+   \hat{W} = \left(\begin{array}{cccc} 1/4 & 1/9 & 3/8 & 1/3 \\                   
+                                       2/4 & 2/9 & 0 & 1/3\\                   
+                                       0   & 1/9 & 3/8 & 0\\
+                                       1/4 & 5/9&  2/8 & 1/3 \end{array} \right),
+\end{equation*}
+!et
+and we choose our initial state as
+
+!bt
+\begin{equation*}
+\hat{w}(t=0)=  \left(\begin{array}{c} 1\\                   
+                                 0\\
+                                 0 \\                   
+                                 0 \end{array} \right).
+\end{equation*}
+!et
+!eblock
+
+!split
+===== An Illustrative Example =====
+!bblock
+We note that both the vector and the matrix are properly normalized. Summing the vector elements gives one and
+summing over columns for the matrix results also in one.  Furthermore, the largest eigenvalue is one.
+We act then on $\hat{w}$ with $\hat{W}$.
+The first iteration is
+
+!bt
+\begin{equation*}
+   \hat{w}(t=\epsilon) = \hat{W}\hat{w}(t=0),
+\end{equation*}
+!et
+ 
+resulting in
+
+!bt
+\begin{equation*}
+\hat{w}(t=\epsilon)=  \left(\begin{array}{c} 1/4\\                   
+                                1/2 \\
+                                0 \\                   
+                                1/4 \end{array} \right).
+\end{equation*}
+!et
+!eblock
+
+!split
+===== An Illustrative Example, next step =====
+!bblock
+
+The next iteration results in
+
+!bt
+\begin{equation*}
+   \hat{w}(t=2\epsilon) = \hat{W}\hat{w}(t=\epsilon),
+\end{equation*}
+!et
+ 
+resulting in
+
+!bt
+\begin{equation*}
+\hat{w}(t=2\epsilon)=  \left(\begin{array}{c} 0.201389\\
+   0.319444 \\
+   0.055556 \\
+   0.423611 \end{array} \right).
+\end{equation*}
+!et
+Note that the vector $\hat{w}$ is always normalized to $1$. 
+!eblock
+!split
+===== An Illustrative Example, the steady state =====
+!bblock
+We find the steady state of the system by solving the set of equations
+
+!bt
+\begin{equation*} 
+w(t=\infty) = Ww(t=\infty),
+\end{equation*}
+!et
+which is an eigenvalue problem with eigenvalue equal to _one_!
+This set of equations reads
+!bt
+\begin{align}
+ W_{11}w_1(t=\infty) +W_{12}w_2(t=\infty) +W_{13}w_3(t=\infty)+ W_{14}w_4(t=\infty)=&w_1(t=\infty) \nonumber \\
+W_{21}w_1(t=\infty) + W_{22}w_2(t=\infty) + W_{23}w_3(t=\infty)+ W_{24}w_4(t=\infty)=&w_2(t=\infty) \nonumber \\
+W_{31}w_1(t=\infty) + W_{32}w_2(t=\infty) + W_{33}w_3(t=\infty)+ W_{34}w_4(t=\infty)=&w_3(t=\infty) \nonumber \\
+W_{41}w_1(t=\infty) + W_{42}w_2(t=\infty) + W_{43}w_3(t=\infty)+ W_{44}w_4(t=\infty)=&w_4(t=\infty) \nonumber \\
+\end{align}
+!et
+with the constraint that
+
+!bt
+\begin{equation*}
+   \sum_i w_i(t=\infty) = 1, 
+\end{equation*}
+!et
+yielding as solution
+
+!bt
+\begin{equation*}
+\hat{w}(t=\infty)=  \left(\begin{array}{c}0.244318 \\                   
+                                 0.319602 \\  0.056818 \\  0.379261 \end{array} \right).
+\end{equation*}
+!et
+!eblock
+
+!split
+===== An Illustrative Example, iterative steps =====
+!bblock
+
+The table here  demonstrates the convergence as a function of the number of iterations or
+time steps. After  twelve iterations we have reached the exact value with six leading digits. 
+
+|-------------------------------------------------------------------------------------------------------------|
+| Iteration           | $w_1$               | $w_2$               | $w_3$               | $w_4$               |
+|---------r--------------------l--------------------l--------------------l--------------------l---------------|
+| 0                   | 1.000000            | 0.000000            | 0.000000            | 0.000000            |
+| 1                   | 0.250000            | 0.500000            | 0.000000            | 0.250000            |
+| 2                   | 0.201389            | 0.319444            | 0.055556            | 0.423611            |
+| 3                   | 0.247878            | 0.312886            | 0.056327            | 0.382909            |
+| 4                   | 0.245494            | 0.321106            | 0.055888            | 0.377513            |
+| 5                   | 0.243847            | 0.319941            | 0.056636            | 0.379575            |
+| 6                   | 0.244274            | 0.319547            | 0.056788            | 0.379391            |
+| 7                   | 0.244333            | 0.319611            | 0.056801            | 0.379255            |
+| 8                   | 0.244314            | 0.319610            | 0.056813            | 0.379264            |
+| 9                   | 0.244317            | 0.319603            | 0.056817            | 0.379264            |
+| 10                  | 0.244318            | 0.319602            | 0.056818            | 0.379262            |
+| 11                  | 0.244318            | 0.319602            | 0.056818            | 0.379261            |
+| 12                  | 0.244318            | 0.319602            | 0.056818            | 0.379261            |
+| $\hat{w}(t=\infty)$ | 0.244318            | 0.319602            | 0.056818            | 0.379261            |
+|-------------------------------------------------------------------------------------------------------------|
+
+!eblock
+
+!split
+===== Small exercise =====
+
+Write a small code which diagonalized the matrix $\bm{W}$ and find the eigenpairs anc ompare the coefficients $w_i$.
+_Note:_ You may need to normalize the eigenvectors from the diagonalization procedure. What is the largest eigenvalue?
+
+
+!split
+===== An Illustrative Example, what does it mean? =====
+!bblock
+
+We have after $t$-steps
+
+!bt
+\begin{equation*}
+   \hat{w}(t) = \hat{W}^t\hat{w}(0),
+\end{equation*}
+!et
+with $\hat{w}(0)$ the distribution at $t=0$ and $\hat{W}$ representing the 
+transition probability matrix. 
+
+!eblock
+
+!split
+===== An Illustrative Example, understanding the basics =====
+!bblock
+
+We can always expand $\hat{w}(0)$ in terms of the right eigenvectors 
+$\hat{v}$ of $\hat{W}$ as
+
+!bt
+\begin{equation*}
+    \hat{w}(0)  = \sum_i\alpha_i\hat{v}_i,
+\end{equation*}
+!et
+resulting in
+
+!bt
+\begin{equation*}
+   \hat{w}(t) = \hat{W}^t\hat{w}(0)=\hat{W}^t\sum_i\alpha_i\hat{v}_i=
+\sum_i\lambda_i^t\alpha_i\hat{v}_i,
+\end{equation*}
+!et
+with $\lambda_i$ the $i^{\mathrm{th}}$ eigenvalue corresponding to  
+the eigenvector $\hat{v}_i$. 
+
+If we assume that $\lambda_0$ is the largest eigenvector we see that in the limit $t\rightarrow \infty$,
+$\hat{w}(t)$ becomes proportional to the corresponding eigenvector 
+$\hat{v}_0$. This is our steady state or final distribution. 
+
+!eblock
+
+
+
+
+!split
+===== Basics of the Metropolis Algorithm =====
+
+
+The Metropolis et al.
+algorithm was invented by Metropolis et al.
 and is often simply called the Metropolis algorithm.
 It is a method to sample a normalized probability
-distribution by a stochastic process. We define $\mathbf{P}_i^{(n)}$ to
+distribution by a stochastic process. We define ${\cal w}_i^{(n)}$ to
 be the probability for finding the system in the state $i$ at step $n$.
-The algorithm is then
+
+In the simulations, our assumption is that we have a model for ${\cal w}_i^{(n)}$, but we do not know $W$.
+We will hence model $W$ in terms of a likelihood for making transition $T$ and a likelihood for accepting a transition.
+That is
+!bt
+\[
+W_{i\rightarrow j}=A_{i\rightarrow j}T_{i\rightarrow j}
+\]
+!et
+
+!split
+=====  The basic of the Metropolis Algorithm =====
+
+
 
 * Sample a possible new state $j$ with some probability $T_{i\rightarrow j}$.
-* Accept the new state $j$ with probability $A_{i \rightarrow j}$ and use it as the next sample. With probability $1-A_{i\rightarrow j}$ the move is rejected and the original state $i$ is used again as a sample.
+* Accept the new state $j$ with probability $A_{i \rightarrow j}$ and use it as the next sample.
+* With probability $1-A_{i\rightarrow j}$ the move is rejected and the original state $i$ is used again as a sample.
+
 
 We wish to derive the required properties of $T$ and $A$ such that
-$\mathbf{P}_i^{(n\rightarrow \infty)} \rightarrow p_i$ so that starting
+${\cal w}_i^{(n\rightarrow \infty)} \rightarrow p_i$ so that starting
 from any distribution, the method converges to the correct distribution.
 Note that the description here is for a discrete probability distribution.
 Replacing probabilities $p_i$ with expressions like $p(x_i)dx_i$ will
 take all of these over to the corresponding continuum expressions.
 
-The dynamical equation for $\mathbf{P}_i^{(n)}$ can be written directly from
+!split
+===== More on the Metropolis =====
+
+The dynamical equation for ${\cal w}_i^{(n)}$ can be written directly from
 the description above. The probability of being in the state $i$ at step $n$
 is given by the probability of being in any state $j$ at the previous step,
 and making an accepted transition to $i$ added to the probability of
 being in the state $i$, making a transition to any state $j$ and
 rejecting the move:
 !bt
-\[
-\mathbf{P}^{(n)}_i = \sum_j \left [
-\mathbf{P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
-+\mathbf{P}^{(n-1)}_iT_{i\rightarrow j}\left ( 1- A_{i\rightarrow j} \right)
+\begin{equation}
+\label{eq:eq1}
+{\cal w}^{(n)}_i = \sum_j \left [
+{\cal w}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
++{\cal w}^{(n-1)}_iT_{i\rightarrow j}\left ( 1- A_{i\rightarrow j} \right)
 \right ] \,.
-\]
-!et
-Since the probability of making some transition must be 1,
-$\sum_j T_{i\rightarrow j} = 1$, and the above equation becomes
-!bt
-\[
-\mathbf{P}^{(n)}_i = \mathbf{P}^{(n-1)}_i +
- \sum_j \left [
-\mathbf{P}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
--\mathbf{P}^{(n-1)}_iT_{i\rightarrow j}A_{i\rightarrow j}
-\right ] \,.
-\]
+\end{equation}
 !et
 
-For large $n$ we require that $\mathbf{P}^{(n\rightarrow \infty)}_i = p_i$,
+!split
+=====  Metropolis algorithm, setting it up =====
+Since the probability of making some transition must be 1,
+$\sum_j T_{i\rightarrow j} = 1$, and Eq. (ref{eq:eq1}) becomes
+
+!bt
+\begin{equation}
+{\cal w}^{(n)}_i = {\cal w}^{(n-1)}_i +
+ \sum_j \left [
+{\cal w}^{(n-1)}_jT_{j\rightarrow i} A_{j\rightarrow i} 
+-{\cal w}^{(n-1)}_iT_{i\rightarrow j}A_{i\rightarrow j}
+\right ] \,.
+\end{equation}
+!et
+
+!split
+===== Metropolis continues =====
+
+For large $n$ we require that ${\cal w}^{(n\rightarrow \infty)}_i = p_i$,
 the desired probability distribution. Taking this limit, gives the
 balance requirement
+
 !bt
-\[
- \sum_j \left [
-p_jT_{j\rightarrow i} A_{j\rightarrow i}
--p_iT_{i\rightarrow j}A_{i\rightarrow j}
-\right ] = 0 \,.
-\]
+\begin{equation}
+\sum_j \left [p_jT_{j\rightarrow i} A_{j\rightarrow i}-p_iT_{i\rightarrow j}A_{i\rightarrow j}
+\right ] = 0,
+\end{equation}
 !et
+
+
+!split
+===== Detailed Balance =====
+
 The balance requirement is very weak. Typically the much stronger detailed
 balance requirement is enforced, that is rather than the sum being
 set to zero, we set each term separately to zero and use this
 to determine the acceptance probabilities. Rearranging, the result is
+
 !bt
-\[
+\begin{equation}
 \frac{ A_{j\rightarrow i}}{A_{i\rightarrow j}}
 = \frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}} \,.
-\]
+\end{equation}
 !et
+
+!split
+===== More on Detailed Balance =====
 
 The Metropolis choice is to maximize the $A$ values, that is
+
 !bt
-\[
+\begin{equation}
 A_{j \rightarrow i} = \min \left ( 1,
 \frac{p_iT_{i\rightarrow j}}{ p_jT_{j\rightarrow i}}\right ).
-\]
+\end{equation}
 !et
+
 Other choices are possible, but they all correspond to multilplying
 $A_{i\rightarrow j}$ and $A_{j\rightarrow i}$ by the same constant
-smaller than unity.\footnote{The penalty function method uses just such
+smaller than unity. The penalty function method uses just such
 a factor to compensate for $p_i$ that are evaluated stochastically
-and are therefore noisy.}
+and are therefore noisy.
 
 Having chosen the acceptance probabilities, we have guaranteed that
-if the  $\mathbf{P}_i^{(n)}$ has equilibrated, that is if it is equal to $p_i$,
+if the  ${\cal w}_i^{(n)}$ has equilibrated, that is if it is equal to $p_i$,
 it will remain equilibrated. Next we need to find the circumstances for
 convergence to equilibrium.
 
+!split
+===== Dynamical Equation =====
+
 The dynamical equation can be written as
+
 !bt
-\[
-\mathbf{P}^{(n)}_i = \sum_j M_{ij}\mathbf{P}^{(n-1)}_j
-\]
+\begin{equation}
+{\cal w}^{(n)}_i = \sum_j M_{ij}{\cal w}^{(n-1)}_j
+\end{equation}
 !et
 with the matrix $M$ given by
+
 !bt
-\[
+\begin{equation}
 M_{ij} = \delta_{ij}\left [ 1 -\sum_k T_{i\rightarrow k} A_{i \rightarrow k}
 \right ] + T_{j\rightarrow i} A_{j\rightarrow i} \,.
-\]
+\end{equation}
 !et
+
 Summing over $i$ shows that $\sum_i M_{ij} = 1$, and since
 $\sum_k T_{i\rightarrow k} = 1$, and $A_{i \rightarrow k} \leq 1$, the
 elements of the matrix satisfy $M_{ij} \geq 0$. The matrix $M$ is therefore
 a stochastic matrix.
 
+
+!split
+===== Interpreting the Metropolis Algorithm =====
 
 The Metropolis method is simply the power method for computing the
 right eigenvector of $M$ with the largest magnitude eigenvalue.
@@ -573,7 +929,144 @@ with eigenvalue 1. Therefore, for the Metropolis method to converge
 to this result, we must show that $M$ has only one eigenvalue with this
 magnitude, and all other eigenvalues are smaller.
 
+Even a defective matrix has at least one left and right eigenvector for
+each eigenvalue. An example of a defective matrix is
 
+
+!bt
+\[
+\begin{bmatrix}
+0 & 1\\
+0 & 0 \\
+\end{bmatrix},
+\]
+!et
+with two zero eigenvalues, only one right eigenvector
+
+!bt
+\[
+\begin{bmatrix}
+1 \\
+0\\
+\end{bmatrix}
+\]
+!et
+and only one left eigenvector $(0\ 1)$.
+
+!split
+===== Gershgorin bounds and Metropolis =====
+
+The Gershgorin bounds for the eigenvalues can be derived by multiplying on
+the left with the eigenvector with the maximum and minimum eigenvalues,
+
+!bt
+\begin{align}
+\sum_i \psi^{\rm max}_i M_{ij} =& \lambda_{\rm max}  \psi^{\rm max}_j
+\nonumber\\
+\sum_i \psi^{\rm min}_i M_{ij} =& \lambda_{\rm min}  \psi^{\rm min}_j
+\end{align}
+!et
+
+!split
+===== Normalizing the Eigenvectors =====
+
+Next we choose the normalization of these eigenvectors so that the
+largest element (or one of the equally largest elements)
+has value 1. Let's call this element $k$, and
+we can therefore bound the magnitude of the other elements to be less
+than or equal to 1.
+This leads to the inequalities, using the property that $M_{ij}\geq 0$,
+
+!bt
+\begin{eqnarray}
+\sum_i M_{ik} \leq \lambda_{\rm max}
+\nonumber\\
+M_{kk}-\sum_{i \neq k} M_{ik} \geq \lambda_{\rm min}
+\end{eqnarray}
+!et
+where the equality from the maximum
+will occur only if the eigenvector takes the value 1 for all values of
+$i$ where $M_{ik} \neq 0$, and the equality for the minimum will
+occur only if the eigenvector takes the value -1 for all values of $i\neq k$
+where $M_{ik} \neq 0$.
+
+
+!split
+===== More Metropolis analysis =====
+
+That the maximum eigenvalue is 1 follows immediately from the property
+that $\sum_i M_{ik} = 1$. Similarly the minimum eigenvalue can be -1,
+but only if $M_{kk} = 0$ and the magnitude of all the other elements
+$\psi_i^{\rm min}$ of
+the eigenvector that multiply nonzero elements $M_{ik}$ are -1.
+
+Let's first see what the properties of $M$ must be
+to eliminate any -1 eigenvalues. 
+To have a -1 eigenvalue, the left eigenvector must contain only $\pm 1$
+and $0$ values. Taking in turn each $\pm 1$ value as the maximum, so that
+it corresponds to the index $k$, the nonzero $M_{ik}$ values must
+correspond to $i$ index values of the eigenvector which have opposite
+sign elements. That is, the $M$ matrix must break up into sets of
+states that always make transitions from set A to set B ... back to set A.
+In particular, there can be no rejections of these moves in the cycle
+since the -1 eigenvalue requires $M_{kk}=0$. To guarantee no eigenvalues
+with eigenvalue -1, we simply have to make sure that there are no
+cycles among states. Notice that this is generally trivial since such
+cycles cannot have any rejections at any stage. An example of such
+a cycle is sampling a noninteracting Ising spin. If the transition is
+taken to flip the spin, and the energy difference is zero, the Boltzmann
+factor will not change and the move will always be accepted. The system
+will simply flip from up to down to up to down ad infinitum. Including
+a rejection probability or using a heat bath algorithm
+immediately fixes the problem.
+
+!split
+===== Final Considerations I =====
+
+Next we need to make sure that there is only one left eigenvector
+with eigenvalue 1. To get an eigenvalue 1, the left eigenvector must be 
+constructed from only ones and zeroes. It is straightforward to
+see that a vector made up of
+ones and zeroes can only be an eigenvector with eigenvalue 1 if the 
+matrix element $M_{ij} = 0$ for all cases where $\psi_i \neq \psi_j$.
+That is we can choose an index $i$ and take $\psi_i = 1$.
+We require all elements $\psi_j$ where $M_{ij} \neq 0$ to also have
+the value $1$. Continuing we then require all elements $\psi_\ell$ $M_{j\ell}$
+to have value $1$. Only if the matrix $M$ can be put into block diagonal
+form can there be more than one choice for the left eigenvector with
+eigenvalue 1. We therefore require that the transition matrix not
+be in block diagonal form. This simply means that we must choose
+the transition probability so that we can get from any allowed state
+to any other in a series of transitions.
+
+!split
+===== Final Considerations II =====
+
+
+Finally, we note that for a defective matrix, with more eigenvalues
+than independent eigenvectors for eigenvalue 1,
+the left and right
+eigenvectors of eigenvalue 1 would be orthogonal.
+Here the left eigenvector is all 1
+except for states that can never be reached, and the right eigenvector
+is $p_i > 0$ except for states that give zero probability. We already
+require that we can reach
+all states that contribute to $p_i$. Therefore the left and right
+eigenvectors with eigenvalue 1 do not correspond to a defective sector
+of the matrix and they are unique. The Metropolis algorithm therefore
+converges exponentially to the desired distribution.
+
+
+!split
+===== Final Considerations III =====
+
+The requirements for the transition $T_{i \rightarrow j}$ are
+* A series of transitions must let us to get from any allowed state to any other by a finite series of transitions.
+* The transitions cannot be grouped into sets of states, A, B, C ,... such that transitions from $A$ go to $B$, $B$ to $C$ etc and finally back to $A$. With condition (a) satisfied, this condition will always be satisfied if either $T_{i \rightarrow i} \neq 0$ or there are some rejected moves.
+
+
+
+!split
 ===== The system: two particles (fermions normally) in a harmonic oscillator trap in two dimensions =====
 
 The Hamiltonian of the quantum dot is given by
@@ -589,6 +1082,9 @@ inter-electron Coulomb interactions. In dimensionless units,
 !et
 with $r_{ij}=\sqrt{\mathbf{r}_i^2 - \mathbf{r}_j^2}$.
 
+!split
+===== Separating the degrees of freedom =====
+
 This leads to the  separable Hamiltonian, with the relative motion part given by ($r_{ij}=r$)
 !bt
 \[ 
@@ -598,6 +1094,8 @@ This leads to the  separable Hamiltonian, with the relative motion part given by
 plus a standard Harmonic Oscillator problem  for the center-of-mass motion.
 This system has analytical solutions in two and three dimensions ("M. Taut 1993 and 1994":"https://journals.aps.org/pra/abstract/10.1103/PhysRevA.48.3561"). 
 
+!split
+===== Variational Monte Carlo code (best seen with jupyter-notebook) =====
 We want to perform  a Variational Monte Carlo calculation of the ground state of two electrons in a quantum dot well with different oscillator energies, assuming total spin $S=0$.
 Our trial wave function has the following form
 !bt
@@ -656,7 +1154,8 @@ for the correlation part of the wave fuction.
 For general systems containing more than say two electrons, we have this
 condition for each electron pair $ij$.
 
-=== First code attempt for the two-electron case ===
+!split
+===== First code attempt for the two-electron case =====
 
 First, as with the hydrogen case, we declare where to store files.
 !bc pycod
