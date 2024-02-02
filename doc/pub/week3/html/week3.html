@@ -156,10 +156,10 @@ div.toc p,a {
                2,
                None,
                'code-example-for-the-interacting-case-with-importance-sampling'),
-              ('Importance sampling, program elements',
+              ('Importance sampling, programming elements',
                2,
                None,
-               'importance-sampling-program-elements'),
+               'importance-sampling-programming-elements'),
               ('Importance sampling, program elements',
                2,
                None,
@@ -452,7 +452,13 @@ $$
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="code-example-for-the-interacting-case-with-importance-sampling">Code example for the interacting case with importance sampling </h2>
 
-<p>We are now ready to implement importance sampling. This is done here for the two-electron case with the Coulomb interaction, as in the previous example. We have two variational parameters \( \alpha \) and \( \beta \). After the set up of files</p>
+<b>Note: this is best seen using the Jupyter-notebook</b>.
+
+<p>We are now ready to implement importance sampling. This is done here
+for the two-electron case with the Coulomb interaction, as in the
+previous example. We have two variational parameters \( \alpha \) and
+\( \beta \). After the set up of files
+</p>
 
 
 <!-- code=python (!bc pycod) typeset with pygments style "default" -->
@@ -711,11 +717,9 @@ plt<span style="color: #666666">.</span>show()
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>The general derivative formula of the Jastrow factor is (the subscript \( C \) stands for Correlation)</p>
+<h2 id="importance-sampling-programming-elements">Importance sampling, programming elements </h2>
+
+<p>The general derivative formula of the Jastrow factor (or the ansatz for the correlated part of the wave function) is (the subscript \( C \) stands for Correlation)</p>
 $$
 \frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
 \sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
@@ -733,14 +737,10 @@ $$
 <p>the gradient needed for the quantum force and local energy is easy to compute.  
 The function \( f(r_{ij}) \) will depends on the system under study. In the equations below we will keep this general form.
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>In the Metropolis/Hasting algorithm, the <em>acceptance ratio</em> determines the probability for a particle  to be accepted at a new position. The ratio of the trial wave functions evaluated at the new and current positions is given by (\( OB \) for the onebody  part)</p>
 $$
 R \equiv \frac{\Psi_{T}^{new}}{\Psi_{T}^{old}} = 
@@ -755,15 +755,12 @@ The second is needed when we compute the kinetic energy term of the local energy
 $$
 \frac{\mathbf{\mathbf{\nabla}}  \Psi}{\Psi}  = \frac{\mathbf{\nabla}  (\Psi_{OB} \, \Psi_{C})}{\Psi_{OB} \, \Psi_{C}}  =  \frac{ \Psi_C \mathbf{\nabla}  \Psi_{OB} + \Psi_{OB} \mathbf{\nabla}  \Psi_{C}}{\Psi_{OB} \Psi_{C}} = \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>The expectation value of the kinetic energy expressed in atomic units for electron \( i \) is </p>
+
+<p>The expectation value of the kinetic energy expressed in scaled units  for particle  \( i \) is </p>
 $$
  \langle \hat{K}_i \rangle = -\frac{1}{2}\frac{\langle\Psi|\mathbf{\nabla}_{i}^2|\Psi \rangle}{\langle\Psi|\Psi \rangle},
 $$
@@ -771,27 +768,21 @@ $$
 $$
 \hat{K}_i = -\frac{1}{2}\frac{\mathbf{\nabla}_{i}^{2} \Psi}{\Psi}.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>The second derivative which enters the definition of the local energy is </p>
 $$
 \frac{\mathbf{\nabla}^2 \Psi}{\Psi}=\frac{\mathbf{\nabla}^2 \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}^2  \Psi_C}{ \Psi_C} + 2 \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}}\cdot\frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
 $$
 
-<p>We discuss here how to calculate these quantities in an optimal way,</p>
-</div>
+<p>We discuss here how to calculate these quantities in an optimal way.</p>
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We have defined the correlated function as</p>
 $$
 \Psi_C=\prod_{i < j}g(r_{ij})=\prod_{i < j}^Ng(r_{ij})= \prod_{i=1}^N\prod_{j=i+1}^Ng(r_{ij}),
@@ -806,14 +797,11 @@ $$
 $$
 \Psi_C=\prod_{i < j}g(r_{ij})=\exp{\left\{\sum_{i < j}f(r_{ij})\right\}}.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>The total number of different relative distances \( r_{ij} \) is \( N(N-1)/2 \). In a matrix storage format, the relative distances  form a strictly upper triangular matrix</p>
 $$
  \mathbf{r} \equiv \begin{pmatrix}
@@ -828,13 +816,10 @@ $$
 <p>This applies to  \( \mathbf{g} = \mathbf{g}(r_{ij}) \) as well. </p>
 
 <p>In our algorithm we will move one particle  at the time, say the \( kth \)-particle.  This sampling will be seen to be particularly efficient when we are going to compute a Slater determinant. </p>
-</div>
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We have that the ratio between Jastrow factors \( R_C \) is given by</p>
 $$
 R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} =
@@ -855,14 +840,11 @@ $$
 +
 \sum_{i=k+1}^{N}\big(f_{ki}^\mathrm{new}-f_{ki}^\mathrm{cur}\big)
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>One needs to develop a special algorithm 
 that runs only through the elements of the upper triangular
 matrix \( \mathbf{g} \) and have \( k \) as an index. 
@@ -874,13 +856,10 @@ $$
 $$
 
 <p>for all dimensions and with \( i \) running over all particles.</p>
-</div>
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>For the first derivative only \( N-1 \) terms survive the ratio because the \( g \)-terms that are not differentiated cancel with their corresponding ones in the denominator. Then,</p>
 $$
 \frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
@@ -898,14 +877,9 @@ $$
 $$
 
 <p>with both expressions scaling as \( \mathcal{O}(N) \).</p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
 
 <p>Using the identity </p>
 $$
@@ -925,14 +899,11 @@ $$
 \sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
 -\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>For correlation forms depending only on the scalar distances \( r_{ij} \) we can use the chain rule. Noting that </p>
 $$
 \frac{\partial g_{ij}}{\partial x_j} = \frac{\partial g_{ij}}{\partial r_{ij}} \frac{\partial r_{ij}}{\partial x_j} = \frac{x_j - x_i}{r_{ij}} \frac{\partial g_{ij}}{\partial r_{ij}},
@@ -944,14 +915,11 @@ $$
 \sum_{i=1}^{k-1}\frac{1}{g_{ik}} \frac{\mathbf{r_{ik}}}{r_{ik}} \frac{\partial g_{ik}}{\partial r_{ik}}
 -\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial g_{ki}}{\partial r_{ki}}.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>Note that for the Pade-Jastrow form we can set \( g_{ij} \equiv g(r_{ij}) = e^{f(r_{ij})} = e^{f_{ij}} \) and </p>
 $$
 \frac{\partial g_{ij}}{\partial r_{ij}} = g_{ij} \frac{\partial f_{ij}}{\partial r_{ij}}.
@@ -970,14 +938,10 @@ $$
 $$
 
 <p>is the relative distance. </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>The second derivative of the Jastrow factor divided by the Jastrow factor (the way it enters the kinetic energy) is</p>
 $$
 \left[\frac{\mathbf{\nabla}^2 \Psi_C}{\Psi_C}\right]_x =\  
@@ -989,14 +953,11 @@ $$
 \sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}
 \right)^2
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling">Importance sampling </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>But we have a simple form for the function, namely</p>
 $$
 \Psi_{C}=\prod_{i < j}\exp{f(r_{ij})},
@@ -1010,101 +971,82 @@ $$
 \sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}f'(r_{ki})f'(r_{kj})+
 \sum_{j\ne k}\left( f''(r_{kj})+\frac{2}{r_{kj}}f'(r_{kj})\right)
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>A stochastic process is simply a function of two variables, one is the time,
-the other is a stochastic variable \( X \), defined by specifying
+
+<p>A stochastic process is simply a function of two variables, one is the
+time, the other is a stochastic variable \( X \), defined by specifying
 </p>
-<ul>
+
+<ol>
 <li> the set \( \left\{x\right\} \) of possible values for \( X \);</li>
 <li> the probability distribution, \( w_X(x) \),  over this set, or briefly \( w(x) \)</li>
-</ul>
-<p>The set of values \( \left\{x\right\} \) for \( X \) 
-may be discrete, or continuous. If the set of
-values is continuous, then \( w_X (x) \) is a probability density so that 
-\( w_X (x)dx \)
-is the probability that one finds the stochastic variable \( X \) to have values
-in the range \( [x, x + dx] \) .
+</ol>
+<p>The set of values \( \left\{x\right\} \) for \( X \) may be discrete, or
+continuous. If the set of values is continuous, then \( w_X (x) \) is a
+probability density so that \( w_X (x)dx \) is the probability that one
+finds the stochastic variable \( X \) to have values in the range \( [x, x +dx] \) .
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>     An arbitrary number of other stochastic variables may be derived from
-\( X \). For example, any \( Y \) given by a mapping of \( X \), is also a stochastic
-variable. The mapping may also be time-dependent, that is, the mapping
-depends on an additional variable \( t \)
+
+<p>An arbitrary number of other stochastic variables may be derived from
+\( X \). For example, any \( Y \) given by a mapping of \( X \), is also a
+stochastic variable. The mapping may also be time-dependent, that is,
+the mapping depends on an additional variable \( t \)
 </p>
-$$
-                              Y_X (t) = f (X, t) .
+$$ Y_X (t) = f(X, t).
 $$
 
-<p>The quantity \( Y_X (t) \) is called a random function, or, since \( t \) often is time,
-a stochastic process. A stochastic process is a function of two variables,
-one is the time, the other is a stochastic variable \( X \). Let \( x \) be one of the
-possible values of \( X \) then
+<p>The quantity \( Y_X (t) \) is called a random function,
+or, since \( t \) often is time, a stochastic process. A stochastic
+process is a function of two variables, one is the time, the other is
+a stochastic variable \( X \). Let \( x \) be one of the possible values of
+\( X \) then
 </p>
-$$
-                               y(t) = f (x, t),
-$$
+$$ y(t) = f (x, t), $$
 
-<p>is a function of \( t \), called a sample function or realization of the process.
-In physics one considers the stochastic process to be an ensemble of such
-sample functions.
+<p>is a function of \( t \), called a
+sample function or realization of the process.  In physics one
+considers the stochastic process to be an ensemble of such sample
+functions.
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>     For many physical systems initial distributions of a stochastic 
-variable \( y \) tend to equilibrium distributions: \( w(y, t)\rightarrow w_0(y) \) 
-as \( t\rightarrow\infty \). In
-equilibrium detailed balance constrains the transition rates
+
+<p>For many physical systems initial distributions of a stochastic
+variable \( y \) tend to equilibrium distributions: \( w(y, t)\rightarrow
+w_0(y) \) as \( t\rightarrow\infty \). In equilibrium detailed balance
+constrains the transition rates
 </p>
 $$
      W(y\rightarrow y')w(y ) = W(y'\rightarrow y)w_0 (y),
 $$
 
-<p>where \( W(y'\rightarrow y) \) 
-is the probability, per unit time, that the system changes
-from a state \( |y\rangle \) , characterized by the value \( y \) 
-for the stochastic variable \( Y \) , to a state \( |y'\rangle \).
+<p>where \( W(y'\rightarrow y) \) is the probability, per unit time, that the
+system changes from a state \( |y\rangle \) , characterized by the value
+\( y \) for the stochastic variable \( Y \) , to a state \( |y'\rangle \).
 </p>
 
-<p>Note that for a system in equilibrium the transition rate 
-\( W(y'\rightarrow y) \) and
-the reverse \( W(y\rightarrow y') \) may be very different. 
+<p>Note that for a system in equilibrium the transition rate
+\( W(y'\rightarrow y) \) and the reverse \( W(y\rightarrow y') \) may be very
+different.
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>Consider, for instance, a simple
-system that has only two energy levels \( \epsilon_0 = 0 \) and 
-\( \epsilon_1 = \Delta E \). 
+
+<p>Consider, for instance, a simple system that has only two energy
+levels \( \epsilon_0 = 0 \) and \( \epsilon_1 = \Delta E \).
 </p>
 
 <p>For a system governed by the Boltzmann distribution we find (the partition function has been taken out)</p>
 $$
-     W(0\rightarrow 1)\exp{-(\epsilon_0/kT)} = W(1\rightarrow 0)\exp{-(\epsilon_1/kT)}
+     W(0\rightarrow 1)\exp{-(\epsilon_0/kT)} = W(1\rightarrow 0)\exp{-(\epsilon_1/kT)}.
 $$
 
 <p>We get then</p>
@@ -1113,14 +1055,10 @@ $$
 $$
 
 <p>which goes to zero when \( T \) tends to zero.</p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>If we assume a discrete set of events,
 our initial probability
 distribution function can be  given by 
@@ -1143,14 +1081,10 @@ $$
 vector \( \mathbf{x} \). The Kroenecker \( \delta \) function is replaced by the \( \delta \) distribution
 function \( \delta(\mathbf{x}) \) at  \( t=0 \).  
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>The transition from a state \( j \) to a state \( i \) is now replaced by a transition
 to a state with position \( \mathbf{y} \) from a state with position \( \mathbf{x} \). 
 The discrete sum of transition probabilities can then be replaced by an integral
@@ -1171,14 +1105,10 @@ $$
 $$
 
 <p>that is no time-dependence. Note our change of notation for \( W \)</p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We can solve the equation for \( w(\mathbf{y},t) \) by making a Fourier transform to
 momentum space. 
 The PDF \( w(\mathbf{x},t) \) is related to its Fourier transform
@@ -1199,14 +1129,11 @@ $$
 $$
    \tilde{w}(\mathbf{k},0)=1/2\pi.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We can then use the Fourier-transformed diffusion equation </p>
 $$
     \frac{\partial \tilde{w}(\mathbf{k},t)}{\partial t} = -D\mathbf{k}^2\tilde{w}(\mathbf{k},t),
@@ -1217,14 +1144,11 @@ $$
    \tilde{w}(\mathbf{k},t)=\tilde{w}(\mathbf{k},0)\exp{\left[-(D\mathbf{k}^2t)\right)}=
     \frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}. 
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>With the Fourier transform we obtain </p>
 $$
    w(\mathbf{x},t)=\int_{-\infty}^{\infty}d\mathbf{k} \exp{\left[i\mathbf{kx}\right]}\frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}=
@@ -1235,14 +1159,11 @@ $$
 $$
    \int_{-\infty}^{\infty}w(\mathbf{x},t)d\mathbf{x}=1.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>The solution represents the probability of finding
 our random walker at position \( \mathbf{x} \) at time \( t \) if the initial distribution 
 was placed at \( \mathbf{x}=0 \) at \( t=0 \). 
@@ -1262,14 +1183,10 @@ $$
 <p>and that it satisfies the normalization condition and is itself a solution
 to the diffusion equation.
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>Let us now assume that we have three PDFs for times \( t_0 < t' < t \), that is
 \( w(\mathbf{x}_0,t_0) \), \( w(\mathbf{x}',t') \) and \( w(\mathbf{x},t) \).
 We have then  
@@ -1287,14 +1204,11 @@ $$
 $$
    w(\mathbf{x}',t')= \int_{-\infty}^{\infty} W(\mathbf{x}'.t'|\mathbf{x}_0,t_0)w(\mathbf{x}_0,t_0)d\mathbf{x}_0.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We can combine these equations and arrive at the famous Einstein-Smoluchenski-Kolmogorov-Chapman (ESKC) relation</p>
 $$
  W(\mathbf{x}t|\mathbf{x}_0t_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},t|\mathbf{x}',t')W(\mathbf{x}',t'|\mathbf{x}_0,t_0)d\mathbf{x}'.
@@ -1306,14 +1220,11 @@ $$
 $$
  W(\mathbf{v},t|\mathbf{v}_0,t_0)  = \int_{-\infty}^{\infty} W(\mathbf{v},t|\mathbf{v}',t')W(\mathbf{v}',t'|\mathbf{v}_0,t_0)d\mathbf{x}'.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We will now derive the Fokker-Planck equation. 
 We start from the ESKC equation
 </p>
@@ -1325,28 +1236,21 @@ $$
 $$
  W(\mathbf{x},s+\tau|\mathbf{x}_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},\tau|\mathbf{x}')W(\mathbf{x}',s|\mathbf{x}_0)d\mathbf{x}'.
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>Assume now that \( \tau \) is very small so that we can make an expansion in terms of a small step \( xi \), with \( \mathbf{x}'=\mathbf{x}-\xi \), that is</p>
 $$
  W(\mathbf{x},s|\mathbf{x}_0)+\frac{\partial W}{\partial s}\tau +O(\tau^2) = \int_{-\infty}^{\infty} W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0)d\mathbf{x}'.
 $$
 
 <p>We assume that \( W(\mathbf{x},\tau|\mathbf{x}-\xi) \) takes non-negligible values only when \( \xi \) is small. This is just another way of stating the Master equation!!</p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We say thus that \( \mathbf{x} \) changes only by a small amount in the time interval \( \tau \). 
 This means that we can make a Taylor expansion in terms of \( \xi \), that is we
 expand
@@ -1356,14 +1260,11 @@ W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0) =
 \sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W(\mathbf{x}+\xi,\tau|\mathbf{x})W(\mathbf{x},s|\mathbf{x}_0)
 \right].
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We can then rewrite the ESKC equation as </p>
 $$
 \frac{\partial W}{\partial s}\tau=-W(\mathbf{x},s|\mathbf{x}_0)+
@@ -1374,14 +1275,10 @@ $$
 <p>We have neglected higher powers of \( \tau \) and have used that for \( n=0 \) 
 we get simply \( W(\mathbf{x},s|\mathbf{x}_0) \) due to normalization.
 </p>
-</div>
-
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
+
 <p>We say thus that \( \mathbf{x} \) changes only by a small amount in the time interval \( \tau \). 
 This means that we can make a Taylor expansion in terms of \( \xi \), that is we
 expand
@@ -1391,7 +1288,6 @@ W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0) =
 \sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W(\mathbf{x}+\xi,\tau|\mathbf{x})W(\mathbf{x},s|\mathbf{x}_0)
 \right].
 $$
-</div>
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
