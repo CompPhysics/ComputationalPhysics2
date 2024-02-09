@@ -604,323 +604,6 @@ plt.show()
 </section>
 
 <section>
-<h2 id="importance-sampling-programming-elements">Importance sampling, programming elements </h2>
-
-<p>The general derivative formula of the Jastrow factor (or the ansatz for the correlated part of the wave function) is (the subscript \( C \) stands for Correlation)</p>
-<p>&nbsp;<br>
-$$
-\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
-\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
-+
-\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k}
-$$
-<p>&nbsp;<br>
-
-<p>However, 
-with our written in way which can be reused later as
-</p>
-<p>&nbsp;<br>
-$$
-\Psi_C=\prod_{i < j}g(r_{ij})= \exp{\left\{\sum_{i < j}f(r_{ij})\right\}},
-$$
-<p>&nbsp;<br>
-
-<p>the gradient needed for the quantum force and local energy is easy to compute.  
-The function \( f(r_{ij}) \) will depends on the system under study. In the equations below we will keep this general form.
-</p>
-</section>
-
-<section>
-<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
-
-<p>In the Metropolis/Hasting algorithm, the <em>acceptance ratio</em> determines the probability for a particle  to be accepted at a new position. The ratio of the trial wave functions evaluated at the new and current positions is given by (\( OB \) for the onebody  part)</p>
-<p>&nbsp;<br>
-$$
-R \equiv \frac{\Psi_{T}^{new}}{\Psi_{T}^{old}} = 
-\frac{\Psi_{OB}^{new}}{\Psi_{OB}^{old}}\frac{\Psi_{C}^{new}}{\Psi_{C}^{old}}
-$$
-<p>&nbsp;<br>
-
-<p>Here \( \Psi_{OB} \) is our onebody part (Slater determinant or product of boson single-particle states)  while \( \Psi_{C} \) is our correlation function, or Jastrow factor. 
-We need to optimize the \( \nabla \Psi_T / \Psi_T \) ratio and the second derivative as well, that is
-the \( \mathbf{\nabla}^2 \Psi_T/\Psi_T \) ratio. The first is needed when we compute the so-called quantum force in importance sampling.
-The second is needed when we compute the kinetic energy term of the local energy.
-</p>
-<p>&nbsp;<br>
-$$
-\frac{\mathbf{\mathbf{\nabla}}  \Psi}{\Psi}  = \frac{\mathbf{\nabla}  (\Psi_{OB} \, \Psi_{C})}{\Psi_{OB} \, \Psi_{C}}  =  \frac{ \Psi_C \mathbf{\nabla}  \Psi_{OB} + \Psi_{OB} \mathbf{\nabla}  \Psi_{C}}{\Psi_{OB} \Psi_{C}} = \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>The expectation value of the kinetic energy expressed in scaled units  for particle  \( i \) is </p>
-<p>&nbsp;<br>
-$$
- \langle \hat{K}_i \rangle = -\frac{1}{2}\frac{\langle\Psi|\mathbf{\nabla}_{i}^2|\Psi \rangle}{\langle\Psi|\Psi \rangle},
-$$
-<p>&nbsp;<br>
-
-<p>&nbsp;<br>
-$$
-\hat{K}_i = -\frac{1}{2}\frac{\mathbf{\nabla}_{i}^{2} \Psi}{\Psi}.
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>The second derivative which enters the definition of the local energy is </p>
-<p>&nbsp;<br>
-$$
-\frac{\mathbf{\nabla}^2 \Psi}{\Psi}=\frac{\mathbf{\nabla}^2 \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}^2  \Psi_C}{ \Psi_C} + 2 \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}}\cdot\frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
-$$
-<p>&nbsp;<br>
-
-<p>We discuss here how to calculate these quantities in an optimal way.</p>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>We have defined the correlated function as</p>
-<p>&nbsp;<br>
-$$
-\Psi_C=\prod_{i < j}g(r_{ij})=\prod_{i < j}^Ng(r_{ij})= \prod_{i=1}^N\prod_{j=i+1}^Ng(r_{ij}),
-$$
-<p>&nbsp;<br>
-
-<p>with 
-\( r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2+(z_i-z_j)^2} \) in three dimensions or
-\( r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2} \) if we work with two-dimensional systems.
-</p>
-
-<p>In our particular case we have</p>
-<p>&nbsp;<br>
-$$
-\Psi_C=\prod_{i < j}g(r_{ij})=\exp{\left\{\sum_{i < j}f(r_{ij})\right\}}.
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>The total number of different relative distances \( r_{ij} \) is \( N(N-1)/2 \). In a matrix storage format, the relative distances  form a strictly upper triangular matrix</p>
-<p>&nbsp;<br>
-$$
- \mathbf{r} \equiv \begin{pmatrix}
-  0 & r_{1,2} & r_{1,3} & \cdots & r_{1,N} \\
-  \vdots & 0       & r_{2,3} & \cdots & r_{2,N} \\
-  \vdots & \vdots  & 0  & \ddots & \vdots  \\
-  \vdots & \vdots  & \vdots  & \ddots  & r_{N-1,N} \\
-  0 & 0  & 0  & \cdots  & 0
- \end{pmatrix}.
-$$
-<p>&nbsp;<br>
-
-<p>This applies to  \( \mathbf{g} = \mathbf{g}(r_{ij}) \) as well. </p>
-
-<p>In our algorithm we will move one particle  at the time, say the \( kth \)-particle.  This sampling will be seen to be particularly efficient when we are going to compute a Slater determinant. </p>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>We have that the ratio between Jastrow factors \( R_C \) is given by</p>
-<p>&nbsp;<br>
-$$
-R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} =
-\prod_{i=1}^{k-1}\frac{g_{ik}^\mathrm{new}}{g_{ik}^\mathrm{cur}}
-\prod_{i=k+1}^{N}\frac{ g_{ki}^\mathrm{new}} {g_{ki}^\mathrm{cur}}.
-$$
-<p>&nbsp;<br>
-
-<p>For the Pade-Jastrow form</p>
-<p>&nbsp;<br>
-$$
- R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} = 
-\frac{\exp{U_{new}}}{\exp{U_{cur}}} = \exp{\Delta U},
-$$
-<p>&nbsp;<br>
-
-<p>where</p>
-<p>&nbsp;<br>
-$$
-\Delta U =
-\sum_{i=1}^{k-1}\big(f_{ik}^\mathrm{new}-f_{ik}^\mathrm{cur}\big)
-+
-\sum_{i=k+1}^{N}\big(f_{ki}^\mathrm{new}-f_{ki}^\mathrm{cur}\big)
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>One needs to develop a special algorithm 
-that runs only through the elements of the upper triangular
-matrix \( \mathbf{g} \) and have \( k \) as an index. 
-</p>
-
-<p>The expression to be derived in the following is of interest when computing the quantum force and the kinetic energy. It has the form</p>
-<p>&nbsp;<br>
-$$
-\frac{\mathbf{\nabla}_i\Psi_C}{\Psi_C} = \frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_i},
-$$
-<p>&nbsp;<br>
-
-<p>for all dimensions and with \( i \) running over all particles.</p>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>For the first derivative only \( N-1 \) terms survive the ratio because the \( g \)-terms that are not differentiated cancel with their corresponding ones in the denominator. Then,</p>
-<p>&nbsp;<br>
-$$
-\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
-\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
-+
-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_k}.
-$$
-<p>&nbsp;<br>
-
-<p>An equivalent equation is obtained for the exponential form after replacing \( g_{ij} \) by \( \exp(f_{ij}) \), yielding:</p>
-<p>&nbsp;<br>
-$$
-\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
-\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
-+
-\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k},
-$$
-<p>&nbsp;<br>
-
-<p>with both expressions scaling as \( \mathcal{O}(N) \).</p>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>Using the identity </p>
-<p>&nbsp;<br>
-$$
-\frac{\partial}{\partial x_i}g_{ij} = -\frac{\partial}{\partial x_j}g_{ij},
-$$
-<p>&nbsp;<br>
-
-<p>we get expressions where all the derivatives acting on the particle  are represented by the <em>second</em> index of \( g \):</p>
-<p>&nbsp;<br>
-$$
-\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
-\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
--\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_i},
-$$
-<p>&nbsp;<br>
-
-<p>and for the exponential case:</p>
-<p>&nbsp;<br>
-$$
-\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
-\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
--\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}.
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>For correlation forms depending only on the scalar distances \( r_{ij} \) we can use the chain rule. Noting that </p>
-<p>&nbsp;<br>
-$$
-\frac{\partial g_{ij}}{\partial x_j} = \frac{\partial g_{ij}}{\partial r_{ij}} \frac{\partial r_{ij}}{\partial x_j} = \frac{x_j - x_i}{r_{ij}} \frac{\partial g_{ij}}{\partial r_{ij}},
-$$
-<p>&nbsp;<br>
-
-<p>we arrive at</p>
-<p>&nbsp;<br>
-$$
-\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} = 
-\sum_{i=1}^{k-1}\frac{1}{g_{ik}} \frac{\mathbf{r_{ik}}}{r_{ik}} \frac{\partial g_{ik}}{\partial r_{ik}}
--\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial g_{ki}}{\partial r_{ki}}.
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>Note that for the Pade-Jastrow form we can set \( g_{ij} \equiv g(r_{ij}) = e^{f(r_{ij})} = e^{f_{ij}} \) and </p>
-<p>&nbsp;<br>
-$$
-\frac{\partial g_{ij}}{\partial r_{ij}} = g_{ij} \frac{\partial f_{ij}}{\partial r_{ij}}.
-$$
-<p>&nbsp;<br>
-
-<p>Therefore, </p>
-<p>&nbsp;<br>
-$$
-\frac{1}{\Psi_{C}}\frac{\partial \Psi_{C}}{\partial x_k} =
-\sum_{i=1}^{k-1}\frac{\mathbf{r_{ik}}}{r_{ik}}\frac{\partial f_{ik}}{\partial r_{ik}}
--\sum_{i=k+1}^{N}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial f_{ki}}{\partial r_{ki}},
-$$
-<p>&nbsp;<br>
-
-<p>where </p>
-<p>&nbsp;<br>
-$$
- \mathbf{r}_{ij} = |\mathbf{r}_j - \mathbf{r}_i| = (x_j - x_i)\mathbf{e}_1 + (y_j - y_i)\mathbf{e}_2 + (z_j - z_i)\mathbf{e}_3
-$$
-<p>&nbsp;<br>
-
-<p>is the relative distance. </p>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>The second derivative of the Jastrow factor divided by the Jastrow factor (the way it enters the kinetic energy) is</p>
-<p>&nbsp;<br>
-$$
-\left[\frac{\mathbf{\nabla}^2 \Psi_C}{\Psi_C}\right]_x =\  
-2\sum_{k=1}^{N}
-\sum_{i=1}^{k-1}\frac{\partial^2 g_{ik}}{\partial x_k^2}\ +\ 
-\sum_{k=1}^N
-\left(
-\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k} -
-\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}
-\right)^2
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
-<h2 id="importance-sampling">Importance sampling </h2>
-
-<p>But we have a simple form for the function, namely</p>
-<p>&nbsp;<br>
-$$
-\Psi_{C}=\prod_{i < j}\exp{f(r_{ij})},
-$$
-<p>&nbsp;<br>
-
-<p>and it is easy to see that for particle  \( k \)
-we have
-</p>
-<p>&nbsp;<br>
-$$
-  \frac{\mathbf{\nabla}^2_k \Psi_C}{\Psi_C }=
-\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}f'(r_{ki})f'(r_{kj})+
-\sum_{j\ne k}\left( f''(r_{kj})+\frac{2}{r_{kj}}f'(r_{kj})\right)
-$$
-<p>&nbsp;<br>
-</section>
-
-<section>
 <h2 id="importance-sampling-fokker-planck-and-langevin-equations">Importance sampling, Fokker-Planck and Langevin equations </h2>
 
 <p>A stochastic process is simply a function of two variables, one is the
@@ -1545,6 +1228,323 @@ $$
 
 <p>where we have used \( \langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =6Dt \).</p>
 </div>
+</section>
+
+<section>
+<h2 id="importance-sampling-programming-elements">Importance sampling, programming elements </h2>
+
+<p>The general derivative formula of the Jastrow factor (or the ansatz for the correlated part of the wave function) is (the subscript \( C \) stands for Correlation)</p>
+<p>&nbsp;<br>
+$$
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k}
+$$
+<p>&nbsp;<br>
+
+<p>However, 
+with our written in way which can be reused later as
+</p>
+<p>&nbsp;<br>
+$$
+\Psi_C=\prod_{i < j}g(r_{ij})= \exp{\left\{\sum_{i < j}f(r_{ij})\right\}},
+$$
+<p>&nbsp;<br>
+
+<p>the gradient needed for the quantum force and local energy is easy to compute.  
+The function \( f(r_{ij}) \) will depends on the system under study. In the equations below we will keep this general form.
+</p>
+</section>
+
+<section>
+<h2 id="importance-sampling-program-elements">Importance sampling, program elements </h2>
+
+<p>In the Metropolis/Hasting algorithm, the <em>acceptance ratio</em> determines the probability for a particle  to be accepted at a new position. The ratio of the trial wave functions evaluated at the new and current positions is given by (\( OB \) for the onebody  part)</p>
+<p>&nbsp;<br>
+$$
+R \equiv \frac{\Psi_{T}^{new}}{\Psi_{T}^{old}} = 
+\frac{\Psi_{OB}^{new}}{\Psi_{OB}^{old}}\frac{\Psi_{C}^{new}}{\Psi_{C}^{old}}
+$$
+<p>&nbsp;<br>
+
+<p>Here \( \Psi_{OB} \) is our onebody part (Slater determinant or product of boson single-particle states)  while \( \Psi_{C} \) is our correlation function, or Jastrow factor. 
+We need to optimize the \( \nabla \Psi_T / \Psi_T \) ratio and the second derivative as well, that is
+the \( \mathbf{\nabla}^2 \Psi_T/\Psi_T \) ratio. The first is needed when we compute the so-called quantum force in importance sampling.
+The second is needed when we compute the kinetic energy term of the local energy.
+</p>
+<p>&nbsp;<br>
+$$
+\frac{\mathbf{\mathbf{\nabla}}  \Psi}{\Psi}  = \frac{\mathbf{\nabla}  (\Psi_{OB} \, \Psi_{C})}{\Psi_{OB} \, \Psi_{C}}  =  \frac{ \Psi_C \mathbf{\nabla}  \Psi_{OB} + \Psi_{OB} \mathbf{\nabla}  \Psi_{C}}{\Psi_{OB} \Psi_{C}} = \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>The expectation value of the kinetic energy expressed in scaled units  for particle  \( i \) is </p>
+<p>&nbsp;<br>
+$$
+ \langle \hat{K}_i \rangle = -\frac{1}{2}\frac{\langle\Psi|\mathbf{\nabla}_{i}^2|\Psi \rangle}{\langle\Psi|\Psi \rangle},
+$$
+<p>&nbsp;<br>
+
+<p>&nbsp;<br>
+$$
+\hat{K}_i = -\frac{1}{2}\frac{\mathbf{\nabla}_{i}^{2} \Psi}{\Psi}.
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>The second derivative which enters the definition of the local energy is </p>
+<p>&nbsp;<br>
+$$
+\frac{\mathbf{\nabla}^2 \Psi}{\Psi}=\frac{\mathbf{\nabla}^2 \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}^2  \Psi_C}{ \Psi_C} + 2 \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}}\cdot\frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+$$
+<p>&nbsp;<br>
+
+<p>We discuss here how to calculate these quantities in an optimal way.</p>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>We have defined the correlated function as</p>
+<p>&nbsp;<br>
+$$
+\Psi_C=\prod_{i < j}g(r_{ij})=\prod_{i < j}^Ng(r_{ij})= \prod_{i=1}^N\prod_{j=i+1}^Ng(r_{ij}),
+$$
+<p>&nbsp;<br>
+
+<p>with 
+\( r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2+(z_i-z_j)^2} \) in three dimensions or
+\( r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2} \) if we work with two-dimensional systems.
+</p>
+
+<p>In our particular case we have</p>
+<p>&nbsp;<br>
+$$
+\Psi_C=\prod_{i < j}g(r_{ij})=\exp{\left\{\sum_{i < j}f(r_{ij})\right\}}.
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>The total number of different relative distances \( r_{ij} \) is \( N(N-1)/2 \). In a matrix storage format, the relative distances  form a strictly upper triangular matrix</p>
+<p>&nbsp;<br>
+$$
+ \mathbf{r} \equiv \begin{pmatrix}
+  0 & r_{1,2} & r_{1,3} & \cdots & r_{1,N} \\
+  \vdots & 0       & r_{2,3} & \cdots & r_{2,N} \\
+  \vdots & \vdots  & 0  & \ddots & \vdots  \\
+  \vdots & \vdots  & \vdots  & \ddots  & r_{N-1,N} \\
+  0 & 0  & 0  & \cdots  & 0
+ \end{pmatrix}.
+$$
+<p>&nbsp;<br>
+
+<p>This applies to  \( \mathbf{g} = \mathbf{g}(r_{ij}) \) as well. </p>
+
+<p>In our algorithm we will move one particle  at the time, say the \( kth \)-particle.  This sampling will be seen to be particularly efficient when we are going to compute a Slater determinant. </p>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>We have that the ratio between Jastrow factors \( R_C \) is given by</p>
+<p>&nbsp;<br>
+$$
+R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} =
+\prod_{i=1}^{k-1}\frac{g_{ik}^\mathrm{new}}{g_{ik}^\mathrm{cur}}
+\prod_{i=k+1}^{N}\frac{ g_{ki}^\mathrm{new}} {g_{ki}^\mathrm{cur}}.
+$$
+<p>&nbsp;<br>
+
+<p>For the Pade-Jastrow form</p>
+<p>&nbsp;<br>
+$$
+ R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} = 
+\frac{\exp{U_{new}}}{\exp{U_{cur}}} = \exp{\Delta U},
+$$
+<p>&nbsp;<br>
+
+<p>where</p>
+<p>&nbsp;<br>
+$$
+\Delta U =
+\sum_{i=1}^{k-1}\big(f_{ik}^\mathrm{new}-f_{ik}^\mathrm{cur}\big)
++
+\sum_{i=k+1}^{N}\big(f_{ki}^\mathrm{new}-f_{ki}^\mathrm{cur}\big)
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>One needs to develop a special algorithm 
+that runs only through the elements of the upper triangular
+matrix \( \mathbf{g} \) and have \( k \) as an index. 
+</p>
+
+<p>The expression to be derived in the following is of interest when computing the quantum force and the kinetic energy. It has the form</p>
+<p>&nbsp;<br>
+$$
+\frac{\mathbf{\nabla}_i\Psi_C}{\Psi_C} = \frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_i},
+$$
+<p>&nbsp;<br>
+
+<p>for all dimensions and with \( i \) running over all particles.</p>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>For the first derivative only \( N-1 \) terms survive the ratio because the \( g \)-terms that are not differentiated cancel with their corresponding ones in the denominator. Then,</p>
+<p>&nbsp;<br>
+$$
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_k}.
+$$
+<p>&nbsp;<br>
+
+<p>An equivalent equation is obtained for the exponential form after replacing \( g_{ij} \) by \( \exp(f_{ij}) \), yielding:</p>
+<p>&nbsp;<br>
+$$
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k},
+$$
+<p>&nbsp;<br>
+
+<p>with both expressions scaling as \( \mathcal{O}(N) \).</p>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>Using the identity </p>
+<p>&nbsp;<br>
+$$
+\frac{\partial}{\partial x_i}g_{ij} = -\frac{\partial}{\partial x_j}g_{ij},
+$$
+<p>&nbsp;<br>
+
+<p>we get expressions where all the derivatives acting on the particle  are represented by the <em>second</em> index of \( g \):</p>
+<p>&nbsp;<br>
+$$
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
+-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_i},
+$$
+<p>&nbsp;<br>
+
+<p>and for the exponential case:</p>
+<p>&nbsp;<br>
+$$
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
+-\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}.
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>For correlation forms depending only on the scalar distances \( r_{ij} \) we can use the chain rule. Noting that </p>
+<p>&nbsp;<br>
+$$
+\frac{\partial g_{ij}}{\partial x_j} = \frac{\partial g_{ij}}{\partial r_{ij}} \frac{\partial r_{ij}}{\partial x_j} = \frac{x_j - x_i}{r_{ij}} \frac{\partial g_{ij}}{\partial r_{ij}},
+$$
+<p>&nbsp;<br>
+
+<p>we arrive at</p>
+<p>&nbsp;<br>
+$$
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} = 
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}} \frac{\mathbf{r_{ik}}}{r_{ik}} \frac{\partial g_{ik}}{\partial r_{ik}}
+-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial g_{ki}}{\partial r_{ki}}.
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>Note that for the Pade-Jastrow form we can set \( g_{ij} \equiv g(r_{ij}) = e^{f(r_{ij})} = e^{f_{ij}} \) and </p>
+<p>&nbsp;<br>
+$$
+\frac{\partial g_{ij}}{\partial r_{ij}} = g_{ij} \frac{\partial f_{ij}}{\partial r_{ij}}.
+$$
+<p>&nbsp;<br>
+
+<p>Therefore, </p>
+<p>&nbsp;<br>
+$$
+\frac{1}{\Psi_{C}}\frac{\partial \Psi_{C}}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\mathbf{r_{ik}}}{r_{ik}}\frac{\partial f_{ik}}{\partial r_{ik}}
+-\sum_{i=k+1}^{N}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial f_{ki}}{\partial r_{ki}},
+$$
+<p>&nbsp;<br>
+
+<p>where </p>
+<p>&nbsp;<br>
+$$
+ \mathbf{r}_{ij} = |\mathbf{r}_j - \mathbf{r}_i| = (x_j - x_i)\mathbf{e}_1 + (y_j - y_i)\mathbf{e}_2 + (z_j - z_i)\mathbf{e}_3
+$$
+<p>&nbsp;<br>
+
+<p>is the relative distance. </p>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>The second derivative of the Jastrow factor divided by the Jastrow factor (the way it enters the kinetic energy) is</p>
+<p>&nbsp;<br>
+$$
+\left[\frac{\mathbf{\nabla}^2 \Psi_C}{\Psi_C}\right]_x =\  
+2\sum_{k=1}^{N}
+\sum_{i=1}^{k-1}\frac{\partial^2 g_{ik}}{\partial x_k^2}\ +\ 
+\sum_{k=1}^N
+\left(
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k} -
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}
+\right)^2
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="importance-sampling">Importance sampling </h2>
+
+<p>But we have a simple form for the function, namely</p>
+<p>&nbsp;<br>
+$$
+\Psi_{C}=\prod_{i < j}\exp{f(r_{ij})},
+$$
+<p>&nbsp;<br>
+
+<p>and it is easy to see that for particle  \( k \)
+we have
+</p>
+<p>&nbsp;<br>
+$$
+  \frac{\mathbf{\nabla}^2_k \Psi_C}{\Psi_C }=
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}f'(r_{ki})f'(r_{kj})+
+\sum_{j\ne k}\left( f''(r_{kj})+\frac{2}{r_{kj}}f'(r_{kj})\right)
+$$
+<p>&nbsp;<br>
 </section>
 
 
