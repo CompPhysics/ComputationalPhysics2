@@ -10,3 +10,5 @@ print(np.linalg.eig(A))
 #  Solution with iterative methods
 
 # Solution with gradient descent and fixed learning rate
+
+# Then using Jax
