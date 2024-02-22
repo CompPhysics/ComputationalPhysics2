@@ -1,9 +1,9 @@
 TITLE: Week 8 February 19-23: Gradient Methods
 AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Isotope Beams, Michigan State University, East Lansing, Michigan, USA
-DATE: today
+DATE: February 23, 2024
 
 !split
-===== Overview of week 8 =====
+===== Overview  =====
 !bblock  Topics
 * Gradient methods:
   o Semi-Newton methods (Broyden's algorithm)
@@ -29,7 +29,7 @@ o "Handwritten notes":"https://github.com/CompPhysics/ComputationalPhysics2/blob
 !split
 ===== Brief reminder on Newton-Raphson's method =====
 
-Let us quickly remind ourselves how we derive the above method.
+Let us quickly remind ourselves on how we derive the above method.
 
 Perhaps the most celebrated of all one-dimensional root-finding
 routines is Newton's method, also called the Newton-Raphson
@@ -440,7 +440,66 @@ leading to the iterative scheme
 
 
 !split
-=====  Code examples for steepest descent =====
+===== Our simple $2\times 2$ example =====
+
+Last week we introduced the simple two-dimensional function
+!bt
+\[
+f(x_1,x_2)=x_1^2+x_1x_2+10x_2^2-5x_1-3x_2,
+\]
+!et
+which is of the form (in terms of vectors and matrices)
+!bt
+\[
+f(\bm{x})=\frac{1}{2}\bm{x}^T\bm{A}\bm{x}-\bm{b}^T\bm{x},
+\]
+!et
+where we have
+!bt
+\[
+\bm{x}=\begin{bmatrix} x_1 \\ x_2\end{bmatrix},
+\]
+!et
+!bt
+\[
+\bm{b}=\begin{bmatrix} 5 \\ 3\end{bmatrix},
+\]
+!et
+and
+!bt
+\[
+\bm{A}=\begin{bmatrix} 2 & 1\\ 1& 20\end{bmatrix}.
+\]
+!et
+
+!split
+===== Derivatives and more =====
+
+Optimizing the above equation, that is
+!bt
+\[
+\nabla f = 0 = \bm{A}\bm{x}-\bm{b},
+\]
+!et
+which leads to a simple matrix-inversion problem
+!bt
+\[
+\bm{x}=\bm{A}^{-1}\bm{b}.
+\]
+!et
+This problem is easy to solve since we can calculate the inverse. Alternatively, we can solve the two coupled equations with two unknowns
+!bt
+\[
+\frac{\partial f}{\partial x_1}=2x_1+x_2-5=0,
+\]
+!et
+and 
+!bt
+\[
+\frac{\partial f}{\partial x_2}=x_1+20x_2-3=0,
+\]
+!et
+with solutions $x_1=97/39$ and $x_2=1/39$. 
 
 !split
 ===== Simple codes for  steepest descent and conjugate gradient using a $2\times 2$ matrix, in c++, Python code to come =====
@@ -461,8 +520,8 @@ int main(int  argc, char * argv[]){
   // Set our initial guess
   x0(0) = x0(1) = 0;
   // Set the matrix
-  A(0,0) =  3;    A(1,0) =  2;   A(0,1) =  2;   A(1,1) =  6;
-  b(0) = 2; b(1) = -8;
+  A(0,0) =  2;    A(1,0) =  1;   A(0,1) =  1;   A(1,1) =  20;
+  b(0) = 5; b(1) = 3;
   cout << "The Matrix A that we are using: " << endl;
   A.Print();
   cout << endl;
@@ -516,15 +575,15 @@ import matplotlib.pyplot as pt
 from mpl_toolkits.mplot3d import axes3d
 
 def f(x):
-    return 0.5*x[0]**2 + 2.5*x[1]**2
+    return x[0]**2 + 10.0*x[1]**2+x[0]*x[1]-5.0*x[0]-3*x[2]
 
 def df(x):
-    return np.array([x[0], 5*x[1]])
+    return np.array(2*[x[0]+x[1]-5.0, x[0]+20*x[1]]-3.0)
 
 fig = pt.figure()
 ax = fig.gca(projection="3d")
 
-xmesh, ymesh = np.mgrid[-2:2:50j,-2:2:50j]
+xmesh, ymesh = np.mgrid[-2:3:00j,-2:3:00j]
 fmesh = f(np.array([xmesh, ymesh]))
 ax.plot_surface(xmesh, ymesh, fmesh)
 !ec
@@ -532,7 +591,7 @@ And then as countor plot
 !bc pycod
 pt.axis("equal")
 pt.contour(xmesh, ymesh, fmesh)
-guesses = [np.array([2, 2./5])]
+guesses = [np.array([3.0, 0.05])]
 !ec
 Find guesses
 !bc pycod
