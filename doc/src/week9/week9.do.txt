@@ -66,7 +66,7 @@ This defined the sample mean of of experiment $i$ with $n$ samples as
 and the sample variance
 !bt
 \[
-\sigma^2_i=\frac{1}{n}\sum_{j} \left( (x_{ij}-\overline{x}_i\right)^2.
+\sigma^2_i=\frac{1}{n}\sum_{j} \left(x_{ij}-\overline{x}_i\right)^2.
 \]
 !et
 !eblock
@@ -110,7 +110,7 @@ We have from the equation for $\sigma_m^2$
 \overline{x}_i-\overline{X}=\frac{1}{n}\sum_{j=1}^{n}\left(x_{i}-\overline{X}\right),
 \]
 !et
-and introducing the centered value $\tilde{x}_{ij}=x_{ij}-\overline{X}, we can rewrite $\sigma_m^2$ as
+and introducing the centered value $\tilde{x}_{ij}=x_{ij}-\overline{X}$, we can rewrite $\sigma_m^2$ as
 !bt
 \[
 \sigma^2_{m}=\frac{1}{m}\sum_{i} \left( \overline{x}_{i}-\overline{X}\right)^2=\frac{1}{m}\sum_{i=1}^{m}\left[ \frac{i}{n}\sum_{j=1}^{n}\tilde{x}_{ij}\right]^2.
@@ -119,16 +119,72 @@ and introducing the centered value $\tilde{x}_{ij}=x_{ij}-\overline{X}, we can r
 
 !split
 ===== Further rewriting =====
+
 We can rewrite the latter in terms of a sum over diagonal elements only and another sum which contains the non-diagonal elements
 !bt
 \begin{align*}
 \sigma^2_{m}& =\frac{1}{m}\sum_{i=1}^{m}\left[ \frac{i}{n}\sum_{j=1}^{n}\tilde{x}_{ij}\right]^2 \\
-            & = \frac{1}{mn^2}\sum_{i=1}^{m} \sum_{j=1}^{n}\tilde{x}_ij}^2+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j<k}^{n}\tilde{x}_{ij}\tilde{x}_{ik}.
+            & = \frac{1}{mn^2}\sum_{i=1}^{m} \sum_{j=1}^{n}\tilde{x}_{ij}^2+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j<k}^{n}\tilde{x}_{ij}\tilde{x}_{ik}.
 \end{align*}
 !et
-The first term on the last rhs is nothing but the total sample variance $\sigma^2$ divided by $m$
+The first term on the last rhs is nothing but the total sample variance $\sigma^2$ divided by $m$. The second term represents the covariance.
 
 
+
+!split
+===== The covariance term  =====
+
+Using the definition of the total sample variance we have
+!bt
+\begin{align*}
+\sigma^2_{m}& = \frac{\sigma^2}{m}+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j<k}^{n}\tilde{x}_{ij}\tilde{x}_{ik}.
+\end{align*}
+!et
+
+The first term is what we have used till now in order to estimate the
+standard deviation. However, the second term which gives us a measure
+of the correlations between different stochastic events, can result in
+contributions which give rise to a larger standard deviation and
+variance $\sigma_m^2$. Note also the evaluation of the second term
+leads to a double sum over all events. If we run a VMC calculation
+with say $10^9$ Monte carlo samples, the latter term would lead to
+$10^{18}$ function evaluations. We don't want to, by obvious reasons, to venture into that many evaluations.
+
+Note also that if our stochastic events are iid then the covariance terms is zero.
+
+!split
+===== Rewriting the covariance term  =====
+
+We introduce now a variable $d=\vert j-k\vert $ and rewrite 
+!bt
+\[
+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j<k}^{n}\tilde{x}_{ij}\tilde{x}_{ik},
+\]
+!et
+in terms of a function
+!bt
+\[
+f_d=\frac{2}{mn}\sum_{i=1}^{m} \sum_{k=1}^{n-d}\tilde{x}_{ik}\tilde{x}_{i(k+d)}.
+\]
+!et
+We note that for $d=$ we have
+!bt
+\[
+f_0=\frac{2}{mn}\sum_{i=1}^{m} \sum_{k=1}^{n}\tilde{x}_{ik}\tilde{x}_{i(k)}=\sigma^2!
+\]
+!et
+
+!split
+===== Introducing the correlation function =====
+
+We introduce then a correlation function $\kappa_d=f_d/\sigma^2$. Note that $\kappa_0 =1$.  We rewrite the variance $\sigma_m^2$ as
+!bt
+\begin{align*}
+\sigma^2_{m}& = \frac{\sigma^2}{m}\left[1+2\sum_{d=1}^{n-1} \kappa_d\right].
+\end{align*}
+!et
+
+The code here shows the evolution of $\kappa_d$ as a function of $d$ for a series of random numbers. We see that the function $\kappa_d$ approaches $0$ as $d\rightarrow \infty$.
 
 
 !split

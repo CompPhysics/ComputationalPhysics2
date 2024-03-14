@@ -69,6 +69,26 @@ div.toc p,a {
                'overview-of-week-11-march-11-15'),
               ('Why resampling methods ?', 2, None, 'why-resampling-methods'),
               ('Statistical analysis', 2, None, 'statistical-analysis'),
+              ('And why do we use such methods?',
+               2,
+               None,
+               'and-why-do-we-use-such-methods'),
+              ('Central limit theorem', 2, None, 'central-limit-theorem'),
+              ('Running many measurements',
+               2,
+               None,
+               'running-many-measurements'),
+              ('Adding more definitions', 2, None, 'adding-more-definitions'),
+              ('Further rewriting', 2, None, 'further-rewriting'),
+              ('The covariance term', 2, None, 'the-covariance-term'),
+              ('Rewriting the covariance term',
+               2,
+               None,
+               'rewriting-the-covariance-term'),
+              ('Introducing the correlation function',
+               2,
+               None,
+               'introducing-the-correlation-function'),
               ('Statistics, wrapping up from last week',
                2,
                None,
@@ -106,43 +126,6 @@ div.toc p,a {
                None,
                'time-auto-correlation-function'),
               ('Correlation Time', 2, None, 'correlation-time'),
-              ('Resampling methods: Jackknife and Bootstrap',
-               2,
-               None,
-               'resampling-methods-jackknife-and-bootstrap'),
-              ('Resampling methods: Jackknife',
-               2,
-               None,
-               'resampling-methods-jackknife'),
-              ('Resampling methods: Jackknife estimator',
-               2,
-               None,
-               'resampling-methods-jackknife-estimator'),
-              ('Jackknife code example', 2, None, 'jackknife-code-example'),
-              ('Resampling methods: Bootstrap',
-               2,
-               None,
-               'resampling-methods-bootstrap'),
-              ('Resampling methods: Bootstrap background',
-               2,
-               None,
-               'resampling-methods-bootstrap-background'),
-              ('Resampling methods: More Bootstrap background',
-               2,
-               None,
-               'resampling-methods-more-bootstrap-background'),
-              ('Resampling methods: Bootstrap approach',
-               2,
-               None,
-               'resampling-methods-bootstrap-approach'),
-              ('Resampling methods: Bootstrap steps',
-               2,
-               None,
-               'resampling-methods-bootstrap-steps'),
-              ('Code example for the Bootstrap method',
-               2,
-               None,
-               'code-example-for-the-bootstrap-method'),
               ('Resampling methods: Blocking',
                2,
                None,
@@ -157,7 +140,10 @@ div.toc p,a {
                2,
                None,
                'blocking-transformations-final-expressions'),
-              ('How do we proceed?', 2, None, 'how-do-we-proceed'),
+              ('Example code form last week',
+               2,
+               None,
+               'example-code-form-last-week'),
               ('Resampling analysis', 2, None, 'resampling-analysis')]}
 end of tocinfo -->
 
@@ -196,7 +182,7 @@ MathJax.Hub.Config({
 </center>
 <br>
 <center>
-<h4>March 18-22</h4>
+<h4>March 11-15</h4>
 </center> <!-- date -->
 <br>
 
@@ -205,12 +191,14 @@ MathJax.Hub.Config({
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Topics</b>
 <p>
-<ul>
-<li> Resampling Techniques and statistics: Bootstrap and Blocking</li> 
+<ol>
+<li> Reminder from last week about statistical observables, the central limit theorem and bootstrapping, see notes from last week</li>
+<li> Resampling TechniquesL Blocking</li> 
 <li> Discussion of onebody densities</li>
-<li> <a href="https://youtu.be/" target="_blank">Video of lecture TBA</a></li>
-<li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2024/NotesMarch22.pdf" target="_blank">Handwritten notes</a></li>
-</ul>
+<li> Start discussion on optimization and parallelization
+<!-- * <a href="https://youtu.be/" target="_blank">Video of lecture TBA</a> -->
+<!-- * <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2024/NotesMarch22.pdf" target="_blank">Handwritten notes</a> --></li>
+</ol>
 </div>
 
 
@@ -245,14 +233,160 @@ MathJax.Hub.Config({
 <ul>
 <li> As in other experiments, many numerical  experiments have two classes of errors:
 <ol type="a"></li>
- <li> Statistical errors</li>
- <li> Systematical errors</li>
+<li> Statistical errors</li>
+<li> Systematical errors</li>
 </ol>
 <li> Statistical errors can be estimated using standard tools from statistics</li>
 <li> Systematical errors are method specific and must be treated differently from case to case.</li> 
 </ul>
 </div>
     
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="and-why-do-we-use-such-methods">And why do we use such methods? </h2>
+
+<p>As you will see below, due to correlations between various
+measurements, we need to evaluate the so-called covariance in order to
+establish a proper evaluation of the total variance and the thereby
+the standard deviation of a given expectation value.
+</p>
+
+<p>The covariance however, leads to an evaluation of a double sum over the various stochastic variables. This becomes computationally too expensive to evaluate.
+Methods like the Bootstrap, the Jackknife and/or Blocking allow us to circumvent this problem. 
+</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="central-limit-theorem">Central limit theorem </h2>
+
+<p>Last week we derived the central limit theorem with the following assumptions:</p>
+
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Measurement \( i \)</b>
+<p>
+<p>We assumed that each individual measurement \( x_{ij} \) is represented by stochastic variables which independent and identically distributed (iid).
+This defined the sample mean of of experiment \( i \) with \( n \) samples as
+</p>
+$$
+\overline{x}_i=\frac{1}{n}\sum_{j} x_{ij}.
+$$
+
+<p>and the sample variance</p>
+$$
+\sigma^2_i=\frac{1}{n}\sum_{j} \left(x_{ij}-\overline{x}_i\right)^2.
+$$
+</div>
+
+<p>Note that we use \( n \) instead of \( n-1 \) in the definition of
+variance. The sample variance and mean are not necessarily equal to
+the exact values we would get if we knew the corresponding probability
+distribution.
+</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="running-many-measurements">Running many measurements </h2>
+
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Adding \( m \) measurements \( i \)</b>
+<p>
+<p>With the assumption that the average measurements \( i \) are also defined as  iid stochastic variables and have the same probability function \( p \),
+we defined the total average over \( m \) experiments as
+</p>
+$$
+\overline{X}=\frac{1}{m}\sum_{i} \overline{x}_{i}.
+$$
+
+<p>and the total variance</p>
+$$
+\sigma^2_{m}=\frac{1}{m}\sum_{i} \left( \overline{x}_{i}-\overline{X}\right)^2.
+$$
+</div>
+
+<p>These are the quantities we used in showing that if the individual mean values are iid stochastic variables, then in the limit \( m\rightarrow \infty \), the distribution for \( \overline{X} \) is given by a Gaussian distribution with variance \( \sigma^2_m \).</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="adding-more-definitions">Adding more definitions </h2>
+
+<p>The total sample variance over the \( mn \) measurements is defined as</p>
+$$
+\sigma^2=\frac{1}{mn}\sum_{i=1}^{m} \sum_{j=1}^{n}\left(x_{ij}-\overline{X}\right)^2.
+$$
+
+<p>We have from the equation for \( \sigma_m^2 \) </p>
+$$
+\overline{x}_i-\overline{X}=\frac{1}{n}\sum_{j=1}^{n}\left(x_{i}-\overline{X}\right),
+$$
+
+<p>and introducing the centered value \( \tilde{x}_{ij}=x_{ij}-\overline{X} \), we can rewrite \( \sigma_m^2 \) as</p>
+$$
+\sigma^2_{m}=\frac{1}{m}\sum_{i} \left( \overline{x}_{i}-\overline{X}\right)^2=\frac{1}{m}\sum_{i=1}^{m}\left[ \frac{i}{n}\sum_{j=1}^{n}\tilde{x}_{ij}\right]^2.
+$$
+
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="further-rewriting">Further rewriting </h2>
+
+<p>We can rewrite the latter in terms of a sum over diagonal elements only and another sum which contains the non-diagonal elements</p>
+$$
+\begin{align*}
+\sigma^2_{m}& =\frac{1}{m}\sum_{i=1}^{m}\left[ \frac{i}{n}\sum_{j=1}^{n}\tilde{x}_{ij}\right]^2 \\
+            & = \frac{1}{mn^2}\sum_{i=1}^{m} \sum_{j=1}^{n}\tilde{x}_{ij}^2+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j < k}^{n}\tilde{x}_{ij}\tilde{x}_{ik}.
+\end{align*}
+$$
+
+<p>The first term on the last rhs is nothing but the total sample variance \( \sigma^2 \) divided by \( m \). The second term represents the covariance.</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="the-covariance-term">The covariance term  </h2>
+
+<p>Using the definition of the total sample variance we have</p>
+$$
+\begin{align*}
+\sigma^2_{m}& = \frac{\sigma^2}{m}+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j < k}^{n}\tilde{x}_{ij}\tilde{x}_{ik}.
+\end{align*}
+$$
+
+<p>The first term is what we have used till now in order to estimate the
+standard deviation. However, the second term which gives us a measure
+of the correlations between different stochastic events, can result in
+contributions which give rise to a larger standard deviation and
+variance \( \sigma_m^2 \). Note also the evaluation of the second term
+leads to a double sum over all events. If we run a VMC calculation
+with say \( 10^9 \) Monte carlo samples, the latter term would lead to
+\( 10^{18} \) function evaluations. We don't want to, by obvious reasons, to venture into that many evaluations.
+</p>
+
+<p>Note also that if our stochastic events are iid then the covariance terms is zero.</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="rewriting-the-covariance-term">Rewriting the covariance term  </h2>
+
+<p>We introduce now a variable \( d=\vert j-k\vert  \) and rewrite </p>
+$$
+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j < k}^{n}\tilde{x}_{ij}\tilde{x}_{ik},
+$$
+
+<p>in terms of a function</p>
+$$
+f_d=\frac{2}{mn}\sum_{i=1}^{m} \sum_{k=1}^{n-d}\tilde{x}_{ik}\tilde{x}_{i(k+d)}.
+$$
+
+<p>We note that for \( d= \) we have</p>
+$$
+f_0=\frac{2}{mn}\sum_{i=1}^{m} \sum_{k=1}^{n}\tilde{x}_{ik}\tilde{x}_{i(k)}=\sigma^2!
+$$
+
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="introducing-the-correlation-function">Introducing the correlation function </h2>
+
+<p>We introduce then a correlation function \( \kappa_d=f_d/\sigma^2 \). Note that \( \kappa_0 =1 \).  We rewrite the variance \( \sigma_m^2 \) as</p>
+$$
+\begin{align*}
+\sigma^2_{m}& = \frac{\sigma^2}{m}\left[1+2\sum_{d=1}^{n-1} \kappa_d\right].
+\end{align*}
+$$
+
+<p>The code here shows the evolution of \( \kappa_d \) as a function of \( d \) for a series of random numbers. We see that the function \( \kappa_d \) approaches \( 0 \) as \( d\rightarrow \infty \).</p>
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="statistics-wrapping-up-from-last-week">Statistics, wrapping up from last week </h2>
@@ -561,268 +695,6 @@ $$   \tau_{\mathrm{int}} = \sum_k \frac{\phi(k)}{\phi(0)}, $$
 
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="resampling-methods-jackknife-and-bootstrap">Resampling methods: Jackknife and Bootstrap </h2>
-
-<p>Two famous
-resampling methods are the <b>independent bootstrap</b> and <b>the jackknife</b>. 
-</p>
-
-<p>The jackknife is a special case of the independent bootstrap. Still, the jackknife was made
-popular prior to the independent bootstrap. And as the popularity of
-the independent bootstrap soared, new variants, such as <b>the dependent bootstrap</b>.
-</p>
-
-<p>The Jackknife and independent bootstrap work for
-independent, identically distributed random variables.
-If these conditions are not
-satisfied, the methods will fail.  Yet, it should be said that if the data are
-independent, identically distributed, and we only want to estimate the
-variance of \( \overline{X} \) (which often is the case), then there is no
-need for bootstrapping. 
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="resampling-methods-jackknife">Resampling methods: Jackknife </h2>
-
-<p>The Jackknife works by making many replicas of the estimator \( \widehat{\theta} \). 
-The jackknife is a resampling method, we explained that this happens by scrambling the data in some way. When using the jackknife, this is done by systematically leaving out one observation from the vector of observed values \( \hat{x} = (x_1,x_2,\cdots,X_n) \). 
-Let \( \hat{x}_i \) denote the vector
-</p>
-$$
-\hat{x}_i = (x_1,x_2,\cdots,x_{i-1},x_{i+1},\cdots,x_n),
-$$
-
-<p>which equals the vector \( \hat{x} \) with the exception that observation
-number \( i \) is left out. Using this notation, define
-\( \widehat{\theta}_i \) to be the estimator
-\( \widehat{\theta} \) computed using \( \vec{X}_i \). 
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="resampling-methods-jackknife-estimator">Resampling methods: Jackknife estimator </h2>
-
-<p>To get an estimate for the bias and
-standard error of \( \widehat{\theta} \), use the following
-estimators for each component of \( \widehat{\theta} \)
-</p>
-
-$$
-\widehat{\mathrm{Bias}}(\widehat \theta,\theta) = (n-1)\left( - \widehat{\theta} + \frac{1}{n}\sum_{i=1}^{n} \widehat \theta_i \right) \qquad \text{and} \qquad \widehat{\sigma}^2_{\widehat{\theta} } = \frac{n-1}{n}\sum_{i=1}^{n}( \widehat{\theta}_i - \frac{1}{n}\sum_{j=1}^{n}\widehat \theta_j )^2.
-$$
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="jackknife-code-example">Jackknife code example </h2>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="line-height: 125%;"><span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> *
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.random</span> <span style="color: #8B008B; font-weight: bold">import</span> randint, randn
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">jackknife</span>(data, stat):
-    n = <span style="color: #658b00">len</span>(data);t = zeros(n); inds = arange(n); t0 = time()
-    <span style="color: #228B22">## &#39;jackknifing&#39; by leaving out an observation for each i                                                                                                                      </span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(n):
-        t[i] = stat(delete(data,i) )
-
-    <span style="color: #228B22"># analysis                                                                                                                                                                     </span>
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Runtime: %g sec&quot;</span> % (time()-t0)); <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Jackknife Statistics :&quot;</span>)
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;original           bias      std. error&quot;</span>)
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;%8g %14g %15g&quot;</span> % (stat(data),(n-<span style="color: #B452CD">1</span>)*mean(t)/n, (n*var(t))**<span style="color: #B452CD">.5</span>))
-
-    <span style="color: #8B008B; font-weight: bold">return</span> t
-
-
-<span style="color: #228B22"># Returns mean of data samples                                                                                                                                                     </span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">stat</span>(data):
-    <span style="color: #8B008B; font-weight: bold">return</span> mean(data)
-
-
-mu, sigma = <span style="color: #B452CD">100</span>, <span style="color: #B452CD">15</span>
-datapoints = <span style="color: #B452CD">10000</span>
-x = mu + sigma*random.randn(datapoints)
-<span style="color: #228B22"># jackknife returns the data sample                                                                                                                                                </span>
-t = jackknife(x, stat)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="resampling-methods-bootstrap">Resampling methods: Bootstrap </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>Bootstrapping is a nonparametric approach to statistical inference
-that substitutes computation for more traditional distributional
-assumptions and asymptotic results. Bootstrapping offers a number of
-advantages: 
-</p>
-<ol>
-<li> The bootstrap is quite general, although there are some cases in which it fails.</li>  
-<li> Because it does not require distributional assumptions (such as normally distributed errors), the bootstrap can provide more accurate inferences when the data are not well behaved or when the sample size is small.</li>  
-<li> It is possible to apply the bootstrap to statistics with sampling distributions that are difficult to derive, even asymptotically.</li> 
-<li> It is relatively simple to apply the bootstrap to complex data-collection plans (such as stratified and clustered samples).</li>
-</ol>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="resampling-methods-bootstrap-background">Resampling methods: Bootstrap background </h2>
-
-<p>Since \( \widehat{\theta} = \widehat{\theta}(\hat{X}) \) is a function of random variables,
-\( \widehat{\theta} \) itself must be a random variable. Thus it has
-a pdf, call this function \( p(\hat{t}) \). The aim of the bootstrap is to
-estimate \( p(\hat{t}) \) by the relative frequency of
-\( \widehat{\theta} \). You can think of this as using a histogram
-in the place of \( p(\hat{t}) \). If the relative frequency closely
-resembles \( p(\vec{t}) \), then using numerics, it is straight forward to
-estimate all the interesting parameters of \( p(\hat{t}) \) using point
-estimators.  
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="resampling-methods-more-bootstrap-background">Resampling methods: More Bootstrap background </h2>
-
-<p>In the case that \( \widehat{\theta} \) has
-more than one component, and the components are independent, we use the
-same estimator on each component separately.  If the probability
-density function of \( X_i \), \( p(x) \), had been known, then it would have
-been straight forward to do this by: 
-</p>
-<ol>
-<li> Drawing lots of numbers from \( p(x) \), suppose we call one such set of numbers \( (X_1^*, X_2^*, \cdots, X_n^*) \).</li> 
-<li> Then using these numbers, we could compute a replica of \( \widehat{\theta} \) called \( \widehat{\theta}^* \).</li> 
-</ol>
-<p>By repeated use of (1) and (2), many
-estimates of \( \widehat{\theta} \) could have been obtained. The
-idea is to use the relative frequency of \( \widehat{\theta}^* \)
-(think of a histogram) as an estimate of \( p(\hat{t}) \).
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="resampling-methods-bootstrap-approach">Resampling methods: Bootstrap approach </h2>
-
-<p>But
-unless there is enough information available about the process that
-generated \( X_1,X_2,\cdots,X_n \), \( p(x) \) is in general
-unknown. Therefore, <a href="https://projecteuclid.org/euclid.aos/1176344552" target="_blank">Efron in 1979</a>  asked the
-question: What if we replace \( p(x) \) by the relative frequency
-of the observation \( X_i \); if we draw observations in accordance with
-the relative frequency of the observations, will we obtain the same
-result in some asymptotic sense? The answer is yes.
-</p>
-
-<p>Instead of generating the histogram for the relative
-frequency of the observation \( X_i \), just draw the values
-\( (X_1^*,X_2^*,\cdots,X_n^*) \) with replacement from the vector
-\( \hat{X} \). 
-</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="resampling-methods-bootstrap-steps">Resampling methods: Bootstrap steps </h2>
-
-<p>The independent bootstrap works like this: </p>
-
-<ol>
-<li> Draw with replacement \( n \) numbers for the observed variables \( \hat{x} = (x_1,x_2,\cdots,x_n) \).</li> 
-<li> Define a vector \( \hat{x}^* \) containing the values which were drawn from \( \hat{x} \).</li> 
-<li> Using the vector \( \hat{x}^* \) compute \( \widehat{\theta}^* \) by evaluating \( \widehat \theta \) under the observations \( \hat{x}^* \).</li> 
-<li> Repeat this process \( k \) times.</li> 
-</ol>
-<p>When you are done, you can draw a histogram of the relative frequency of \( \widehat \theta^* \). This is your estimate of the probability distribution \( p(t) \). Using this probability distribution you can estimate any statistics thereof. In principle you never draw the histogram of the relative frequency of \( \widehat{\theta}^* \). Instead you use the estimators corresponding to the statistic of interest. For example, if you are interested in estimating the variance of \( \widehat \theta \), apply the etsimator \( \widehat \sigma^2 \) to the values \( \widehat \theta ^* \).</p>
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="code-example-for-the-bootstrap-method">Code example for the Bootstrap method </h2>
-
-<p>The following code starts with a Gaussian distribution with mean value \( \mu =100 \) and variance \( \sigma=15 \). We use this to generate the data used in the bootstrap analysis. The bootstrap analysis returns a data set after a given number of bootstrap operations (as many as we have data points). This data set consists of estimated mean values for each bootstrap operation. The histogram generated by the bootstrap method shows that the distribution for these mean values is also a Gaussian, centered around the mean value \( \mu=100 \) but with standard deviation \( \sigma/\sqrt{n} \), where \( n \) is the number of bootstrap samples (in this case the same as the number of original data points). The value of the standard deviation is what we expect from the central limit theorem. </p>
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="line-height: 125%;">%matplotlib inline
-
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> *
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.random</span> <span style="color: #8B008B; font-weight: bold">import</span> randint, randn
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.stats</span> <span style="color: #8B008B; font-weight: bold">import</span> norm
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
-
-<span style="color: #228B22"># Returns mean of bootstrap samples                                                                                                                                                </span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">stat</span>(data):
-    <span style="color: #8B008B; font-weight: bold">return</span> mean(data)
-
-<span style="color: #228B22"># Bootstrap algorithm                                                                                                                                                              </span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">bootstrap</span>(data, statistic, R):
-    t = zeros(R); n = <span style="color: #658b00">len</span>(data); inds = arange(n); t0 = time()
-
-    <span style="color: #228B22"># non-parametric bootstrap                                                                                                                                                     </span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(R):
-        t[i] = statistic(data[randint(<span style="color: #B452CD">0</span>,n,n)])
-
-    <span style="color: #228B22"># analysis                                                                                                                                                                     </span>
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Runtime: %g sec&quot;</span> % (time()-t0)); <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Bootstrap Statistics :&quot;</span>)
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;original           bias      std. error&quot;</span>)
-    <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;%8g %8g %14g %15g&quot;</span> % (statistic(data), std(data),\
-                             mean(t), \
-                             std(t)))
-    <span style="color: #8B008B; font-weight: bold">return</span> t
-
-
-mu, sigma = <span style="color: #B452CD">100</span>, <span style="color: #B452CD">15</span>
-datapoints = <span style="color: #B452CD">10000</span>
-x = mu + sigma*random.randn(datapoints)
-<span style="color: #228B22"># bootstrap returns the data sample                                                                                                          t = bootstrap(x, stat, datapoints)</span>
-<span style="color: #228B22"># the histogram of the bootstrapped  data  </span>
-t = bootstrap(x, stat, datapoints)
-<span style="color: #228B22"># the histogram of the bootstrapped  data                                            </span>
-n, binsboot, patches = plt.hist(t, bins=<span style="color: #B452CD">50</span>, density=<span style="color: #CD5555">&#39;true&#39;</span>,histtype=<span style="color: #CD5555">&#39;bar&#39;</span>, color=<span style="color: #CD5555">&#39;red&#39;</span>, alpha=<span style="color: #B452CD">0.75</span>)
-
-<span style="color: #228B22"># add a &#39;best fit&#39; line                                                                                                                                                          </span>
-y = norm.pdf( binsboot, mean(t), std(t))
-lt = plt.plot(binsboot, y, <span style="color: #CD5555">&#39;r--&#39;</span>, linewidth=<span style="color: #B452CD">1</span>)
-plt.xlabel(<span style="color: #CD5555">&#39;Smarts&#39;</span>)
-plt.ylabel(<span style="color: #CD5555">&#39;Probability&#39;</span>)
-plt.axis([<span style="color: #B452CD">99.5</span>, <span style="color: #B452CD">100.6</span>, <span style="color: #B452CD">0</span>, <span style="color: #B452CD">3.0</span>])
-plt.grid(<span style="color: #8B008B; font-weight: bold">True</span>)
-
-plt.show()
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="resampling-methods-blocking">Resampling methods: Blocking  </h2>
 
 <p>The blocking method was made popular by <a href="https://aip.scitation.org/doi/10.1063/1.457480" target="_blank">Flyvbjerg and Pedersen (1989)</a>
@@ -953,43 +825,8 @@ It means we can apply blocking transformations until
 
 <p>For an elegant solution and proof of the blocking method, see the recent article of <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" target="_blank">Marius Jonsson (former MSc student of the Computational Physics group)</a>.</p>
 
-<p>We can improve upon this by using the algorithms provided by the <b>optimize</b> package in Python.
-One of these algorithms is  Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno (BFGS) algorithm. 
-</p>
-
-<p>The optimization problem is to minimize \( f(\mathbf {x} ) \) where
-\( \mathbf {x} \) is a vector in \( R^{n} \), and \( f \) is a differentiable
-scalar function. There are no constraints on the values that \( \mathbf{x} \) can take.
-</p>
-
-<p>The algorithm begins at an initial estimate for the optimal value
-\( \mathbf {x}_{0} \) and proceeds iteratively to get a better estimate at
-each stage.
-</p>
-
-<p>The search direction \( p_k \) at stage \( k \) is given by the solution of the analogue of the Newton equation</p>
-
-$$
-B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
-$$
-
-<p>where \( B_{k} \) is an approximation to the Hessian matrix, which is
-updated iteratively at each stage, and \( \nabla f(\mathbf {x} _{k}) \)
-is the gradient of the function
-evaluated at \( x_k \). 
-A line search in the direction \( p_k \) is then used to
-find the next point \( x_{k+1} \) by minimising 
-</p>
-$$
-f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
-$$
-
-<p>over the scalar \( \alpha > 0 \).</p>
-
-<p>The modified code here uses the BFGS algorithm but performs now a
-production run and writes to file all average values of the
-energy. 
-</p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="example-code-form-last-week">Example code form last week </h2>
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
 <div class="cell border-box-sizing code_cell rendered">
@@ -1228,110 +1065,14 @@ frame = pd.DataFrame(data)
   </div>
 </div>
 
-<p>Note that the <b>minimize</b> function returns the final values for the
-variable \( \alpha=x0[0] \) and \( \beta=x0[1] \) in the array \( x \).
-</p>
 
-<p>When we have found the minimum, we use these optimal parameters to perform a production run of energies.
-The output is in turn written to file and is used, together with resampling methods like the <b>blocking method</b>,
-to obtain the best possible estimate for the standard deviation.   The optimal minimum is, even with our guess, rather close to the exact value of \( 3.0 \) a.u.
-</p>
-
-<p>The <a href="https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/Programs/Resampling" target="_blank">sampling
-functions</a>
-can be used to perform both a blocking analysis, or a standard
-bootstrap and jackknife analysis.
-</p>
-<h2 id="how-do-we-proceed">How do we proceed? </h2>
-
-<p>There are several paths which can be chosen. One is to extend the
-brute force gradient descent method with an adapative stochastic
-gradient. There are several examples of this. A recent approach based
-on <a href="https://arxiv.org/pdf/1805.09416.pdf" target="_blank">the Langevin equations</a>
-seems like a promising approach for general and possibly non-convex
-optimization problems.
-</p>
-
-<p>Here we would like to point out that our next step is now to use the
-optimal values for our variational parameters and use these as inputs
-to a production run. Here we would output values of the energy and
-perform for example a blocking analysis of the results in order to get
-a best possible estimate of the standard deviation.
-</p>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="resampling-analysis">Resampling analysis </h2>
 
 <p>The next step is then to use the above data sets and perform a
-resampling analysis, either using say the Bootstrap method or the
-Blocking method. Since the data will be correlated, we would recommend
-to use the non-iid Bootstrap code here. The theoretical background for these resampling methods is found in the <a href="http://compphysics.github.io/ComputationalPhysics2/doc/pub/statanalysis/html/statanalysis.html" target="_blank">statistical analysis lecture notes</a>
+resampling analysis using the blocking method
+The blocking code, based on the article of <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" target="_blank">Marius Jonsson</a> is given here
 </p>
-
-<p>Here we have tailored the codes to the output file from the previous example. We present first the bootstrap resampling with non-iid stochastic event.</p>
-
-
-<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
-<div class="cell border-box-sizing code_cell rendered">
-  <div class="input">
-    <div class="inner_cell">
-      <div class="input_area">
-        <div class="highlight" style="background: #eeeedd">
-  <pre style="line-height: 125%;"><span style="color: #228B22"># Common imports</span>
-<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">os</span>
-
-<span style="color: #228B22"># Where to save the figures and data files</span>
-DATA_ID = <span style="color: #CD5555">&quot;Results/EnergyMin&quot;</span>
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">data_path</span>(dat_id):
-    <span style="color: #8B008B; font-weight: bold">return</span> os.path.join(DATA_ID, dat_id)
-
-infile = <span style="color: #658b00">open</span>(data_path(<span style="color: #CD5555">&quot;Energies.dat&quot;</span>),<span style="color: #CD5555">&#39;r&#39;</span>)
-
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> std, mean, concatenate, arange, loadtxt, zeros, ceil
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.random</span> <span style="color: #8B008B; font-weight: bold">import</span> randint
-<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">time</span> <span style="color: #8B008B; font-weight: bold">import</span> time
-
-
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">tsboot</span>(data,statistic,R,l):
-    t = zeros(R); n = <span style="color: #658b00">len</span>(data); k = <span style="color: #658b00">int</span>(ceil(<span style="color: #658b00">float</span>(n)/l));
-    inds = arange(n); t0 = time()
-    
-    <span style="color: #228B22"># time series bootstrap</span>
-    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(R):
-        <span style="color: #228B22"># construct bootstrap sample from</span>
-        <span style="color: #228B22"># k chunks of data. The chunksize is l</span>
-        _data = concatenate([data[j:j+l] <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> randint(<span style="color: #B452CD">0</span>,n-l,k)])[<span style="color: #B452CD">0</span>:n];
-        t[i] = statistic(_data)
-
-    <span style="color: #228B22"># analysis</span>
-    <span style="color: #658b00">print</span> (<span style="color: #CD5555">&quot;Runtime: %g sec&quot;</span> % (time()-t0)); <span style="color: #658b00">print</span> (<span style="color: #CD5555">&quot;Bootstrap Statistics :&quot;</span>)
-    <span style="color: #658b00">print</span> (<span style="color: #CD5555">&quot;original           bias      std. error&quot;</span>)
-    <span style="color: #658b00">print</span> (<span style="color: #CD5555">&quot;%8g %14g %15g&quot;</span> % (statistic(data), \
-                             mean(t) - statistic(data), \
-                             std(t) ))
-    <span style="color: #8B008B; font-weight: bold">return</span> t
-<span style="color: #228B22"># Read in data</span>
-X = loadtxt(infile)
-<span style="color: #228B22"># statistic to be estimated. Takes two args.</span>
-<span style="color: #228B22"># arg1: the data</span>
-<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">stat</span>(data):
-    <span style="color: #8B008B; font-weight: bold">return</span> mean(data)
-t = tsboot(X, stat, <span style="color: #B452CD">2</span>**<span style="color: #B452CD">12</span>, <span style="color: #B452CD">2</span>**<span style="color: #B452CD">10</span>)
-</pre>
-</div>
-      </div>
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output">
-      <div class="output_area">
-        <div class="output_subarea output_stream output_stdout output_text">          
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<p>The blocking code, based on the article of <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" target="_blank">Marius Jonsson</a> is given here</p>
 
 
 <!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
