@@ -90,6 +90,10 @@ div.toc p,a {
                2,
                None,
                'introducing-the-correlation-function'),
+              ('Computing the correlation function',
+               2,
+               None,
+               'computing-the-correlation-function'),
               ('Resampling methods: Blocking',
                2,
                None,
@@ -725,9 +729,82 @@ $$
 \end{align*}
 $$
 
-<p>The code here shows the evolution of \( \kappa_d \) as a function of \( d \) for a series of random numbers. We see that the function \( \kappa_d \) approaches \( 0 \) as \( d\rightarrow \infty \).</p>
+<p>The code here shows the evolution of \( \kappa_d \) as a function of \( d \)
+for a series of random numbers. We see that the function \( \kappa_d \)
+approaches \( 0 \) as \( d\rightarrow \infty \).
+</p>
 
-<p><b>Note</b>: code will be inserted here later.</p>
+<p>In this case, our data are given by random numbers generated for the uniform distribution with \( x\in [0,1] \). Even with two random numbers being far away, we note that the correlation function is not zero.</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="computing-the-correlation-function">Computing the correlation function </h2>
+
+<p>This code is best seen with the jupyter-notebook</p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="line-height: 125%;"><span style="color: #228B22">#!/usr/bin/env python</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.mlab</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">mlab</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">random</span>
+
+<span style="color: #228B22"># initialize the rng with a seed, simple uniform distribution</span>
+random.seed() 
+m = <span style="color: #B452CD">10000</span>
+samplefactor = <span style="color: #B452CD">1.0</span>/m
+x = np.zeros(m)   
+MeanValue = <span style="color: #B452CD">0.</span>
+VarValue = <span style="color: #B452CD">0.</span>
+<span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span> (m):
+    value = random.random()
+    x[i] = value
+    MeanValue += value
+    VarValue += value*value
+
+MeanValue *= samplefactor
+VarValue *= samplefactor
+Variance = VarValue-MeanValue*MeanValue
+STDev = np.sqrt(Variance)
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;MeanValue =&quot;</span>, MeanValue)
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Variance =&quot;</span>, Variance)
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Standard deviation =&quot;</span>, STDev)
+
+<span style="color: #228B22"># Computing the autocorrelation function</span>
+autocorrelation = np.zeros(m)
+darray = np.zeros(m)
+<span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span> (m):
+    <span style="color: #658b00">sum</span> = <span style="color: #B452CD">0.0</span>
+    darray[j] = j
+    <span style="color: #8B008B; font-weight: bold">for</span> k <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span> (m-j):
+        <span style="color: #658b00">sum</span> += (x[k]-MeanValue)*(x[k+j]-MeanValue ) 
+    autocorrelation[j] = (<span style="color: #658b00">sum</span>/Variance)*samplefactor
+<span style="color: #228B22"># Visualize results</span>
+plt.plot(darray, autocorrelation,<span style="color: #CD5555">&#39;ro&#39;</span>)
+plt.axis([<span style="color: #B452CD">0</span>,m,-<span style="color: #B452CD">0.2</span>, <span style="color: #B452CD">1.1</span>])
+plt.xlabel(<span style="color: #CD5555">r&#39;$d$&#39;</span>)
+plt.ylabel(<span style="color: #CD5555">r&#39;$\kappa_d$&#39;</span>)
+plt.title(<span style="color: #CD5555">r&#39;autocorrelation function for RNG with uniform distribution&#39;</span>)
+plt.show()
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="resampling-methods-blocking">Resampling methods: Blocking  </h2>

@@ -614,7 +614,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week9-bs113.html#private-variables" style="font-size: 80%;">Private variables</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs114.html#master-region" style="font-size: 80%;">Master region</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs115.html#parallel-for-loop" style="font-size: 80%;">Parallel for loop</a></li>
-     <!-- navigation toc: --> <li><a href="#parallel-computations-and-loops" style="font-size: 80%;">Parallel computations and loops</a></li>
+     <!-- navigation toc: --> <li><a href="._week9-bs116.html#parallel-computations-and-loops" style="font-size: 80%;">Parallel computations and loops</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs117.html#scheduling-of-loop-computations" style="font-size: 80%;">Scheduling of  loop computations</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs118.html#example-code-for-loop-scheduling" style="font-size: 80%;">Example code for loop scheduling</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs119.html#example-code-for-loop-scheduling-guided-instead-of-dynamic" style="font-size: 80%;">Example code for loop scheduling, guided instead of dynamic</a></li>
@@ -639,7 +639,7 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week9-bs138.html#find-the-max-location-for-each-thread" style="font-size: 80%;">Find the max location for each thread</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs139.html#combine-the-values-from-each-thread" style="font-size: 80%;">Combine the values from each thread</a></li>
      <!-- navigation toc: --> <li><a href="._week9-bs140.html#matrix-matrix-multiplication-https-github-com-compphysics-computationalphysicsmsu-blob-master-doc-programs-parallelizationopenmp-openmpvectornorm-cpp" style="font-size: 80%;">"Matrix-matrix multiplication":"https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPvectornorm.cpp"</a></li>
-     <!-- navigation toc: --> <li><a href="._week9-bs141.html#matrix-matrix-multiplication-https-github-com-compphysics-computationalphysicsmsu-blob-master-doc-programs-parallelizationopenmp-openmpmatrixmatrixmult-cpp" style="font-size: 80%;">"Matrix-matrix multiplication":"https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPmatrixmatrixmult.cpp"</a></li>
+     <!-- navigation toc: --> <li><a href="#matrix-matrix-multiplication-https-github-com-compphysics-computationalphysicsmsu-blob-master-doc-programs-parallelizationopenmp-openmpmatrixmatrixmult-cpp" style="font-size: 80%;">"Matrix-matrix multiplication":"https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPmatrixmatrixmult.cpp"</a></li>
 
         </ul>
       </li>
@@ -649,23 +649,94 @@ MathJax.Hub.Config({
 </div> <!-- end of navigation bar -->
 <div class="container">
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
-<a name="part0116"></a>
+<a name="part0141"></a>
 <!-- !split -->
-<h2 id="parallel-computations-and-loops" class="anchor">Parallel computations and loops </h2>
+<h2 id="matrix-matrix-multiplication-https-github-com-compphysics-computationalphysicsmsu-blob-master-doc-programs-parallelizationopenmp-openmpmatrixmatrixmult-cpp" class="anchor"><a href="https://github.com/CompPhysics/ComputationalPhysicsMSU/blob/master/doc/Programs/ParallelizationOpenMP/OpenMPmatrixmatrixmult.cpp" target="_self">Matrix-matrix multiplication</a> </h2>
+<p>This the matrix-matrix multiplication code with plain c++ memory allocation using OpenMP</p>
 
-<div class="panel panel-default">
-<div class="panel-body">
-<!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
-<p>OpenMP provides an easy way to parallelize a loop</p>
 
-<!-- code=c++ (!bc cppcod) typeset with pygments style "default" -->
+<!-- code=text (!bc dat) typeset with pygments style "default" -->
 <div class="cell border-box-sizing code_cell rendered">
   <div class="input">
     <div class="inner_cell">
       <div class="input_area">
         <div class="highlight" style="background: #f8f8f8">
-  <pre style="line-height: 125%;"><span style="color: #BC7A00">#pragma omp parallel for</span>
-<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">for</span><span style="color: #bbbbbb"> </span>(i<span style="color: #666666">=0</span>;<span style="color: #bbbbbb"> </span>i<span style="color: #666666">&lt;</span>n;<span style="color: #bbbbbb"> </span>i<span style="color: #666666">++</span>)<span style="color: #bbbbbb"> </span>c[i]<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span>a[i];<span style="color: #bbbbbb"></span>
+  <pre style="line-height: 125%;">//  Matrix-matrix multiplication and Frobenius norm of a matrix with OpenMP
+#include &lt;cstdlib&gt;
+#include &lt;iostream&gt;
+#include &lt;cmath&gt;
+#include &lt;iomanip&gt;
+#include  &lt;omp.h&gt;
+# include &lt;ctime&gt;
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+{
+  // read in dimension of square matrix
+  int n = atoi(argv[1]);
+  double **A, **B, **C;
+  int i, j, k;
+  int thread_num;
+  double wtime, Fsum, s, angle;
+  cout &lt;&lt; &quot;  Compute matrix product C = A * B and Frobenius norm.&quot; &lt;&lt; endl;
+  omp_set_num_threads(4);
+  thread_num = omp_get_max_threads ();
+  cout &lt;&lt; &quot;  The number of processors available = &quot; &lt;&lt; omp_get_num_procs () &lt;&lt; endl ;
+  cout &lt;&lt; &quot;  The number of threads available    = &quot; &lt;&lt; thread_num &lt;&lt;  endl;
+  cout &lt;&lt; &quot;  The matrix order n                 = &quot; &lt;&lt; n &lt;&lt; endl;
+
+  s = 1.0/sqrt( (double) n);
+  wtime = omp_get_wtime ( );
+  // Allocate space for the two matrices
+  A = new double*[n]; B = new double*[n]; C = new double*[n];
+  for (i = 0; i &lt; n; i++){
+    A[i] = new double[n];
+    B[i] = new double[n];
+    C[i] = new double[n];
+  }
+  // Define parallel region
+# pragma omp parallel for default(shared) private (angle, i, j, k) reduction(+:Fsum)
+  // Set up values for matrix A and B and zero matrix C
+  for (i = 0; i &lt; n; i++){
+    for (j = 0; j &lt; n; j++) {
+      angle = 2.0*M_PI*i*j/ (( double ) n);
+      A[i][j] = s * ( sin ( angle ) + cos ( angle ) );
+      B[j][i] =  A[i][j];
+    }
+  }
+  // Then perform the matrix-matrix multiplication
+  for (i = 0; i &lt; n; i++){
+    for (j = 0; j &lt; n; j++) {
+       C[i][j] =  0.0;    
+       for (k = 0; k &lt; n; k++) {
+            C[i][j] += A[i][k]*B[k][j];
+       }
+    }
+  }
+  // Compute now the Frobenius norm
+  Fsum = 0.0;
+  for (i = 0; i &lt; n; i++){
+    for (j = 0; j &lt; n; j++) {
+      Fsum += C[i][j]*C[i][j];
+    }
+  }
+  Fsum = sqrt(Fsum);
+// end parallel region and letting only one thread perform I/O
+  wtime = omp_get_wtime ( ) - wtime;
+  cout &lt;&lt; setiosflags(ios::showpoint | ios::uppercase);
+  cout &lt;&lt; setprecision(10) &lt;&lt; setw(20) &lt;&lt; &quot;Time used  for matrix-matrix multiplication=&quot; &lt;&lt; wtime  &lt;&lt; endl;
+  cout &lt;&lt; &quot;  Frobenius norm  = &quot; &lt;&lt; Fsum &lt;&lt; endl;
+  // Free up space
+  for (int i = 0; i &lt; n; i++){
+    delete[] A[i];
+    delete[] B[i];
+    delete[] C[i];
+  }
+  delete[] A;
+  delete[] B;
+  delete[] C;
+  return 0;
+}
 </pre>
 </div>
       </div>
@@ -681,40 +752,22 @@ MathJax.Hub.Config({
   </div>
 </div>
 
-<p>OpenMP handles index variable (no need to declare in for loop or make private)</p>
-
-<p>Which thread does which values?  Several options. </p>
-</div>
-</div>
-
 
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-<li><a href="._week9-bs115.html">&laquo;</a></li>
+<li><a href="._week9-bs140.html">&laquo;</a></li>
   <li><a href="._week9-bs000.html">1</a></li>
   <li><a href="">...</a></li>
-  <li><a href="._week9-bs108.html">109</a></li>
-  <li><a href="._week9-bs109.html">110</a></li>
-  <li><a href="._week9-bs110.html">111</a></li>
-  <li><a href="._week9-bs111.html">112</a></li>
-  <li><a href="._week9-bs112.html">113</a></li>
-  <li><a href="._week9-bs113.html">114</a></li>
-  <li><a href="._week9-bs114.html">115</a></li>
-  <li><a href="._week9-bs115.html">116</a></li>
-  <li class="active"><a href="._week9-bs116.html">117</a></li>
-  <li><a href="._week9-bs117.html">118</a></li>
-  <li><a href="._week9-bs118.html">119</a></li>
-  <li><a href="._week9-bs119.html">120</a></li>
-  <li><a href="._week9-bs120.html">121</a></li>
-  <li><a href="._week9-bs121.html">122</a></li>
-  <li><a href="._week9-bs122.html">123</a></li>
-  <li><a href="._week9-bs123.html">124</a></li>
-  <li><a href="._week9-bs124.html">125</a></li>
-  <li><a href="._week9-bs125.html">126</a></li>
-  <li><a href="">...</a></li>
-  <li><a href="._week9-bs141.html">142</a></li>
-  <li><a href="._week9-bs117.html">&raquo;</a></li>
+  <li><a href="._week9-bs133.html">134</a></li>
+  <li><a href="._week9-bs134.html">135</a></li>
+  <li><a href="._week9-bs135.html">136</a></li>
+  <li><a href="._week9-bs136.html">137</a></li>
+  <li><a href="._week9-bs137.html">138</a></li>
+  <li><a href="._week9-bs138.html">139</a></li>
+  <li><a href="._week9-bs139.html">140</a></li>
+  <li><a href="._week9-bs140.html">141</a></li>
+  <li class="active"><a href="._week9-bs141.html">142</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 </div>  <!-- end container -->

@@ -183,9 +183,62 @@ We introduce then a correlation function $\kappa_d=f_d/\sigma^2$. Note that $\ka
 \end{align*}
 !et
 
-The code here shows the evolution of $\kappa_d$ as a function of $d$ for a series of random numbers. We see that the function $\kappa_d$ approaches $0$ as $d\rightarrow \infty$.
+The code here shows the evolution of $\kappa_d$ as a function of $d$
+for a series of random numbers. We see that the function $\kappa_d$
+approaches $0$ as $d\rightarrow \infty$.
 
-_Note_: code will be inserted here later.
+In this case, our data are given by random numbers generated for the uniform distribution with $x\in [0,1]$. Even with two random numbers being far away, we note that the correlation function is not zero.
+
+!split
+===== Computing the correlation function =====
+
+This code is best seen with the jupyter-notebook
+!bc pycod
+#!/usr/bin/env python
+import numpy as np
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
+import random
+
+# initialize the rng with a seed, simple uniform distribution
+random.seed() 
+m = 10000
+samplefactor = 1.0/m
+x = np.zeros(m)   
+MeanValue = 0.
+VarValue = 0.
+for i in range (m):
+    value = random.random()
+    x[i] = value
+    MeanValue += value
+    VarValue += value*value
+
+MeanValue *= samplefactor
+VarValue *= samplefactor
+Variance = VarValue-MeanValue*MeanValue
+STDev = np.sqrt(Variance)
+print("MeanValue =", MeanValue)
+print("Variance =", Variance)
+print("Standard deviation =", STDev)
+
+# Computing the autocorrelation function
+autocorrelation = np.zeros(m)
+darray = np.zeros(m)
+for j in range (m):
+    sum = 0.0
+    darray[j] = j
+    for k in range (m-j):
+        sum += (x[k]-MeanValue)*(x[k+j]-MeanValue ) 
+    autocorrelation[j] = (sum/Variance)*samplefactor
+# Visualize results
+plt.plot(darray, autocorrelation,'ro')
+plt.axis([0,m,-0.2, 1.1])
+plt.xlabel(r'$d$')
+plt.ylabel(r'$\kappa_d$')
+plt.title(r'autocorrelation function for RNG with uniform distribution')
+plt.show()
+!ec
+
 
 
 
