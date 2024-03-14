@@ -1,0 +1,460 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+c1}{// Variational Monte Carlo for atoms with importance sampling, slater det}
+\PYG{c+c1}{// Test case for 2\PYGZhy{}electron quantum dot, no classes using Mersenne\PYGZhy{}Twister RNG}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZdq{}mpi.h\PYGZdq{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}cmath\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}random\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}string\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}iostream\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}fstream\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}iomanip\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZdq{}vectormatrixclass.h\PYGZdq{}}
+
+\PYG{k}{using}\PYG{+w}{ }\PYG{k}{namespace}\PYG{+w}{  }\PYG{n+nn}{std}\PYG{p}{;}
+\PYG{c+c1}{// output file as global variable}
+\PYG{n}{ofstream}\PYG{+w}{ }\PYG{n}{ofile}\PYG{p}{;}
+\PYG{c+c1}{// the step length and its squared inverse for the second derivative}
+\PYG{c+c1}{//  Here we define global variables  used in various functions}
+\PYG{c+c1}{//  These can be changed by using classes}
+\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{2}\PYG{p}{;}
+\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{+w}{  }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{2}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{//  we fix also the number of electrons to be 2}
+
+\PYG{c+c1}{// declaration of functions}
+
+\PYG{c+c1}{// The Mc sampling for the variational Monte Carlo}
+\PYG{k+kt}{void}\PYG{+w}{  }\PYG{n+nf}{MonteCarloSampling}\PYG{p}{(}\PYG{k+kt}{int}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{);}
+
+\PYG{c+c1}{// The variational wave function}
+\PYG{k+kt}{double}\PYG{+w}{  }\PYG{n+nf}{WaveFunction}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{);}
+
+\PYG{c+c1}{// The local energy}
+\PYG{k+kt}{double}\PYG{+w}{  }\PYG{n+nf}{LocalEnergy}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{);}
+
+\PYG{c+c1}{// The quantum force}
+\PYG{k+kt}{void}\PYG{+w}{  }\PYG{n+nf}{QuantumForce}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{p}{);}
+
+
+\PYG{c+c1}{// inline function for single\PYGZhy{}particle wave function}
+\PYG{k+kr}{inline}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n+nf}{SPwavefunction}\PYG{p}{(}\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{alpha}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{   }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{exp}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{alpha}\PYG{o}{*}\PYG{n}{r}\PYG{o}{*}\PYG{l+m+mf}{0.5}\PYG{p}{);}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{// inline function for derivative of single\PYGZhy{}particle wave function}
+\PYG{k+kr}{inline}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n+nf}{DerivativeSPwavefunction}\PYG{p}{(}\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{alpha}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{k}{return}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{o}{*}\PYG{n}{alpha}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{// function for absolute value of relative distance}
+\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n+nf}{RelativeDistance}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{r\PYGZus{}ij}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{k}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{n}{r\PYGZus{}ij}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{r}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{k}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{(}\PYG{n}{j}\PYG{p}{,}\PYG{n}{k}\PYG{p}{))}\PYG{o}{*}\PYG{p}{(}\PYG{n}{r}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{k}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{(}\PYG{n}{j}\PYG{p}{,}\PYG{n}{k}\PYG{p}{));}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{r\PYGZus{}ij}\PYG{p}{);}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{// inline function for derivative of Jastrow factor}
+\PYG{k+kr}{inline}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n+nf}{JastrowDerivative}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{beta}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{k}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{  }\PYG{k}{return}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{r}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{k}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{(}\PYG{n}{j}\PYG{p}{,}\PYG{n}{k}\PYG{p}{))}\PYG{o}{/}\PYG{p}{(}\PYG{n}{RelativeDistance}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{)}\PYG{o}{*}\PYG{n}{pow}\PYG{p}{(}\PYG{l+m+mf}{1.0}\PYG{o}{+}\PYG{n}{beta}\PYG{o}{*}\PYG{n}{RelativeDistance}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{),}\PYG{l+m+mi}{2}\PYG{p}{));}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{// function for square of position of single particle}
+\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n+nf}{singleparticle\PYGZus{}pos2}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{r\PYGZus{}single\PYGZus{}particle}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{r\PYGZus{}single\PYGZus{}particle}\PYG{+w}{  }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{r}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{o}{*}\PYG{n}{r}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{r\PYGZus{}single\PYGZus{}particle}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n+nf}{lnsrch}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{xold}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{fold}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{g}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{x}\PYG{p}{,}
+\PYG{+w}{		 }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{f}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{stpmax}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{check}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{*}\PYG{n}{func}\PYG{p}{)(}\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{));}
+
+\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n+nf}{dfpmin}\PYG{p}{(}\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{gtol}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{iter}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{fret}\PYG{p}{,}
+\PYG{+w}{	    }\PYG{k+kt}{double}\PYG{p}{(}\PYG{o}{*}\PYG{n}{func}\PYG{p}{)(}\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{),}\PYG{+w}{ }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{*}\PYG{n}{dfunc}\PYG{p}{)(}\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{g}\PYG{p}{));}
+
+\PYG{k}{static}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{sqrarg}\PYG{p}{;}
+\PYG{c+cp}{\PYGZsh{}define SQR(a) ((sqrarg=(a)) == 0.0 ? 0.0 : sqrarg*sqrarg)}
+
+
+\PYG{k}{static}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{maxarg1}\PYG{p}{,}\PYG{n}{maxarg2}\PYG{p}{;}
+\PYG{c+cp}{\PYGZsh{}define FMAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1) \PYGZgt{} (maxarg2) ?\PYGZbs{}}
+\PYG{c+cp}{        (maxarg1) : (maxarg2))}
+
+
+\PYG{c+c1}{// Begin of main program}
+
+\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n+nf}{main}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{argc}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{char}\PYG{o}{*}\PYG{+w}{ }\PYG{n}{argv}\PYG{p}{[])}
+\PYG{p}{\PYGZob{}}
+
+\PYG{+w}{  }\PYG{c+c1}{//  MPI initializations}
+\PYG{+w}{  }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{NumberProcesses}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MyRank}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{NumberMCsamples}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{MPI\PYGZus{}Init}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n}{argc}\PYG{p}{,}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{argv}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{MPI\PYGZus{}Comm\PYGZus{}size}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{MPI\PYGZus{}COMM\PYGZus{}WORLD}\PYG{p}{,}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{NumberProcesses}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{MPI\PYGZus{}Comm\PYGZus{}rank}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{MPI\PYGZus{}COMM\PYGZus{}WORLD}\PYG{p}{,}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{MyRank}\PYG{p}{);}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{StartTime}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}Wtime}\PYG{p}{();}
+\PYG{+w}{  }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{MyRank}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{argc}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{cout}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Bad Usage: \PYGZdq{}}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{argv}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}
+\PYG{+w}{      }\PYG{l+s}{\PYGZdq{} Read also output file on same line and number of Monte Carlo cycles\PYGZdq{}}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{endl}\PYG{p}{;}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{c+c1}{// Read filename and number of Monte Carlo cycles from the command line}
+\PYG{+w}{  }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{MyRank}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{argc}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{string}\PYG{+w}{ }\PYG{n}{filename}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{argv}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{];}\PYG{+w}{ }\PYG{c+c1}{// first command line argument after name of program}
+\PYG{+w}{    }\PYG{n}{NumberMCsamples}\PYG{+w}{  }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{atoi}\PYG{p}{(}\PYG{n}{argv}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{]);}
+\PYG{+w}{    }\PYG{n}{string}\PYG{+w}{ }\PYG{n}{fileout}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{filename}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{string}\PYG{+w}{ }\PYG{n}{argument}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{to\PYGZus{}string}\PYG{p}{(}\PYG{n}{NumberMCsamples}\PYG{p}{);}
+\PYG{+w}{    }\PYG{c+c1}{// Final filename as filename+NumberMCsamples}
+\PYG{+w}{    }\PYG{n}{fileout}\PYG{p}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{argument}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{ofile}\PYG{p}{.}\PYG{n}{open}\PYG{p}{(}\PYG{n}{fileout}\PYG{p}{);}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{c+c1}{// broadcast the number of  Monte Carlo samples}
+\PYG{+w}{  }\PYG{n}{MPI\PYGZus{}Bcast}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n}{NumberMCsamples}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}INT}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}COMM\PYGZus{}WORLD}\PYG{p}{);}
+\PYG{+w}{  }\PYG{c+c1}{// Two variational parameters only}
+\PYG{+w}{  }\PYG{n}{Vector}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{);}
+\PYG{+w}{  }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{TotalNumberMCsamples}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{NumberMCsamples}\PYG{o}{*}\PYG{n}{NumberProcesses}\PYG{p}{;}
+\PYG{+w}{  }\PYG{c+c1}{// Loop over variational parameters}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{alpha}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.5}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{alpha}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{l+m+mf}{1.5}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{alpha}\PYG{+w}{ }\PYG{o}{+=}\PYG{l+m+mf}{0.1}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{beta}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{beta}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{l+m+mf}{0.5}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{beta}\PYG{+w}{ }\PYG{o}{+=}\PYG{l+m+mf}{0.05}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{alpha}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// value of alpha}
+\PYG{+w}{      }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{beta}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// value of beta}
+\PYG{+w}{      }\PYG{c+c1}{//  Do the mc sampling  and accumulate data with MPI\PYGZus{}Reduce}
+\PYG{+w}{      }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{TotalEnergy}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{TotalEnergySquared}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{LocalProcessEnergy}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{LocalProcessEnergy2}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{LocalProcessEnergy}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{LocalProcessEnergy2}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{MonteCarloSampling}\PYG{p}{(}\PYG{n}{NumberMCsamples}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{LocalProcessEnergy}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{LocalProcessEnergy2}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{);}
+\PYG{+w}{      }\PYG{c+c1}{//  Collect data in total averages}
+\PYG{+w}{      }\PYG{n}{MPI\PYGZus{}Reduce}\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n}{LocalProcessEnergy}\PYG{p}{,}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{TotalEnergy}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}DOUBLE}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}SUM}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}COMM\PYGZus{}WORLD}\PYG{p}{);}
+\PYG{+w}{      }\PYG{n}{MPI\PYGZus{}Reduce}\PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n}{LocalProcessEnergy2}\PYG{p}{,}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{TotalEnergySquared}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}DOUBLE}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}SUM}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}COMM\PYGZus{}WORLD}\PYG{p}{);}
+\PYG{+w}{      }\PYG{c+c1}{// Print out results  in case of Master node, set to MyRank = 0}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{+w}{ }\PYG{n}{MyRank}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{Energy}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{TotalEnergy}\PYG{o}{/}\PYG{p}{(}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{double}\PYG{p}{)}\PYG{n}{NumberProcesses}\PYG{p}{);}
+\PYG{+w}{	}\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{Variance}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{TotalEnergySquared}\PYG{o}{/}\PYG{p}{(}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{double}\PYG{p}{)}\PYG{n}{NumberProcesses}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{Energy}\PYG{o}{*}\PYG{n}{Energy}\PYG{p}{;}
+\PYG{+w}{	}\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{StandardDeviation}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{Variance}\PYG{o}{/}\PYG{p}{((}\PYG{k+kt}{double}\PYG{p}{)}\PYG{n}{TotalNumberMCsamples}\PYG{p}{));}\PYG{+w}{ }\PYG{c+c1}{// over optimistic error}
+\PYG{+w}{	}\PYG{n}{ofile}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setiosflags}\PYG{p}{(}\PYG{n}{ios}\PYG{o}{::}\PYG{n}{showpoint}\PYG{+w}{ }\PYG{o}{|}\PYG{+w}{ }\PYG{n}{ios}\PYG{o}{::}\PYG{n}{uppercase}\PYG{p}{);}
+\PYG{+w}{	}\PYG{n}{ofile}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setw}\PYG{p}{(}\PYG{l+m+mi}{15}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setprecision}\PYG{p}{(}\PYG{l+m+mi}{8}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{);}
+\PYG{+w}{	}\PYG{n}{ofile}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setw}\PYG{p}{(}\PYG{l+m+mi}{15}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setprecision}\PYG{p}{(}\PYG{l+m+mi}{8}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{);}
+\PYG{+w}{	}\PYG{n}{ofile}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setw}\PYG{p}{(}\PYG{l+m+mi}{15}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setprecision}\PYG{p}{(}\PYG{l+m+mi}{8}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Energy}\PYG{p}{;}
+\PYG{+w}{	}\PYG{n}{ofile}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setw}\PYG{p}{(}\PYG{l+m+mi}{15}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setprecision}\PYG{p}{(}\PYG{l+m+mi}{8}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Variance}\PYG{p}{;}
+\PYG{+w}{	}\PYG{n}{ofile}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setw}\PYG{p}{(}\PYG{l+m+mi}{15}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{setprecision}\PYG{p}{(}\PYG{l+m+mi}{8}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{StandardDeviation}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{endl}\PYG{p}{;}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{EndTime}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{MPI\PYGZus{}Wtime}\PYG{p}{();}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{TotalTime}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{EndTime}\PYG{o}{\PYGZhy{}}\PYG{n}{StartTime}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{+w}{ }\PYG{n}{MyRank}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{+w}{ }\PYG{p}{)}\PYG{+w}{  }\PYG{n}{cout}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Time = \PYGZdq{}}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{  }\PYG{n}{TotalTime}\PYG{+w}{  }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{} on number of processors: \PYGZdq{}}\PYG{+w}{  }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberProcesses}\PYG{+w}{  }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{endl}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{MyRank}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{  }\PYG{n}{ofile}\PYG{p}{.}\PYG{n}{close}\PYG{p}{();}\PYG{+w}{  }\PYG{c+c1}{// close output file}
+\PYG{+w}{  }\PYG{c+c1}{// End MPI}
+\PYG{+w}{  }\PYG{n}{MPI\PYGZus{}Finalize}\PYG{+w}{ }\PYG{p}{();}
+\PYG{+w}{  }\PYG{k}{return}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}\PYG{+w}{  }\PYG{c+c1}{//  end of main function}
+
+
+\PYG{c+c1}{// Monte Carlo sampling with the Metropolis algorithm}
+
+\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n+nf}{MonteCarloSampling}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{NumberMCsamples}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{cumulative\PYGZus{}e}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{cumulative\PYGZus{}e2}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{VariationalParameters}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+
+\PYG{+w}{ }\PYG{c+c1}{// Initialize the seed and call the Mersienne algo}
+\PYG{+w}{  }\PYG{n}{std}\PYG{o}{::}\PYG{n}{random\PYGZus{}device}\PYG{+w}{ }\PYG{n}{rd}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{std}\PYG{o}{::}\PYG{n}{mt19937\PYGZus{}64}\PYG{+w}{ }\PYG{n}{gen}\PYG{p}{(}\PYG{n}{rd}\PYG{p}{());}
+\PYG{+w}{  }\PYG{c+c1}{// Set up the uniform distribution for x \PYGZbs{}in [[0, 1]}
+\PYG{+w}{  }\PYG{n}{std}\PYG{o}{::}\PYG{n}{uniform\PYGZus{}real\PYGZus{}distribution}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{double}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{UniformNumberGenerator}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,}\PYG{l+m+mf}{1.0}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{std}\PYG{o}{::}\PYG{n}{normal\PYGZus{}distribution}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{double}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{Normaldistribution}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,}\PYG{l+m+mf}{1.0}\PYG{p}{);}
+\PYG{+w}{  }\PYG{c+c1}{// diffusion constant from Schroedinger equation}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{D}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.5}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{timestep}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.05}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{//  we fix the time step  for the gaussian deviate}
+\PYG{+w}{  }\PYG{c+c1}{// allocate matrices which contain the position of the particles}
+\PYG{+w}{  }\PYG{n}{Matrix}\PYG{+w}{ }\PYG{n}{OldPosition}\PYG{p}{(}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{NewPosition}\PYG{p}{(}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{Matrix}\PYG{+w}{ }\PYG{n}{OldQuantumForce}\PYG{p}{(}\PYG{n}{NumberParticles}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{NewQuantumForce}\PYG{p}{(}\PYG{n}{NumberParticles}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{);}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{Energy}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{EnergySquared}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{DeltaE}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{  }\PYG{c+c1}{//  initial trial positions}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{OldPosition}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{Normaldistribution}\PYG{p}{(}\PYG{n}{gen}\PYG{p}{)}\PYG{o}{*}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{timestep}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{OldWaveFunction}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{WaveFunction}\PYG{p}{(}\PYG{n}{OldPosition}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{QuantumForce}\PYG{p}{(}\PYG{n}{OldPosition}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{OldQuantumForce}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{);}
+\PYG{+w}{  }\PYG{c+c1}{// loop over monte carlo cycles}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{cycles}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{cycles}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{n}{NumberMCsamples}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{cycles}\PYG{o}{++}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{    }\PYG{c+c1}{// new position}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{c+c1}{// gaussian deviate to compute new positions using a given timestep}
+\PYG{+w}{	}\PYG{n}{NewPosition}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{OldPosition}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{Normaldistribution}\PYG{p}{(}\PYG{n}{gen}\PYG{p}{)}\PYG{o}{*}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{timestep}\PYG{p}{)}\PYG{o}{+}\PYG{n}{OldQuantumForce}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{o}{*}\PYG{n}{timestep}\PYG{o}{*}\PYG{n}{D}\PYG{p}{;}
+\PYG{+w}{	}\PYG{c+c1}{//	NewPosition(i,j) = OldPosition(i,j) + gaussian\PYGZus{}deviate(\PYGZam{}idum)*sqrt(timestep)+OldQuantumForce(i,j)*timestep*D;}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{c+c1}{//  for the other particles we need to set the position to the old position since}
+\PYG{+w}{      }\PYG{c+c1}{//  we move only one particle at the time}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{k}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	    }\PYG{n}{NewPosition}\PYG{p}{(}\PYG{n}{k}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{OldPosition}\PYG{p}{(}\PYG{n}{k}\PYG{p}{,}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{	  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{NewWaveFunction}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{WaveFunction}\PYG{p}{(}\PYG{n}{NewPosition}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{);}
+\PYG{+w}{      }\PYG{n}{QuantumForce}\PYG{p}{(}\PYG{n}{NewPosition}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{NewQuantumForce}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{);}
+\PYG{+w}{      }\PYG{c+c1}{//  we compute the log of the ratio of the greens functions to be used in the}
+\PYG{+w}{      }\PYG{c+c1}{//  Metropolis\PYGZhy{}Hastings algorithm}
+\PYG{+w}{      }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{GreensFunction}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{n}{GreensFunction}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{p}{(}\PYG{n}{OldQuantumForce}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{o}{+}\PYG{n}{NewQuantumForce}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{))}\PYG{o}{*}
+\PYG{+w}{	  }\PYG{p}{(}\PYG{n}{D}\PYG{o}{*}\PYG{n}{timestep}\PYG{o}{*}\PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{p}{(}\PYG{n}{OldQuantumForce}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{NewQuantumForce}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{))}\PYG{o}{\PYGZhy{}}\PYG{n}{NewPosition}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{o}{+}\PYG{n}{OldPosition}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{));}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{n}{GreensFunction}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{exp}\PYG{p}{(}\PYG{n}{GreensFunction}\PYG{p}{);}
+\PYG{+w}{      }\PYG{c+c1}{// The Metropolis test is performed by moving one particle at the time}
+\PYG{+w}{      }\PYG{k}{if}\PYG{p}{(}\PYG{n}{UniformNumberGenerator}\PYG{p}{(}\PYG{n}{gen}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{n}{GreensFunction}\PYG{o}{*}\PYG{n}{NewWaveFunction}\PYG{o}{*}\PYG{n}{NewWaveFunction}\PYG{o}{/}\PYG{n}{OldWaveFunction}\PYG{o}{/}\PYG{n}{OldWaveFunction}\PYG{+w}{ }\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{  }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	  }\PYG{n}{OldPosition}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{NewPosition}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{	  }\PYG{n}{OldQuantumForce}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{NewQuantumForce}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{	}\PYG{n}{OldWaveFunction}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{NewWaveFunction}\PYG{p}{;}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}\PYG{+w}{  }\PYG{c+c1}{//  end of loop over particles}
+\PYG{+w}{    }\PYG{c+c1}{// compute local energy}
+\PYG{+w}{    }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{DeltaE}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{LocalEnergy}\PYG{p}{(}\PYG{n}{OldPosition}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{);}
+\PYG{+w}{    }\PYG{c+c1}{// update energies}
+\PYG{+w}{    }\PYG{n}{Energy}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{DeltaE}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{EnergySquared}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{DeltaE}\PYG{o}{*}\PYG{n}{DeltaE}\PYG{p}{;}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{+w}{   }\PYG{c+c1}{// end of loop over MC trials}
+\PYG{+w}{  }\PYG{c+c1}{// update the energy average and its squared}
+\PYG{+w}{  }\PYG{n}{cumulative\PYGZus{}e}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{Energy}\PYG{o}{/}\PYG{n}{NumberMCsamples}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{cumulative\PYGZus{}e2}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{EnergySquared}\PYG{o}{/}\PYG{n}{NumberMCsamples}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}\PYG{+w}{   }\PYG{c+c1}{// end MonteCarloSampling function}
+
+
+\PYG{c+c1}{// Function to compute the squared wave function and the quantum force}
+
+\PYG{k+kt}{double}\PYG{+w}{  }\PYG{n+nf}{WaveFunction}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{VariationalParameters}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{wf}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{  }\PYG{c+c1}{// full Slater determinant for two particles, replace with Slater det for more particles}
+\PYG{+w}{  }\PYG{n}{wf}\PYG{+w}{  }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{SPwavefunction}\PYG{p}{(}\PYG{n}{singleparticle\PYGZus{}pos2}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{))}\PYG{o}{*}\PYG{n}{SPwavefunction}\PYG{p}{(}\PYG{n}{singleparticle\PYGZus{}pos2}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{),}\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{));}
+\PYG{+w}{  }\PYG{c+c1}{// contribution from Jastrow factor}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{wf}\PYG{+w}{ }\PYG{o}{*=}\PYG{+w}{ }\PYG{n}{exp}\PYG{p}{(}\PYG{n}{RelativeDistance}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{)}\PYG{o}{/}\PYG{p}{((}\PYG{l+m+mf}{1.0}\PYG{o}{+}\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{RelativeDistance}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{))));}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{wf}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{// Function to calculate the local energy without numerical derivation of kinetic energy}
+
+\PYG{k+kt}{double}\PYG{+w}{  }\PYG{n+nf}{LocalEnergy}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{VariationalParameters}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+
+\PYG{+w}{  }\PYG{c+c1}{// compute the kinetic and potential energy from the single\PYGZhy{}particle part}
+\PYG{+w}{  }\PYG{c+c1}{// for a many\PYGZhy{}electron system this has to be replaced by a Slater determinant}
+\PYG{+w}{  }\PYG{c+c1}{// The absolute value of the interparticle length}
+\PYG{+w}{  }\PYG{n}{Matrix}\PYG{+w}{ }\PYG{n}{length}\PYG{p}{(}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{);}
+\PYG{+w}{  }\PYG{c+c1}{// Set up interparticle distance}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{length}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{RelativeDistance}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{      }\PYG{n}{length}\PYG{p}{(}\PYG{n}{j}\PYG{p}{,}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{  }\PYG{n}{length}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{KineticEnergy}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{  }\PYG{c+c1}{// Set up kinetic energy from Slater and Jastrow terms}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{k}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{sum1}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	  }\PYG{n}{sum1}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{JastrowDerivative}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{k}\PYG{p}{);}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{n}{KineticEnergy}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{sum1}\PYG{o}{+}\PYG{n}{DerivativeSPwavefunction}\PYG{p}{(}\PYG{n}{r}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{k}\PYG{p}{),}\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)))}\PYG{o}{*}\PYG{p}{(}\PYG{n}{sum1}\PYG{o}{+}\PYG{n}{DerivativeSPwavefunction}\PYG{p}{(}\PYG{n}{r}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{k}\PYG{p}{),}\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)));}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{n}{KineticEnergy}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{l+m+mi}{\PYGZhy{}2}\PYG{o}{*}\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{o}{*}\PYG{n}{NumberParticles}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{KineticEnergy}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{l+m+mf}{2.0}\PYG{o}{/}\PYG{p}{(}\PYG{n}{pow}\PYG{p}{(}\PYG{l+m+mf}{1.0}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{length}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{),}\PYG{l+m+mi}{2}\PYG{p}{))}\PYG{o}{*}\PYG{p}{(}\PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{length}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{l+m+mi}{\PYGZhy{}2}\PYG{o}{*}\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{+}\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{length}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{))}\PYG{+w}{ }\PYG{p}{);}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{n}{KineticEnergy}\PYG{+w}{ }\PYG{o}{*=}\PYG{+w}{ }\PYG{l+m+mf}{\PYGZhy{}0.5}\PYG{p}{;}
+\PYG{+w}{  }\PYG{c+c1}{// Set up potential energy, external potential + eventual electron\PYGZhy{}electron repulsion}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{PotentialEnergy}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{DistanceSquared}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{singleparticle\PYGZus{}pos2}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{PotentialEnergy}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{n}{DistanceSquared}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// sp energy HO part, note it has the oscillator frequency set to 1!}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{c+c1}{// Add the electron\PYGZhy{}electron repulsion}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{l+m+mi}{\PYGZhy{}1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{PotentialEnergy}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{length}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{LocalE}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{KineticEnergy}\PYG{o}{+}\PYG{n}{PotentialEnergy}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{LocalE}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{// Compute the analytical expression for the quantum force}
+\PYG{k+kt}{void}\PYG{+w}{  }\PYG{n+nf}{QuantumForce}\PYG{p}{(}\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Matrix}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{qforce}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{VariationalParameters}\PYG{p}{)}
+\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{c+c1}{// compute the first derivative}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{k}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{Dimension}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{k}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{c+c1}{// single\PYGZhy{}particle part, replace with Slater det for larger systems}
+\PYG{+w}{      }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{sppart}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{DerivativeSPwavefunction}\PYG{p}{(}\PYG{n}{r}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{k}\PYG{p}{),}\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{));}
+\PYG{+w}{      }\PYG{c+c1}{//  Jastrow factor contribution}
+\PYG{+w}{      }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{Jsum}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{NumberParticles}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{+w}{ }\PYG{n}{j}\PYG{+w}{ }\PYG{o}{!=}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	  }\PYG{n}{Jsum}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{JastrowDerivative}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{VariationalParameters}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{j}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{k}\PYG{p}{);}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{n}{qforce}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{k}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{2.0}\PYG{o}{*}\PYG{p}{(}\PYG{n}{Jsum}\PYG{o}{+}\PYG{n}{sppart}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{c+c1}{// end of QuantumForce function}
+
+
+\PYG{c+cp}{\PYGZsh{}define ITMAX 200}
+\PYG{c+cp}{\PYGZsh{}define EPS 3.0e\PYGZhy{}8}
+\PYG{c+cp}{\PYGZsh{}define TOLX (4*EPS)}
+\PYG{c+cp}{\PYGZsh{}define STPMX 100.0}
+
+\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n+nf}{dfpmin}\PYG{p}{(}\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{gtol}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{iter}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{fret}\PYG{p}{,}
+\PYG{+w}{	    }\PYG{k+kt}{double}\PYG{p}{(}\PYG{o}{*}\PYG{n}{func}\PYG{p}{)(}\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{),}\PYG{+w}{ }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{*}\PYG{n}{dfunc}\PYG{p}{)(}\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{g}\PYG{p}{))}
+\PYG{p}{\PYGZob{}}
+
+\PYG{+w}{  }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{check}\PYG{p}{,}\PYG{n}{i}\PYG{p}{,}\PYG{n}{its}\PYG{p}{,}\PYG{n}{j}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{den}\PYG{p}{,}\PYG{n}{fac}\PYG{p}{,}\PYG{n}{fad}\PYG{p}{,}\PYG{n}{fae}\PYG{p}{,}\PYG{n}{fp}\PYG{p}{,}\PYG{n}{stpmax}\PYG{p}{,}\PYG{n}{sum}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{,}\PYG{n}{sumdg}\PYG{p}{,}\PYG{n}{sumxi}\PYG{p}{,}\PYG{n}{temp}\PYG{p}{,}\PYG{n}{test}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{Vector}\PYG{+w}{ }\PYG{n}{dg}\PYG{p}{(}\PYG{n}{n}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{(}\PYG{n}{n}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{hdg}\PYG{p}{(}\PYG{n}{n}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{pnew}\PYG{p}{(}\PYG{n}{n}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{xi}\PYG{p}{(}\PYG{n}{n}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{Matrix}\PYG{+w}{ }\PYG{n}{hessian}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{n}{n}\PYG{p}{);}
+
+\PYG{+w}{  }\PYG{n}{fp}\PYG{o}{=}\PYG{p}{(}\PYG{o}{*}\PYG{n}{func}\PYG{p}{)(}\PYG{n}{p}\PYG{p}{);}
+\PYG{+w}{  }\PYG{p}{(}\PYG{o}{*}\PYG{n}{dfunc}\PYG{p}{)(}\PYG{n}{p}\PYG{p}{,}\PYG{n}{g}\PYG{p}{);}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{j}\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{hessian}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{hessian}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{n}{g}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{sum}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{*}\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{n}{stpmax}\PYG{o}{=}\PYG{n}{STPMX}\PYG{o}{*}\PYG{n}{FMAX}\PYG{p}{(}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{sum}\PYG{p}{),(}\PYG{k+kt}{double}\PYG{p}{)}\PYG{n}{n}\PYG{p}{);}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{its}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{n}{its}\PYG{o}{\PYGZlt{}=}\PYG{n}{ITMAX}\PYG{p}{;}\PYG{n}{its}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{o}{*}\PYG{n}{iter}\PYG{o}{=}\PYG{n}{its}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{lnsrch}\PYG{p}{(}\PYG{n}{n}\PYG{p}{,}\PYG{n}{p}\PYG{p}{,}\PYG{n}{fp}\PYG{p}{,}\PYG{n}{g}\PYG{p}{,}\PYG{n}{xi}\PYG{p}{,}\PYG{n}{pnew}\PYG{p}{,}\PYG{n}{fret}\PYG{p}{,}\PYG{n}{stpmax}\PYG{p}{,}\PYG{o}{\PYGZam{}}\PYG{n}{check}\PYG{p}{,}\PYG{n}{func}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{fp}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{fret}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{n}{pnew}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{      }\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{n}{pnew}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{n}{test}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{temp}\PYG{o}{=}\PYG{n}{fabs}\PYG{p}{(}\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{))}\PYG{o}{/}\PYG{n}{FMAX}\PYG{p}{(}\PYG{n}{fabs}\PYG{p}{(}\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)),}\PYG{l+m+mf}{1.0}\PYG{p}{);}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{test}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{test}\PYG{o}{=}\PYG{n}{temp}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{test}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{TOLX}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{return}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{dg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{n}{g}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{(}\PYG{o}{*}\PYG{n}{dfunc}\PYG{p}{)(}\PYG{n}{p}\PYG{p}{,}\PYG{n}{g}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{test}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{den}\PYG{o}{=}\PYG{n}{FMAX}\PYG{p}{(}\PYG{o}{*}\PYG{n}{fret}\PYG{p}{,}\PYG{l+m+mf}{1.0}\PYG{p}{);}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{temp}\PYG{o}{=}\PYG{n}{fabs}\PYG{p}{(}\PYG{n}{g}\PYG{p}{(}\PYG{n}{i}\PYG{p}{))}\PYG{o}{*}\PYG{n}{FMAX}\PYG{p}{(}\PYG{n}{fabs}\PYG{p}{(}\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)),}\PYG{l+m+mf}{1.0}\PYG{p}{)}\PYG{o}{/}\PYG{n}{den}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{test}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{test}\PYG{o}{=}\PYG{n}{temp}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{test}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{gtol}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{return}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{dg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{n}{g}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{dg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{hdg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{j}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{j}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{hdg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{hessian}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{o}{*}\PYG{n}{dg}\PYG{p}{(}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{n}{fac}\PYG{o}{=}\PYG{n}{fae}\PYG{o}{=}\PYG{n}{sumdg}\PYG{o}{=}\PYG{n}{sumxi}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{fac}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{dg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{*}\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{      }\PYG{n}{fae}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{dg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{*}\PYG{n}{hdg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{      }\PYG{n}{sumdg}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{SQR}\PYG{p}{(}\PYG{n}{dg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{));}
+\PYG{+w}{      }\PYG{n}{sumxi}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{SQR}\PYG{p}{(}\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{));}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{fac}\PYG{o}{*}\PYG{n}{fac}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{EPS}\PYG{o}{*}\PYG{n}{sumdg}\PYG{o}{*}\PYG{n}{sumxi}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{fac}\PYG{o}{=}\PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{fac}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{fad}\PYG{o}{=}\PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{fae}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{dg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{n}{fac}\PYG{o}{*}\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{fad}\PYG{o}{*}\PYG{n}{hdg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{j}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{j}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	  }\PYG{n}{hessian}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{fac}\PYG{o}{*}\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{*}\PYG{n}{xi}\PYG{p}{(}\PYG{n}{j}\PYG{p}{)}
+\PYG{+w}{	    }\PYG{o}{\PYGZhy{}}\PYG{n}{fad}\PYG{o}{*}\PYG{n}{hdg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{*}\PYG{n}{hdg}\PYG{p}{(}\PYG{n}{j}\PYG{p}{)}\PYG{o}{+}\PYG{n}{fae}\PYG{o}{*}\PYG{n}{dg}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{*}\PYG{n}{dg}\PYG{p}{(}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{j}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{j}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{j}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{xi}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZhy{}=}\PYG{+w}{ }\PYG{n}{hessian}\PYG{p}{(}\PYG{n}{i}\PYG{p}{,}\PYG{n}{j}\PYG{p}{)}\PYG{o}{*}\PYG{n}{g}\PYG{p}{(}\PYG{n}{j}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{n}{cout}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}too many iterations in dfpmin\PYGZdq{}}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{endl}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\PYG{c+cp}{\PYGZsh{}undef ITMAX}
+\PYG{c+cp}{\PYGZsh{}undef EPS}
+\PYG{c+cp}{\PYGZsh{}undef TOLX}
+\PYG{c+cp}{\PYGZsh{}undef STPMX}
+
+\PYG{c+cp}{\PYGZsh{}define ALF 1.0e\PYGZhy{}4}
+\PYG{c+cp}{\PYGZsh{}define TOLX 1.0e\PYGZhy{}7}
+
+\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n+nf}{lnsrch}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{n}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{xold}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{fold}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{g}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{x}\PYG{p}{,}
+\PYG{+w}{	    }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{f}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{stpmax}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{check}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{*}\PYG{n}{func}\PYG{p}{)(}\PYG{n}{Vector}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{p}\PYG{p}{))}
+\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{,}\PYG{n}{alam}\PYG{p}{,}\PYG{n}{alam2}\PYG{p}{,}\PYG{n}{alamin}\PYG{p}{,}\PYG{n}{b}\PYG{p}{,}\PYG{n}{disc}\PYG{p}{,}\PYG{n}{f2}\PYG{p}{,}\PYG{n}{fold2}\PYG{p}{,}\PYG{n}{rhs1}\PYG{p}{,}\PYG{n}{rhs2}\PYG{p}{,}\PYG{n}{slope}\PYG{p}{,}\PYG{n}{sum}\PYG{p}{,}\PYG{n}{temp}\PYG{p}{,}
+\PYG{+w}{    }\PYG{n}{test}\PYG{p}{,}\PYG{n}{tmplam}\PYG{p}{;}
+
+\PYG{+w}{  }\PYG{o}{*}\PYG{n}{check}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{sum}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{,}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{sum}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{*}\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{sum}\PYG{o}{=}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{sum}\PYG{p}{);}
+\PYG{+w}{  }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{sum}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{stpmax}\PYG{p}{)}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{*=}\PYG{+w}{ }\PYG{n}{stpmax}\PYG{o}{/}\PYG{n}{sum}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{slope}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{,}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}
+\PYG{+w}{    }\PYG{n}{slope}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{*}\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{test}\PYG{o}{=}\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{temp}\PYG{o}{=}\PYG{n}{fabs}\PYG{p}{(}\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{))}\PYG{o}{/}\PYG{n}{FMAX}\PYG{p}{(}\PYG{n}{fabs}\PYG{p}{(}\PYG{n}{xold}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)),}\PYG{l+m+mf}{1.0}\PYG{p}{);}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{temp}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{test}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{test}\PYG{o}{=}\PYG{n}{temp}\PYG{p}{;}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{n}{alamin}\PYG{o}{=}\PYG{n}{TOLX}\PYG{o}{/}\PYG{n}{test}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{alam}\PYG{o}{=}\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\PYG{+w}{  }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(;;)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{n}{xold}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{+}\PYG{n}{alam}\PYG{o}{*}\PYG{n}{p}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{    }\PYG{o}{*}\PYG{n}{f}\PYG{o}{=}\PYG{p}{(}\PYG{o}{*}\PYG{n}{func}\PYG{p}{)(}\PYG{n}{x}\PYG{p}{);}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{alam}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{alamin}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{n}{i}\PYG{o}{\PYGZlt{}}\PYG{n}{n}\PYG{p}{;}\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{x}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}\PYG{o}{=}\PYG{n}{xold}\PYG{p}{(}\PYG{n}{i}\PYG{p}{);}
+\PYG{+w}{      }\PYG{o}{*}\PYG{n}{check}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{return}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k}{else}\PYG{+w}{ }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{*}\PYG{n}{f}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{n}{fold}\PYG{o}{+}\PYG{n}{ALF}\PYG{o}{*}\PYG{n}{alam}\PYG{o}{*}\PYG{n}{slope}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{return}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k}{else}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{alam}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{)}
+\PYG{+w}{	}\PYG{n}{tmplam}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{n}{slope}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mf}{2.0}\PYG{o}{*}\PYG{p}{(}\PYG{o}{*}\PYG{n}{f}\PYG{o}{\PYGZhy{}}\PYG{n}{fold}\PYG{o}{\PYGZhy{}}\PYG{n}{slope}\PYG{p}{));}
+\PYG{+w}{      }\PYG{k}{else}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{n}{rhs1}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{f}\PYG{o}{\PYGZhy{}}\PYG{n}{fold}\PYG{o}{\PYGZhy{}}\PYG{n}{alam}\PYG{o}{*}\PYG{n}{slope}\PYG{p}{;}
+\PYG{+w}{	}\PYG{n}{rhs2}\PYG{o}{=}\PYG{n}{f2}\PYG{o}{\PYGZhy{}}\PYG{n}{fold2}\PYG{o}{\PYGZhy{}}\PYG{n}{alam2}\PYG{o}{*}\PYG{n}{slope}\PYG{p}{;}
+\PYG{+w}{	}\PYG{n}{a}\PYG{o}{=}\PYG{p}{(}\PYG{n}{rhs1}\PYG{o}{/}\PYG{p}{(}\PYG{n}{alam}\PYG{o}{*}\PYG{n}{alam}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{rhs2}\PYG{o}{/}\PYG{p}{(}\PYG{n}{alam2}\PYG{o}{*}\PYG{n}{alam2}\PYG{p}{))}\PYG{o}{/}\PYG{p}{(}\PYG{n}{alam}\PYG{o}{\PYGZhy{}}\PYG{n}{alam2}\PYG{p}{);}
+\PYG{+w}{	}\PYG{n}{b}\PYG{o}{=}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{alam2}\PYG{o}{*}\PYG{n}{rhs1}\PYG{o}{/}\PYG{p}{(}\PYG{n}{alam}\PYG{o}{*}\PYG{n}{alam}\PYG{p}{)}\PYG{o}{+}\PYG{n}{alam}\PYG{o}{*}\PYG{n}{rhs2}\PYG{o}{/}\PYG{p}{(}\PYG{n}{alam2}\PYG{o}{*}\PYG{n}{alam2}\PYG{p}{))}\PYG{o}{/}\PYG{p}{(}\PYG{n}{alam}\PYG{o}{\PYGZhy{}}\PYG{n}{alam2}\PYG{p}{);}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{a}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{tmplam}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{n}{slope}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mf}{2.0}\PYG{o}{*}\PYG{n}{b}\PYG{p}{);}
+\PYG{+w}{	}\PYG{k}{else}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	  }\PYG{n}{disc}\PYG{o}{=}\PYG{n}{b}\PYG{o}{*}\PYG{n}{b}\PYG{l+m+mf}{\PYGZhy{}3.0}\PYG{o}{*}\PYG{n}{a}\PYG{o}{*}\PYG{n}{slope}\PYG{p}{;}
+\PYG{+w}{	  }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{disc}\PYG{o}{\PYGZlt{}}\PYG{l+m+mf}{0.0}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{cout}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}Roundoff problem in lnsrch.\PYGZdq{}}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{endl}\PYG{p}{;}
+\PYG{+w}{	  }\PYG{k}{else}\PYG{+w}{ }\PYG{n}{tmplam}\PYG{o}{=}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{b}\PYG{o}{+}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{disc}\PYG{p}{))}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mf}{3.0}\PYG{o}{*}\PYG{n}{a}\PYG{p}{);}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{tmplam}\PYG{o}{\PYGZgt{}}\PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{n}{alam}\PYG{p}{)}
+\PYG{+w}{	  }\PYG{n}{tmplam}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{n}{alam}\PYG{p}{;}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{n}{alam2}\PYG{o}{=}\PYG{n}{alam}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{f2}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{f}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{fold2}\PYG{o}{=}\PYG{n}{fold}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{alam}\PYG{o}{=}\PYG{n}{FMAX}\PYG{p}{(}\PYG{n}{tmplam}\PYG{p}{,}\PYG{l+m+mf}{0.1}\PYG{o}{*}\PYG{n}{alam}\PYG{p}{);}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+\PYG{c+cp}{\PYGZsh{}undef ALF}
+\PYG{c+cp}{\PYGZsh{}undef TOLX}
+
+
+\end{Verbatim}

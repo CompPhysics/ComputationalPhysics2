@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}omp.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}define CHUNKSIZE 100}
+\PYG{c+cp}{\PYGZsh{}define N 1000}
+\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n+nf}{main}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{argc}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{char}\PYG{+w}{ }\PYG{o}{*}\PYG{n}{argv}\PYG{p}{[])}
+\PYG{p}{\PYGZob{}}
+\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{i}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{chunk}\PYG{p}{;}
+\PYG{k+kt}{float}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{[}\PYG{n}{N}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{b}\PYG{p}{[}\PYG{n}{N}\PYG{p}{],}\PYG{+w}{ }\PYG{n}{c}\PYG{p}{[}\PYG{n}{N}\PYG{p}{];}
+\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{N}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{b}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\PYG{n}{chunk}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{CHUNKSIZE}\PYG{p}{;}
+\PYG{c+cp}{\PYGZsh{}pragma omp parallel shared(a,b,c,chunk) private(i)}
+\PYG{p}{\PYGZob{}}
+\PYG{c+cp}{\PYGZsh{}pragma omp for schedule(dynamic,chunk)}
+\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{i}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{n}{N}\PYG{p}{;}\PYG{+w}{ }\PYG{n}{i}\PYG{o}{++}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{c}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n}{b}\PYG{p}{[}\PYG{n}{i}\PYG{p}{];}
+\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{c+cm}{/* end of parallel region */}
+\PYG{p}{\PYGZcb{}}
+
+\end{Verbatim}

@@ -1,0 +1,81 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+//  Matrix\PYGZhy{}matrix multiplication and Frobenius norm of a matrix with OpenMP
+\PYGZsh{}include \PYGZlt{}cstdlib\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}iostream\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}cmath\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}iomanip\PYGZgt{}
+\PYGZsh{}include  \PYGZlt{}omp.h\PYGZgt{}
+\PYGZsh{} include \PYGZlt{}ctime\PYGZgt{}
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+\PYGZob{}
+  // read in dimension of square matrix
+  int n = atoi(argv[1]);
+  double **A, **B, **C;
+  int i, j, k;
+  int thread\PYGZus{}num;
+  double wtime, Fsum, s, angle;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  Compute matrix product C = A * B and Frobenius norm.\PYGZdq{} \PYGZlt{}\PYGZlt{} endl;
+  omp\PYGZus{}set\PYGZus{}num\PYGZus{}threads(4);
+  thread\PYGZus{}num = omp\PYGZus{}get\PYGZus{}max\PYGZus{}threads ();
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  The number of processors available = \PYGZdq{} \PYGZlt{}\PYGZlt{} omp\PYGZus{}get\PYGZus{}num\PYGZus{}procs () \PYGZlt{}\PYGZlt{} endl ;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  The number of threads available    = \PYGZdq{} \PYGZlt{}\PYGZlt{} thread\PYGZus{}num \PYGZlt{}\PYGZlt{}  endl;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  The matrix order n                 = \PYGZdq{} \PYGZlt{}\PYGZlt{} n \PYGZlt{}\PYGZlt{} endl;
+
+  s = 1.0/sqrt( (double) n);
+  wtime = omp\PYGZus{}get\PYGZus{}wtime ( );
+  // Allocate space for the two matrices
+  A = new double*[n]; B = new double*[n]; C = new double*[n];
+  for (i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    A[i] = new double[n];
+    B[i] = new double[n];
+    C[i] = new double[n];
+  \PYGZcb{}
+  // Define parallel region
+\PYGZsh{} pragma omp parallel for default(shared) private (angle, i, j, k) reduction(+:Fsum)
+  // Set up values for matrix A and B and zero matrix C
+  for (i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    for (j = 0; j \PYGZlt{} n; j++) \PYGZob{}
+      angle = 2.0*M\PYGZus{}PI*i*j/ (( double ) n);
+      A[i][j] = s * ( sin ( angle ) + cos ( angle ) );
+      B[j][i] =  A[i][j];
+    \PYGZcb{}
+  \PYGZcb{}
+  // Then perform the matrix\PYGZhy{}matrix multiplication
+  for (i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    for (j = 0; j \PYGZlt{} n; j++) \PYGZob{}
+       C[i][j] =  0.0;
+       for (k = 0; k \PYGZlt{} n; k++) \PYGZob{}
+            C[i][j] += A[i][k]*B[k][j];
+       \PYGZcb{}
+    \PYGZcb{}
+  \PYGZcb{}
+  // Compute now the Frobenius norm
+  Fsum = 0.0;
+  for (i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    for (j = 0; j \PYGZlt{} n; j++) \PYGZob{}
+      Fsum += C[i][j]*C[i][j];
+    \PYGZcb{}
+  \PYGZcb{}
+  Fsum = sqrt(Fsum);
+// end parallel region and letting only one thread perform I/O
+  wtime = omp\PYGZus{}get\PYGZus{}wtime ( ) \PYGZhy{} wtime;
+  cout \PYGZlt{}\PYGZlt{} setiosflags(ios::showpoint | ios::uppercase);
+  cout \PYGZlt{}\PYGZlt{} setprecision(10) \PYGZlt{}\PYGZlt{} setw(20) \PYGZlt{}\PYGZlt{} \PYGZdq{}Time used  for matrix\PYGZhy{}matrix multiplication=\PYGZdq{} \PYGZlt{}\PYGZlt{} wtime  \PYGZlt{}\PYGZlt{} endl;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  Frobenius norm  = \PYGZdq{} \PYGZlt{}\PYGZlt{} Fsum \PYGZlt{}\PYGZlt{} endl;
+  // Free up space
+  for (int i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    delete[] A[i];
+    delete[] B[i];
+    delete[] C[i];
+  \PYGZcb{}
+  delete[] A;
+  delete[] B;
+  delete[] C;
+  return 0;
+\PYGZcb{}
+
+
+
+\end{Verbatim}

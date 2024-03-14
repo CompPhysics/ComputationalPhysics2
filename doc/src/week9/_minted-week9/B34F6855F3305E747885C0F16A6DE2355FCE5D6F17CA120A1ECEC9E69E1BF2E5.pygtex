@@ -1,0 +1,59 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+c1}{\PYGZsh{} Common imports}
+\PYG{k+kn}{import} \PYG{n+nn}{os}
+
+\PYG{c+c1}{\PYGZsh{} Where to save the figures and data files}
+\PYG{n}{DATA\PYGZus{}ID} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Results/EnergyMin\PYGZdq{}}
+
+\PYG{k}{def} \PYG{n+nf}{data\PYGZus{}path}\PYG{p}{(}\PYG{n}{dat\PYGZus{}id}\PYG{p}{):}
+    \PYG{k}{return} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{DATA\PYGZus{}ID}\PYG{p}{,} \PYG{n}{dat\PYGZus{}id}\PYG{p}{)}
+
+\PYG{n}{infile} \PYG{o}{=} \PYG{n+nb}{open}\PYG{p}{(}\PYG{n}{data\PYGZus{}path}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Energies.dat\PYGZdq{}}\PYG{p}{),}\PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}}\PYG{p}{)}
+
+\PYG{k+kn}{from} \PYG{n+nn}{numpy} \PYG{k+kn}{import} \PYG{n}{log2}\PYG{p}{,} \PYG{n}{zeros}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{,} \PYG{n}{var}\PYG{p}{,} \PYG{n+nb}{sum}\PYG{p}{,} \PYG{n}{loadtxt}\PYG{p}{,} \PYG{n}{arange}\PYG{p}{,} \PYG{n}{array}\PYG{p}{,} \PYG{n}{cumsum}\PYG{p}{,} \PYG{n}{dot}\PYG{p}{,} \PYG{n}{transpose}\PYG{p}{,} \PYG{n}{diagonal}\PYG{p}{,} \PYG{n}{sqrt}
+\PYG{k+kn}{from} \PYG{n+nn}{numpy.linalg} \PYG{k+kn}{import} \PYG{n}{inv}
+
+\PYG{k}{def} \PYG{n+nf}{block}\PYG{p}{(}\PYG{n}{x}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} preliminaries}
+    \PYG{n}{n} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{d} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{log2}\PYG{p}{(}\PYG{n}{n}\PYG{p}{))}
+    \PYG{n}{s}\PYG{p}{,} \PYG{n}{gamma} \PYG{o}{=} \PYG{n}{zeros}\PYG{p}{(}\PYG{n}{d}\PYG{p}{),} \PYG{n}{zeros}\PYG{p}{(}\PYG{n}{d}\PYG{p}{)}
+    \PYG{n}{mu} \PYG{o}{=} \PYG{n}{mean}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} estimate the auto\PYGZhy{}covariance and variances}
+    \PYG{c+c1}{\PYGZsh{} for each blocking transformation}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n}{arange}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{d}\PYG{p}{):}
+        \PYG{n}{n} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} estimate autocovariance of x}
+        \PYG{n}{gamma}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{o}{**}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n+nb}{sum}\PYG{p}{(} \PYG{p}{(}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:(}\PYG{n}{n}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)]}\PYG{o}{\PYGZhy{}}\PYG{n}{mu}\PYG{p}{)}\PYG{o}{*}\PYG{p}{(}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{n}{n}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{mu}\PYG{p}{)} \PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} estimate variance of x}
+        \PYG{n}{s}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n}{var}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+        \PYG{c+c1}{\PYGZsh{} perform blocking transformation}
+        \PYG{n}{x} \PYG{o}{=} \PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{p}{(}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{::}\PYG{l+m+mi}{2}\PYG{p}{]} \PYG{o}{+} \PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{::}\PYG{l+m+mi}{2}\PYG{p}{])}
+
+    \PYG{c+c1}{\PYGZsh{} generate the test observator M\PYGZus{}k from the theorem}
+    \PYG{n}{M} \PYG{o}{=} \PYG{p}{(}\PYG{n}{cumsum}\PYG{p}{(} \PYG{p}{((}\PYG{n}{gamma}\PYG{o}{/}\PYG{n}{s}\PYG{p}{)}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{o}{**}\PYG{n}{arange}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{d}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{)[::}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])[::}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{p}{)}  \PYG{p}{)[::}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]}
+
+    \PYG{c+c1}{\PYGZsh{} we need a list of magic numbers}
+    \PYG{n}{q} \PYG{o}{=}\PYG{n}{array}\PYG{p}{([}\PYG{l+m+mf}{6.634897}\PYG{p}{,}\PYG{l+m+mf}{9.210340}\PYG{p}{,} \PYG{l+m+mf}{11.344867}\PYG{p}{,} \PYG{l+m+mf}{13.276704}\PYG{p}{,} \PYG{l+m+mf}{15.086272}\PYG{p}{,} \PYG{l+m+mf}{16.811894}\PYG{p}{,} \PYG{l+m+mf}{18.475307}\PYG{p}{,} \PYG{l+m+mf}{20.090235}\PYG{p}{,} \PYG{l+m+mf}{21.665994}\PYG{p}{,} \PYG{l+m+mf}{23.209251}\PYG{p}{,} \PYG{l+m+mf}{24.724970}\PYG{p}{,} \PYG{l+m+mf}{26.216967}\PYG{p}{,} \PYG{l+m+mf}{27.688250}\PYG{p}{,} \PYG{l+m+mf}{29.141238}\PYG{p}{,} \PYG{l+m+mf}{30.577914}\PYG{p}{,} \PYG{l+m+mf}{31.999927}\PYG{p}{,} \PYG{l+m+mf}{33.408664}\PYG{p}{,} \PYG{l+m+mf}{34.805306}\PYG{p}{,} \PYG{l+m+mf}{36.190869}\PYG{p}{,} \PYG{l+m+mf}{37.566235}\PYG{p}{,} \PYG{l+m+mf}{38.932173}\PYG{p}{,} \PYG{l+m+mf}{40.289360}\PYG{p}{,} \PYG{l+m+mf}{41.638398}\PYG{p}{,} \PYG{l+m+mf}{42.979820}\PYG{p}{,} \PYG{l+m+mf}{44.314105}\PYG{p}{,} \PYG{l+m+mf}{45.641683}\PYG{p}{,} \PYG{l+m+mf}{46.962942}\PYG{p}{,} \PYG{l+m+mf}{48.278236}\PYG{p}{,} \PYG{l+m+mf}{49.587884}\PYG{p}{,} \PYG{l+m+mf}{50.892181}\PYG{p}{])}
+
+    \PYG{c+c1}{\PYGZsh{} use magic to determine when we should have stopped blocking}
+    \PYG{k}{for} \PYG{n}{k} \PYG{o+ow}{in} \PYG{n}{arange}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{d}\PYG{p}{):}
+        \PYG{k}{if}\PYG{p}{(}\PYG{n}{M}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{n}{q}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]):}
+            \PYG{k}{break}
+    \PYG{k}{if} \PYG{p}{(}\PYG{n}{k} \PYG{o}{\PYGZgt{}=} \PYG{n}{d}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{):}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Warning: Use more data\PYGZdq{}}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{mu}\PYG{p}{,} \PYG{n}{s}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{o}{**}\PYG{p}{(}\PYG{n}{d}\PYG{o}{\PYGZhy{}}\PYG{n}{k}\PYG{p}{)}
+
+
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{loadtxt}\PYG{p}{(}\PYG{n}{infile}\PYG{p}{)}
+\PYG{p}{(}\PYG{n}{mean}\PYG{p}{,} \PYG{n}{var}\PYG{p}{)} \PYG{o}{=} \PYG{n}{block}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+\PYG{n}{std} \PYG{o}{=} \PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{var}\PYG{p}{)}
+\PYG{k+kn}{import} \PYG{n+nn}{pandas} \PYG{k}{as} \PYG{n+nn}{pd}
+\PYG{k+kn}{from} \PYG{n+nn}{pandas} \PYG{k+kn}{import} \PYG{n}{DataFrame}
+\PYG{n}{data} \PYG{o}{=}\PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}Mean\PYGZsq{}}\PYG{p}{:[}\PYG{n}{mean}\PYG{p}{],} \PYG{l+s+s1}{\PYGZsq{}STDev\PYGZsq{}}\PYG{p}{:[}\PYG{n}{std}\PYG{p}{]\PYGZcb{}}
+\PYG{n}{frame} \PYG{o}{=} \PYG{n}{pd}\PYG{o}{.}\PYG{n}{DataFrame}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,}\PYG{n}{index}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}Values\PYGZsq{}}\PYG{p}{])}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{frame}\PYG{p}{)}
+
+
+\end{Verbatim}

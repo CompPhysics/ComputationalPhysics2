@@ -1,0 +1,60 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+//  OpenMP program to compute vector norm by adding two other vectors
+\PYGZsh{}include \PYGZlt{}cstdlib\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}iostream\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}cmath\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}iomanip\PYGZgt{}
+\PYGZsh{}include  \PYGZlt{}omp.h\PYGZgt{}
+\PYGZsh{} include \PYGZlt{}ctime\PYGZgt{}
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+\PYGZob{}
+  // read in dimension of vector
+  int n = atoi(argv[1]);
+  double *a, *b, *c;
+  int i;
+  int thread\PYGZus{}num;
+  double wtime, Norm2, s, angle;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  Perform addition of two vectors and compute the norm\PYGZhy{}2.\PYGZdq{} \PYGZlt{}\PYGZlt{} endl;
+  omp\PYGZus{}set\PYGZus{}num\PYGZus{}threads(4);
+  thread\PYGZus{}num = omp\PYGZus{}get\PYGZus{}max\PYGZus{}threads ();
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  The number of processors available = \PYGZdq{} \PYGZlt{}\PYGZlt{} omp\PYGZus{}get\PYGZus{}num\PYGZus{}procs () \PYGZlt{}\PYGZlt{} endl ;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  The number of threads available    = \PYGZdq{} \PYGZlt{}\PYGZlt{} thread\PYGZus{}num \PYGZlt{}\PYGZlt{}  endl;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  The matrix order n                 = \PYGZdq{} \PYGZlt{}\PYGZlt{} n \PYGZlt{}\PYGZlt{} endl;
+
+  s = 1.0/sqrt( (double) n);
+  wtime = omp\PYGZus{}get\PYGZus{}wtime ( );
+  // Allocate space for the vectors to be used
+  a = new double [n]; b = new double [n]; c = new double [n];
+  // Define parallel region
+\PYGZsh{} pragma omp parallel for default(shared) private (angle, i) reduction(+:Norm2)
+  // Set up values for vectors  a and b
+  for (i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+      angle = 2.0*M\PYGZus{}PI*i/ (( double ) n);
+      a[i] = s*(sin(angle) + cos(angle));
+      b[i] =  s*sin(2.0*angle);
+      c[i] = 0.0;
+  \PYGZcb{}
+  // Then perform the vector addition
+  for (i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+     c[i] += a[i]+b[i];
+  \PYGZcb{}
+  // Compute now the norm\PYGZhy{}2
+  Norm2 = 0.0;
+  for (i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+     Norm2  += c[i]*c[i];
+  \PYGZcb{}
+// end parallel region
+  wtime = omp\PYGZus{}get\PYGZus{}wtime ( ) \PYGZhy{} wtime;
+  cout \PYGZlt{}\PYGZlt{} setiosflags(ios::showpoint | ios::uppercase);
+  cout \PYGZlt{}\PYGZlt{} setprecision(10) \PYGZlt{}\PYGZlt{} setw(20) \PYGZlt{}\PYGZlt{} \PYGZdq{}Time used  for norm\PYGZhy{}2 computation=\PYGZdq{} \PYGZlt{}\PYGZlt{} wtime  \PYGZlt{}\PYGZlt{} endl;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{} Norm\PYGZhy{}2  = \PYGZdq{} \PYGZlt{}\PYGZlt{} Norm2 \PYGZlt{}\PYGZlt{} endl;
+  // Free up space
+  delete[] a;
+  delete[] b;
+  delete[] c;
+  return 0;
+\PYGZcb{}
+
+\end{Verbatim}

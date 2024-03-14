@@ -1,0 +1,68 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYGZsh{}include \PYGZlt{}cstdlib\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}iostream\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}cmath\PYGZgt{}
+\PYGZsh{}include \PYGZlt{}iomanip\PYGZgt{}
+\PYGZsh{}include \PYGZdq{}time.h\PYGZdq{}
+
+using namespace std; // note use of namespace
+int main (int argc, char* argv[])
+\PYGZob{}
+  // read in dimension of square matrix
+  int n = atoi(argv[1]);
+  double s = 1.0/sqrt( (double) n);
+  double **A, **B, **C;
+  // Start timing
+  clock\PYGZus{}t start, finish;
+  start = clock();
+  // Allocate space for the two matrices
+  A = new double*[n]; B = new double*[n]; C = new double*[n];
+  for (int i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    A[i] = new double[n];
+    B[i] = new double[n];
+    C[i] = new double[n];
+  \PYGZcb{}
+  // Set up values for matrix A and B and zero matrix C
+  for (int i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    for (int j = 0; j \PYGZlt{} n; j++) \PYGZob{}
+      double angle = 2.0*M\PYGZus{}PI*i*j/ (( double ) n);
+      A[i][j] = s * ( sin ( angle ) + cos ( angle ) );
+      B[j][i] =  A[i][j];
+    \PYGZcb{}
+  \PYGZcb{}
+  // Then perform the matrix\PYGZhy{}matrix multiplication
+  for (int i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    for (int j = 0; j \PYGZlt{} n; j++) \PYGZob{}
+      double sum = 0.0;
+       for (int k = 0; k \PYGZlt{} n; k++) \PYGZob{}
+           sum += B[i][k]*A[k][j];
+       \PYGZcb{}
+       C[i][j] = sum;
+    \PYGZcb{}
+  \PYGZcb{}
+  // Compute now the Frobenius norm
+  double Fsum = 0.0;
+  for (int i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    for (int j = 0; j \PYGZlt{} n; j++) \PYGZob{}
+      Fsum += C[i][j]*C[i][j];
+    \PYGZcb{}
+  \PYGZcb{}
+  Fsum = sqrt(Fsum);
+  finish = clock();
+  double timeused = (double) (finish \PYGZhy{} start)/(CLOCKS\PYGZus{}PER\PYGZus{}SEC );
+  cout \PYGZlt{}\PYGZlt{} setiosflags(ios::showpoint | ios::uppercase);
+  cout \PYGZlt{}\PYGZlt{} setprecision(10) \PYGZlt{}\PYGZlt{} setw(20) \PYGZlt{}\PYGZlt{} \PYGZdq{}Time used  for matrix\PYGZhy{}matrix multiplication=\PYGZdq{} \PYGZlt{}\PYGZlt{} timeused  \PYGZlt{}\PYGZlt{} endl;
+  cout \PYGZlt{}\PYGZlt{} \PYGZdq{}  Frobenius norm  = \PYGZdq{} \PYGZlt{}\PYGZlt{} Fsum \PYGZlt{}\PYGZlt{} endl;
+  // Free up space
+  for (int i = 0; i \PYGZlt{} n; i++)\PYGZob{}
+    delete[] A[i];
+    delete[] B[i];
+    delete[] C[i];
+  \PYGZcb{}
+  delete[] A;
+  delete[] B;
+  delete[] C;
+  return 0;
+\PYGZcb{}
+
+\end{Verbatim}
