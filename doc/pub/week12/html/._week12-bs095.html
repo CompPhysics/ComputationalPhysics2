@@ -1,0 +1,543 @@
+<!--
+HTML file automatically generated from DocOnce source
+(https://github.com/doconce/doconce/)
+doconce format html week12.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week12-bs --no_mako
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Boltzmann machines and deep learning and discussions of project 2">
+<title>Boltzmann machines and deep learning and discussions of project 2</title>
+<!-- Bootstrap style: bootstrap -->
+<!-- doconce format html week12.do.txt --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=week12-bs --no_mako -->
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<!-- not necessary
+<link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+-->
+<style type="text/css">
+/* Add scrollbar to dropdown menus in bootstrap navigation bar */
+.dropdown-menu {
+   height: auto;
+   max-height: 400px;
+   overflow-x: hidden;
+}
+/* Adds an invisible element before each target to offset for the navigation
+   bar */
+.anchor::before {
+  content:"";
+  display:block;
+  height:50px;      /* fixed header height for style bootstrap */
+  margin:-50px 0 0; /* negative fixed header height */
+}
+</style>
+</head>
+
+<!-- tocinfo
+{'highest level': 2,
+ 'sections': [('Plans for the week of April 8-12, 2024',
+               2,
+               None,
+               'plans-for-the-week-of-april-8-12-2024'),
+              ('Energy models', 2, None, 'energy-models'),
+              ('Probability model', 2, None, 'probability-model'),
+              ('Marginal and conditional probabilities',
+               2,
+               None,
+               'marginal-and-conditional-probabilities'),
+              ('Change of notation', 2, None, 'change-of-notation'),
+              ('Optimization problem', 2, None, 'optimization-problem'),
+              ('Further simplifications', 2, None, 'further-simplifications'),
+              ('Optimizing the logarithm instead',
+               2,
+               None,
+               'optimizing-the-logarithm-instead'),
+              ('Expression for the gradients',
+               2,
+               None,
+               'expression-for-the-gradients'),
+              ('The derivative of the partition function',
+               2,
+               None,
+               'the-derivative-of-the-partition-function'),
+              ('Explicit expression for the derivative',
+               2,
+               None,
+               'explicit-expression-for-the-derivative'),
+              ('Final expression', 2, None, 'final-expression'),
+              ('Introducing the energy model',
+               2,
+               None,
+               'introducing-the-energy-model'),
+              ('More compact notation', 2, None, 'more-compact-notation'),
+              ('Anticipating results to be derived',
+               2,
+               None,
+               'anticipating-results-to-be-derived'),
+              ('Boltzmann Machines, marginal and conditional probabilities',
+               2,
+               None,
+               'boltzmann-machines-marginal-and-conditional-probabilities'),
+              ('Generative and discriminative models',
+               2,
+               None,
+               'generative-and-discriminative-models'),
+              ('Basics of the Boltzmann machine',
+               2,
+               None,
+               'basics-of-the-boltzmann-machine'),
+              ('More about the basics', 2, None, 'more-about-the-basics'),
+              ('Difficult to train', 2, None, 'difficult-to-train'),
+              ('The network layers', 2, None, 'the-network-layers'),
+              ('Goal of hidden layer', 2, None, 'goal-of-hidden-layer'),
+              ('The parameters', 2, None, 'the-parameters'),
+              ('Joint distribution', 2, None, 'joint-distribution'),
+              ('Network Elements, the energy function',
+               2,
+               None,
+               'network-elements-the-energy-function'),
+              ('Defining different types of RBMs',
+               2,
+               None,
+               'defining-different-types-of-rbms'),
+              ('Gaussian-binary RBM', 2, None, 'gaussian-binary-rbm'),
+              ('Cost function', 2, None, 'cost-function'),
+              ('Optimization / Training', 2, None, 'optimization-training'),
+              ('Gradients', 2, None, 'gradients'),
+              ('Simplifications', 2, None, 'simplifications'),
+              ('Positive and negative phases',
+               2,
+               None,
+               'positive-and-negative-phases'),
+              ('Gradient examples', 2, None, 'gradient-examples'),
+              ('Kullback-Leibler relative entropy',
+               2,
+               None,
+               'kullback-leibler-relative-entropy'),
+              ('Kullback-Leibler divergence',
+               2,
+               None,
+               'kullback-leibler-divergence'),
+              ('Maximizing log-likelihood',
+               2,
+               None,
+               'maximizing-log-likelihood'),
+              ('More on the partition function',
+               2,
+               None,
+               'more-on-the-partition-function'),
+              ('Setting up for gradient descent calculations',
+               2,
+               None,
+               'setting-up-for-gradient-descent-calculations'),
+              ('Difference of moments', 2, None, 'difference-of-moments'),
+              ('More observations', 2, None, 'more-observations'),
+              ('Adding hyperparameters', 2, None, 'adding-hyperparameters'),
+              ('Mathematical details', 2, None, 'mathematical-details'),
+              ('Binary-binary (BB) RBMs', 2, None, 'binary-binary-bb-rbms'),
+              ('Marginal probability', 2, None, 'marginal-probability'),
+              ('Marginal Probability Density Function for the visible units',
+               2,
+               None,
+               'marginal-probability-density-function-for-the-visible-units'),
+              ('Marginal probability for hidden units',
+               2,
+               None,
+               'marginal-probability-for-hidden-units'),
+              ('Conditional Probability Density Functions',
+               2,
+               None,
+               'conditional-probability-density-functions'),
+              ('On and off probabilities', 2, None, 'on-and-off-probabilities'),
+              ('Conditional probability for visible units',
+               2,
+               None,
+               'conditional-probability-for-visible-units'),
+              ('Gaussian-Binary Restricted Boltzmann Machines',
+               2,
+               None,
+               'gaussian-binary-restricted-boltzmann-machines'),
+              ('Joint Probability Density Function',
+               2,
+               None,
+               'joint-probability-density-function'),
+              ('Partition function', 2, None, 'partition-function'),
+              ('Marginal Probability Density Functions',
+               2,
+               None,
+               'marginal-probability-density-functions'),
+              ('Then the visible units', 2, None, 'then-the-visible-units'),
+              ('Conditional Probability Density Functions',
+               2,
+               None,
+               'conditional-probability-density-functions'),
+              ('Hidden units', 2, None, 'hidden-units'),
+              ('Visible units', 2, None, 'visible-units'),
+              ('Comments', 2, None, 'comments'),
+              ('Neural Quantum States', 2, None, 'neural-quantum-states'),
+              ('Model for the trial wave function',
+               2,
+               None,
+               'model-for-the-trial-wave-function'),
+              ('Allowing for complex valued functions',
+               2,
+               None,
+               'allowing-for-complex-valued-functions'),
+              ('Squared wave function', 2, None, 'squared-wave-function'),
+              ('Cost function', 2, None, 'cost-function'),
+              ('And the gradient', 2, None, 'and-the-gradient'),
+              ('Additional details', 2, None, 'additional-details'),
+              ('Final equation', 2, None, 'final-equation'),
+              ('Code example', 2, None, 'code-example'),
+              ('Project 2, VMC for fermions: Efficient calculation of Slater '
+               'determinants',
+               2,
+               None,
+               'project-2-vmc-for-fermions-efficient-calculation-of-slater-determinants'),
+              ('Matrix elements of Slater determinants',
+               2,
+               None,
+               'matrix-elements-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('Efficient calculation of Slater determinants',
+               2,
+               None,
+               'efficient-calculation-of-slater-determinants'),
+              ('The gradient and the Laplacian',
+               2,
+               None,
+               'the-gradient-and-the-laplacian'),
+              ('How to compute the derivates of the Slater determinant',
+               2,
+               None,
+               'how-to-compute-the-derivates-of-the-slater-determinant'),
+              ('The Slater determinant', 2, None, 'the-slater-determinant'),
+              ('Rewriting the Slater determinant',
+               2,
+               None,
+               'rewriting-the-slater-determinant'),
+              ('Splitting the Slater determinant',
+               2,
+               None,
+               'splitting-the-slater-determinant'),
+              ('Spin up and spin down parts',
+               2,
+               None,
+               'spin-up-and-spin-down-parts'),
+              ('Factorization', 2, None, 'factorization'),
+              ('Number of operations', 2, None, 'number-of-operations'),
+              ('Counting the number of FLOPS',
+               2,
+               None,
+               'counting-the-number-of-flops'),
+              ('Computation of ratios', 2, None, 'computation-of-ratios'),
+              ('Scaling properties', 2, None, 'scaling-properties'),
+              ('How to get the determinant',
+               2,
+               None,
+               'how-to-get-the-determinant'),
+              ('Expectation value of the kinetic energy',
+               2,
+               None,
+               'expectation-value-of-the-kinetic-energy'),
+              ('Second derivative of the Jastrow factor',
+               2,
+               None,
+               'second-derivative-of-the-jastrow-factor'),
+              ('Functional form', 2, None, 'functional-form'),
+              ('Second derivative of the Jastrow factor',
+               2,
+               None,
+               'second-derivative-of-the-jastrow-factor'),
+              ('Gradient and Laplacian', 2, None, 'gradient-and-laplacian'),
+              ('The gradient for the determinant',
+               2,
+               None,
+               'the-gradient-for-the-determinant'),
+              ('Jastrow gradient in quantum force',
+               2,
+               None,
+               'jastrow-gradient-in-quantum-force'),
+              ('Metropolis Hastings part', 2, None, 'metropolis-hastings-part'),
+              ('Proof for updating algorithm for Slater determinant',
+               2,
+               None,
+               'proof-for-updating-algorithm-for-slater-determinant'),
+              ('Proof for updating algorithm for Slater determinant',
+               2,
+               None,
+               'proof-for-updating-algorithm-for-slater-determinant'),
+              ('Proof for updating algorithm for Slater determinant',
+               2,
+               None,
+               'proof-for-updating-algorithm-for-slater-determinant'),
+              ('Proof for updating algorithm for Slater determinant',
+               2,
+               None,
+               'proof-for-updating-algorithm-for-slater-determinant'),
+              ('Proof for updating algorithm for Slater determinant',
+               2,
+               None,
+               'proof-for-updating-algorithm-for-slater-determinant'),
+              ('Proof for updating algorithm for Slater determinant',
+               2,
+               None,
+               'proof-for-updating-algorithm-for-slater-determinant'),
+              ('Proof for updating algorithm for Slater determinant',
+               2,
+               None,
+               'proof-for-updating-algorithm-for-slater-determinant')]}
+end of tocinfo -->
+
+<body>
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- Bootstrap navigation bar -->
+<div class="navbar navbar-default navbar-fixed-top">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="week12-bs.html">Boltzmann machines and deep learning and discussions of project 2</a>
+  </div>
+  <div class="navbar-collapse collapse navbar-responsive-collapse">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Contents <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+     <!-- navigation toc: --> <li><a href="._week12-bs001.html#plans-for-the-week-of-april-8-12-2024" style="font-size: 80%;">Plans for the week of April 8-12, 2024</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs002.html#energy-models" style="font-size: 80%;">Energy models</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs003.html#probability-model" style="font-size: 80%;">Probability model</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs004.html#marginal-and-conditional-probabilities" style="font-size: 80%;">Marginal and conditional probabilities</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs005.html#change-of-notation" style="font-size: 80%;">Change of notation</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs006.html#optimization-problem" style="font-size: 80%;">Optimization problem</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs007.html#further-simplifications" style="font-size: 80%;">Further simplifications</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs008.html#optimizing-the-logarithm-instead" style="font-size: 80%;">Optimizing the logarithm instead</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs009.html#expression-for-the-gradients" style="font-size: 80%;">Expression for the gradients</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs010.html#the-derivative-of-the-partition-function" style="font-size: 80%;">The derivative of the partition function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs011.html#explicit-expression-for-the-derivative" style="font-size: 80%;">Explicit expression for the derivative</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs012.html#final-expression" style="font-size: 80%;">Final expression</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs013.html#introducing-the-energy-model" style="font-size: 80%;">Introducing the energy model</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs014.html#more-compact-notation" style="font-size: 80%;">More compact notation</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs015.html#anticipating-results-to-be-derived" style="font-size: 80%;">Anticipating results to be derived</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs016.html#boltzmann-machines-marginal-and-conditional-probabilities" style="font-size: 80%;">Boltzmann Machines, marginal and conditional probabilities</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs017.html#generative-and-discriminative-models" style="font-size: 80%;">Generative and discriminative models</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs018.html#basics-of-the-boltzmann-machine" style="font-size: 80%;">Basics of the Boltzmann machine</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs019.html#more-about-the-basics" style="font-size: 80%;">More about the basics</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs020.html#difficult-to-train" style="font-size: 80%;">Difficult to train</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs021.html#the-network-layers" style="font-size: 80%;">The network layers</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs022.html#goal-of-hidden-layer" style="font-size: 80%;">Goal of hidden layer</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs023.html#the-parameters" style="font-size: 80%;">The parameters</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs024.html#joint-distribution" style="font-size: 80%;">Joint distribution</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs025.html#network-elements-the-energy-function" style="font-size: 80%;">Network Elements, the energy function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs026.html#defining-different-types-of-rbms" style="font-size: 80%;">Defining different types of RBMs</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs027.html#gaussian-binary-rbm" style="font-size: 80%;">Gaussian-binary RBM</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs063.html#cost-function" style="font-size: 80%;">Cost function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs029.html#optimization-training" style="font-size: 80%;">Optimization / Training</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs030.html#gradients" style="font-size: 80%;">Gradients</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs031.html#simplifications" style="font-size: 80%;">Simplifications</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs032.html#positive-and-negative-phases" style="font-size: 80%;">Positive and negative phases</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs033.html#gradient-examples" style="font-size: 80%;">Gradient examples</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs034.html#kullback-leibler-relative-entropy" style="font-size: 80%;">Kullback-Leibler relative entropy</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs035.html#kullback-leibler-divergence" style="font-size: 80%;">Kullback-Leibler divergence</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs036.html#maximizing-log-likelihood" style="font-size: 80%;">Maximizing log-likelihood</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs037.html#more-on-the-partition-function" style="font-size: 80%;">More on the partition function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs038.html#setting-up-for-gradient-descent-calculations" style="font-size: 80%;">Setting up for gradient descent calculations</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs039.html#difference-of-moments" style="font-size: 80%;">Difference of moments</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs040.html#more-observations" style="font-size: 80%;">More observations</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs041.html#adding-hyperparameters" style="font-size: 80%;">Adding hyperparameters</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs042.html#mathematical-details" style="font-size: 80%;">Mathematical details</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs043.html#binary-binary-bb-rbms" style="font-size: 80%;">Binary-binary (BB) RBMs</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs044.html#marginal-probability" style="font-size: 80%;">Marginal probability</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs045.html#marginal-probability-density-function-for-the-visible-units" style="font-size: 80%;">Marginal Probability Density Function for the visible units</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs046.html#marginal-probability-for-hidden-units" style="font-size: 80%;">Marginal probability for hidden units</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs055.html#conditional-probability-density-functions" style="font-size: 80%;">Conditional Probability Density Functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs048.html#on-and-off-probabilities" style="font-size: 80%;">On and off probabilities</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs049.html#conditional-probability-for-visible-units" style="font-size: 80%;">Conditional probability for visible units</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs050.html#gaussian-binary-restricted-boltzmann-machines" style="font-size: 80%;">Gaussian-Binary Restricted Boltzmann Machines</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs051.html#joint-probability-density-function" style="font-size: 80%;">Joint Probability Density Function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs052.html#partition-function" style="font-size: 80%;">Partition function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs053.html#marginal-probability-density-functions" style="font-size: 80%;">Marginal Probability Density Functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs054.html#then-the-visible-units" style="font-size: 80%;">Then the visible units</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs055.html#conditional-probability-density-functions" style="font-size: 80%;">Conditional Probability Density Functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs056.html#hidden-units" style="font-size: 80%;">Hidden units</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs057.html#visible-units" style="font-size: 80%;">Visible units</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs058.html#comments" style="font-size: 80%;">Comments</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs059.html#neural-quantum-states" style="font-size: 80%;">Neural Quantum States</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs060.html#model-for-the-trial-wave-function" style="font-size: 80%;">Model for the trial wave function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs061.html#allowing-for-complex-valued-functions" style="font-size: 80%;">Allowing for complex valued functions</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs062.html#squared-wave-function" style="font-size: 80%;">Squared wave function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs063.html#cost-function" style="font-size: 80%;">Cost function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs064.html#and-the-gradient" style="font-size: 80%;">And the gradient</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs065.html#additional-details" style="font-size: 80%;">Additional details</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs066.html#final-equation" style="font-size: 80%;">Final equation</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs067.html#code-example" style="font-size: 80%;">Code example</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs068.html#project-2-vmc-for-fermions-efficient-calculation-of-slater-determinants" style="font-size: 80%;">Project 2, VMC for fermions: Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs069.html#matrix-elements-of-slater-determinants" style="font-size: 80%;">Matrix elements of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs079.html#efficient-calculation-of-slater-determinants" style="font-size: 80%;">Efficient calculation of Slater determinants</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs080.html#the-gradient-and-the-laplacian" style="font-size: 80%;">The gradient and the Laplacian</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs081.html#how-to-compute-the-derivates-of-the-slater-determinant" style="font-size: 80%;">How to compute the derivates of the Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs082.html#the-slater-determinant" style="font-size: 80%;">The Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs083.html#rewriting-the-slater-determinant" style="font-size: 80%;">Rewriting the Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs084.html#splitting-the-slater-determinant" style="font-size: 80%;">Splitting the Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs085.html#spin-up-and-spin-down-parts" style="font-size: 80%;">Spin up and spin down parts</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs086.html#factorization" style="font-size: 80%;">Factorization</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs087.html#number-of-operations" style="font-size: 80%;">Number of operations</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs088.html#counting-the-number-of-flops" style="font-size: 80%;">Counting the number of FLOPS</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs089.html#computation-of-ratios" style="font-size: 80%;">Computation of ratios</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs090.html#scaling-properties" style="font-size: 80%;">Scaling properties</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs091.html#how-to-get-the-determinant" style="font-size: 80%;">How to get the determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs092.html#expectation-value-of-the-kinetic-energy" style="font-size: 80%;">Expectation value of the kinetic energy</a></li>
+     <!-- navigation toc: --> <li><a href="#second-derivative-of-the-jastrow-factor" style="font-size: 80%;">Second derivative of the Jastrow factor</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs094.html#functional-form" style="font-size: 80%;">Functional form</a></li>
+     <!-- navigation toc: --> <li><a href="#second-derivative-of-the-jastrow-factor" style="font-size: 80%;">Second derivative of the Jastrow factor</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs096.html#gradient-and-laplacian" style="font-size: 80%;">Gradient and Laplacian</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs097.html#the-gradient-for-the-determinant" style="font-size: 80%;">The gradient for the determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs098.html#jastrow-gradient-in-quantum-force" style="font-size: 80%;">Jastrow gradient in quantum force</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs099.html#metropolis-hastings-part" style="font-size: 80%;">Metropolis Hastings part</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs106.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs106.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs106.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs106.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs106.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs106.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs106.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+</div> <!-- end of navigation bar -->
+<div class="container">
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
+<a name="part0095"></a>
+<!-- !split -->
+<h2 id="second-derivative-of-the-jastrow-factor" class="anchor">Second derivative of the Jastrow factor </h2>
+<div class="panel panel-default">
+<div class="panel-body">
+<!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
+<p>Using </p>
+$$
+f(r_{ij})= \frac{ar_{ij}}{1+\beta r_{ij}},
+$$
+
+<p>and \( g'(r_{kj})=dg(r_{kj})/dr_{kj} \) and 
+\( g''(r_{kj})=d^2g(r_{kj})/dr_{kj}^2 \)  we find that for particle  \( k \)
+we have
+</p>
+$$
+  \frac{\nabla^2_k \Psi_C}{\Psi_C }=
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}\frac{a}{(1+\beta r_{ki})^2}
+\frac{a}{(1+\beta r_{kj})^2}+
+\sum_{j\ne k}\left(\frac{2a}{r_{kj}(1+\beta r_{kj})^2}-\frac{2a\beta}{(1+\beta r_{kj})^3}\right)
+$$
+</div>
+</div>
+
+
+<p>
+<!-- navigation buttons at the bottom of the page -->
+<ul class="pagination">
+<li><a href="._week12-bs094.html">&laquo;</a></li>
+  <li><a href="._week12-bs000.html">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week12-bs087.html">88</a></li>
+  <li><a href="._week12-bs088.html">89</a></li>
+  <li><a href="._week12-bs089.html">90</a></li>
+  <li><a href="._week12-bs090.html">91</a></li>
+  <li><a href="._week12-bs091.html">92</a></li>
+  <li><a href="._week12-bs092.html">93</a></li>
+  <li><a href="._week12-bs093.html">94</a></li>
+  <li><a href="._week12-bs094.html">95</a></li>
+  <li class="active"><a href="._week12-bs095.html">96</a></li>
+  <li><a href="._week12-bs096.html">97</a></li>
+  <li><a href="._week12-bs097.html">98</a></li>
+  <li><a href="._week12-bs098.html">99</a></li>
+  <li><a href="._week12-bs099.html">100</a></li>
+  <li><a href="._week12-bs100.html">101</a></li>
+  <li><a href="._week12-bs101.html">102</a></li>
+  <li><a href="._week12-bs102.html">103</a></li>
+  <li><a href="._week12-bs103.html">104</a></li>
+  <li><a href="._week12-bs104.html">105</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="._week12-bs106.html">107</a></li>
+  <li><a href="._week12-bs096.html">&raquo;</a></li>
+</ul>
+<!-- ------------------- end of main content --------------- -->
+</div>  <!-- end container -->
+<!-- include javascript, jQuery *first* -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<!-- Bootstrap footer
+<footer>
+<a href="https://..."><img width="250" align=right src="https://..."></a>
+</footer>
+-->
+<center style="font-size:80%">
+<!-- copyright only on the titlepage -->
+</center>
+</body>
+</html>
+
