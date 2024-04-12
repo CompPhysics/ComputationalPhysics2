@@ -1,4 +1,4 @@
-TITLE: Neural networks and project 2
+TITLE: Boltzmann machines and deep learning and discussions of project 2
 AUTHOR: Morten Hjorth-Jensen {copyright, 1999-present|CC BY-NC} Email morten.hjorth-jensen@fys.uio.no at Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway & Department of Physics and Astronomy and Facility for Rare Ion Beams, Michigan State University, East Lansing, Michigan, USA
 DATE: April 12
 
@@ -15,6 +15,939 @@ o Discussion of how to implement Slater determinants and other variants of proje
 #* "Video of lecture":"https://youtu.be/TSjELFyEy9U"
 #* "Handwritten notes":"https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2024/NotesApril10.pdf"
 #!eblock
+
+
+!split
+===== Energy models =====
+
+Last week we defined a domain $\bm{X}$ of stochastic variables $\bm{X}= \{x_0,x_1, \dots , x_{n-1}\}$ with a pertinent probability distribution
+!bt
+\[
+p(\bm{X})=\prod_{x_i\in \bm{X}}p(x_i),
+\]
+!et
+where we have assumed that the random varaibles $x_i$ are all independent and identically distributed (iid).
+
+We will now assume that we can defined this function in terms of optimization parameters $\bm{\Theta}$, which could be the biases and weights of deep network, and a set of hidden variables we also assume to be random variables which also are iid. The domain of these variables is
+$\bm{H}= \{h_0,h_1, \dots , h_{m-1}\}$.
+
+!split
+===== Probability model =====
+
+We define a probability
+!bt
+\[
+p(x_i,h_j;\bm{\Theta}) = \frac{f(x_i,h_j;\bm{\Theta})}{Z(\bm{\Theta})},
+\]
+!et
+where $f(x_i,h_j;\bm{\Theta})$ is a function which we assume is larger or
+equal than zero and obeys all properties required for a probability
+distribution and $Z(\bm{\Theta})$ is a normalization constant. Inspired by
+statistical mechanics, we call it often for the partition function.
+It is defined as (assuming that we have discrete probability distributions)
+!bt
+\[
+Z(\bm{\Theta})=\sum_{x_i\in \bm{X}}\sum_{h_j\in \bm{H}} f(x_i,h_j;\bm{\Theta}).
+\]
+!et
+
+!split
+===== Marginal and conditional probabilities =====
+
+We can in turn define the marginal probabilities
+!bt
+\[
+p(x_i;\bm{\Theta}) = \frac{\sum_{h_j\in \bm{H}}f(x_i,h_j;\bm{\Theta})}{Z(\bm{\Theta})},
+\]
+!et
+and 
+!bt
+\[
+p(h_i;\bm{\Theta}) = \frac{\sum_{x_i\in \bm{X}}f(x_i,h_j;\bm{\Theta})}{Z(\bm{\Theta})}.
+\]
+!et
+
+
+!split
+===== Change of notation =====
+
+_Note the change to a vector notation_. A variable like $\bm{x}$
+represents now a specific _configuration_. We can generate an infinity
+of such configurations. The final partition function is then the sum
+over all such possible configurations, that is
+
+!bt
+\[
+Z(\bm{\Theta})=\sum_{x_i\in \bm{X}}\sum_{h_j\in \bm{H}} f(x_i,h_j;\bm{\Theta}),
+\]
+!et
+changes to
+!bt
+\[
+Z(\bm{\Theta})=\sum_{\bm{x}}\sum_{\bm{h}} f(\bm{x},\bm{h};\bm{\Theta}).
+\]
+!et
+If we have a binary set of variable $x_i$ and $h_j$ and $M$ values of $x_i$ and $N$ values of $h_j$ we have in total $2^M$ and $2^N$ possible $\bm{x}$ and $\bm{h}$ configurations, respectively.
+
+We see that even for the modest binary case, we can easily approach a
+number of configuration which is not possible to deal with.
+
+!split
+===== Optimization problem =====
+
+At the end, we are not interested in the probabilities of the hidden variables. The probability we thus want to optimize is 
+!bt
+\[
+p(\bm{X};\bm{\Theta})=\prod_{x_i\in \bm{X}}p(x_i;\bm{\Theta})=\prod_{x_i\in \bm{X}}\left(\frac{\sum_{h_j\in \bm{H}}f(x_i,h_j;\bm{\Theta})}{Z(\bm{\Theta})}\right),
+\]
+!et
+which we rewrite as
+!bt
+\[
+p(\bm{X};\bm{\Theta})=\frac{1}{Z(\bm{\Theta})}\prod_{x_i\in \bm{X}}\left(\sum_{h_j\in \bm{H}}f(x_i,h_j;\bm{\Theta})\right).
+\]
+!et
+
+!split
+===== Further simplifications =====
+
+We simplify further by rewriting it as
+!bt
+\[
+p(\bm{X};\bm{\Theta})=\frac{1}{Z(\bm{\Theta})}\prod_{x_i\in \bm{X}}f(x_i;\bm{\Theta}),
+\]
+!et
+where we used $p(x_i;\bm{\Theta}) = \sum_{h_j\in \bm{H}}f(x_i,h_j;\bm{\Theta})$.
+The optimization problem is then
+!bt
+\[
+{\displaystyle \mathrm{arg} \hspace{0.1cm}\max_{\bm{\bm{\Theta}}\in {\mathbb{R}}^{p}}} \hspace{0.1cm}p(\bm{X};\bm{\Theta}).
+\]
+!et
+
+!split
+===== Optimizing the logarithm instead =====
+
+Computing the derivatives with respect to the parameters $\bm{\Theta}$ is
+easier (and equivalent) if we compute  the logarithm of the
+probability. We will thus optimize
+!bt
+\[
+{\displaystyle \mathrm{arg} \hspace{0.1cm}\max_{\bm{\bm{\Theta}}\in {\mathbb{R}}^{p}}} \hspace{0.1cm}\log{p(\bm{X};\bm{\Theta})},
+\]
+!et
+which leads to
+!bt
+\[
+\nabla_{\bm{\Theta}}\log{p(\bm{X};\bm{\Theta})}=0.
+\]
+!et
+
+!split
+===== Expression for the gradients =====
+This leads to the following equation
+!bt
+\[
+\nabla_{\bm{\Theta}}\log{p(\bm{X};\bm{\Theta})}=\nabla_{\bm{\Theta}}\left(\sum_{x_i\in \bm{X}}\log{f(x_i;\bm{\Theta})}\right)-\nabla_{\bm{\Theta}}\log{Z(\bm{\Theta})}=0.
+\]
+!et
+
+The first term is called the positive phase and we assume that we have a model for the function $f$ from which we can sample values. Below we will develop an explicit model for this.
+The second term is called the negative phase and is the one which leads to more difficulties.
+
+!split
+===== The derivative of the partition function =====
+
+The partition function, defined above as
+!bt
+\[
+Z(\bm{\Theta})=\sum_{x_i\in \bm{X}}\sum_{h_j\in \bm{H}} f(x_i,h_j;\bm{\Theta}),
+\]
+!et
+is in general the most problematic term. In principle both $x$ and $h$ can span large degrees of freedom, if not even infinitely many ones, and computing the partition function itself is often not desirable or even feasible. The above derivative of the partition function can however be written in terms of an expectation value which is in turn evaluated  using Monte Carlo sampling and the theory of Markov chains, popularly shortened to MCMC (or just MC$^2$).
+
+!split
+===== Explicit expression for the derivative =====
+We can rewrite
+!bt
+\[
+\nabla_{\bm{\Theta}}\log{Z(\bm{\Theta})}=\frac{\nabla_{\bm{\Theta}}Z(\bm{\Theta})}{Z(\bm{\Theta})},
+\]
+!et
+which reads in more detail
+!bt
+\[
+\nabla_{\bm{\Theta}}\log{Z(\bm{\Theta})}=\frac{\nabla_{\bm{\Theta}} \sum_{x_i\in \bm{X}}f(x_i;\bm{\Theta})   }{Z(\bm{\Theta})}.
+\]
+!et
+
+We can rewrite the function $f$ (we have assumed that is larger or
+equal than zero) as $f=\exp{\log{f}}$. We can then reqrite the last
+equation as
+
+!bt
+\[
+\nabla_{\bm{\Theta}}\log{Z(\bm{\Theta})}=\frac{ \sum_{x_i\in \bm{X}} \nabla_{\bm{\Theta}}\exp{\log{f(x_i;\bm{\Theta})}}   }{Z(\bm{\Theta})}.
+\]
+!et
+
+!split
+===== Final expression =====
+
+Taking the derivative gives us
+!bt
+\[
+\nabla_{\bm{\Theta}}\log{Z(\bm{\Theta})}=\frac{ \sum_{x_i\in \bm{X}}f(x_i;\bm{\Theta}) \nabla_{\bm{\Theta}}\log{f(x_i;\bm{\Theta})}   }{Z(\bm{\Theta})}, 
+\]
+!et
+which is the expectation value of $\log{f}$
+!bt
+\[
+\nabla_{\bm{\Theta}}\log{Z(\bm{\Theta})}=\sum_{x_i\in \bm{X}}p(x_i;\bm{\Theta}) \nabla_{\bm{\Theta}}\log{f(x_i;\bm{\Theta})},
+\]
+!et
+that is
+!bt
+\[
+\nabla_{\bm{\Theta}}\log{Z(\bm{\Theta})}=\mathbb{E}(\log{f(x_i;\bm{\Theta})}).
+\]
+!et
+
+This quantity is evaluated using Monte Carlo sampling, with Gibbs
+sampling as the standard sampling rule.  Before we discuss the
+explicit algorithms, we need to remind ourselves about Markov chains
+and sampling rules like the Metropolis-Hastings algorithm and Gibbs
+sampling.
+
+!split
+===== Introducing the energy model =====
+
+As we will see below, a typical Boltzmann machines employs a probability distribution
+!bt
+\[
+p(\bm{x},\bm{h};\bm{\Theta}) = \frac{f(\bm{x},\bm{h};\bm{\Theta})}{Z(\bm{\Theta})},
+\]
+!et
+where $f(\bm{x},\bm{h};\bm{\Theta})$ is given by a so-called energy model. If we assume that the random variables $x_i$ and $h_j$ take binary values only, for example $x_i,h_j=\{0,1\}$, we have a so-called binary-binary model where
+!bt
+\[
+f(\bm{x},\bm{h};\bm{\Theta})=-E(\bm{x}, \bm{h};\bm{\Theta}) = \sum_{x_i\in \bm{X}} x_i a_i+\sum_{h_j\in \bm{H}} b_j h_j + \sum_{x_i\in \bm{X},h_j\in\bm{H}} x_i w_{ij} h_j,
+\]
+!et
+where the set of parameters are given by the biases and weights $\bm{\Theta}=\{\bm{a},\bm{b},\bm{W}\}$.
+_Note the vector notation_ instead of $x_i$ and $h_j$ for $f$. The vectors $\bm{x}$ and $\bm{h}$ represent a specific instance of stochastic variables $x_i$ and $h_j$. These arrangements of $\bm{x}$ and $\bm{h}$ lead to a specific energy configuration.
+
+!split
+===== More compact notation =====
+
+With the above definition we can write the probability as
+!bt
+\[
+p(\bm{x},\bm{h};\bm{\Theta}) = \frac{\exp{(\bm{a}^T\bm{x}+\bm{b}^T\bm{h}+\bm{x}^T\bm{W}\bm{h})}}{Z(\bm{\Theta})},
+\]
+!et
+where the biases $\bm{a}$ and $\bm{h}$ and the weights defined by the matrix $\bm{W}$ are the parameters we need to optimize.
+
+!split
+===== Anticipating results to be derived =====
+
+Since the binary-binary energy model is linear in the parameters $a_i$, $b_j$ and
+$w_{ij}$, it is easy to see that the derivatives with respect to the
+various optimization parameters yield expressions used in the
+evaluation of gradients like
+!bt
+\[
+\frac{\partial E(\bm{x}, \bm{h};\bm{\Theta})}{\partial w_{ij}}=-x_ih_j,
+\]
+!et
+and
+!bt
+\[
+\frac{\partial E(\bm{x}, \bm{h};\bm{\Theta})}{\partial a_i}=-x_i,
+\]
+!et
+and
+!bt
+\[
+\frac{\partial E(\bm{x}, \bm{h};\bm{\Theta})}{\partial b_j}=-h_j.
+\]
+!et
+
+
+
+
+!split
+===== Boltzmann Machines, marginal and conditional probabilities  =====
+
+A generative model can learn to represent and sample from a
+probability distribution. The core idea is to learn a parametric model
+of the probability distribution from which the training data was
+drawn. As an example
+o A model for images could learn to draw new examples of cats and dogs, given a training dataset of images of cats and dogs.
+o Generate a sample of an ordered or disordered Ising model phase, having been given samples of such phases.
+o Model the trial function for Monte Carlo calculations
+
+!split
+===== Generative and discriminative models =====
+
+Generative and discriminative models use both gradient-descent based
+learning procedures for minimizing cost functions
+
+However, in energy based models we don't use backpropagation and automatic
+differentiation for computing gradients, instead we turn to Markov
+Chain Monte Carlo methods.
+
+A typical deep neural network has several hidden layers. A restricted
+Boltzmann machine has normally one hidden layer, however several RBMs can
+be stacked to make up deep Belief Networks, of which they constitute
+the building blocks.
+
+!split
+===== Basics of the Boltzmann machine =====
+!bblock
+A BM is what we would call an undirected probabilistic graphical model
+with stochastic continuous or discrete units.
+!eblock
+!bblock
+It is interpreted as a stochastic recurrent neural network where the
+state of each unit(neurons/nodes) depends on the units it is connected
+to. The weights in the network represent thus the strength of the
+interaction between various units/nodes.
+!eblock
+
+!split
+===== More about the basics =====
+!bblock
+A standard BM network is divided into a set of observable and visible units $\bm{x}$ and a set of unknown hidden units/nodes $\bm{h}$.
+!eblock
+
+!bblock
+Additionally there can be bias nodes for the hidden and visible layers. These biases are normally set to $1$.
+!eblock
+
+!bblock
+BMs are stackable, meaning they cwe can train a BM which serves as input to another BM. We can construct deep networks for learning complex PDFs. The layers can be trained one after another, a feature which makes them popular in deep learning
+!eblock
+
+!split
+===== Difficult to train =====
+
+However, they are often hard to train. This leads to the introduction
+of so-called restricted BMs, or RBMS.  Here we take away all lateral
+connections between nodes in the visible layer as well as connections
+between nodes in the hidden layer.
+
+
+!split
+===== The network layers =====
+
+o A function $\bm{x}$ that represents the visible layer, a vector of $M$ elements (nodes). This layer represents both what the RBM might be given as training input, and what we want it to be able to reconstruct. This might for example be the pixels of an image, the spin values of the Ising model, or coefficients representing speech.
+o The function $\bm{h}$ represents the hidden, or latent, layer. A vector of $N$ elements (nodes). Also called "feature detectors".
+
+
+!split
+===== Goal of hidden layer =====
+
+The goal of the hidden layer is to increase the model's expressive
+power. We encode complex interactions between visible variables by
+introducing additional, hidden variables that interact with visible
+degrees of freedom in a simple manner, yet still reproduce the complex
+correlations between visible degrees in the data once marginalized
+over (integrated out).
+
+!split
+===== The parameters =====
+
+The network parameters, to be optimized/learned:
+o $\bm{a}$ represents the visible bias, a vector of same length $M$ as $\bm{x}$.
+o $\bm{b}$ represents the hidden bias, a vector of same length $N$  as $\bm{h}$.
+o $\bm{W}$ represents the interaction weights, a matrix of size $M\times N$.
+
+Note that we have specified the lengths of $bm{x}$ and $\bm{h}$. These
+lengths define the number of visible and hidden units, respectively.
+
+!split
+===== Joint distribution =====
+
+The restricted Boltzmann machine is described by a Boltzmann distribution
+!bt
+\begin{align*}
+	P_{rbm}(\bm{x},\bm{h},\bm{\Theta}) = \frac{1}{Z(\bm{\Theta})} \exp{-(E(\bm{x},\bm{h},\bm{\Theta}))},
+\end{align*}
+!et
+where $Z$ is the normalization constant or partition function discussed earlier and defined as 
+!bt
+\begin{align*}
+	Z(\bm{\Theta}) = \int \int \exp{-E(\bm{x},\bm{h},\bm{\Theta})} d\bm{x} d\bm{h}.
+\end{align*}
+!et
+It is common to set  the temperature $T$ to one. It is omitted in the equations above. The energy is thus a dimensionless function.
+
+!split
+===== Network Elements, the energy function  =====
+
+The function $E(\bm{x},\bm{h},\bm{\Theta})$ gives the _energy_ of a
+configuration (pair of vectors) $(\bm{x}, \bm{h})$. The lower
+the energy of a configuration, the higher the probability of it. This
+function also depends on the parameters $\bm{a}$, $\bm{b}$ and
+$W$. Thus, when we adjust them during the learning procedure, we are
+adjusting the energy function to best fit our problem.
+
+
+!split
+===== Defining different types of RBMs =====
+
+There are different variants of RBMs, and the differences lie in the types of visible and hidden units we choose as well as in the implementation of the energy function $E(\bm{x},\bm{h},\bm{\Theta})$. The connection between the nodes in the two layers is given by the weights $w_{ij}$. 
+
+!bblock Binary-Binary RBM:
+
+RBMs were first developed using binary units in both the visible and hidden layer. The corresponding energy function is defined as follows:
+!bt
+\begin{align*}
+	E(\bm{x}, \bm{h},\bm{\Theta}) = - \sum_i^M x_i a_i- \sum_j^N b_j h_j - \sum_{i,j}^{M,N} x_i w_{ij} h_j,
+\end{align*}
+!et
+where the binary values taken on by the nodes are most commonly 0 and 1.
+!eblock
+
+
+!split
+===== Gaussian-binary RBM =====
+
+Another varient is the RBM where the visible units are Gaussian while the hidden units remain binary:
+!bt
+\begin{align*}
+	E(\bm{x}, \bm{h},\bm{\Theta}) = \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2} - \sum_j^N b_j h_j - \sum_{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2}. 
+\end{align*}
+!et
+
+This type of RBMs are useful when we model continuous data (i.e., we wish $\bm{x}$ to be continuous). The paramater $\sigma_i^2$ is meant to represent a variance and is foten just set to one.
+
+
+!split
+===== Cost function =====
+
+When working with a training dataset, the most common training
+approach is maximizing the log-likelihood of the training data. The
+log likelihood characterizes the log-probability of generating the
+observed data using our generative model. Using this method our cost
+function is chosen as the negative log-likelihood. The learning then
+consists of trying to find parameters that maximize the probability of
+the dataset, and is known as Maximum Likelihood Estimation (MLE).
+
+Denoting the parameters as $\bm{\Theta} = a_1,...,a_M,b_1,...,b_N,w_{11},...,w_{MN}$, the log-likelihood is given by
+!bt
+\begin{align*}
+	\mathcal{L}(\{ \Theta_i \}) &= \langle \text{log} P_\theta(\bm{x}) \rangle_{data} \\
+	&= - \langle E(\bm{x}; \{ \Theta_i\}) \rangle_{data} - \text{log} Z(\{ \Theta_i\}),
+\end{align*}
+!et
+where we used that the normalization constant does not depend on the data, $\langle \text{log} Z(\{ \Theta_i\}) \rangle = \text{log} Z(\{ \Theta_i\})$
+Our cost function is the negative log-likelihood, $\mathcal{C}(\{ \Theta_i \}) = - \mathcal{L}(\{ \Theta_i \})$
+
+!split
+===== Optimization / Training =====
+
+The training procedure of choice often is Stochastic Gradient Descent (SGD). It consists of a series of iterations where we update the parameters according to the equation
+!bt
+\begin{align*}
+	\bm{\Theta}_{k+1} = \bm{\Theta}_k - \eta \nabla \mathcal{C} (\bm{\Theta}_k)
+\end{align*}
+!et
+at each $k$-th iteration. There are a range of variants of the algorithm which aim at making the learning rate $\eta$ more adaptive so the method might be more efficient while remaining stable.
+
+!split
+===== Gradients =====
+We now need the gradient of the cost function in order to minimize it. We find that
+!bt
+\begin{align*}
+	\frac{\partial \mathcal{C}(\{ \Theta_i\})}{\partial \Theta_i}
+	&= \langle \frac{\partial E(\bm{x}; \Theta_i)}{\partial \Theta_i} \rangle_{data}
+	+ \frac{\partial \text{log} Z(\{ \Theta_i\})}{\partial \Theta_i} \\
+	&= \langle O_i(\bm{x}) \rangle_{data} - \langle O_i(\bm{x}) \rangle_{model}.
+\end{align*}
+!et
+!split
+===== Simplifications =====
+
+In order to simplify notation we defined the "operator"
+!bt
+\begin{align*}
+	O_i(\bm{x}) = \frac{\partial E(\bm{x}; \Theta_i)}{\partial \Theta_i}, 
+\end{align*}
+!et
+and used the statistical mechanics relationship between expectation values and the log-partition function:
+!bt
+\begin{align*}
+	\langle O_i(\bm{x}) \rangle_{model} = \text{Tr} P_\Theta(\bm{x})O_i(\bm{x}) = - \frac{\partial \text{log} Z(\{ \Theta_i\})}{\partial \Theta_i}.
+\end{align*}
+!et
+
+!split
+===== Positive and negative phases =====
+As discussed earlier, the data-dependent term in the gradient is known as the positive phase
+of the gradient, while the model-dependent term is known as the
+negative phase of the gradient. The aim of the training is to lower
+the energy of configurations that are near observed data points
+(increasing their probability), and raising the energy of
+configurations that are far from observed data points (decreasing
+their probability).
+
+!split
+===== Gradient examples =====
+The gradient of the negative log-likelihood cost function of a Binary-Binary RBM is then
+!bt
+\begin{align*}
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial w_{ij}} =& \langle x_i h_j \rangle_{data} - \langle x_i h_j \rangle_{model} \\
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial a_{ij}} =& \langle x_i \rangle_{data} - \langle x_i \rangle_{model} \\
+	\frac{\partial \mathcal{C} (w_{ij}, a_i, b_j)}{\partial b_{ij}} =& \langle h_i \rangle_{data} - \langle h_i \rangle_{model}. \\
+\end{align*}
+!et
+To get the expectation values with respect to the *data*, we set the visible units to each of the observed samples in the training data, then update the hidden units according to the conditional probability found before. We then average over all samples in the training data to calculate expectation values with respect to the data. 
+
+
+
+!split
+===== Kullback-Leibler relative entropy =====
+
+When the goal of the training is to approximate a probability
+distribution, as it is in generative modeling, another relevant
+measure is the _Kullback-Leibler divergence_, also known as the
+relative entropy or Shannon entropy. It is a non-symmetric measure of the
+dissimilarity between two probability density functions $p$ and
+$q$. If $p$ is the unkown probability which we approximate with $q$,
+we can measure the difference by
+!bt
+\begin{align*}
+	\text{KL}(p||q) = \int_{-\infty}^{\infty} p (\bm{x}) \log \frac{p(\bm{x})}{q(\bm{x})}  d\bm{x}.
+\end{align*}
+!et
+
+!split
+===== Kullback-Leibler divergence =====
+
+Thus, the Kullback-Leibler divergence between the distribution of the
+training data $f(\bm{x})$ and the model distribution $p(\bm{x}|
+\bm{\Theta})$ is
+
+!bt
+\begin{align*}
+	\text{KL} (f(\bm{x})|| p(\bm{x}| \bm{\Theta})) =& \int_{-\infty}^{\infty}
+	f (\bm{x}) \log \frac{f(\bm{x})}{p(\bm{x}| \bm{\Theta})} d\bm{x} \\
+	=& \int_{-\infty}^{\infty} f(\bm{x}) \log f(\bm{x}) d\bm{x} - \int_{-\infty}^{\infty} f(\bm{x}) \log
+	p(\bm{x}| \bm{\Theta}) d\bm{x} \\
+	%=& \mathbb{E}_{f(\bm{x})} (\log f(\bm{x})) - \mathbb{E}_{f(\bm{x})} (\log p(\bm{x}| \bm{\Theta}))
+	=& \langle \log f(\bm{x}) \rangle_{f(\bm{x})} - \langle \log p(\bm{x}| \bm{\Theta}) \rangle_{f(\bm{x})} \\
+	=& \langle \log f(\bm{x}) \rangle_{data} + \langle E(\bm{x}) \rangle_{data} + \log Z \\
+	=& \langle \log f(\bm{x}) \rangle_{data} + \mathcal{C}_{LL} .
+\end{align*}
+!et
+
+!split
+===== Maximizing log-likelihood =====
+
+The first term is constant with respect to $\bm{\Theta}$ since
+$f(\bm{x})$ is independent of $\bm{\Theta}$. Thus the Kullback-Leibler
+Divergence is minimal when the second term is minimal. The second term
+is the log-likelihood cost function, hence minimizing the
+Kullback-Leibler divergence is equivalent to maximizing the
+log-likelihood.
+
+
+To further understand generative models it is useful to study the
+gradient of the cost function which is needed in order to minimize it
+using methods like stochastic gradient descent. 
+
+!split
+===== More on the partition function =====
+
+The partition function is the generating function of
+expectation values, in particular there are mathematical relationships
+between expectation values and the log-partition function. In this
+case we have
+!bt
+\begin{align*}
+	\langle \frac{ \partial E(\bm{x}; \Theta_i) } { \partial \Theta_i} \rangle_{model}
+	= \int p(\bm{x}| \bm{\Theta}) \frac{ \partial E(\bm{x}; \Theta_i) } { \partial \Theta_i} d\bm{x} 
+	= -\frac{\partial \log Z(\Theta_i)}{ \partial  \Theta_i} .
+\end{align*}
+!et
+
+Here $\langle \cdot \rangle_{model}$ is the expectation value over the model probability distribution $p(\bm{x}| \bm{\Theta})$.
+
+!split
+===== Setting up for gradient descent calculations =====
+
+Using the previous relationship we can express the gradient of the cost function as
+
+!bt
+\begin{align*}
+	\frac{\partial \mathcal{C}_{LL}}{\partial \Theta_i}
+	=& \langle \frac{ \partial E(\bm{x}; \Theta_i) } { \partial \Theta_i} \rangle_{data} + \frac{\partial \log Z(\Theta_i)}{ \partial  \Theta_i} \\
+	=& \langle \frac{ \partial E(\bm{x}; \Theta_i) } { \partial \Theta_i} \rangle_{data} - \langle \frac{ \partial E(\bm{x}; \Theta_i) } { \partial \Theta_i} \rangle_{model} \\
+	%=& \langle O_i(\bm{x}) \rangle_{data} - \langle O_i(\bm{x}) \rangle_{model}
+\end{align*}
+!et
+
+!split
+===== Difference of moments =====
+
+This expression shows that the gradient of the log-likelihood cost
+function is a _difference of moments_, with one calculated from
+the data and one calculated from the model. The data-dependent term is
+called the _positive phase_ and the model-dependent term is
+called the _negative phase_ of the gradient. We see now that
+minimizing the cost function results in lowering the energy of
+configurations $\bm{x}$ near points in the training data and
+increasing the energy of configurations not observed in the training
+data. That means we increase the model's probability of configurations
+similar to those in the training data.
+
+!split
+===== More observations =====
+
+The gradient of the cost function also demonstrates why gradients of
+unsupervised, generative models must be computed differently from for
+those of for example FNNs. While the data-dependent expectation value
+is easily calculated based on the samples $\bm{x}_i$ in the training
+data, we must sample from the model in order to generate samples from
+which to caclulate the model-dependent term. We sample from the model
+by using MCMC-based methods. We can not sample from the model directly
+because the partition function $Z$ is generally intractable.
+
+
+!split
+===== Adding hyperparameters =====
+
+As in supervised machine learning problems, the goal is also here to
+perform well on _unseen_ data, that is to have good
+generalization from the training data. The distribution $f(x)$ we
+approximate is not the _true_ distribution we wish to estimate,
+it is limited to the training data. Hence, in unsupervised training as
+well it is important to prevent overfitting to the training data. Thus
+it is common to add regularizers to the cost function in the same
+manner as we discussed for say linear regression.
+
+
+!split
+===== Mathematical details =====
+
+Because we are restricted to potential functions which are positive it
+is convenient to express them as exponentials.
+
+The original RBM had binary visible and hidden nodes. They were
+showned to be universal approximators of discrete distributions.
+It was also shown that adding hidden units yields
+strictly improved modelling power.
+
+
+!split
+===== Binary-binary (BB) RBMs =====
+
+The common choice of binary values
+are 0 and 1. However, in some physics applications, -1 and 1 might be
+a more natural choice. We will here use 0 and 1. We habe the energy function
+
+!bt
+\begin{align*}
+	E_{BB}(\bm{x}, \bm{h},\bm{\Theta}) = - \sum_i^M x_i a_i- \sum_j^N b_j h_j - \sum_{i,j}^{M,N} x_i w_{ij} h_j.
+\end{align*}
+!et
+
+
+!split
+===== Marginal probability =====
+
+We have the binary-binary marginal probability defined as 
+!bt
+\begin{align*}
+	p_{BB}(\bm{x}, \bm{h},\bm{\Theta}) =& \frac{1}{Z_{BB}(\bm{\Theta})} e^{\sum_i^M a_i x_i + \sum_j^N b_j h_j + \sum_{ij}^{M,N} x_i w_{ij} h_j} \\
+	=& \frac{1}{Z_{BB}(\bm{\Theta})} e^{\bm{a}^T \bm{x} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}}
+\end{align*}
+!et
+
+with the partition function
+
+!bt
+\begin{align*}
+	Z_{BB}(\bm{\Theta}) = \sum_{\bm{x}, \bm{h}} e^{\bm{a}^T \bm{x} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} .
+\end{align*}
+!et
+
+!split
+===== Marginal Probability Density Function for the visible units  =====
+
+In order to find the probability of any configuration of the visible units we derive the marginal probability density function.
+
+!bt
+\begin{align*}
+	p_{BB} (\bm{x},\bm{\Theta}) =& \sum_{\bm{h}} p_{BB} (\bm{x}, \bm{h},\bm{\Theta}) \\
+	=& \frac{1}{Z_{BB}} \sum_{\bm{h}} e^{\bm{a}^T \bm{x} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{a}^T \bm{x}} \sum_{\bm{h}} e^{\sum_j^N (b_j + \bm{x}^T \bm{w}_{\ast j})h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{a}^T \bm{x}} \sum_{\bm{h}} \prod_j^N e^{ (b_j + \bm{x}^T \bm{w}_{\ast j})h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{a}^T \bm{x}} \bigg ( \sum_{h_1} e^{(b_1 + \bm{x}^T \bm{w}_{\ast 1})h_1}
+	\times \sum_{h_2} e^{(b_2 + \bm{x}^T \bm{w}_{\ast 2})h_2} \times \nonumber \\
+	& ... \times \sum_{h_2} e^{(b_N + \bm{x}^T \bm{w}_{\ast N})h_N} \bigg ) \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{a}^T \bm{x}} \prod_j^N \sum_{h_j} e^{(b_j + \bm{x}^T \bm{w}_{\ast j}) h_j} \nonumber \\
+	=& \frac{1}{Z_{BB}} e^{\bm{a}^T \bm{x}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}) .
+\end{align*}
+!et
+
+!split
+===== Marginal probability for hidden units =====
+
+A similar derivation yields the marginal probability of the hidden units
+
+!bt
+\begin{align*}
+	p_{BB} (\bm{h},\bm{\Theta}) = \frac{1}{Z_{BB}(\bm{\Theta})} e^{\bm{b}^T \bm{h}} \prod_i^M (1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h}}) .
+\end{align*}
+!et
+
+!split
+===== Conditional Probability Density Functions =====
+
+We derive the probability of the hidden units given the visible units using Bayes' rule
+(we drop the explicit $\bm{\Theta}$ dependence)
+!bt
+\begin{align*}
+	p_{BB} (\bm{h}|\bm{x}) =& \frac{p_{BB} (\bm{x}, \bm{h})}{p_{BB} (\bm{x})} \nonumber \\
+	=& \frac{ \frac{1}{Z_{BB}}  e^{\bm{a}^T \bm{x} + \bm{b}^T \bm{h} + \bm{x}^T \bm{W} \bm{h}} }
+	        {\frac{1}{Z_{BB}} e^{\bm{a}^T \bm{x}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}})} \nonumber \\
+	=& \frac{  e^{\bm{a}^T \bm{x}} e^{ \sum_j^N (b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j} }
+	        { e^{\bm{a}^T \bm{x}} \prod_j^N (1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}})} \nonumber \\
+	=& \prod_j^N \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \prod_j^N p_{BB} (h_j| \bm{x}) .
+\end{align*}
+!et
+
+!split
+===== On and off probabilities =====
+
+From this we find the probability of a hidden unit being "on" or "off":
+
+!bt
+\begin{align*}
+	p_{BB} (h_j=1 | \bm{x}) =&   \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} ) h_j}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \\
+	=&  \frac{ e^{(b_j + \bm{x}^T \bm{w}_{\ast j} )}  }
+	{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}}} \\
+	=&  \frac{ 1 }{1 + e^{-(b_j + \bm{x}^T \bm{w}_{\ast j})} } ,
+\end{align*}
+!et
+and
+
+!bt
+\begin{align*}
+	p_{BB} (h_j=0 | \bm{x}) =\frac{ 1 }{1 + e^{b_j + \bm{x}^T \bm{w}_{\ast j}} } .
+\end{align*}
+!et
+
+!split
+===== Conditional probability for visible units =====
+
+Similarly we have that the conditional probability of the visible units given the hidden are
+
+!bt
+\begin{align*}
+	p_{BB} (\bm{x}|\bm{h}) =& \prod_i^M \frac{ e^{ (a_i + \bm{w}_{i\ast}^T \bm{h}) x_i} }{ 1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h}} } \\
+	&= \prod_i^M p_{BB} (x_i | \bm{h}) .
+\end{align*}
+!et
+
+We have
+!bt
+\begin{align*}
+	p_{BB} (x_i=1 | \bm{h}) =& \frac{1}{1 + e^{-(a_i + \bm{w}_{i\ast}^T \bm{h} )}} \\
+	p_{BB} (x_i=0 | \bm{h}) =& \frac{1}{1 + e^{a_i + \bm{w}_{i\ast}^T \bm{h} }} .
+\end{align*}
+!et
+
+
+
+
+!split
+===== Gaussian-Binary Restricted Boltzmann Machines =====
+
+
+Inserting into the expression for $E_{RBM}(\bm{x},\bm{h},\bm{\Theta})$ in equation  results in the energy
+
+!bt
+\begin{align*}
+	E_{GB}(\bm{x}, \bm{h},\bm{\Theta}) =& \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2}
+	- \sum_j^N b_j h_j 
+	-\sum_{ij}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2} \nonumber \\
+	=& \vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 - \bm{b}^T \bm{h} 
+	- (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h} . 
+\end{align*}
+!et
+
+!split
+===== Joint Probability Density Function =====
+
+!bt
+\begin{align*}
+	p_{GB} (\bm{x}, \bm{h},\bm{\Theta}) =& \frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{- \sum_i^M \frac{(x_i - a_i)^2}{2\sigma_i^2}
+	+ \sum_j^N b_j h_j 
+	+\sum_{ij}^{M,N} \frac{x_i w_{ij} h_j}{\sigma_i^2}} \nonumber \\
+	=& \frac{1}{Z_{GB}} \prod_{ij}^{M,N} e^{-\frac{(x_i - a_i)^2}{2\sigma_i^2}
+	+ b_j h_j 
+	+\frac{x_i w_{ij} h_j}{\sigma_i^2}}.
+\end{align*}
+!et
+
+!split
+===== Partition function =====
+
+The partition function is given by
+
+!bt
+\begin{align*}
+	Z_{GB} =& \int \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} e^{-\vert\vert\frac{\tilde{\bm{x}} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \tilde{\bm{h}} 
+	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\tilde{\bm{h}}} d\tilde{\bm{x}} .
+\end{align*}
+!et
+
+!split
+===== Marginal Probability Density Functions =====
+
+We proceed to find the marginal probability densitites of the
+Gaussian-binary RBM. We first marginalize over the binary hidden units
+to find $p_{GB} (\bm{x})$
+
+!bt
+\begin{align*}
+	p_{GB} (\bm{x}) =& \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} p_{GB} (\bm{x}, \tilde{\bm{h}}) \nonumber \\
+	=& \frac{1}{Z_{GB}} \sum_{\tilde{\bm{h}}}^{\tilde{\bm{H}}} 
+	e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \tilde{\bm{h}} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\tilde{\bm{h}}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2}
+	\prod_j^N (1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}} ) .
+\end{align*}
+!et
+
+!split
+===== Then the visible units =====
+We next marginalize over the visible units. This is the first time we
+marginalize over continuous values. We rewrite the exponential factor
+dependent on $\bm{x}$ as a Gaussian function before we integrate in
+the last step.
+
+!bt
+\begin{align*}
+	p_{GB} (\bm{h}) =& \int p_{GB} (\tilde{\bm{x}}, \bm{h}) d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} \int e^{-\vert\vert\frac{\tilde{\bm{x}} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\tilde{\bm{x}}}{\bm{\sigma}^2})^T \bm{W}\bm{h}} d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h} } \int \prod_i^M
+	e^{- \frac{(\tilde{x}_i - a_i)^2}{2\sigma_i^2} + \frac{\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{\sigma_i^2} } d\tilde{\bm{x}} \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h} }
+	\biggl( \int e^{- \frac{(\tilde{x}_1 - a_1)^2}{2\sigma_1^2} + \frac{\tilde{x}_1 \bm{w}_{1\ast}^T \bm{h}}{\sigma_1^2} } d\tilde{x}_1 \nonumber \\
+	& \times \int e^{- \frac{(\tilde{x}_2 - a_2)^2}{2\sigma_2^2} + \frac{\tilde{x}_2 \bm{w}_{2\ast}^T \bm{h}}{\sigma_2^2} } d\tilde{x}_2 \nonumber \\
+	& \times ... \nonumber \\
+	&\times \int e^{- \frac{(\tilde{x}_M - a_M)^2}{2\sigma_M^2} + \frac{\tilde{x}_M \bm{w}_{M\ast}^T \bm{h}}{\sigma_M^2} } d\tilde{x}_M \biggr) \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{(\tilde{x}_i - a_i)^2 - 2\tilde{x}_i \bm{w}_{i\ast}^T \bm{h}}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \tilde{x}_i \bm{w}_{i\ast}^T \bm{h}) + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{\tilde{x}_i^2 - 2\tilde{x}_i(a_i + \bm{w}_{i\ast}^T \bm{h}) + (a_i + \bm{w}_{i\ast}^T \bm{h})^2 - (a_i + \bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\int e^{- \frac{(\tilde{x}_i - (a_i + \bm{w}_{i\ast}^T \bm{h}))^2 - a_i^2 -2a_i \bm{w}_{i\ast}^T \bm{h} - (\bm{w}_{i\ast}^T \bm{h})^2 + a_i^2}{2\sigma_i^2} } d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}
+	\int e^{- \frac{(\tilde{x}_i - a_i - \bm{w}_{i\ast}^T \bm{h})^2}{2\sigma_i^2}}
+	d\tilde{x}_i \nonumber \\
+	=& \frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\sqrt{2\pi \sigma_i^2}
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}} .
+\end{align*}
+!et
+
+!split
+===== Conditional Probability Density Functions =====
+
+We finish by deriving the conditional probabilities.
+!bt 
+\begin{align*}
+	p_{GB} (\bm{h}| \bm{x}) =& \frac{p_{GB} (\bm{x}, \bm{h})}{p_{GB} (\bm{x})} \nonumber \\
+	=& \frac{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}}}
+	{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2}
+	\prod_j^N (1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}} ) }
+	\nonumber \\
+	=& \prod_j^N \frac{e^{(b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j})h_j } }
+	{1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \prod_j^N p_{GB} (h_j|\bm{x}).
+\end{align*}
+!et
+
+
+!split
+===== Hidden units =====
+
+The conditional probability of a binary hidden unit $h_j$ being on or off again takes the form of a sigmoid function
+
+!bt
+\begin{align*}
+	p_{GB} (h_j =1 | \bm{x}) =& \frac{e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j} } }
+	{1 + e^{b_j + (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \nonumber \\
+	=& \frac{1}{1 + e^{-b_j - (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} \\
+	p_{GB} (h_j =0 | \bm{x}) =&
+	\frac{1}{1 + e^{b_j +(\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{w}_{\ast j}}} .
+\end{align*}
+!et
+
+!split
+===== Visible units =====
+
+The conditional probability of the continuous $\bm{x}$ now has another form, however.
+
+!bt
+\begin{align*}
+	p_{GB} (\bm{x}|\bm{h})
+	=& \frac{p_{GB} (\bm{x}, \bm{h})}{p_{GB} (\bm{h})} \nonumber \\
+	=& \frac{\frac{1}{Z_{GB}} e^{-\vert\vert\frac{\bm{x} -\bm{a}}{2\bm{\sigma}}\vert\vert^2 + \bm{b}^T \bm{h} 
+	+ (\frac{\bm{x}}{\bm{\sigma}^2})^T \bm{W}\bm{h}}}
+	{\frac{1}{Z_{GB}} e^{\bm{b}^T \bm{h}} \prod_i^M
+	\sqrt{2\pi \sigma_i^2}
+	e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	\frac{e^{- \frac{(x_i - a_i)^2}{2\sigma_i^2} + \frac{x_i \bm{w}_{i\ast}^T \bm{h}}{2\sigma_i^2} }}
+	{e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	\frac{e^{-\frac{x_i^2 - 2a_i x_i + a_i^2 - 2x_i \bm{w}_{i\ast}^T\bm{h} }{2\sigma_i^2} } }
+	{e^{\frac{2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2 }{2\sigma_i^2}}}
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	e^{- \frac{x_i^2 - 2a_i x_i + a_i^2 - 2x_i \bm{w}_{i\ast}^T\bm{h}
+	+ 2a_i \bm{w}_{i\ast}^T \bm{h} +(\bm{w}_{i\ast}^T \bm{h})^2}
+	{2\sigma_i^2} }
+	\nonumber \\
+	=& \prod_i^M \frac{1}{\sqrt{2\pi \sigma_i^2}}
+	e^{ - \frac{(x_i - b_i - \bm{w}_{i\ast}^T \bm{h})^2}{2\sigma_i^2}} \nonumber \\
+	=& \prod_i^M \mathcal{N}
+	(x_i | b_i + \bm{w}_{i\ast}^T \bm{h}, \sigma_i^2) \\
+	\Rightarrow p_{GB} (x_i|\bm{h}) =& \mathcal{N}
+	(x_i | b_i + \bm{w}_{i\ast}^T \bm{h}, \sigma_i^2) .
+\end{align*}
+!et
+
+
+!split
+===== Comments =====
+
+The form of these conditional probabilities explains the name
+"Gaussian" and the form of the Gaussian-binary energy function. We see
+that the conditional probability of $x_i$ given $\bm{h}$ is a normal
+distribution with mean $b_i + \bm{w}_{i\ast}^T \bm{h}$ and variance
+$\sigma_i^2$.
+
+For the quantum mechanical calculations however, there are several ingredients which simplify our calculations.
 
 
 
@@ -404,3 +1337,6 @@ data ={'Energy':Energies}#,'A Derivative':EnergyDerivatives1,'B Derivative':Ener
 frame = pd.DataFrame(data)
 print(frame)
 !ec
+
+
+
