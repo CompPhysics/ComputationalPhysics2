@@ -91,9 +91,9 @@ MathJax.Hub.Config({
         <ul class="dropdown-menu">
      <!-- navigation toc: --> <li><a href="._week12-bs001.html#plans-for-the-week-of-april-8-12-2024" style="font-size: 80%;">Plans for the week of April 8-12, 2024</a></li>
      <!-- navigation toc: --> <li><a href="._week12-bs002.html#neural-quantum-states" style="font-size: 80%;">Neural Quantum States</a></li>
-     <!-- navigation toc: --> <li><a href="#model-for-the-trial-wave-function" style="font-size: 80%;">Model for the trial wave function</a></li>
+     <!-- navigation toc: --> <li><a href="._week12-bs003.html#model-for-the-trial-wave-function" style="font-size: 80%;">Model for the trial wave function</a></li>
      <!-- navigation toc: --> <li><a href="._week12-bs004.html#allowing-for-complex-valued-functions" style="font-size: 80%;">Allowing for complex valued functions</a></li>
-     <!-- navigation toc: --> <li><a href="._week12-bs005.html#squared-wave-function" style="font-size: 80%;">Squared wave function</a></li>
+     <!-- navigation toc: --> <li><a href="#squared-wave-function" style="font-size: 80%;">Squared wave function</a></li>
      <!-- navigation toc: --> <li><a href="._week12-bs006.html#cost-function" style="font-size: 80%;">Cost function</a></li>
      <!-- navigation toc: --> <li><a href="._week12-bs007.html#and-the-gradient" style="font-size: 80%;">And the gradient</a></li>
      <!-- navigation toc: --> <li><a href="._week12-bs008.html#additional-details" style="font-size: 80%;">Additional details</a></li>
@@ -108,17 +108,26 @@ MathJax.Hub.Config({
 </div> <!-- end of navigation bar -->
 <div class="container">
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
-<a name="part0003"></a>
+<a name="part0005"></a>
 <!-- !split -->
-<h2 id="model-for-the-trial-wave-function" class="anchor">Model for the trial wave function </h2>
-<p>Now this is what we use to represent the wave function, calling it a neural-network quantum state (NQS)</p>
+<h2 id="squared-wave-function" class="anchor">Squared wave function </h2>
+<p>If we assume the wavefunction to be
+positive definite, however, we can use the RBM to represent the squared
+wavefunction, and thereby a probability. This also makes it possible
+to sample from the model using Gibbs sampling, because we can obtain
+the conditional probabilities.
+</p>
 
 $$
 \begin{align*}
-	\Psi (\mathbf{X}) &= F_{rbm}(\mathbf{x}) \\
-	&= \frac{1}{Z}\sum_{\boldsymbol{h}} e^{-E(\mathbf{x}, \mathbf{h})} \\
-	&= \frac{1}{Z} \sum_{\{h_j\}} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{x_i w_{ij} h_j}{\sigma^2}} \\
-	&= \frac{1}{Z} e^{-\sum_i^M \frac{(x_i - a_i)^2}{2\sigma^2}} \prod_j^N (1 + e^{b_j + \sum_i^M \frac{x_i w_{ij}}{\sigma^2}}) \\
+	|\Psi (\mathbf{X})|^2 &= F_{rbm}(\mathbf{X}) \\
+	\Rightarrow \Psi (\mathbf{X}) &= \sqrt{F_{rbm}(\mathbf{X})} \\
+	&= \frac{1}{\sqrt{Z}}\sqrt{\sum_{\{h_j\}} e^{-E(\mathbf{X}, \mathbf{h})}} \\
+	&= \frac{1}{\sqrt{Z}} \sqrt{\sum_{\{h_j\}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{2\sigma^2} + \sum_j^N b_j h_j + \sum_{i,j}^{M,N} \frac{X_i w_{ij} h_j}{\sigma^2}} }\\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \sqrt{\sum_{\{h_j\}} \prod_j^N e^{b_j h_j + \sum_i^M \frac{X_i w_{ij} h_j}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \sqrt{\prod_j^N \sum_{h_j}  e^{b_j h_j + \sum_i^M \frac{X_i w_{ij} h_j}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \prod_j^N \sqrt{e^0 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}} \\
+	&= \frac{1}{\sqrt{Z}} e^{-\sum_i^M \frac{(X_i - a_i)^2}{4\sigma^2}} \prod_j^N \sqrt{1 + e^{b_j + \sum_i^M \frac{X_i w_{ij}}{\sigma^2}}} \\
 \end{align*}
 $$
 
@@ -126,19 +135,19 @@ $$
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-<li><a href="._week12-bs002.html">&laquo;</a></li>
+<li><a href="._week12-bs004.html">&laquo;</a></li>
   <li><a href="._week12-bs000.html">1</a></li>
   <li><a href="._week12-bs001.html">2</a></li>
   <li><a href="._week12-bs002.html">3</a></li>
-  <li class="active"><a href="._week12-bs003.html">4</a></li>
+  <li><a href="._week12-bs003.html">4</a></li>
   <li><a href="._week12-bs004.html">5</a></li>
-  <li><a href="._week12-bs005.html">6</a></li>
+  <li class="active"><a href="._week12-bs005.html">6</a></li>
   <li><a href="._week12-bs006.html">7</a></li>
   <li><a href="._week12-bs007.html">8</a></li>
   <li><a href="._week12-bs008.html">9</a></li>
   <li><a href="._week12-bs009.html">10</a></li>
   <li><a href="._week12-bs010.html">11</a></li>
-  <li><a href="._week12-bs004.html">&raquo;</a></li>
+  <li><a href="._week12-bs006.html">&raquo;</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 </div>  <!-- end container -->
