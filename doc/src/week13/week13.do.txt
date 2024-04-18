@@ -143,10 +143,10 @@ case we therefore get that the *i*-th row of $\hat{C}(\mathbf{r}^{\mathrm{new}})
 and $\hat{C}(\mathbf{r}^{\mathrm{old}})$ must be
 equal. Explicitly, we have:
 !bt
-\begin{equation}
+\begin{equation*}
 C_{ij}(\mathbf{r}^{\mathrm{new}}) = C_{ij}(\mathbf{r}^{\mathrm{old}})\quad
 \forall\ j\in\{1,\dots,N\}
-\end{equation}
+\end{equation*}
 !et
 
 !eblock
@@ -157,7 +157,7 @@ Inserting this into the numerator of eq.~(ref{eq:detratio_cofactors})
 and using eq.~(ref{eq:inverse_cofactor}) to substitute the cofactors
 with the elements of the inverse matrix, we get:
 !bt
-\begin{equation}
+\begin{equation*}
 R =\frac{\sum_{j=1}^N d_{ij}(\mathbf{r}^{\mathrm{new}})\,
 C_{ij}(\mathbf{r}^{\mathrm{old}})}
 {\sum_{j=1}^N d_{ij}(\mathbf{r}^{\mathrm{old}})\,
@@ -166,7 +166,7 @@ C_{ij}(\mathbf{r}^{\mathrm{old}})} =
 d_{ji}^{-1}(\mathbf{r}^{\mathrm{old}})}
 {\sum_{j=1}^N d_{ij}(\mathbf{r}^{\mathrm{old}})\,
 d_{ji}^{-1}(\mathbf{r}^{\mathrm{old}})}
-\end{equation}
+\end{equation*}
 !et
 
 
@@ -204,14 +204,14 @@ inverse matrix can by suitably updated by an algorithm having a time
 scaling of $O(N^2)$.  This algorithm goes as
 follows. First we update all but the *i*-th column of $\hat{D}^{-1}$. For each column $j\neq i$, we first calculate the quantity:
 !bt
-\begin{equation}
+\begin{equation*}
 S_j =
 (\hat{D}(\mathbf{r}^{\mathrm{new}})\times
 \hat{D}^{-1}(\mathbf{r}^{\mathrm{old}}))_{ij} =
 \sum_{l=1}^N d_{il}(\mathbf{r}^{\mathrm{new}})\,
 d^{-1}_{lj}(\mathbf{r}^{\mathrm{old}})
 label{eq:inverse_update_1}
-\end{equation}
+\end{equation*}
 !et
 
 
@@ -222,7 +222,7 @@ label{eq:inverse_update_1}
 The new elements of the *j*-th column of $\hat{D}^{-1}$ are then given
 by:
 !bt
-\begin{equation}
+\begin{equation*}
 d_{kj}^{-1}(\mathbf{r}^{\mathrm{new}}) =
 d_{kj}^{-1}(\mathbf{r}^{\mathrm{old}}) -
 \frac{S_j}{R}\,d_{ki}^{-1}(\mathbf{r}^{\mathrm{old}})\quad
@@ -230,7 +230,7 @@ d_{kj}^{-1}(\mathbf{r}^{\mathrm{old}}) -
 \forall\ \ k\in\{1,\dots,N\}\\j\neq i
 \end{array}
 label{eq:inverse_update_2}
-\end{equation}
+\end{equation*}
 !et
 
 !eblock
@@ -241,12 +241,12 @@ label{eq:inverse_update_2}
 Finally the elements of the *i*-th column of $\hat{D}^{-1}$ are updated
 simply as follows:
 !bt
-\begin{equation}
+\begin{equation*}
 d_{ki}^{-1}(\mathbf{r}^{\mathrm{new}}) =
 \frac{1}{R}\,d_{ki}^{-1}(\mathbf{r}^{\mathrm{old}})\quad
 \forall\ \ k\in\{1,\dots,N\}
 label{eq:inverse_update_3}
-\end{equation}
+\end{equation*}
 !et
 We see from these formulas that the time scaling of an update of
 $\hat{D}^{-1}$ after changing one row of $\hat{D}$ is $O(N^2)$.
@@ -377,11 +377,22 @@ or more generally as
 \]
 !et
 where we have the Slater determinant as the product of a spin up part involving the number of electrons with spin up only (2 for beryllium and 5 for neon) and a spin down part involving the electrons with spin down.
+!eblock
 
-This ansatz is not antisymmetric under the exchange of electrons with  opposite spins but it can be shown (show this) that it gives the same
+!split
+===== Not respecting the symmetry =====
+
+!bblock
+This ansatz is not antisymmetric under the exchange of electrons with
+opposite spins but it can be shown (show this) that it gives the same
 expectation value for the energy as the full Slater determinant.
 
-As long as the Hamiltonian is spin independent, the above is correct. It is rather straightforward to see this if you go back to the equations for the energy discussed earlier  this semester.
+As long as the Hamiltonian is spin independent, the above approach
+gives us the same expectation value for the energy. It is rather
+straightforward to see this if you go back to the equations for the
+energy. We leave this as an exercise to the eager reader.
+
+Can you think of observables where not respecting the symmetry can have consequences?
 
 !eblock
 
@@ -506,13 +517,13 @@ complexity of order of $\mathcal{O}(N^3)$ operations, a luxury that we
 cannot afford for each time a particle  move is accepted.
 We will use the expression
 !bt
-\begin{equation}
+\begin{equation*}
 label{updatingInverse}
 d^{-1}_{kj}(\mathbf{x^{new}}) = \left\{\begin{array}{l l}
   d^{-1}_{kj}(\mathbf{x^{old}}) - \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N} d_{il}(\mathbf{x^{new}})  d^{-1}_{lj}(\mathbf{x^{old}}) & \mbox{if $j \neq i$}\nonumber \\ \\
  \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N} d_{il}(\mathbf{x^{old}}) d^{-1}_{lj}(\mathbf{x^{old}}) & \mbox{if $j=i$}
 \end{array} \right.
-\end{equation}
+\end{equation*}
 !et
 
 !eblock
@@ -561,10 +572,10 @@ The expectation value of the kinetic energy expressed in atomic units for electr
 \]
 !et
 !bt
-\begin{equation}
+\begin{equation*}
 label{kineticE}
 K_i = -\frac{1}{2}\frac{\nabla_{i}^{2} \Psi}{\Psi}.
-\end{equation}
+\end{equation*}
 !et
 !bt
 \begin{align}
@@ -742,17 +753,17 @@ $\hat{D}^{-1}(\mathbf{x}^{\mathrm{old}})$.
 !bblock
 As a starting point we may consider that each time a new position is suggested in the Metropolis algorithm, a row of the current Slater matrix experiences some kind of perturbation. Hence, the Slater matrix with its orbitals evaluated at the new position equals the old Slater matrix plus a perturbation matrix,
 !bt
-\begin{equation}
+\begin{equation*}
 label{oldSM}
 d_{jk}(\mathbf{x^{new}}) = d_{jk}(\mathbf{x^{old}}) + \Delta_{jk},
-\end{equation}
+\end{equation*}
 !et
 where
 !bt
-\begin{equation}
+\begin{equation*}
 label{pertMatrix}
 \Delta_{jk} = \delta_{ik}[\phi_j(\mathbf{x_{i}^{new}}) - \phi_j(\mathbf{x_{i}^{old}})] = \delta_{ik}(\Delta\phi)_j .
-\end{equation}
+\end{equation*}
 !et
 !eblock
 

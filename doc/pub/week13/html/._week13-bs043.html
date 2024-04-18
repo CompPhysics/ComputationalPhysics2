@@ -258,13 +258,13 @@ MathJax.Hub.Config({
      <!-- navigation toc: --> <li><a href="._week13-bs034.html#the-gradient-for-the-determinant" style="font-size: 80%;">The gradient for the determinant</a></li>
      <!-- navigation toc: --> <li><a href="._week13-bs035.html#jastrow-gradient-in-quantum-force" style="font-size: 80%;">Jastrow gradient in quantum force</a></li>
      <!-- navigation toc: --> <li><a href="._week13-bs036.html#metropolis-hastings-part" style="font-size: 80%;">Metropolis Hastings part</a></li>
-     <!-- navigation toc: --> <li><a href="._week13-bs043.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
-     <!-- navigation toc: --> <li><a href="._week13-bs043.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
-     <!-- navigation toc: --> <li><a href="._week13-bs043.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
-     <!-- navigation toc: --> <li><a href="._week13-bs043.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
-     <!-- navigation toc: --> <li><a href="._week13-bs043.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
-     <!-- navigation toc: --> <li><a href="._week13-bs043.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
-     <!-- navigation toc: --> <li><a href="._week13-bs043.html#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
+     <!-- navigation toc: --> <li><a href="#proof-for-updating-algorithm-for-slater-determinant" style="font-size: 80%;">Proof for updating algorithm for Slater determinant</a></li>
 
         </ul>
       </li>
@@ -274,65 +274,41 @@ MathJax.Hub.Config({
 </div> <!-- end of navigation bar -->
 <div class="container">
 <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p> <!-- add vertical space -->
-<a name="part0010"></a>
+<a name="part0043"></a>
 <!-- !split -->
-<h2 id="efficient-calculation-of-slater-determinants" class="anchor">Efficient calculation of Slater determinants </h2>
+<h2 id="proof-for-updating-algorithm-for-slater-determinant" class="anchor">Proof for updating algorithm for Slater determinant </h2>
 <div class="panel panel-default">
 <div class="panel-body">
 <!-- subsequent paragraphs come in larger fonts, so start with a paragraph -->
-
-<p>Now by eq.&nbsp;<a href="._week13-bs006.html#mjx-eqn-2">(2)</a> the denominator of the rightmost
-expression must be unity, so that we finally arrive at:
-</p>
+<p>In this equation, the first line becomes zero for \( j=i \) and the second for \( j \neq i \). Therefore, the update of the inverse for the new Slater matrix is given by</p>
 $$
-\begin{equation}
-R =
-\sum_{j=1}^N d_{ij}(\mathbf{r}^{\mathrm{new}})\,
-d_{ji}^{-1}(\mathbf{r}^{\mathrm{old}}) = 
-\sum_{j=1}^N \phi_j(\mathbf{r}_i^{\mathrm{new}})\,
-d_{ji}^{-1}(\mathbf{r}^{\mathrm{old}})
-\tag{4}
-\end{equation}
+\begin{eqnarray}
+\boxed{d^{-1}_{kj}(\mathbf{x^{new}})  = \left\{ 
+\begin{array}{l l}
+  d^{-1}_{kj}(\mathbf{x^{old}}) - \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N} d_{il}(\mathbf{x^{new}})  d^{-1}_{lj}(\mathbf{x^{old}}) & \mbox{if $j \neq i$}\nonumber \\ \\
+ \frac{d^{-1}_{ki}(\mathbf{x^{old}})}{R} \sum_{l=1}^{N} d_{il}(\mathbf{x^{old}}) d^{-1}_{lj}(\mathbf{x^{old}}) & \mbox{if $j=i$}
+\end{array} \right.}
+\end{eqnarray}
 $$
-
-<p>What this means is that in order to get the ratio when only the <em>i</em>-th
-particle  has been moved, we only need to calculate the dot
-product of the vector \( \left(\phi_1(\mathbf{r}_i^\mathrm{new}),\,\dots,\,\phi_N(\mathbf{r}_i^\mathrm{new})\right) \) of single particle  wave functions
-evaluated at this new position with the <em>i</em>-th column of the inverse
-matrix \( \hat{D}^{-1} \) evaluated at the original position. Such
-an operation has a time scaling of \( O(N) \). The only extra thing we
-need to do is to maintain the inverse matrix \( \hat{D}^{-1}(\mathbf{x}^{\mathrm{old}}) \).
-</p>
 </div>
 </div>
+
 
 <p>
 <!-- navigation buttons at the bottom of the page -->
 <ul class="pagination">
-<li><a href="._week13-bs009.html">&laquo;</a></li>
+<li><a href="._week13-bs042.html">&laquo;</a></li>
   <li><a href="._week13-bs000.html">1</a></li>
   <li><a href="">...</a></li>
-  <li><a href="._week13-bs002.html">3</a></li>
-  <li><a href="._week13-bs003.html">4</a></li>
-  <li><a href="._week13-bs004.html">5</a></li>
-  <li><a href="._week13-bs005.html">6</a></li>
-  <li><a href="._week13-bs006.html">7</a></li>
-  <li><a href="._week13-bs007.html">8</a></li>
-  <li><a href="._week13-bs008.html">9</a></li>
-  <li><a href="._week13-bs009.html">10</a></li>
-  <li class="active"><a href="._week13-bs010.html">11</a></li>
-  <li><a href="._week13-bs011.html">12</a></li>
-  <li><a href="._week13-bs012.html">13</a></li>
-  <li><a href="._week13-bs013.html">14</a></li>
-  <li><a href="._week13-bs014.html">15</a></li>
-  <li><a href="._week13-bs015.html">16</a></li>
-  <li><a href="._week13-bs016.html">17</a></li>
-  <li><a href="._week13-bs017.html">18</a></li>
-  <li><a href="._week13-bs018.html">19</a></li>
-  <li><a href="._week13-bs019.html">20</a></li>
-  <li><a href="">...</a></li>
-  <li><a href="._week13-bs043.html">44</a></li>
-  <li><a href="._week13-bs011.html">&raquo;</a></li>
+  <li><a href="._week13-bs035.html">36</a></li>
+  <li><a href="._week13-bs036.html">37</a></li>
+  <li><a href="._week13-bs037.html">38</a></li>
+  <li><a href="._week13-bs038.html">39</a></li>
+  <li><a href="._week13-bs039.html">40</a></li>
+  <li><a href="._week13-bs040.html">41</a></li>
+  <li><a href="._week13-bs041.html">42</a></li>
+  <li><a href="._week13-bs042.html">43</a></li>
+  <li class="active"><a href="._week13-bs043.html">44</a></li>
 </ul>
 <!-- ------------------- end of main content --------------- -->
 </div>  <!-- end container -->
