@@ -1,4 +1,4 @@
-# Computational Physics 2: computational quantum mechanics
+# Computational Physics II: computational quantum mechanics
 
 ## Introduction
 
@@ -45,10 +45,10 @@ studied.
 ## Learning outcomes
 
 The course introduces a variety of central algorithms and methods for
-professional studies of quantum mechanical systems, with relevance for
+professional studies of quantum mechanical systems, with relevance to
 several problems in physics, materials science and quantum
 chemistry. The course is project based and through the various
-projects, normally two, the participants will be exposed to
+projects, normally two, the participants are exposed to
 fundamental research problems in these fields, with the aim to
 reproduce state of the art scientific results. The students will learn
 to develop and structure large codes for studying these systems, get
@@ -56,9 +56,7 @@ aquainted with supercomputing facilities and learn to handle large
 scientific projects. A good scientific and ethical conduct is
 emphasized throughout the course.
 
-The course is also a continuation of FYS3150 – Computational Physics,
-and it will give a further treatment of several of the numerical
-methods given there.
+The course is also a continuation of FYS3150 – Computational Physics I.
 
 
 ## Prerequisites
@@ -93,11 +91,6 @@ to form small project groups of 2-3 participants, if possible.
 ##  Teaching Assistants Spring Semester 2024
 * _Name_:  Ruben Guevara, 
 * _Email_: ruben.guevara@fys.uio.no
-* _Name_:  Daniel Haas Lima Beccatini, 
-* _Email_: d.h.b.lima@fys.uio.no
-* _Name_:  Håkon Kvernmoen, 
-* _Email_: hakon.kvernmoen@fys.uio.no
-
 
 ## Practicalities
 
@@ -106,6 +99,25 @@ to form small project groups of 2-3 participants, if possible.
 3. Two projects which are graded and count 1/2 each of the final grade;
 4. The course is offered as a FYS4411 (Master of Science level) and a FYS9411 (PhD level) course;
 5. Weekly emails with summary of activities will be mailed to all participants;
+
+## Textbooks
+
+The textbooks we will use, in addition to our lecture notes, are 
+- Federico Becca and Sandro Sorella, Quantum Monte Carlo Approaches for Correlated Systems, see https://www.cambridge.org/core/books/quantum-monte-carlo-approaches-for-correlated-systems/EB88C86BD9553A0738BDAE400D0B2900. This book is fully accessible from the university of Oslo library, log in to https://bibsys-almaprimo.hosted.exlibrisgroup.com/primo-explore/search?vid=BIBSYS. This book is going to be our main text.
+- B. L. Hammond, W. A. Lester, Jr., and P. J. Reynolds, Monte Carlo Methods in Ab Initio Quantum Chemistry, see https://www.worldscientific.com/worldscibooks/10.1142/1170?srsltid=AfmBOorrVkCMZdlyIElZIyR5o4f59PKsCf-DN1DYqOFQ0nSWrEexSS9W#t=aboutBook 
+
+
+## Lectures and ComputerLab 
+
+- Lectures: Friday (10.15am-12pm). First time January 24. Last lecture session May 16 (can be changed).
+- Computerlab: Friday (12.15pm-3pm), first time January 24, last lab session May 16 (can be changed).
+- Weekly plans and all other information are on the webpage of the course
+- First project to be handed in March 21
+- Second and final project to be handed in June 1.
+- There is no final exam, only project work.
+
+
+
 
 ## Grading
 Grading scale: Grades are awarded on a scale from A to F, where A is the best grade and F is a fail. There are two projects which are graded and each project counts 1/2 of the final grade. The total score is thus the average from the two  projects.
@@ -190,8 +202,4 @@ Here we list several useful Python libraries we strongly recommend (if you use a
 * _Scythe_: http://scythe.lsa.umich.edu/ The Scythe Statistical Library is an open source C++ library for statistical computation
 * _Autodiff_: https://autodiff.github.io/ autodiff is a C++17 library that uses modern and advanced programming techniques to enable automatic computation of derivatives in an efficient and easy way.
 * _Optmilib_: https://www.kthohr.com/optimlib.html OptimLib is a lightweight C++ library of numerical optimization methods for nonlinear functions.
-
-## Textbooks
-
-_Recommended textbooks_: Lecture Notes by Morten Hjorth-Jensen
 
