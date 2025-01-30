@@ -115,7 +115,7 @@ The textbooks we will use, in addition to our lecture notes, are
 - First project to be handed in March 21
 - Second and final project to be handed in June 1.
 - There is no final exam, only project work.
-
+- Permanent Zoom link for the whole semester is https://uio.zoom.us/my/mortenhj
 
 
 
