@@ -1,0 +1,1835 @@
+%%
+%% Automatically generated file from DocOnce source
+%% (https://github.com/doconce/doconce/)
+%% doconce format latex week5.do.txt --minted_latex_style=trac --latex_admon=paragraph --no_mako
+%%
+
+
+%-------------------- begin preamble ----------------------
+
+\documentclass[%
+oneside,                 % oneside: electronic viewing, twoside: printing
+final,                   % draft: marks overfull hboxes, figures with paths
+10pt]{article}
+
+\listfiles               %  print all files needed to compile this document
+
+\usepackage{relsize,makeidx,color,setspace,amsmath,amsfonts,amssymb}
+\usepackage[table]{xcolor}
+\usepackage{bm,ltablex,microtype}
+
+\usepackage[pdftex]{graphicx}
+
+\usepackage{fancyvrb} % packages needed for verbatim environments
+\usepackage{minted}
+\usemintedstyle{default}
+
+\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{lmodern}         % Latin Modern fonts derived from Computer Modern
+
+% Hyperlinks in PDF:
+\definecolor{linkcolor}{rgb}{0,0,0.4}
+\usepackage{hyperref}
+\hypersetup{
+    breaklinks=true,
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=black,
+    filecolor=black,
+    %filecolor=blue,
+    pdfmenubar=true,
+    pdftoolbar=true,
+    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+    }
+%\hyperbaseurl{}   % hyperlinks are relative to this root
+
+\setcounter{tocdepth}{2}  % levels in table of contents
+
+% --- fancyhdr package for fancy headers ---
+\usepackage{fancyhdr}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[LE,RO]{\thepage}
+% Ensure copyright on titlepage (article style) and chapter pages (book style)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2025, Morten Hjorth-Jensen. Released under CC Attribution-NonCommercial 4.0 license}}
+%  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+% Ensure copyright on titlepages with \thispagestyle{empty}
+\fancypagestyle{empty}{
+  \fancyhf{}
+  \fancyfoot[C]{{\footnotesize \copyright\ 1999-2025, Morten Hjorth-Jensen. Released under CC Attribution-NonCommercial 4.0 license}}
+  \renewcommand{\footrulewidth}{0mm}
+  \renewcommand{\headrulewidth}{0mm}
+}
+
+\pagestyle{fancy}
+
+
+\usepackage[framemethod=TikZ]{mdframed}
+
+% --- begin definitions of admonition environments ---
+
+% --- end of definitions of admonition environments ---
+
+% prevent orhpans and widows
+\clubpenalty = 10000
+\widowpenalty = 10000
+
+\newenvironment{doconceexercise}{}{}
+\newcounter{doconceexercisecounter}
+
+
+% ------ header in subexercises ------
+%\newcommand{\subex}[1]{\paragraph{#1}}
+%\newcommand{\subex}[1]{\par\vspace{1.7mm}\noindent{\bf #1}\ \ }
+\makeatletter
+% 1.5ex is the spacing above the header, 0.5em the spacing after subex title
+\newcommand\subex{\@startsection*{paragraph}{4}{\z@}%
+                  {1.5ex\@plus1ex \@minus.2ex}%
+                  {-0.5em}%
+                  {\normalfont\normalsize\bfseries}}
+\makeatother
+
+
+% --- end of standard preamble for documents ---
+
+
+% insert custom LaTeX commands...
+
+\raggedbottom
+\makeindex
+\usepackage[totoc]{idxlayout}   % for index in the toc
+\usepackage[nottoc]{tocbibind}  % for references/bibliography in the toc
+
+%-------------------- end preamble ----------------------
+
+\begin{document}
+
+% matching end for #ifdef PREAMBLE
+
+\newcommand{\exercisesection}[1]{\subsection*{#1}}
+
+
+% ------------------- main content ----------------------
+
+
+
+% ----------------- title -------------------------
+
+\thispagestyle{empty}
+
+\begin{center}
+{\LARGE\bf
+\begin{spacing}{1.25}
+Optimization and gradient methods
+\end{spacing}
+}
+\end{center}
+
+% ----------------- author(s) -------------------------
+
+\begin{center}
+{\bf Morten Hjorth-Jensen}
+\end{center}
+
+    \begin{center}
+% List of all institutions:
+\centerline{{\small Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway}}
+\end{center}
+    
+% ----------------- end author(s) -------------------------
+
+% --- begin date ---
+\begin{center}
+February 21, 2025
+\end{center}
+% --- end date ---
+
+\vspace{1cm}
+
+
+% stochastic reconfiguration (see Sorella, PRB 2011, add material later).
+
+% !split
+\subsection*{Plans for the week of February 17-21, 2025}
+
+% --- begin paragraph admon ---
+\paragraph{}
+\begin{itemize}
+\item Reminder on Fokker-Planck equation and Langevin equations (partly from last week)
+
+\item Programming elements of correlation function
+
+\item Start optimization: Expressions for derivatives as functions of the variational parameters
+
+\item Newton's method, gradient descent, Steepest descent and Conjugate Gradient Descent 
+% * \href{{https://youtu.be/}}{Video of Lecture TBA}
+% * \href{{https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2025/NotesFebruary21.pdf}}{Handwritten notes}
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+
+% --- begin paragraph admon ---
+\paragraph{Teaching Material, videos and written material.}
+\begin{itemize}
+\item These lecture notes
+
+\item \href{{https://www.youtube.com/watch?v=eAYohMUpPMA&ab_channel=TomCarlone}}{Video on the Conjugate Gradient methods}
+
+\item Recommended background literature, \href{{https://web.stanford.edu/~boyd/cvxbook/}}{Convex Optimization} by Boyd and Vandenberghe. Their \href{{https://web.stanford.edu/~boyd/cvxbook/bv_cvxslides.pdf}}{lecture slides} are very useful (warning, these are some 300 pages).
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+If we assume a discrete set of events,
+our initial probability
+distribution function can be  given by 
+\[
+   w_i(0) = \delta_{i,0},
+\]
+and its time-development after a given time step $\Delta t=\epsilon$ is
+\[ 
+   w_i(t) = \sum_{j}W(j\rightarrow i)w_j(t=0).
+\] 
+The continuous analog to $w_i(0)$ is
+\[
+   w(\mathbf{x})\rightarrow \delta(\mathbf{x}),
+\]
+where we now have generalized the one-dimensional position $x$ to a generic-dimensional  
+vector $\mathbf{x}$. The Kroenecker $\delta$ function is replaced by the $\delta$ distribution
+function $\delta(\mathbf{x})$ at  $t=0$.  
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+The transition from a state $j$ to a state $i$ is now replaced by a transition
+to a state with position $\mathbf{y}$ from a state with position $\mathbf{x}$. 
+The discrete sum of transition probabilities can then be replaced by an integral
+and we obtain the new distribution at a time $t+\Delta t$ as 
+\[
+   w(\mathbf{y},t+\Delta t)= \int W(\mathbf{y},t+\Delta t| \mathbf{x},t)w(\mathbf{x},t)d\mathbf{x},
+\]
+and after $m$ time steps we have
+\[
+   w(\mathbf{y},t+m\Delta t)= \int W(\mathbf{y},t+m\Delta t| \mathbf{x},t)w(\mathbf{x},t)d\mathbf{x}.
+\]
+When equilibrium is reached we have
+\[
+   w(\mathbf{y})= \int W(\mathbf{y}|\mathbf{x}, t)w(\mathbf{x})d\mathbf{x},
+\]
+that is no time-dependence. Note our change of notation for $W$
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+We can solve the equation for $w(\mathbf{y},t)$ by making a Fourier transform to
+momentum space. 
+The PDF $w(\mathbf{x},t)$ is related to its Fourier transform
+$\tilde{w}(\mathbf{k},t)$ through
+\[
+   w(\mathbf{x},t) = \int_{-\infty}^{\infty}d\mathbf{k} \exp{(i\mathbf{kx})}\tilde{w}(\mathbf{k},t),
+\]
+and using the definition of the 
+$\delta$-function 
+\[
+   \delta(\mathbf{x}) = \frac{1}{2\pi} \int_{-\infty}^{\infty}d\mathbf{k} \exp{(i\mathbf{kx})},
+\]
+ we see that
+\[
+   \tilde{w}(\mathbf{k},0)=1/2\pi.
+\]
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+We can then use the Fourier-transformed diffusion equation 
+\[
+    \frac{\partial \tilde{w}(\mathbf{k},t)}{\partial t} = -D\mathbf{k}^2\tilde{w}(\mathbf{k},t),
+\]
+with the obvious solution
+\[
+   \tilde{w}(\mathbf{k},t)=\tilde{w}(\mathbf{k},0)\exp{\left[-(D\mathbf{k}^2t)\right)}=
+    \frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}. 
+\]
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+With the Fourier transform we obtain 
+\[
+   w(\mathbf{x},t)=\int_{-\infty}^{\infty}d\mathbf{k} \exp{\left[i\mathbf{kx}\right]}\frac{1}{2\pi}\exp{\left[-(D\mathbf{k}^2t)\right]}=
+    \frac{1}{\sqrt{4\pi Dt}}\exp{\left[-(\mathbf{x}^2/4Dt)\right]}, 
+\]
+with the normalization condition
+\[
+   \int_{-\infty}^{\infty}w(\mathbf{x},t)d\mathbf{x}=1.
+\]
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+The solution represents the probability of finding
+our random walker at position $\mathbf{x}$ at time $t$ if the initial distribution 
+was placed at $\mathbf{x}=0$ at $t=0$. 
+
+There is another interesting feature worth observing. The discrete transition probability $W$
+itself is given by a binomial distribution.
+The results from the central limit theorem state that 
+transition probability in the limit $n\rightarrow \infty$ converges to the normal 
+distribution. It is then possible to show that
+\[
+    W(il-jl,n\epsilon)\rightarrow W(\mathbf{y},t+\Delta t|\mathbf{x},t)=
+    \frac{1}{\sqrt{4\pi D\Delta t}}\exp{\left[-((\mathbf{y}-\mathbf{x})^2/4D\Delta t)\right]},
+\]
+and that it satisfies the normalization condition and is itself a solution
+to the diffusion equation.
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+Let us now assume that we have three PDFs for times $t_0 < t' < t$, that is
+$w(\mathbf{x}_0,t_0)$, $w(\mathbf{x}',t')$ and $w(\mathbf{x},t)$.
+We have then  
+\[
+   w(\mathbf{x},t)= \int_{-\infty}^{\infty} W(\mathbf{x}.t|\mathbf{x}'.t')w(\mathbf{x}',t')d\mathbf{x}',
+\]
+and
+\[
+   w(\mathbf{x},t)= \int_{-\infty}^{\infty} W(\mathbf{x}.t|\mathbf{x}_0.t_0)w(\mathbf{x}_0,t_0)d\mathbf{x}_0,
+\]
+and
+\[
+   w(\mathbf{x}',t')= \int_{-\infty}^{\infty} W(\mathbf{x}'.t'|\mathbf{x}_0,t_0)w(\mathbf{x}_0,t_0)d\mathbf{x}_0.
+\]
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+We can combine these equations and arrive at the famous Einstein-Smoluchenski-Kolmogorov-Chapman (ESKC) relation
+\[
+ W(\mathbf{x}t|\mathbf{x}_0t_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},t|\mathbf{x}',t')W(\mathbf{x}',t'|\mathbf{x}_0,t_0)d\mathbf{x}'.
+\]
+We can replace the spatial dependence with a dependence upon say the velocity
+(or momentum), that is we have
+\[
+ W(\mathbf{v},t|\mathbf{v}_0,t_0)  = \int_{-\infty}^{\infty} W(\mathbf{v},t|\mathbf{v}',t')W(\mathbf{v}',t'|\mathbf{v}_0,t_0)d\mathbf{x}'.
+\]
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+We will now derive the Fokker-Planck equation. 
+We start from the ESKC equation
+\[
+ W(\mathbf{x},t|\mathbf{x}_0,t_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},t|\mathbf{x}',t')W(\mathbf{x}',t'|\mathbf{x}_0,t_0)d\mathbf{x}'.
+\]
+Define $s=t'-t_0$, $\tau=t-t'$ and $t-t_0=s+\tau$. We have then
+\[
+ W(\mathbf{x},s+\tau|\mathbf{x}_0)  = \int_{-\infty}^{\infty} W(\mathbf{x},\tau|\mathbf{x}')W(\mathbf{x}',s|\mathbf{x}_0)d\mathbf{x}'.
+\]
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+Assume now that $\tau$ is very small so that we can make an expansion in terms of a small step $\xi$, with $\mathbf{x}'=\mathbf{x}-\xi$, that is
+\[
+ W(\mathbf{x},s|\mathbf{x}_0)+\frac{\partial W}{\partial s}\tau +O(\tau^2) = \int_{-\infty}^{\infty} W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0)d\mathbf{x}'.
+\]
+We assume that $W(\mathbf{x},\tau|\mathbf{x}-\xi)$ takes non-negligible values only when $\xi$ is small. This is just another way of stating the Master equation!!
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+We say thus that $\mathbf{x}$ changes only by a small amount in the time interval $\tau$. 
+This means that we can make a Taylor expansion in terms of $\xi$, that is we
+expand
+\[
+W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0) =
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W(\mathbf{x}+\xi,\tau|\mathbf{x})W(\mathbf{x},s|\mathbf{x}_0)
+\right].
+\]
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+We can then rewrite the ESKC equation as 
+\[
+\frac{\partial W}{\partial s}\tau=-W(\mathbf{x},s|\mathbf{x}_0)+
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W(\mathbf{x},s|\mathbf{x}_0)\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\right.
+\]
+\[
+\left. \xi,\tau|\mathbf{x})d\xi\right].
+\]
+We have neglected higher powers of $\tau$ and have used that for $n=0$ 
+we get simply $W(\mathbf{x},s|\mathbf{x}_0)$ due to normalization.
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+We say thus that $\mathbf{x}$ changes only by a small amount in the time interval $\tau$. 
+This means that we can make a Taylor expansion in terms of $\xi$, that is we
+expand
+\[
+W(\mathbf{x},\tau|\mathbf{x}-\xi)W(\mathbf{x}-\xi,s|\mathbf{x}_0) =
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}\left[W(\mathbf{x}+\xi,\tau|\mathbf{x})W(\mathbf{x},s|\mathbf{x}_0)
+\right].
+\]
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We can then rewrite the ESKC equation as 
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}\tau=-W(\mathbf{x},s|\mathbf{x}_0)+
+\sum_{n=0}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\]
+\[
+\left[W(\mathbf{x},s|\mathbf{x}_0)\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\xi,\tau|\mathbf{x})d\xi\right].
+\]
+We have neglected higher powers of $\tau$ and have used that for $n=0$ 
+we get simply $W(\mathbf{x},s|\mathbf{x}_0)$ due to normalization.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We simplify the above by introducing the moments 
+\[
+M_n=\frac{1}{\tau}\int_{-\infty}^{\infty} \xi^nW(\mathbf{x}+\xi,\tau|\mathbf{x})d\xi=
+\frac{\langle [\Delta x(\tau)]^n\rangle}{\tau},
+\]
+resulting in
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}=
+\sum_{n=1}^{\infty}\frac{(-\xi)^n}{n!}\frac{\partial^n}{\partial x^n}
+\left[W(\mathbf{x},s|\mathbf{x}_0)M_n\right].
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+When $\tau \rightarrow 0$ we assume that $\langle [\Delta x(\tau)]^n\rangle \rightarrow 0$ more rapidly than $\tau$ itself if $n > 2$. 
+When $\tau$ is much larger than the standard correlation time of 
+system then $M_n$ for $n > 2$ can normally be neglected.
+This means that fluctuations become negligible at large time scales.
+
+If we neglect such terms we can rewrite the ESKC equation as 
+\[
+\frac{\partial W(\mathbf{x},s|\mathbf{x}_0)}{\partial s}=
+-\frac{\partial M_1W(\mathbf{x},s|\mathbf{x}_0)}{\partial x}+
+\frac{1}{2}\frac{\partial^2 M_2W(\mathbf{x},s|\mathbf{x}_0)}{\partial x^2}.
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{}
+In a more compact form we have
+\[
+\frac{\partial W}{\partial s}=
+-\frac{\partial M_1W}{\partial x}+
+\frac{1}{2}\frac{\partial^2 M_2W}{\partial x^2},
+\]
+which is the Fokker-Planck equation!  It is trivial to replace 
+position with velocity (momentum).
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+Consider a particle  suspended in a liquid. On its path through the liquid it will continuously collide with the liquid molecules. Because on average the particle  will collide more often on the front side than on the back side, it will experience a systematic force proportional with its velocity, and directed opposite to its velocity. Besides this systematic force the particle  will experience a stochastic force  $\mathbf{F}(t)$. 
+The equations of motion are 
+\begin{itemize}
+\item $\frac{d\mathbf{r}}{dt}=\mathbf{v}$ and 
+
+\item $\frac{d\mathbf{v}}{dt}=-\xi \mathbf{v}+\mathbf{F}$.
+\end{itemize}
+
+\noindent
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+From hydrodynamics  we know that the friction constant  $\xi$ is given by
+\[
+\xi =6\pi \eta a/m 
+\]
+where $\eta$ is the viscosity  of the solvent and a is the radius of the particle .
+
+Solving the second equation in the previous slide we get 
+\[
+\mathbf{v}(t)=\mathbf{v}_{0}e^{-\xi t}+\int_{0}^{t}d\tau e^{-\xi (t-\tau )}\mathbf{F }(\tau ). 
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+If we want to get some useful information out of this, we have to average over all possible realizations of 
+$\mathbf{F}(t)$, with the initial velocity as a condition. A useful quantity for example is
+\[ 
+\langle \mathbf{v}(t)\cdot \mathbf{v}(t)\rangle_{\mathbf{v}_{0}}=v_{0}^{-\xi 2t}
++2\int_{0}^{t}d\tau e^{-\xi (2t-\tau)}\mathbf{v}_{0}\cdot \langle \mathbf{F}(\tau )\rangle_{\mathbf{v}_{0}}
+\]
+\[  	  	
+ +\int_{0}^{t}d\tau ^{\prime }\int_{0}^{t}d\tau e^{-\xi (2t-\tau -\tau ^{\prime })}
+\langle \mathbf{F}(\tau )\cdot \mathbf{F}(\tau ^{\prime })\rangle_{ \mathbf{v}_{0}}.
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+In order to continue we have to make some assumptions about the conditional averages of the stochastic forces. 
+In view of the chaotic character of the stochastic forces the following 
+assumptions seem to be appropriate
+\[ 
+\langle \mathbf{F}(t)\rangle=0, 
+\]
+and
+\[
+\langle \mathbf{F}(t)\cdot \mathbf{F}(t^{\prime })\rangle_{\mathbf{v}_{0}}=  C_{\mathbf{v}_{0}}\delta (t-t^{\prime }).
+\] 	
+
+We omit the subscript $\mathbf{v}_{0}$, when the quantity of interest turns out to be independent of $\mathbf{v}_{0}$. Using the last three equations we get
+ \[
+\langle \mathbf{v}(t)\cdot \mathbf{v}(t)\rangle_{\mathbf{v}_{0}}=v_{0}^{2}e^{-2\xi t}+\frac{C_{\mathbf{v}_{0}}}{2\xi }(1-e^{-2\xi t}).
+\]
+For large t this should be equal to 3kT/m, from which it follows that
+\[
+\langle \mathbf{F}(t)\cdot \mathbf{F}(t^{\prime })\rangle =6\frac{kT}{m}\xi \delta (t-t^{\prime }). 
+\]
+This result is called the fluctuation-dissipation theorem .
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+Integrating 
+ \[ 
+\mathbf{v}(t)=\mathbf{v}_{0}e^{-\xi t}+\int_{0}^{t}d\tau e^{-\xi (t-\tau )}\mathbf{F }(\tau ), 
+\] 
+we get
+\[
+\mathbf{r}(t)=\mathbf{r}_{0}+\mathbf{v}_{0}\frac{1}{\xi }(1-e^{-\xi t})+
+\int_0^td\tau \int_0^{\tau}\tau ^{\prime } e^{-\xi (\tau -\tau ^{\prime })}\mathbf{F}(\tau ^{\prime }), 
+\]
+from which we calculate the mean square displacement 
+\[
+\langle ( \mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle _{\mathbf{v}_{0}}=\frac{v_0^2}{\xi}(1-e^{-\xi t})^{2}+\frac{3kT}{m\xi ^{2}}(2\xi t-3+4e^{-\xi t}-e^{-2\xi t}). 
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, Fokker-Planck and Langevin equations}
+
+% --- begin paragraph admon ---
+\paragraph{Langevin equation.}
+For very large $t$ this becomes
+\[
+\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =\frac{6kT}{m\xi }t 
+\] 
+from which we get the Einstein relation  
+ \[ 
+D= \frac{kT}{m\xi } 
+\] 	
+where we have used $\langle (\mathbf{r}(t)-\mathbf{r}_{0})^{2}\rangle =6Dt$.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Importance sampling, programming elements}
+
+The general derivative formula of the Jastrow factor (or the ansatz for the correlated part of the wave function) is (the subscript $C$ stands for Correlation)
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k}
+\]
+However, 
+with our written in way which can be reused later as
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})= \exp{\left\{\sum_{i<j}f(r_{ij})\right\}},
+\]
+the gradient needed for the quantum force and local energy is easy to compute.  
+The function $f(r_{ij})$ will depends on the system under study. In the equations below we will keep this general form.
+
+% !split
+\subsection*{Importance sampling, program elements}
+
+In the Metropolis/Hasting algorithm, the \emph{acceptance ratio} determines the probability for a particle  to be accepted at a new position. The ratio of the trial wave functions evaluated at the new and current positions is given by ($OB$ for the onebody  part)
+\[
+R \equiv \frac{\Psi_{T}^{new}}{\Psi_{T}^{old}} = 
+\frac{\Psi_{OB}^{new}}{\Psi_{OB}^{old}}\frac{\Psi_{C}^{new}}{\Psi_{C}^{old}}
+\]
+Here $\Psi_{OB}$ is our onebody part (Slater determinant or product of boson single-particle states)  while $\Psi_{C}$ is our correlation function, or Jastrow factor. 
+We need to optimize the $\nabla \Psi_T / \Psi_T$ ratio and the second derivative as well, that is
+the $\mathbf{\nabla}^2 \Psi_T/\Psi_T$ ratio. The first is needed when we compute the so-called quantum force in importance sampling.
+The second is needed when we compute the kinetic energy term of the local energy.
+\[
+\frac{\mathbf{\mathbf{\nabla}}  \Psi}{\Psi}  = \frac{\mathbf{\nabla}  (\Psi_{OB} \, \Psi_{C})}{\Psi_{OB} \, \Psi_{C}}  =  \frac{ \Psi_C \mathbf{\nabla}  \Psi_{OB} + \Psi_{OB} \mathbf{\nabla}  \Psi_{C}}{\Psi_{OB} \Psi_{C}} = \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+\]
+
+% !split
+\subsection*{Importance sampling}
+
+The expectation value of the kinetic energy expressed in scaled units  for particle  $i$ is 
+\[
+ \langle \hat{K}_i \rangle = -\frac{1}{2}\frac{\langle\Psi|\mathbf{\nabla}_{i}^2|\Psi \rangle}{\langle\Psi|\Psi \rangle},
+\]
+\[
+\hat{K}_i = -\frac{1}{2}\frac{\mathbf{\nabla}_{i}^{2} \Psi}{\Psi}.
+\]
+
+% !split
+\subsection*{Importance sampling}
+
+The second derivative which enters the definition of the local energy is 
+\[
+\frac{\mathbf{\nabla}^2 \Psi}{\Psi}=\frac{\mathbf{\nabla}^2 \Psi_{OB}}{\Psi_{OB}} + \frac{\mathbf{\nabla}^2  \Psi_C}{ \Psi_C} + 2 \frac{\mathbf{\nabla}  \Psi_{OB}}{\Psi_{OB}}\cdot\frac{\mathbf{\nabla}   \Psi_C}{ \Psi_C}
+\]
+We discuss here how to calculate these quantities in an optimal way.
+
+% !split
+\subsection*{Importance sampling}
+
+We have defined the correlated function as
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})=\prod_{i< j}^Ng(r_{ij})= \prod_{i=1}^N\prod_{j=i+1}^Ng(r_{ij}),
+\]
+with 
+$r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2+(z_i-z_j)^2}$ in three dimensions or
+$r_{ij}=|\mathbf{r}_i-\mathbf{r}_j|=\sqrt{(x_i-x_j)^2+(y_i-y_j)^2}$ if we work with two-dimensional systems.
+
+In our particular case we have
+\[
+\Psi_C=\prod_{i< j}g(r_{ij})=\exp{\left\{\sum_{i<j}f(r_{ij})\right\}}.
+\]
+
+% !split
+\subsection*{Importance sampling}
+
+The total number of different relative distances $r_{ij}$ is $N(N-1)/2$. In a matrix storage format, the relative distances  form a strictly upper triangular matrix
+\[
+ \mathbf{r} \equiv \begin{pmatrix}
+  0 & r_{1,2} & r_{1,3} & \cdots & r_{1,N} \\
+  \vdots & 0       & r_{2,3} & \cdots & r_{2,N} \\
+  \vdots & \vdots  & 0  & \ddots & \vdots  \\
+  \vdots & \vdots  & \vdots  & \ddots  & r_{N-1,N} \\
+  0 & 0  & 0  & \cdots  & 0
+ \end{pmatrix}.
+\]
+This applies to  $\mathbf{g} = \mathbf{g}(r_{ij})$ as well. 
+
+In our algorithm we will move one particle  at the time, say the $kth$-particle.  This sampling will be seen to be particularly efficient when we are going to compute a Slater determinant. 
+
+% !split
+\subsection*{Importance sampling}
+
+We have that the ratio between Jastrow factors $R_C$ is given by
+\[
+R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} =
+\prod_{i=1}^{k-1}\frac{g_{ik}^\mathrm{new}}{g_{ik}^\mathrm{cur}}
+\prod_{i=k+1}^{N}\frac{ g_{ki}^\mathrm{new}} {g_{ki}^\mathrm{cur}}.
+\]
+For the Pade-Jastrow form
+\[
+ R_{C} = \frac{\Psi_{C}^\mathrm{new}}{\Psi_{C}^\mathrm{cur}} = 
+\frac{\exp{U_{new}}}{\exp{U_{cur}}} = \exp{\Delta U},
+\]
+where
+\[
+\Delta U =
+\sum_{i=1}^{k-1}\big(f_{ik}^\mathrm{new}-f_{ik}^\mathrm{cur}\big)
++
+\sum_{i=k+1}^{N}\big(f_{ki}^\mathrm{new}-f_{ki}^\mathrm{cur}\big)
+\]
+
+% !split
+\subsection*{Importance sampling}
+
+One needs to develop a special algorithm 
+that runs only through the elements of the upper triangular
+matrix $\mathbf{g}$ and have $k$ as an index. 
+
+The expression to be derived in the following is of interest when computing the quantum force and the kinetic energy. It has the form
+\[
+\frac{\mathbf{\nabla}_i\Psi_C}{\Psi_C} = \frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_i},
+\]
+for all dimensions and with $i$ running over all particles.
+
+% !split
+\subsection*{Importance sampling}
+
+For the first derivative only $N-1$ terms survive the ratio because the $g$-terms that are not differentiated cancel with their corresponding ones in the denominator. Then,
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_k}.
+\]
+An equivalent equation is obtained for the exponential form after replacing $g_{ij}$ by $\exp(f_{ij})$, yielding:
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
++
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_k},
+\]
+with both expressions scaling as $\mathcal{O}(N)$.
+
+% !split
+\subsection*{Importance sampling}
+
+Using the identity 
+\[
+\frac{\partial}{\partial x_i}g_{ij} = -\frac{\partial}{\partial x_j}g_{ij},
+\]
+we get expressions where all the derivatives acting on the particle  are represented by the \emph{second} index of $g$:
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}}\frac{\partial g_{ik}}{\partial x_k}
+-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\partial g_{ki}}{\partial x_i},
+\]
+and for the exponential case:
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k}
+-\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}.
+\]
+
+% !split
+\subsection*{Importance sampling}
+
+For correlation forms depending only on the scalar distances $r_{ij}$ we can use the chain rule. Noting that 
+\[
+\frac{\partial g_{ij}}{\partial x_j} = \frac{\partial g_{ij}}{\partial r_{ij}} \frac{\partial r_{ij}}{\partial x_j} = \frac{x_j - x_i}{r_{ij}} \frac{\partial g_{ij}}{\partial r_{ij}},
+\]
+we arrive at
+\[
+\frac{1}{\Psi_C}\frac{\partial \Psi_C}{\partial x_k} = 
+\sum_{i=1}^{k-1}\frac{1}{g_{ik}} \frac{\mathbf{r_{ik}}}{r_{ik}} \frac{\partial g_{ik}}{\partial r_{ik}}
+-\sum_{i=k+1}^{N}\frac{1}{g_{ki}}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial g_{ki}}{\partial r_{ki}}.
+\]
+
+% !split
+\subsection*{Importance sampling}
+
+Note that for the Pade-Jastrow form we can set $g_{ij} \equiv g(r_{ij}) = e^{f(r_{ij})} = e^{f_{ij}}$ and 
+\[
+\frac{\partial g_{ij}}{\partial r_{ij}} = g_{ij} \frac{\partial f_{ij}}{\partial r_{ij}}.
+\]
+Therefore, 
+\[
+\frac{1}{\Psi_{C}}\frac{\partial \Psi_{C}}{\partial x_k} =
+\sum_{i=1}^{k-1}\frac{\mathbf{r_{ik}}}{r_{ik}}\frac{\partial f_{ik}}{\partial r_{ik}}
+-\sum_{i=k+1}^{N}\frac{\mathbf{r_{ki}}}{r_{ki}}\frac{\partial f_{ki}}{\partial r_{ki}},
+\]
+where 
+\[
+ \mathbf{r}_{ij} = |\mathbf{r}_j - \mathbf{r}_i| = (x_j - x_i)\mathbf{e}_1 + (y_j - y_i)\mathbf{e}_2 + (z_j - z_i)\mathbf{e}_3
+\]
+is the relative distance. 
+
+% !split
+\subsection*{Importance sampling}
+
+The second derivative of the Jastrow factor divided by the Jastrow factor (the way it enters the kinetic energy) is
+\[
+\left[\frac{\mathbf{\nabla}^2 \Psi_C}{\Psi_C}\right]_x =\  
+2\sum_{k=1}^{N}
+\sum_{i=1}^{k-1}\frac{\partial^2 g_{ik}}{\partial x_k^2}\ +\ 
+\sum_{k=1}^N
+\left(
+\sum_{i=1}^{k-1}\frac{\partial g_{ik}}{\partial x_k} -
+\sum_{i=k+1}^{N}\frac{\partial g_{ki}}{\partial x_i}
+\right)^2
+\]
+
+% !split
+\subsection*{Importance sampling}
+
+But we have a simple form for the function, namely
+\[
+\Psi_{C}=\prod_{i< j}\exp{f(r_{ij})},
+\]
+and it is easy to see that for particle  $k$
+we have
+\[
+  \frac{\mathbf{\nabla}^2_k \Psi_C}{\Psi_C }=
+\sum_{ij\ne k}\frac{(\mathbf{r}_k-\mathbf{r}_i)(\mathbf{r}_k-\mathbf{r}_j)}{r_{ki}r_{kj}}f'(r_{ki})f'(r_{kj})+
+\sum_{j\ne k}\left( f''(r_{kj})+\frac{2}{r_{kj}}f'(r_{kj})\right)
+\]
+
+% !split
+\subsection*{Top-down optimization view}
+
+\begin{itemize}
+\item We will start with a top-down view, with a simple harmonic oscillator problem in one dimension as case.
+
+\item Thereafter we continue with implementing the simplest possible steepest descent approach to our two-electron problem with an electrostatic (Coulomb) interaction. Our code includes also importance sampling. The simple Python code here illustrates the basic elements which need to be included in our own code.
+
+\item Then we move on to the mathematical description of various gradient methods.
+\end{itemize}
+
+\noindent
+% !split
+\subsection*{Motivation}
+
+% --- begin paragraph admon ---
+\paragraph{}
+Our aim with this part of the project is to be able to
+\begin{itemize}
+\item find an optimal value for the variational parameters using only some few Monte Carlo cycles
+
+\item use these optimal values for the variational parameters to perform a large-scale Monte Carlo calculation
+\end{itemize}
+
+\noindent
+To achieve this will look at methods like the simplest possible \emph{gradient descent}, \emph{Steepest descent}, the \emph{conjugate gradient method} and stochastic gradient descent.
+These methods allow us to find
+the minima of a multivariable  function like our energy (function of several variational parameters). 
+Alternatively, you can always use Newton's method. In particular, since we will normally have one variational parameter,
+Newton's method can be easily used in finding the minimum of the local energy.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Simple example and demonstration}
+
+Let us illustrate what is needed in our calculations using a simple example, the harmonic oscillator in one dimension.
+For the harmonic oscillator in one-dimension we have a  trial wave function and probability
+\[
+\psi_T(x;\alpha) = \exp{-(\frac{1}{2}\alpha^2x^2)},
+\]
+which results in a local energy 
+\[
+\frac{1}{2}\left(\alpha^2+x^2(1-\alpha^4)\right).
+\]
+We can compare our numerically calculated energies with the exact energy as function of $\alpha$
+\[
+\overline{E}[\alpha] = \frac{1}{4}\left(\alpha^2+\frac{1}{\alpha^2}\right).
+\]
+
+% !split
+\subsection*{Simple example and demonstration}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The derivative of the energy with respect to $\alpha$ gives
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = \frac{1}{2}\alpha-\frac{1}{2\alpha^3}
+\end{equation*}
+and a second derivative which is always positive (meaning that we find a minimum)
+\begin{equation*}
+\frac{d^2\langle  E_L[\alpha]\rangle}{d\alpha^2} = \frac{1}{2}+\frac{3}{2\alpha^4}
+\end{equation*}
+The condition
+\begin{equation*}
+\frac{d\langle  E_L[\alpha]\rangle}{d\alpha} = 0,
+\end{equation*}
+gives the optimal $\alpha=1$, as expected.
+% --- end paragraph admon ---
+
+
+
+% !split
+
+% --- begin exercise ---
+\begin{doconceexercise}
+\refstepcounter{doconceexercisecounter}
+
+\exercisesection*{Exercise \thedoconceexercisecounter: Find the local energy for the harmonic oscillator}
+                             
+
+% --- begin subexercise ---
+\subex{a)}
+Derive the local energy for the harmonic oscillator in one dimension and find its expectation value.
+
+% --- end subexercise ---
+
+% --- begin subexercise ---
+\subex{b)}
+Show also that the optimal value of optimal $\alpha=1$
+
+% --- end subexercise ---
+
+% --- begin subexercise ---
+\subex{c)}
+Repeat the above steps in two dimensions for $N$ bosons or electrons. What is the optimal value of $\alpha$?
+
+% --- end subexercise ---
+
+\end{doconceexercise}
+% --- end exercise ---
+
+% !split
+\subsection*{Variance in the simple model}
+
+% --- begin paragraph admon ---
+\paragraph{}
+We can also minimize the variance. In our simple model the variance is
+
+\[
+\sigma^2[\alpha]=\frac{1}{4}\left(1+(1-\alpha^4)^2\frac{3}{4\alpha^4}\right)-\overline{E}^2.
+\]
+which yields a second derivative which is always positive.
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Computing the derivatives}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+In general we end up computing the expectation value of the energy in terms 
+of some parameters $\alpha_0,\alpha_1,\dots,\alpha_n$
+and we search for a minimum in this multi-variable parameter space.  
+This leads to an energy minimization problem \emph{where we need the derivative of the energy as a function of the variational parameters}.
+
+In the above example this was easy and we were able to find the expression for the derivative by simple derivations. 
+However, in our actual calculations the energy is represented by a multi-dimensional integral with several variational parameters.
+How can we can then obtain the derivatives of the energy with respect to the variational parameters without having 
+to resort to expensive numerical derivations?
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Expressions for finding the derivatives of the local energy}
+
+% --- begin paragraph admon ---
+\paragraph{}
+
+To find the derivatives of the local energy expectation value as function of the variational parameters, we can use the chain rule and the hermiticity of the Hamiltonian.  
+
+Let us define 
+\[
+\bar{E}_{\alpha}=\frac{d\langle  E_L[\alpha]\rangle}{d\alpha}.
+\]
+as the derivative of the energy with respect to the variational parameter $\alpha$ (we limit ourselves to one parameter only).
+In the above example this was easy and we obtain a simple expression for the derivative.
+We define also the derivative of the trial function (skipping the subindex $T$) as 
+\[
+\bar{\psi}_{\alpha}=\frac{d\psi[\alpha]\rangle}{d\alpha}.
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+\subsection*{Derivatives of the local energy}
+
+% --- begin paragraph admon ---
+\paragraph{}
+The elements of the gradient of the local energy are then (using the chain rule and the hermiticity of the Hamiltonian)
+\[
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+\]
+From a computational point of view it means that you need to compute the expectation values of 
+\[
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle,
+\]
+and
+\[
+\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha]\rangle
+\]
+% --- end paragraph admon ---
+
+
+
+% !split
+
+% --- begin exercise ---
+\begin{doconceexercise}
+\refstepcounter{doconceexercisecounter}
+
+\exercisesection*{Exercise \thedoconceexercisecounter: General expression for the derivative of the energy}
+                             
+
+% --- begin subexercise ---
+\subex{a)}
+Show that 
+\[
+\bar{E}_{\alpha} = 2\left( \langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}E_L[\alpha]\rangle -\langle \frac{\bar{\psi}_{\alpha}}{\psi[\alpha]}\rangle\langle E_L[\alpha] \rangle\right).
+\]
+
+% --- end subexercise ---
+
+% --- begin subexercise ---
+\subex{b)}
+Find the corresponding expression for the variance.
+
+% --- end subexercise ---
+
+\end{doconceexercise}
+% --- end exercise ---
+
+% !split
+\subsection*{Python program for 2-electrons in 2 dimensions}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=7mm]{python}
+# 2-electron VMC code for 2dim quantum dot with importance sampling
+# Using gaussian rng for new positions and Metropolis- Hastings 
+# Added energy minimization with gradient descent using fixed step size
+# To do: replace with optimization codes from scipy and/or use stochastic gradient descent
+from math import exp, sqrt
+from random import random, seed, normalvariate
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import sys
+
+
+
+# Trial wave function for the 2-electron quantum dot in two dims
+def WaveFunction(r,alpha,beta):
+    r1 = r[0,0]**2 + r[0,1]**2
+    r2 = r[1,0]**2 + r[1,1]**2
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = r12/(1+beta*r12)
+    return exp(-0.5*alpha*(r1+r2)+deno)
+
+# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
+def LocalEnergy(r,alpha,beta):
+    
+    r1 = (r[0,0]**2 + r[0,1]**2)
+    r2 = (r[1,0]**2 + r[1,1]**2)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    deno2 = deno*deno
+    return 0.5*(1-alpha*alpha)*(r1 + r2) +2.0*alpha + 1.0/r12+deno2*(alpha*r12-deno2+2*beta*deno-1.0/r12)
+
+# Derivate of wave function ansatz as function of variational parameters
+def DerivativeWFansatz(r,alpha,beta):
+    
+    WfDer  = np.zeros((2), np.double)
+    r1 = (r[0,0]**2 + r[0,1]**2)
+    r2 = (r[1,0]**2 + r[1,1]**2)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    deno2 = deno*deno
+    WfDer[0] = -0.5*(r1+r2)
+    WfDer[1] = -r12*r12*deno2
+    return  WfDer
+
+# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
+def QuantumForce(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    qforce[0,:] = -2*r[0,:]*alpha*(r[0,:]-r[1,:])*deno*deno/r12
+    qforce[1,:] = -2*r[1,:]*alpha*(r[1,:]-r[0,:])*deno*deno/r12
+    return qforce
+    
+
+# Computing the derivative of the energy and the energy 
+def EnergyMinimization(alpha, beta):
+
+    NumberMCcycles= 10000
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    # seed for rng generator 
+    seed()
+    energy = 0.0
+    DeltaE = 0.0
+    EnergyDer = np.zeros((2), np.double)
+    DeltaPsi = np.zeros((2), np.double)
+    DerivativePsiE = np.zeros((2), np.double)
+    #Initial position
+    for i in range(NumberParticles):
+        for j in range(Dimension):
+            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    #Loop over MC MCcycles
+    for MCcycle in range(NumberMCcycles):
+        #Trial position moving one particle at the time
+        for i in range(NumberParticles):
+            for j in range(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = 0.0
+            for j in range(Dimension):
+                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+            #Metropolis-Hastings test to see whether we accept the move
+            if random() <= ProbabilityRatio:
+                for j in range(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
+        DeltaPsi += DerPsi
+        energy += DeltaE
+        DerivativePsiE += DerPsi*DeltaE
+            
+    # We calculate mean values
+    energy /= NumberMCcycles
+    DerivativePsiE /= NumberMCcycles
+    DeltaPsi /= NumberMCcycles
+    EnergyDer  = 2*(DerivativePsiE-DeltaPsi*energy)
+    return energy, EnergyDer
+
+
+#Here starts the main program with variable declarations
+NumberParticles = 2
+Dimension = 2
+# guess for variational parameters
+alpha = 0.9
+beta = 0.2
+# Set up iteration using gradient descent method
+Energy = 0
+EDerivative = np.zeros((2), np.double)
+eta = 0.01
+Niterations = 50
+# 
+for iter in range(Niterations):
+    Energy, EDerivative = EnergyMinimization(alpha,beta)
+    alphagradient = EDerivative[0]
+    betagradient = EDerivative[1]
+    alpha -= eta*alphagradient
+    beta -= eta*betagradient 
+
+print(alpha, beta)
+print(Energy, EDerivative[0], EDerivative[1])
+
+
+
+
+\end{minted}
+
+
+% !split
+\subsection*{Using Broyden's algorithm in scipy}
+The following function uses the above described BFGS algorithm. Here we have defined a function which calculates the energy and a function which computes the first derivative.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\begin{minted}[fontsize=\fontsize{9pt}{9pt},linenos=false,mathescape,baselinestretch=1.0,fontfamily=tt,xleftmargin=7mm]{python}
+# 2-electron VMC code for 2dim quantum dot with importance sampling
+# Using gaussian rng for new positions and Metropolis- Hastings 
+# Added energy minimization using the BFGS algorithm, see p. 136 of https://www.springer.com/it/book/9780387303031
+from math import exp, sqrt
+from random import random, seed, normalvariate
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from scipy.optimize import minimize
+import sys
+
+
+# Trial wave function for the 2-electron quantum dot in two dims
+def WaveFunction(r,alpha,beta):
+    r1 = r[0,0]**2 + r[0,1]**2
+    r2 = r[1,0]**2 + r[1,1]**2
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = r12/(1+beta*r12)
+    return exp(-0.5*alpha*(r1+r2)+deno)
+
+# Local energy  for the 2-electron quantum dot in two dims, using analytical local energy
+def LocalEnergy(r,alpha,beta):
+    
+    r1 = (r[0,0]**2 + r[0,1]**2)
+    r2 = (r[1,0]**2 + r[1,1]**2)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    deno2 = deno*deno
+    return 0.5*(1-alpha*alpha)*(r1 + r2) +2.0*alpha + 1.0/r12+deno2*(alpha*r12-deno2+2*beta*deno-1.0/r12)
+
+# Derivate of wave function ansatz as function of variational parameters
+def DerivativeWFansatz(r,alpha,beta):
+    
+    WfDer  = np.zeros((2), np.double)
+    r1 = (r[0,0]**2 + r[0,1]**2)
+    r2 = (r[1,0]**2 + r[1,1]**2)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    deno2 = deno*deno
+    WfDer[0] = -0.5*(r1+r2)
+    WfDer[1] = -r12*r12*deno2
+    return  WfDer
+
+# Setting up the quantum force for the two-electron quantum dot, recall that it is a vector
+def QuantumForce(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[0,0]-r[1,0])**2 + (r[0,1]-r[1,1])**2)
+    deno = 1.0/(1+beta*r12)
+    qforce[0,:] = -2*r[0,:]*alpha*(r[0,:]-r[1,:])*deno*deno/r12
+    qforce[1,:] = -2*r[1,:]*alpha*(r[1,:]-r[0,:])*deno*deno/r12
+    return qforce
+    
+
+# Computing the derivative of the energy and the energy 
+def EnergyDerivative(x0):
+
+    
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    NumberMCcycles= 10000
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = 0.0
+    DeltaE = 0.0
+    alpha = x0[0]
+    beta = x0[1]
+    EnergyDer = 0.0
+    DeltaPsi = 0.0
+    DerivativePsiE = 0.0 
+    #Initial position
+    for i in range(NumberParticles):
+        for j in range(Dimension):
+            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    #Loop over MC MCcycles
+    for MCcycle in range(NumberMCcycles):
+        #Trial position moving one particle at the time
+        for i in range(NumberParticles):
+            for j in range(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = 0.0
+            for j in range(Dimension):
+                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+            #Metropolis-Hastings test to see whether we accept the move
+            if random() <= ProbabilityRatio:
+                for j in range(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
+        DeltaPsi += DerPsi
+        energy += DeltaE
+        DerivativePsiE += DerPsi*DeltaE
+            
+    # We calculate mean values
+    energy /= NumberMCcycles
+    DerivativePsiE /= NumberMCcycles
+    DeltaPsi /= NumberMCcycles
+    EnergyDer  = 2*(DerivativePsiE-DeltaPsi*energy)
+    return EnergyDer
+
+
+# Computing the expectation value of the local energy 
+def Energy(x0):
+    # Parameters in the Fokker-Planck simulation of the quantum force
+    D = 0.5
+    TimeStep = 0.05
+    # positions
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    # Quantum force
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = 0.0
+    DeltaE = 0.0
+    alpha = x0[0]
+    beta = x0[1]
+    NumberMCcycles= 10000
+    #Initial position
+    for i in range(NumberParticles):
+        for j in range(Dimension):
+            PositionOld[i,j] = normalvariate(0.0,1.0)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    #Loop over MC MCcycles
+    for MCcycle in range(NumberMCcycles):
+        #Trial position moving one particle at the time
+        for i in range(NumberParticles):
+            for j in range(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(0.0,1.0)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = 0.0
+            for j in range(Dimension):
+                GreensFunction += 0.5*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*0.5*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**2/wfold**2
+            #Metropolis-Hastings test to see whether we accept the move
+            if random() <= ProbabilityRatio:
+                for j in range(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        energy += DeltaE
+            
+    # We calculate mean values
+    energy /= NumberMCcycles
+    return energy
+
+
+
+
+#Here starts the main program with variable declarations
+NumberParticles = 2
+Dimension = 2
+# seed for rng generator 
+seed()
+# guess for variational parameters
+x0 = np.array([0.9,0.2])
+# Using Broydens method
+res = minimize(Energy, x0, method='BFGS', jac=EnergyDerivative, options={'gtol': 1e-4,'disp': True})
+print(res.x)
+
+\end{minted}
+
+Note that the \textbf{minimize} function returns the finale values for the variable $\alpha=x0[0]$ and $\beta=x0[1]$ in the array $x$. 
+
+% !split
+\subsection*{Brief reminder on Newton-Raphson's method}
+
+Let us quickly remind ourselves how we derive the above method.
+
+Perhaps the most celebrated of all one-dimensional root-finding
+routines is Newton's method, also called the Newton-Raphson
+method. This method  requires the evaluation of both the
+function $f$ and its derivative $f'$ at arbitrary points. 
+If you can only calculate the derivative
+numerically and/or your function is not of the smooth type, we
+normally discourage the use of this method.
+
+% !split
+\subsection*{The equations}
+
+The Newton-Raphson formula consists geometrically of extending the
+tangent line at a current point until it crosses zero, then setting
+the next guess to the abscissa of that zero-crossing.  The mathematics
+behind this method is rather simple. Employing a Taylor expansion for
+$x$ sufficiently close to the solution $s$, we have
+
+\[
+    f(s)=0=f(x)+(s-x)f'(x)+\frac{(s-x)^2}{2}f''(x) +\dots.
+    \label{eq:taylornr}
+\]
+
+For small enough values of the function and for well-behaved
+functions, the terms beyond linear are unimportant, hence we obtain
+
+\[
+   f(x)+(s-x)f'(x)\approx 0,
+\]
+yielding
+\[
+   s\approx x-\frac{f(x)}{f'(x)}.
+\]
+
+Having in mind an iterative procedure, it is natural to start iterating with
+\[
+   x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}.
+\]
+
+% !split
+\subsection*{Simple geometric interpretation}
+
+The above is Newton-Raphson's method. It has a simple geometric
+interpretation, namely $x_{n+1}$ is the point where the tangent from
+$(x_n,f(x_n))$ crosses the $x$-axis.  Close to the solution,
+Newton-Raphson converges fast to the desired result. However, if we
+are far from a root, where the higher-order terms in the series are
+important, the Newton-Raphson formula can give grossly inaccurate
+results. For instance, the initial guess for the root might be so far
+from the true root as to let the search interval include a local
+maximum or minimum of the function.  If an iteration places a trial
+guess near such a local extremum, so that the first derivative nearly
+vanishes, then Newton-Raphson may fail totally
+
+% !split
+\subsection*{Extending to more than one variable}
+
+Newton's method can be generalized to systems of several non-linear equations
+and variables. Consider the case with two equations
+\[
+   \begin{array}{cc} f_1(x_1,x_2) &=0\\
+                     f_2(x_1,x_2) &=0,\end{array}.
+\]
+
+% !split
+\subsection*{Taylor expansion}
+We Taylor expand to obtain
+
+\[
+   \begin{array}{cc} 0=f_1(x_1+h_1,x_2+h_2)=&f_1(x_1,x_2)+h_1
+                     \partial f_1/\partial x_1+h_2
+                     \partial f_1/\partial x_2+\dots\\
+                     0=f_2(x_1+h_1,x_2+h_2)=&f_2(x_1,x_2)+h_1
+                     \partial f_2/\partial x_1+h_2
+                     \partial f_2/\partial x_2+\dots
+                       \end{array}.
+\]
+
+% !split
+\subsection*{Jacobian}
+Defining the Jacobian matrix $\hat{J}$ we have
+\[
+ \hat{J}=\left( \begin{array}{cc}
+                         \partial f_1/\partial x_1  & \partial f_1/\partial x_2 \\
+                          \partial f_2/\partial x_1     &\partial f_2/\partial x_2
+             \end{array} \right),
+\]
+we can rephrase Newton's method as
+\[
+\left(\begin{array}{c} x_1^{n+1} \\ x_2^{n+1} \end{array} \right)=
+\left(\begin{array}{c} x_1^{n} \\ x_2^{n} \end{array} \right)+
+\left(\begin{array}{c} h_1^{n} \\ h_2^{n} \end{array} \right),
+\]
+where we have defined
+\[
+   \left(\begin{array}{c} h_1^{n} \\ h_2^{n} \end{array} \right)=
+   -{\bf \hat{J}}^{-1}
+   \left(\begin{array}{c} f_1(x_1^{n},x_2^{n}) \\ f_2(x_1^{n},x_2^{n}) \end{array} \right).
+\]
+
+% !split
+\subsection*{Inverse of Jacobian}
+
+We need thus to compute the inverse of the Jacobian matrix and it
+is to understand that difficulties  may
+arise in case $\hat{J}$ is nearly singular.
+
+It is rather straightforward to extend the above scheme to systems of
+more than two non-linear equations. In our case, the Jacobian matrix is given by the Hessian that represents the second derivative of cost function. 
+
+
+% ------------------- end of main content ---------------
+
+\end{document}
+
