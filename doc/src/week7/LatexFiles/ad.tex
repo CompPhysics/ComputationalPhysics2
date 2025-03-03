@@ -1,0 +1,117 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{graphicx}
+
+\title{Automatic Differentiation}
+\author{Author Name}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Automatic Differentiation (AD) is a numerical technique for efficiently and accurately evaluating derivatives of numerical functions. This document explains the fundamental principles of AD, contrasts it with symbolic and numerical differentiation, and describes both forward-mode and reverse-mode implementations. The relationship between computational graphs and derivative calculation is explored, along with practical considerations for implementation.
+\end{abstract}
+
+\section{Introduction}
+Automatic differentiation (AD), also called algorithmic differentiation, is a family of techniques for computing derivatives of functions implemented as computer programs. Unlike symbolic differentiation (which operates on mathematical expressions) and numerical differentiation (which uses finite differences), AD decomposes programs into elementary operations and applies the chain rule repeatedly.
+
+\section{Key Concepts}
+\subsection{Forward Mode AD}
+Forward mode AD computes directional derivatives by propagating derivatives along with function evaluations:
+
+\begin{equation}
+\dot{z} = \frac{\partial z}{\partial x} \dot{x}
+\end{equation}
+
+\begin{algorithm}
+\caption{Forward Mode AD}
+\begin{algorithmic}[1]
+\State Represent variables as dual numbers $(v, \dot{v})$
+\State Initialize input variables with $\dot{x}_i = 1$ for target variable
+\State Perform elementary operations with dual arithmetic:
+\begin{align*}
+(v, \dot{v}) + (u, \dot{u}) &= (v+u, \dot{v}+\dot{u}) \\
+(v, \dot{v}) \times (u, \dot{u}) &= (vu, v\dot{u} + u\dot{v})
+\end{align*}
+\State Final value contains function result and derivative
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Reverse Mode AD}
+Reverse mode AD (backpropagation) computes gradients by propagating adjoints backward through the computation graph:
+
+\begin{equation}
+\bar{x}_i = \frac{\partial f}{\partial x_i} = \sum_{j \in \text{children}(i)} \bar{x}_j \frac{\partial x_j}{\partial x_i}
+\end{equation}
+
+\begin{algorithm}
+\caption{Reverse Mode AD}
+\begin{algorithmic}[1]
+\State Construct computation graph during forward pass
+\State Initialize adjoint of output: $\bar{y} = 1$
+\State Backpropagate using chain rule:
+\[
+\bar{x}_i = \sum_{j} \bar{x}_j \frac{\partial f_j}{\partial x_i}
+\]
+\State Accumulate gradients through reverse traversal
+\end{algorithmic}
+\end{algorithm}
+
+\section{Implementation Approaches}
+\begin{itemize}
+\item \textbf{Operator Overloading}: Create dual number types that overload operators
+\item \textbf{Source Transformation}: Generate derivative code by parsing source
+\item \textbf{Tape-based Methods}: Record operations during forward pass for reversal
+\end{itemize}
+
+\section{Example: Function Evaluation}
+Consider $f(x, y) = xy + \sin(x)$ with $x = \frac{\pi}{2}, y = 3$:
+
+\paragraph{Forward Mode}
+\begin{align*}
+x &= (\frac{\pi}{2}, 1) \\
+y &= (3, 0) \\
+xy &= (\frac{3\pi}{2}, 3) \\
+\sin(x) &= (1, \cos(\frac{\pi}{2})) \\
+f &= (\frac{3\pi}{2} + 1, 3 + 0) = (5.712, 3)
+\end{align*}
+
+\paragraph{Reverse Mode}
+\begin{enumerate}
+\item Forward pass: Compute $f = 5.712$
+\item Reverse pass:
+\begin{align*}
+\bar{f} &= 1 \\
+\bar{\sin(x)} &= 1 \\
+\bar{xy} &= 1 \\
+\bar{y} &= x = \frac{\pi}{2} \\
+\bar{x} &= y + \cos(x) = 3 + 0 = 3
+\end{align*}
+\end{enumerate}
+
+\section{Applications and Considerations}
+\begin{itemize}
+\item Machine learning (neural network training via backpropagation)
+\item Optimization (gradient-based methods)
+\item Computational finance (sensitivity analysis)
+\item \textbf{Efficiency}: Reverse mode preferred for $\mathbb{R}^n \to \mathbb{R}$
+\item \textbf{Memory}: Reverse mode requires storing intermediate values
+\end{itemize}
+
+\section{Comparison of Methods}
+\[
+\begin{array}{lccc}
+& \text{AD} & \text{Symbolic} & \text{Numerical} \\
+\text{Accuracy} & \text{Exact} & \text{Exact} & \text{Approx} \\
+\text{Complexity} & O(1) & \text{Expression swell} & O(n) \\
+\text{Implementation} & \text{Program} & \text{Expression} & \text{Function calls}
+\end{array}
+\]
+
+\section{Conclusion}
+Automatic differentiation combines the accuracy of symbolic differentiation with the efficiency of numerical methods. Its two main modes (forward and reverse) provide flexibility for different computational requirements, making it indispensable in modern machine learning and scientific computing. Modern frameworks like TensorFlow and PyTorch implement sophisticated AD systems that handle complex computation graphs efficiently.
+
+\end{document}
