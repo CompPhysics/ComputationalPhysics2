@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
+\title{The Broyden-Fletcher-Goldfarb-Shanno (BFGS) Algorithm}
+\author{Author Name}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is a quasi-Newton method for solving unconstrained optimization problems. This document describes the BFGS algorithm, including its iterative procedure and update formula for approximating the inverse Hessian matrix.
+\end{abstract}
+
+\section{Introduction}
+Quasi-Newton methods iteratively improve an approximation of the Hessian matrix (or its inverse) to find local minima of differentiable functions. The BFGS algorithm, named after its inventors, is particularly popular due to its efficiency and robustness.
+
+\section{Algorithm Description}
+Consider the unconstrained optimization problem:
+\[
+\min_{x \in \mathbb{R}^n} f(x)
+\]
+where \( f: \mathbb{R}^n \to \mathbb{R} \) is twice differentiable. The BFGS algorithm maintains an inverse Hessian approximation \( H_k \) and updates it using rank-2 corrections.
+
+\begin{algorithm}
+\caption{BFGS Algorithm}
+\begin{algorithmic}[1]
+\State Initialize \( x_0 \in \mathbb{R}^n \), \( H_0 = I \), \( k = 0 \)
+\While{not converged}
+   \State Compute gradient: \( g_k = \nabla f(x_k) \)
+   \State Search direction: \( d_k = -H_k g_k \)
+   \State Find \( \alpha_k \) satisfying Wolfe conditions
+   \State Update position: \( x_{k+1} = x_k + \alpha_k d_k \)
+   \State Compute \( s_k = x_{k+1} - x_k \)
+   \State Compute \( y_k = \nabla f(x_{k+1}) - g_k \)
+   \State Compute \( \rho_k = \frac{1}{y_k^\top s_k} \)
+   \State Update \( H_{k+1} = (I - \rho_k s_k y_k^\top) H_k (I - \rho_k y_k s_k^\top) + \rho_k s_k s_k^\top \)
+   \State \( k \leftarrow k + 1 \)
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\section{BFGS Update Formula}
+The BFGS update formula preserves positive definiteness of \( H_k \) when \( y_k^\top s_k > 0 \) (ensured by Wolfe conditions). The update satisfies the secant condition \( H_{k+1} y_k = s_k \) and is derived using variational principles:
+
+\begin{equation}
+H_{k+1} = \left(I - \rho_k s_k y_k^\top \right) H_k \left(I - \rho_k y_k s_k^\top \right) + \rho_k s_k s_k^\top
+\end{equation}
+
+\section{Convergence}
+BFGS exhibits superlinear convergence under the following conditions:
+\begin{itemize}
+   \item \( f \) is strongly convex
+   \item Hessian is Lipschitz continuous
+   \item Line search satisfies Wolfe conditions
+\end{itemize}
+
+\section{Conclusion}
+BFGS remains one of the most effective quasi-Newton methods due to its numerical stability and efficient approximation of curvature information. Its avoidance of explicit Hessian calculations makes it suitable for high-dimensional optimization problems.
+
+\end{document}
