@@ -1,63 +1,95 @@
-\documentclass{article}
-\usepackage{amsmath, amssymb}
-\usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
+\documentclass[12pt]{article}
+\usepackage{amsmath,amsfonts,amssymb}
 
 \title{The Broyden-Fletcher-Goldfarb-Shanno (BFGS) Algorithm}
-\author{Author Name}
-\date{\today}
+\author{}
+\date{}
 
 \begin{document}
+
 \maketitle
 
-\begin{abstract}
-The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is a quasi-Newton method for solving unconstrained optimization problems. This document describes the BFGS algorithm, including its iterative procedure and update formula for approximating the inverse Hessian matrix.
-\end{abstract}
-
 \section{Introduction}
-Quasi-Newton methods iteratively improve an approximation of the Hessian matrix (or its inverse) to find local minima of differentiable functions. The BFGS algorithm, named after its inventors, is particularly popular due to its efficiency and robustness.
 
-\section{Algorithm Description}
-Consider the unconstrained optimization problem:
+The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is an iterative method for solving unconstrained nonlinear optimization problems. It belongs to the family of quasi-Newton methods, which aim to approximate the inverse Hessian matrix used in Newton's method for optimization. BFGS is widely used due to its efficiency and the fact that it does not require the computation of second derivatives.
+
+Given an objective function \( f(\mathbf{x}) \), the goal is to minimize \( f(\mathbf{x}) \) with respect to the vector \( \mathbf{x} \). The BFGS method iteratively updates an estimate of the inverse Hessian matrix and a search direction to find the minimum of \( f(\mathbf{x}) \).
+
+\section{Optimization Problem}
+
+We are given the following unconstrained optimization problem:
+
 \[
-\min_{x \in \mathbb{R}^n} f(x)
+\mathbf{x}^* = \arg \min_{\mathbf{x}} f(\mathbf{x})
 \]
-where \( f: \mathbb{R}^n \to \mathbb{R} \) is twice differentiable. The BFGS algorithm maintains an inverse Hessian approximation \( H_k \) and updates it using rank-2 corrections.
 
-\begin{algorithm}
-\caption{BFGS Algorithm}
-\begin{algorithmic}[1]
-\State Initialize \( x_0 \in \mathbb{R}^n \), \( H_0 = I \), \( k = 0 \)
-\While{not converged}
-   \State Compute gradient: \( g_k = \nabla f(x_k) \)
-   \State Search direction: \( d_k = -H_k g_k \)
-   \State Find \( \alpha_k \) satisfying Wolfe conditions
-   \State Update position: \( x_{k+1} = x_k + \alpha_k d_k \)
-   \State Compute \( s_k = x_{k+1} - x_k \)
-   \State Compute \( y_k = \nabla f(x_{k+1}) - g_k \)
-   \State Compute \( \rho_k = \frac{1}{y_k^\top s_k} \)
-   \State Update \( H_{k+1} = (I - \rho_k s_k y_k^\top) H_k (I - \rho_k y_k s_k^\top) + \rho_k s_k s_k^\top \)
-   \State \( k \leftarrow k + 1 \)
-\EndWhile
-\end{algorithmic}
-\end{algorithm}
+where \( f: \mathbb{R}^n \to \mathbb{R} \) is a differentiable objective function, and \( \mathbf{x} \in \mathbb{R}^n \) is the vector of decision variables.
 
-\section{BFGS Update Formula}
-The BFGS update formula preserves positive definiteness of \( H_k \) when \( y_k^\top s_k > 0 \) (ensured by Wolfe conditions). The update satisfies the secant condition \( H_{k+1} y_k = s_k \) and is derived using variational principles:
+The first-order necessary conditions for optimality are given by:
 
-\begin{equation}
-H_{k+1} = \left(I - \rho_k s_k y_k^\top \right) H_k \left(I - \rho_k y_k s_k^\top \right) + \rho_k s_k s_k^\top
-\end{equation}
+\[
+\nabla f(\mathbf{x}^*) = 0
+\]
 
-\section{Convergence}
-BFGS exhibits superlinear convergence under the following conditions:
+where \( \nabla f(\mathbf{x}) \) denotes the gradient of \( f(\mathbf{x}) \).
+
+\section{BFGS Algorithm Overview}
+
+The BFGS method is an iterative procedure that approximates the inverse Hessian matrix \( H_k \) at each iteration. The update of the current solution \( \mathbf{x}_k \) involves computing a search direction and step length. The general steps of the BFGS algorithm are as follows:
+
+\begin{enumerate}
+   \item Initialize \( \mathbf{x}_0 \) and choose an initial guess for the inverse Hessian approximation \( H_0 \), typically \( H_0 = I \) (the identity matrix).
+   \item For each iteration \( k \), do the following:
+   \begin{enumerate}
+       \item Compute the gradient at the current point: \( \nabla f(\mathbf{x}_k) \).
+       \item Compute the search direction:
+       \[
+       \mathbf{p}_k = -H_k \nabla f(\mathbf{x}_k)
+       \]
+       \item Perform a line search to find an appropriate step size \( \alpha_k \), which minimizes \( f(\mathbf{x}_k + \alpha_k \mathbf{p}_k) \).
+       \item Update the current point:
+       \[
+       \mathbf{x}_{k+1} = \mathbf{x}_k + \alpha_k \mathbf{p}_k
+       \]
+       \item Compute the new gradient \( \nabla f(\mathbf{x}_{k+1}) \).
+       \item Update the inverse Hessian approximation using the following formula:
+       \[
+       s_k = \mathbf{x}_{k+1} - \mathbf{x}_k, \quad y_k = \nabla f(\mathbf{x}_{k+1}) - \nabla f(\mathbf{x}_k)
+       \]
+       \[
+       H_{k+1} = H_k + \frac{s_k s_k^T}{s_k^T y_k} - \frac{H_k y_k y_k^T H_k}{y_k^T H_k y_k}
+       \]
+   \end{enumerate}
+   \item Repeat the process until convergence, i.e., \( \|\nabla f(\mathbf{x}_k)\| \) is sufficiently small.
+\end{enumerate}
+
+\section{Convergence and Termination Criteria}
+
+The BFGS algorithm is guaranteed to converge to a local minimum under certain conditions, such as the objective function being smooth and convex. The algorithm terminates when the gradient \( \nabla f(\mathbf{x}_k) \) is sufficiently close to zero, or when a maximum number of iterations is reached.
+
+A typical convergence criterion is:
+
+\[
+\|\nabla f(\mathbf{x}_k)\| \leq \epsilon
+\]
+
+where \( \epsilon \) is a small tolerance value.
+
+\section{Properties of BFGS}
+
+The BFGS algorithm has several key properties that make it widely used:
+
 \begin{itemize}
-   \item \( f \) is strongly convex
-   \item Hessian is Lipschitz continuous
-   \item Line search satisfies Wolfe conditions
+   \item \textbf{No need for second derivatives:} The BFGS method approximates the Hessian matrix and avoids the direct computation of second derivatives.
+   \item \textbf{Superlinear convergence:} The BFGS method typically converges faster than gradient descent methods, especially near the optimum.
+   \item \textbf{Memory efficiency:} The BFGS algorithm maintains a low-rank approximation of the inverse Hessian, making it computationally efficient.
+   \item \textbf{Positive definiteness:} If the initial Hessian approximation is positive definite, the BFGS update preserves this property.
 \end{itemize}
 
 \section{Conclusion}
-BFGS remains one of the most effective quasi-Newton methods due to its numerical stability and efficient approximation of curvature information. Its avoidance of explicit Hessian calculations makes it suitable for high-dimensional optimization problems.
+
+The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is an effective and widely used method for solving unconstrained optimization problems. By iteratively approximating the inverse Hessian matrix, BFGS achieves efficient convergence without requiring the explicit computation of second derivatives. Its performance is highly dependent on the choice of the initial guess and the line search strategy.
 
 \end{document}
+
+
