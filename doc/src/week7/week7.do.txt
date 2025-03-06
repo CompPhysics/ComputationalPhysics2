@@ -6,7 +6,7 @@ DATE: March 7, 2025
 !split
 ===== Overview of week March 3-7 =====
 !bblock  Gradient methods:
-o Semi-Newton methods (Broyden's algorithm)
+o Semi-Newton methods (Broyden's algorithm and Broyden-Farberg-Goldberg-Shanno algorithm)
 o Steepest descent and conjugate gradient descent
 o Stochastic gradient descent and variants thereof
 o Automatic differentiation
@@ -377,7 +377,7 @@ The solution is updated as:
 !et
 
 !split
-==== Broyden’s Bad Method =====
+===== Broyden’s Bad Method =====
 
 Let \( \mathbf{H}_k \) be the approximation of the inverse Jacobian \( \mathbf{J}_k^{-1} \) at iteration \( k \). The update rule for \( \mathbf{H}_k \) is:
 !bt
@@ -402,47 +402,39 @@ The solution is updated as:
 ===== Algorithm Steps =====
 
 The steps of Broyden’s algorithm (Good Method) are as follows:
-\begin{enumerate}
-   \item Initialize \( \mathbf{x}_0 \) and \( \mathbf{B}_0 \) (e.g., \( \mathbf{B}_0 = \mathbf{I} \), the identity matrix).
-   \item For \( k = 0, 1, 2, \dots \):
-   \begin{enumerate}
-       \item Compute the step: \( \mathbf{s}_k = -\mathbf{B}_k^{-1} \mathbf{F}(\mathbf{x}_k) \).
-       \item Update the solution: \( \mathbf{x}_{k+1} = \mathbf{x}_k + \mathbf{s}_k \).
-       \item Compute \( \mathbf{y}_k = \mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k) \).
-       \item Update the Jacobian approximation:
+o Initialize \( \mathbf{x}_0 \) and \( \mathbf{B}_0 \) (e.g., \( \mathbf{B}_0 = \mathbf{I} \), the identity matrix).
+o For \( k = 0, 1, 2, \dots \):
+  o Compute the step: \( \mathbf{s}_k = -\mathbf{B}_k^{-1} \mathbf{F}(\mathbf{x}_k) \).
+  o Update the solution: \( \mathbf{x}_{k+1} = \mathbf{x}_k + \mathbf{s}_k \).
+  o Compute \( \mathbf{y}_k = \mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k) \).
+  o Update the Jacobian approximation:
+!bt  
        \[
        \mathbf{B}_{k+1} = \mathbf{B}_k + \frac{(\mathbf{y}_k - \mathbf{B}_k \mathbf{s}_k) \mathbf{s}_k^\top}{\mathbf{s}_k^\top \mathbf{s}_k}.
        \]
-       \item Check for convergence: If \( \|\mathbf{F}(\mathbf{x}_{k+1})\| < \epsilon \), stop.
-   \end{enumerate}
-\end{enumerate}
+!et       
+  o Check for convergence: If \( \|\mathbf{F}(\mathbf{x}_{k+1})\| < \epsilon \), stop.
 
 !split
 ===== Advantages and Limitations =====
 
-\subsubsection*{Advantages}
-\begin{itemize}
-   \item Avoids the need to compute the exact Jacobian at each iteration.
-   \item Suitable for high-dimensional problems where computing the Jacobian is expensive.
-\end{itemize}
+!bblock Advantages
+o Avoids the need to compute the exact Jacobian at each iteration.
+o Suitable for high-dimensional problems where computing the Jacobian is expensive.
+!eblock
 
-\subsubsection*{Limitations}
-\begin{itemize}
-   \item Convergence is not guaranteed for all problems.
-   \� The approximation of the Jacobian may become inaccurate over time, requiring periodic reinitialization.
-\end{itemize}
+!bblock Limitations
+o Convergence is not guaranteed for all problems.
+oThe approximation of the Jacobian may become inaccurate over time, requiring periodic reinitialization.
+!eblock
 
-\subsection*{Applications}
+!split
+===== Applications =====
 
 Broyden’s algorithm is widely used in:
-\begin{itemize}
-   \item Optimization problems.
-   \item Solving systems of nonlinear equations in scientific computing.
-   \item Machine learning for training certain types of models.
-\end{itemize}
-
-\end{document}
-
+o Optimization problems.
+o Solving systems of nonlinear equations in scientific computing.
+o Machine learning for training certain types of models.
 
 
 !split

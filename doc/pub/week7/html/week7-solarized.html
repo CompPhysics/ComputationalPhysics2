@@ -95,6 +95,28 @@ div.toc p,a {
                'conditions-on-convex-functions'),
               ('More on convex functions', 2, None, 'more-on-convex-functions'),
               ('Some simple problems', 2, None, 'some-simple-problems'),
+              ('Broyden’s Algorithm for Solving Nonlinear Equations',
+               2,
+               None,
+               'broyden-s-algorithm-for-solving-nonlinear-equations'),
+              ('Problem Formulation', 2, None, 'problem-formulation'),
+              ('Just a short reminder of Newton’s Method',
+               2,
+               None,
+               'just-a-short-reminder-of-newton-s-method'),
+              ('Broyden’s Method', 2, None, 'broyden-s-method'),
+              ('Broyden’s Good Method', 2, None, 'broyden-s-good-method'),
+              ('Broyden’s Bad Method', 2, None, 'broyden-s-bad-method'),
+              ('Algorithm Steps', 2, None, 'algorithm-steps'),
+              ('Advantages and Limitations',
+               2,
+               None,
+               'advantages-and-limitations'),
+              ('Applications', 2, None, 'applications'),
+              ('Broyden–Fletcher–Goldfarb–Shanno algorithm',
+               2,
+               None,
+               'broyden-fletcher-goldfarb-shanno-algorithm'),
               ('Standard steepest descent',
                2,
                None,
@@ -135,10 +157,6 @@ div.toc p,a {
                2,
                None,
                'conjugate-gradient-method'),
-              ('Broyden–Fletcher–Goldfarb–Shanno algorithm',
-               2,
-               None,
-               'broyden-fletcher-goldfarb-shanno-algorithm'),
               ('Using gradient descent methods, limitations',
                2,
                None,
@@ -332,7 +350,7 @@ MathJax.Hub.Config({
 <b>Gradient methods:</b>
 <p>
 <ol>
-<li> Semi-Newton methods (Broyden's algorithm)</li>
+<li> Semi-Newton methods (Broyden's algorithm and Broyden-Farberg-Goldberg-Shanno algorithm)</li>
 <li> Steepest descent and conjugate gradient descent</li>
 <li> Stochastic gradient descent and variants thereof</li>
 <li> Automatic differentiation</li>
@@ -340,9 +358,8 @@ MathJax.Hub.Config({
 </div>
 
 
-<ul>
-<li> <a href="https://youtu.be/" target="_blank">Video of lecture to be added</a></li>
-</ul>
+<!-- * <a href="https://youtu.be/" target="_blank">Video of lecture to be added</a> -->
+
 <div class="alert alert-block alert-block alert-text-normal">
 <b>Teaching Material, videos and written material</b>
 <p>
@@ -658,6 +675,165 @@ is minimal, where \( f \) is convex and differentiable. Then, any point
 </ul>
 </ol>
 <p>Using the definition of convexity, try to show that a function satisfying the properties above is convex (the third condition is not needed to show this).</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="broyden-s-algorithm-for-solving-nonlinear-equations">Broyden&#8217;s Algorithm for Solving Nonlinear Equations </h2>
+
+<p>Broyden&#8217;s algorithm is a quasi-Newton method used to solve systems of
+nonlinear equations. Unlike Newton&#8217;s method, which requires the
+computation of the Jacobian matrix at each iteration, Broyden&#8217;s method
+approximates the Jacobian (or its inverse) to reduce computational
+cost. This makes it particularly useful for high-dimensional problems
+where computing the exact Jacobian is expensive.
+</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="problem-formulation">Problem Formulation </h2>
+
+<p>Consider a system of \( n \) nonlinear equations:</p>
+$$
+\mathbf{F}(\mathbf{x}) = \mathbf{0},
+$$
+
+<p>where \( \mathbf{F}: \mathbb{R}^n \to \mathbb{R}^n \) is a vector-valued function, and \( \mathbf{x} \in \mathbb{R}^n \) is the vector of unknowns. The goal is to find \( \mathbf{x}^* \) such that \( \mathbf{F}(\mathbf{x}^*) = \mathbf{0} \).</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="just-a-short-reminder-of-newton-s-method">Just a short reminder of Newton&#8217;s Method </h2>
+
+<p>Newton&#8217;s method iteratively updates the solution as:</p>
+$$
+\mathbf{x}_{k+1} = \mathbf{x}_k - \mathbf{J}_k^{-1} \mathbf{F}(\mathbf{x}_k),
+$$
+
+<p>where \( \mathbf{J}_k = \mathbf{J}(\mathbf{x}_k) \) is the Jacobian matrix of \( \mathbf{F} \) evaluated at \( \mathbf{x}_k \). However, computing \( \mathbf{J}_k \) and its inverse at each iteration can be computationally expensive.</p>
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="broyden-s-method">Broyden&#8217;s Method </h2>
+
+<p>Broyden&#8217;s method approximates the Jacobian (or its inverse) to avoid recomputing it at every iteration. There are two variants of Broyden&#8217;s method:</p>
+<ol>
+<li> Broyden&#8217;s Good Method: Updates an approximation of the Jacobian matrix.</li>
+<li> Broyden&#8217;s Bad Method: Updates an approximation of the inverse Jacobian matrix.</li>
+</ol>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="broyden-s-good-method">Broyden&#8217;s Good Method </h2>
+
+<p>Let \( \mathbf{B}_k \) be the approximation of the Jacobian \( \mathbf{J}_k \) at iteration \( k \). The update rule for \( \mathbf{B}_k \) is:</p>
+$$
+\mathbf{B}_{k+1} = \mathbf{B}_k + \frac{(\mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k) - \mathbf{B}_k \mathbf{s}_k) \mathbf{s}_k^\top}{\mathbf{s}_k^\top \mathbf{s}_k},
+$$
+
+<p>where \( \mathbf{s}_k = \mathbf{x}_{k+1} - \mathbf{x}_k \) is the step vector. The new approximation \( \mathbf{B}_{k+1} \) satisfies the **secant equation:</p>
+$$
+\mathbf{B}_{k+1} \mathbf{s}_k = \mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k).
+$$
+
+<p>The solution is updated as:</p>
+$$
+\mathbf{x}_{k+1} = \mathbf{x}_k - \mathbf{B}_k^{-1} \mathbf{F}(\mathbf{x}_k).
+$$
+
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="broyden-s-bad-method">Broyden&#8217;s Bad Method </h2>
+
+<p>Let \( \mathbf{H}_k \) be the approximation of the inverse Jacobian \( \mathbf{J}_k^{-1} \) at iteration \( k \). The update rule for \( \mathbf{H}_k \) is:</p>
+$$
+\mathbf{H}_{k+1} = \mathbf{H}_k + \frac{(\mathbf{s}_k - \mathbf{H}_k \mathbf{y}_k) \mathbf{s}_k^\top \mathbf{H}_k}{\mathbf{s}_k^\top \mathbf{H}_k \mathbf{y}_k},
+$$
+
+<p>where \( \mathbf{y}_k = \mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k) \). The new approximation \( \mathbf{H}_{k+1} \) satisfies the **inverse secant equation**:</p>
+$$
+\mathbf{H}_{k+1} \mathbf{y}_k = \mathbf{s}_k.
+$$
+
+<p>The solution is updated as:</p>
+$$
+\mathbf{x}_{k+1} = \mathbf{x}_k - \mathbf{H}_k \mathbf{F}(\mathbf{x}_k).
+$$
+
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="algorithm-steps">Algorithm Steps </h2>
+
+<p>The steps of Broyden&#8217;s algorithm (Good Method) are as follows:</p>
+<ol>
+<li> Initialize \( \mathbf{x}_0 \) and \( \mathbf{B}_0 \) (e.g., \( \mathbf{B}_0 = \mathbf{I} \), the identity matrix).</li>
+<li> For \( k = 0, 1, 2, \dots \):
+<ol type="a"></li>
+ <li> Compute the step: \( \mathbf{s}_k = -\mathbf{B}_k^{-1} \mathbf{F}(\mathbf{x}_k) \).</li>
+ <li> Update the solution: \( \mathbf{x}_{k+1} = \mathbf{x}_k + \mathbf{s}_k \).</li>
+ <li> Compute \( \mathbf{y}_k = \mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k) \).</li>
+ <li> Update the Jacobian approximation:</li>
+</ol>
+</ol>
+$$
+       \mathbf{B}_{k+1} = \mathbf{B}_k + \frac{(\mathbf{y}_k - \mathbf{B}_k \mathbf{s}_k) \mathbf{s}_k^\top}{\mathbf{s}_k^\top \mathbf{s}_k}.
+       $$
+
+<ol>
+ <li> Check for convergence: If \( \|\mathbf{F}(\mathbf{x}_{k+1})\| < \epsilon \), stop.</li>
+</ol>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="advantages-and-limitations">Advantages and Limitations </h2>
+
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Advantages</b>
+<p>
+<ol>
+<li> Avoids the need to compute the exact Jacobian at each iteration.</li>
+<li> Suitable for high-dimensional problems where computing the Jacobian is expensive.</li>
+</ol>
+</div>
+
+
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Limitations</b>
+<p>
+<ol>
+<li> Convergence is not guaranteed for all problems.</li>
+</ol>
+<p>oThe approximation of the Jacobian may become inaccurate over time, requiring periodic reinitialization.</p>
+</div>
+
+
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="applications">Applications </h2>
+
+<p>Broyden&#8217;s algorithm is widely used in:</p>
+<ol>
+<li> Optimization problems.</li>
+<li> Solving systems of nonlinear equations in scientific computing.</li>
+<li> Machine learning for training certain types of models.</li>
+</ol>
+<!-- !split --><br><br><br><br><br><br><br><br><br><br>
+<h2 id="broyden-fletcher-goldfarb-shanno-algorithm">Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno algorithm </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>The optimization problem is to minimize \( f(\mathbf {x} ) \) where \( \mathbf {x} \)  is a vector in \( R^{n} \), and \( f \) is a differentiable scalar function. There are no constraints on the values that  \( \mathbf {x} \)  can take.</p>
+
+<p>The algorithm begins at an initial estimate for the optimal value \( \mathbf {x}_{0} \) and proceeds iteratively to get a better estimate at each stage.</p>
+
+<p>The search direction \( p_k \) at stage \( k \) is given by the solution of the analogue of the Newton equation</p>
+$$
+B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
+$$
+
+<p>where \( B_{k} \) is an approximation to the Hessian matrix, which is
+updated iteratively at each stage, and \( \nabla f(\mathbf {x} _{k}) \)
+is the gradient of the function
+evaluated at \( x_k \). 
+A line search in the direction \( p_k \) is then used to
+find the next point \( x_{k+1} \) by minimising 
+</p>
+$$
+f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
+$$
+
+<p>over the scalar \( \alpha > 0 \).</p>
+</div>
+
 
 <!-- !split --><br><br><br><br><br><br><br><br><br><br>
 <h2 id="standard-steepest-descent">Standard steepest descent </h2>
@@ -1024,35 +1200,6 @@ $$
 \hat{r}_{k+1}=\hat{r}_k-\hat{A}\hat{p}_{k},
  \end{equation*}
 $$
-</div>
-
-
-<!-- !split --><br><br><br><br><br><br><br><br><br><br>
-<h2 id="broyden-fletcher-goldfarb-shanno-algorithm">Broyden&#8211;Fletcher&#8211;Goldfarb&#8211;Shanno algorithm </h2>
-<div class="alert alert-block alert-block alert-text-normal">
-<b></b>
-<p>
-<p>The optimization problem is to minimize \( f(\mathbf {x} ) \) where \( \mathbf {x} \)  is a vector in \( R^{n} \), and \( f \) is a differentiable scalar function. There are no constraints on the values that  \( \mathbf {x} \)  can take.</p>
-
-<p>The algorithm begins at an initial estimate for the optimal value \( \mathbf {x}_{0} \) and proceeds iteratively to get a better estimate at each stage.</p>
-
-<p>The search direction \( p_k \) at stage \( k \) is given by the solution of the analogue of the Newton equation</p>
-$$
-B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
-$$
-
-<p>where \( B_{k} \) is an approximation to the Hessian matrix, which is
-updated iteratively at each stage, and \( \nabla f(\mathbf {x} _{k}) \)
-is the gradient of the function
-evaluated at \( x_k \). 
-A line search in the direction \( p_k \) is then used to
-find the next point \( x_{k+1} \) by minimising 
-</p>
-$$
-f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
-$$
-
-<p>over the scalar \( \alpha > 0 \).</p>
 </div>
 
 
@@ -3546,7 +3693,7 @@ derivative_fn = grad(sum_logistic)
 
 <!-- ------------------- end of main content --------------- -->
 <center style="font-size:80%">
-<!-- copyright --> &copy; 1999-2024, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+<!-- copyright --> &copy; 1999-2025, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
 </center>
 </body>
 </html>
