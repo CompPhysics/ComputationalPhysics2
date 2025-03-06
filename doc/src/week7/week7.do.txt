@@ -12,7 +12,7 @@ o Stochastic gradient descent and variants thereof
 o Automatic differentiation
 !eblock
 
-* "Video of lecture to be added":"https://youtu.be/"
+#* "Video of lecture to be added":"https://youtu.be/"
 
 !bblock Teaching Material, videos and written material
 o These lecture notes
@@ -312,6 +312,169 @@ o A norm is any function that satisfy the following properties
  * $f(x) \leq 0$ for all $x \in \mathbb{R}^n$ with equality if and only if $x = 0$
 
 Using the definition of convexity, try to show that a function satisfying the properties above is convex (the third condition is not needed to show this).
+
+
+
+!split
+===== Broyden’s Algorithm for Solving Nonlinear Equations =====
+
+Broyden’s algorithm is a quasi-Newton method used to solve systems of
+nonlinear equations. Unlike Newton’s method, which requires the
+computation of the Jacobian matrix at each iteration, Broyden’s method
+approximates the Jacobian (or its inverse) to reduce computational
+cost. This makes it particularly useful for high-dimensional problems
+where computing the exact Jacobian is expensive.
+
+!split
+===== Problem Formulation =====
+
+Consider a system of \( n \) nonlinear equations:
+!bt
+\[
+\mathbf{F}(\mathbf{x}) = \mathbf{0},
+\]
+!et
+where \( \mathbf{F}: \mathbb{R}^n \to \mathbb{R}^n \) is a vector-valued function, and \( \mathbf{x} \in \mathbb{R}^n \) is the vector of unknowns. The goal is to find \( \mathbf{x}^* \) such that \( \mathbf{F}(\mathbf{x}^*) = \mathbf{0} \).
+
+!split
+===== Just a short reminder of Newton’s Method =====
+
+Newton’s method iteratively updates the solution as:
+!bt
+\[
+\mathbf{x}_{k+1} = \mathbf{x}_k - \mathbf{J}_k^{-1} \mathbf{F}(\mathbf{x}_k),
+\]
+!et
+where \( \mathbf{J}_k = \mathbf{J}(\mathbf{x}_k) \) is the Jacobian matrix of \( \mathbf{F} \) evaluated at \( \mathbf{x}_k \). However, computing \( \mathbf{J}_k \) and its inverse at each iteration can be computationally expensive.
+
+!split
+===== Broyden’s Method =====
+
+Broyden’s method approximates the Jacobian (or its inverse) to avoid recomputing it at every iteration. There are two variants of Broyden’s method:
+o Broyden’s Good Method: Updates an approximation of the Jacobian matrix.
+o Broyden’s Bad Method: Updates an approximation of the inverse Jacobian matrix.
+
+!split
+===== Broyden’s Good Method =====
+
+Let \( \mathbf{B}_k \) be the approximation of the Jacobian \( \mathbf{J}_k \) at iteration \( k \). The update rule for \( \mathbf{B}_k \) is:
+!bt
+\[
+\mathbf{B}_{k+1} = \mathbf{B}_k + \frac{(\mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k) - \mathbf{B}_k \mathbf{s}_k) \mathbf{s}_k^\top}{\mathbf{s}_k^\top \mathbf{s}_k},
+\]
+!et
+where \( \mathbf{s}_k = \mathbf{x}_{k+1} - \mathbf{x}_k \) is the step vector. The new approximation \( \mathbf{B}_{k+1} \) satisfies the **secant equation:
+!bt
+\[
+\mathbf{B}_{k+1} \mathbf{s}_k = \mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k).
+\]
+!et
+The solution is updated as:
+!bt
+\[
+\mathbf{x}_{k+1} = \mathbf{x}_k - \mathbf{B}_k^{-1} \mathbf{F}(\mathbf{x}_k).
+\]
+!et
+
+!split
+==== Broyden’s Bad Method =====
+
+Let \( \mathbf{H}_k \) be the approximation of the inverse Jacobian \( \mathbf{J}_k^{-1} \) at iteration \( k \). The update rule for \( \mathbf{H}_k \) is:
+!bt
+\[
+\mathbf{H}_{k+1} = \mathbf{H}_k + \frac{(\mathbf{s}_k - \mathbf{H}_k \mathbf{y}_k) \mathbf{s}_k^\top \mathbf{H}_k}{\mathbf{s}_k^\top \mathbf{H}_k \mathbf{y}_k},
+\]
+!et
+where \( \mathbf{y}_k = \mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k) \). The new approximation \( \mathbf{H}_{k+1} \) satisfies the **inverse secant equation**:
+!bt
+\[
+\mathbf{H}_{k+1} \mathbf{y}_k = \mathbf{s}_k.
+\]
+!et
+The solution is updated as:
+!bt
+\[
+\mathbf{x}_{k+1} = \mathbf{x}_k - \mathbf{H}_k \mathbf{F}(\mathbf{x}_k).
+\]
+!et
+
+!split
+===== Algorithm Steps =====
+
+The steps of Broyden’s algorithm (Good Method) are as follows:
+\begin{enumerate}
+   \item Initialize \( \mathbf{x}_0 \) and \( \mathbf{B}_0 \) (e.g., \( \mathbf{B}_0 = \mathbf{I} \), the identity matrix).
+   \item For \( k = 0, 1, 2, \dots \):
+   \begin{enumerate}
+       \item Compute the step: \( \mathbf{s}_k = -\mathbf{B}_k^{-1} \mathbf{F}(\mathbf{x}_k) \).
+       \item Update the solution: \( \mathbf{x}_{k+1} = \mathbf{x}_k + \mathbf{s}_k \).
+       \item Compute \( \mathbf{y}_k = \mathbf{F}(\mathbf{x}_{k+1}) - \mathbf{F}(\mathbf{x}_k) \).
+       \item Update the Jacobian approximation:
+       \[
+       \mathbf{B}_{k+1} = \mathbf{B}_k + \frac{(\mathbf{y}_k - \mathbf{B}_k \mathbf{s}_k) \mathbf{s}_k^\top}{\mathbf{s}_k^\top \mathbf{s}_k}.
+       \]
+       \item Check for convergence: If \( \|\mathbf{F}(\mathbf{x}_{k+1})\| < \epsilon \), stop.
+   \end{enumerate}
+\end{enumerate}
+
+!split
+===== Advantages and Limitations =====
+
+\subsubsection*{Advantages}
+\begin{itemize}
+   \item Avoids the need to compute the exact Jacobian at each iteration.
+   \item Suitable for high-dimensional problems where computing the Jacobian is expensive.
+\end{itemize}
+
+\subsubsection*{Limitations}
+\begin{itemize}
+   \item Convergence is not guaranteed for all problems.
+   \� The approximation of the Jacobian may become inaccurate over time, requiring periodic reinitialization.
+\end{itemize}
+
+\subsection*{Applications}
+
+Broyden’s algorithm is widely used in:
+\begin{itemize}
+   \item Optimization problems.
+   \item Solving systems of nonlinear equations in scientific computing.
+   \item Machine learning for training certain types of models.
+\end{itemize}
+
+\end{document}
+
+
+
+!split
+===== Broyden–Fletcher–Goldfarb–Shanno algorithm =====
+!bblock
+The optimization problem is to minimize $f(\mathbf {x} )$ where $\mathbf {x}$  is a vector in $R^{n}$, and $f$ is a differentiable scalar function. There are no constraints on the values that  $\mathbf {x}$  can take.
+
+The algorithm begins at an initial estimate for the optimal value $\mathbf {x}_{0}$ and proceeds iteratively to get a better estimate at each stage.
+
+The search direction $p_k$ at stage $k$ is given by the solution of the analogue of the Newton equation
+!bt
+\[
+B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
+\]
+!et
+
+where $B_{k}$ is an approximation to the Hessian matrix, which is
+updated iteratively at each stage, and $\nabla f(\mathbf {x} _{k})$
+is the gradient of the function
+evaluated at $x_k$. 
+A line search in the direction $p_k$ is then used to
+find the next point $x_{k+1}$ by minimising 
+!bt
+\[
+f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
+\]
+!et
+over the scalar $\alpha > 0$.
+
+!eblock
+
+
 
 
 !split
@@ -625,35 +788,6 @@ which gives
 
 
 
-
-!split
-===== Broyden–Fletcher–Goldfarb–Shanno algorithm =====
-!bblock
-The optimization problem is to minimize $f(\mathbf {x} )$ where $\mathbf {x}$  is a vector in $R^{n}$, and $f$ is a differentiable scalar function. There are no constraints on the values that  $\mathbf {x}$  can take.
-
-The algorithm begins at an initial estimate for the optimal value $\mathbf {x}_{0}$ and proceeds iteratively to get a better estimate at each stage.
-
-The search direction $p_k$ at stage $k$ is given by the solution of the analogue of the Newton equation
-!bt
-\[
-B_{k}\mathbf {p} _{k}=-\nabla f(\mathbf {x}_{k}),
-\]
-!et
-
-where $B_{k}$ is an approximation to the Hessian matrix, which is
-updated iteratively at each stage, and $\nabla f(\mathbf {x} _{k})$
-is the gradient of the function
-evaluated at $x_k$. 
-A line search in the direction $p_k$ is then used to
-find the next point $x_{k+1}$ by minimising 
-!bt
-\[
-f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
-\]
-!et
-over the scalar $\alpha > 0$.
-
-!eblock
 
 
 !split
