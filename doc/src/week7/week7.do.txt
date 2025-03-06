@@ -53,6 +53,9 @@ $x$ sufficiently close to the solution $s$, we have
 \]
 !et
 
+!split
+===== Small values =====
+
 For small enough values of the function and for well-behaved
 functions, the terms beyond linear are unimportant, hence we obtain
 
@@ -116,6 +119,9 @@ which we Taylor expand to obtain
                        \end{array}.
 \]
 !et
+
+!split
+===== Jacobian =====
 Defining the Jacobian matrix $\hat{J}$ we have
 !bt
 \[
@@ -141,12 +147,16 @@ where we have defined
    \left(\begin{array}{c} f_1(x_1^{n},x_2^{n}) \\ f_2(x_1^{n},x_2^{n}) \end{array} \right).
 \]
 !et
+
+!split
+===== Inverse of the Jacobian =====
+
 We need thus to compute the inverse of the Jacobian matrix and it
 is to understand that difficulties  may
 arise in case $\hat{J}$ is nearly singular.
 
 It is rather straightforward to extend the above scheme to systems of
-more than two non-linear equations. In our case, the Jacobian matrix is given by the Hessian that represents the second derivative of cost function. 
+more than two non-linear equations. In our case, the Jacobian matrix is given by the Hessian that represents the second derivative of the energy.
 
 
 
@@ -225,21 +235,6 @@ randomness. One such method is that of Stochastic Gradient Descent
 (SGD), see below.
 
 
-!split 
-===== Convex functions ===== 
-
-Ideally we want our cost/loss function to be convex(concave).
-
-First we give the definition of a convex set: A set $C$ in
-$\mathbb{R}^n$ is said to be convex if, for all $x$ and $y$ in $C$ and
-all $t \in (0,1)$ , the point $(1 − t)x + ty$ also belongs to
-C. Geometrically this means that every point on the line segment
-connecting $x$ and $y$ is in $C$ as discussed below.
-
-The convex subsets of $\mathbb{R}$ are the intervals of
-$\mathbb{R}$. Examples of convex sets of $\mathbb{R}^2$ are the
-regular polygons (triangles, rectangles, pentagons, etc...).
-
 !split
 ===== Convex function =====
 
@@ -263,6 +258,9 @@ a global under estimator of the function. To convince yourself you can
 make a drawing of $f(x) = x^2+1$ and draw the tangent line to $f(x)$ and
 note that it is always below the graph.  
 !eblock
+
+!split
+===== Second condition =====
 
 !bblock Second order condition 
 Assume that $f$ is twice
@@ -311,7 +309,7 @@ o A norm is any function that satisfy the following properties
  * $f(x+y) \leq f(x) + f(y)$
  * $f(x) \leq 0$ for all $x \in \mathbb{R}^n$ with equality if and only if $x = 0$
 
-Using the definition of convexity, try to show that a function satisfying the properties above is convex (the third condition is not needed to show this).
+Using the definition of convexity, try to show that a function satisfying the properties above is convex.
 
 
 
@@ -480,7 +478,6 @@ f(\mathbf {x}_{k}+\alpha \mathbf {p}_{k}),
 \]
 !et
 over the scalar $\alpha > 0$.
-
 !eblock
 
 !split
@@ -508,34 +505,47 @@ where \( \nabla f(\mathbf{x}) \) denotes the gradient of \( f(\mathbf{x}) \).
 ===== BFGS Algorithm Overview =====
 
 
-The BFGS method is an iterative procedure that approximates the inverse Hessian matrix \( H_k \) at each iteration. The update of the current solution \( \mathbf{x}_k \) involves computing a search direction and step length. The general steps of the BFGS algorithm are as follows:
+The BFGS method is an iterative procedure that approximates the
+inverse Hessian matrix \( H_k \) at each iteration. The update of the
+current solution \( \mathbf{x}_k \) involves computing a search
+direction and step length. The general steps of the BFGS algorithm are
+as follows:
 
-\begin{enumerate}
-   \item Initialize \( \mathbf{x}_0 \) and choose an initial guess for the inverse Hessian approximation \( H_0 \), typically \( H_0 = I \) (the identity matrix).
-   \item For each iteration \( k \), do the following:
-   \begin{enumerate}
-       \item Compute the gradient at the current point: \( \nabla f(\mathbf{x}_k) \).
-       \item Compute the search direction:
-       \[
+
+* Initialize \( \mathbf{x}_0 \) and choose an initial guess for the inverse Hessian approximation \( H_0 \), typically \( H_0 = I \) (the identity matrix).
+* For each iteration \( k \), do the following:
+  * Compute the gradient at the current point: \( \nabla f(\mathbf{x}_k) \).
+  * Compute the search direction:
+!bt
+      \[
        \mathbf{p}_k = -H_k \nabla f(\mathbf{x}_k)
        \]
-       \item Perform a line search to find an appropriate step size \( \alpha_k \), which minimizes \( f(\mathbf{x}_k + \alpha_k \mathbf{p}_k) \).
-       \item Update the current point:
+!et
+  * Perform a line search to find an appropriate step size \( \alpha_k \), which minimizes \( f(\mathbf{x}_k + \alpha_k \mathbf{p}_k) \).
+  * Update the current point:
+!bt
        \[
        \mathbf{x}_{k+1} = \mathbf{x}_k + \alpha_k \mathbf{p}_k
        \]
-       \item Compute the new gradient \( \nabla f(\mathbf{x}_{k+1}) \).
-       \item Update the inverse Hessian approximation using the following formula:
+!et
+  * Compute the new gradient \( \nabla f(\mathbf{x}_{k+1}) \).
+
+
+
+!split
+===== Final steps =====
+  * Update the inverse Hessian approximation using the following formula:
+!bt
        \[
        s_k = \mathbf{x}_{k+1} - \mathbf{x}_k, \quad y_k = \nabla f(\mathbf{x}_{k+1}) - \nabla f(\mathbf{x}_k)
        \]
+!et
+!bt
        \[
        H_{k+1} = H_k + \frac{s_k s_k^T}{s_k^T y_k} - \frac{H_k y_k y_k^T H_k}{y_k^T H_k y_k}
        \]
-   \end{enumerate}
-   \item Repeat the process until convergence, i.e., \( \|\nabla f(\mathbf{x}_k)\| \) is sufficiently small.
-\end{enumerate}
-
+!et
+* Repeat the process until convergence, i.e., \( \|\nabla f(\mathbf{x}_k)\| \) is sufficiently small.
 
 !split
 ===== Convergence and Termination Criteria =====
@@ -550,26 +560,25 @@ A typical convergence criterion is:
 !et
 where \( \epsilon \) is a small tolerance value.
 
-\section{Properties of BFGS}
+!split
+===== Properties of BFGS =====
 
 The BFGS algorithm has several key properties that make it widely used:
 
-\begin{itemize}
-   \item \textbf{No need for second derivatives:} The BFGS method approximates the Hessian matrix and avoids the direct computation of second derivatives.
-   \item \textbf{Superlinear convergence:} The BFGS method typically converges faster than gradient descent methods, especially near the optimum.
-   \item \textbf{Memory efficiency:} The BFGS algorithm maintains a low-rank approximation of the inverse Hessian, making it computationally efficient.
-   \item \textbf{Positive definiteness:} If the initial Hessian approximation is positive definite, the BFGS update preserves this property.
-\end{itemize}
+o \textbf{No need for second derivatives:} The BFGS method approximates the Hessian matrix and avoids the direct computation of second derivatives.
+o \textbf{Superlinear convergence:} The BFGS method typically converges faster than gradient descent methods, especially near the optimum.
+o \textbf{Memory efficiency:} The BFGS algorithm maintains a low-rank approximation of the inverse Hessian, making it computationally efficient.
+o \textbf{Positive definiteness:} If the initial Hessian approximation is positive definite, the BFGS update preserves this property.
 
-\section{Conclusion}
+!split
+===== Final words on the BFGS =====
 
-The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is an effective and widely used method for solving unconstrained optimization problems. By iteratively approximating the inverse Hessian matrix, BFGS achieves efficient convergence without requiring the explicit computation of second derivatives. Its performance is highly dependent on the choice of the initial guess and the line search strategy.
-
-\end{document}
-
-
-
-
+The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is an effective
+and widely used method for solving unconstrained optimization
+problems. By iteratively approximating the inverse Hessian matrix,
+BFGS achieves efficient convergence without requiring the explicit
+computation of second derivatives. Its performance is highly dependent
+on the choice of the initial guess and the line search strategy.
 
 
 
@@ -902,251 +911,6 @@ which gives
 	
 * GD can take exponential time to escape saddle points, even with random initialization. As we mentioned, GD is extremely sensitive to initial condition since it determines the particular local minimum GD would eventually reach. However, even with a good initialization scheme, through the introduction of randomness, GD can still take exponential time to escape saddle points.
 	
-
-
-!split
-===== Codes from numerical recipes =====
-!bblock
-You can use codes we have adapted from the text "Numerical Recipes in C++":"http://www.nr.com/", see chapter 10.7.  
-Here we present a program, which you also can find at the webpage of the course we use the functions _dfpmin_ and _lnsrch_.  This is a variant of the Broyden et al algorithm discussed in the previous slide.
-
-* The program uses the harmonic oscillator in one dimensions as example.
-* The program does not use armadillo to handle vectors and matrices, but employs rather my own vector-matrix class. These auxiliary functions, and the main program *model.cpp* can all be found under the "program link here":"https://github.com/CompPhysics/ComputationalPhysics2/tree/gh-pages/doc/pub/cg/programs/c%2B%2B".
-
-Below we show only excerpts from the main program. For the full program, see the above link.
-!eblock
-
-
-!split
-===== Finding the minimum of the harmonic oscillator model in one dimension =====
-!bblock
-!bc pycod
-//   Main function begins here
-int main()
-{
-     int n, iter;
-     double gtol, fret;
-     double alpha;
-     n = 1;
-//   reserve space in memory for vectors containing the variational
-//   parameters
-     Vector g(n), p(n);
-     cout << "Read in guess for alpha" << endl;
-     cin >> alpha;
-     gtol = 1.0e-5;
-//   now call dfmin and compute the minimum
-     p(0) = alpha;
-     dfpmin(p, n, gtol, &iter, &fret, Efunction, dEfunction);
-     cout << "Value of energy minimum = " << fret << endl;
-     cout << "Number of iterations = " << iter << endl;
-     cout << "Value of alpha at minimum = " << p(0) << endl;
-      return 0;
-}  // end of main program
-
-!ec
-!eblock
-
-
-
-!split
-===== Functions to observe =====
-!bblock
-The functions _Efunction_ and _dEfunction_ compute the expectation value of the energy and its derivative.
-They use the the quasi-Newton method of "Broyden, Fletcher, Goldfarb, and Shanno (BFGS)":"https://www.springer.com/it/book/9780387303031"
-It uses the first derivatives only. The BFGS algorithm has proven good performance even for non-smooth optimizations. 
-These functions need to be changed when you want to your own derivatives.
-!bc pycod
-//  this function defines the expectation value of the local energy
-double Efunction(Vector  &x)
-{
-  double value = x(0)*x(0)*0.5+1.0/(8*x(0)*x(0));
-  return value;
-} // end of function to evaluate
-
-//  this function defines the derivative of the energy 
-void dEfunction(Vector &x, Vector &g)
-{
-  g(0) = x(0)-1.0/(4*x(0)*x(0)*x(0));
-} // end of function to evaluate
-!ec
-You need to change these functions in order to compute the local energy for your system. I used 1000
-cycles per call to get a new value of $\langle E_L[\alpha]\rangle$.
-When I compute the local energy I also compute its derivative.
-After roughly 10-20 iterations I got a converged result in terms of $\alpha$.
-!eblock
-
-
-
-!split 
-===== Example of gradient descent applications =====
-
-We will use linear regression as a case study for the gradient descent
-methods. Linear regression is a great test case for the gradient
-descent methods discussed in the lectures since it has several
-desirable properties such as:
-
-o An analytical solution.
-o The gradient can be computed analytically.
-o The cost function is convex which guarantees that gradient descent converges for small enough learning rates
-
-We have the following problem
-
-!bc pycod
-x = 2*np.random.rand(m,1)
-y = 4+3*x+np.random.randn(m,1)
-!ec
-with $x_i \in [0,1] $ is chosen randomly using a uniform distribution. Additionally we have a stochastic noise chosen according to a normal distribution $\cal {N}(0,1)$. 
-The linear regression model is given by 
-!bt
-\[
-h_\beta(x) = \bm{y} = \beta_0 + \beta_1 x,
-\] 
-!et
-such that 
-!bt
-\[
-\bm{y}_i = \beta_0 + \beta_1 x_i.
-\]
-!et
-
-!split 
-===== Gradient descent example =====
-
-Let $\mathbf{y} = (y_1,\cdots,y_n)^T$, $\mathbf{\bm{y}} = (\bm{y}_1,\cdots,\bm{y}_n)^T$ and $\beta = (\beta_0, \beta_1)^T$
-
-It is convenient to write $\mathbf{\bm{y}} = X\beta$ where $X \in \mathbb{R}^{100 \times 2} $ is the design matrix given by (we keep the intercept here)
-!bt
-\[
-X \equiv \begin{bmatrix}
-1 & x_1  \\
-\vdots & \vdots  \\
-1 & x_{100} &  \\
-\end{bmatrix}.
-\]
-!et
-The cost/loss/risk function is given by (
-!bt
-\[
-C(\beta) = \frac{1}{n}||X\beta-\mathbf{y}||_{2}^{2} = \frac{1}{n}\sum_{i=1}^{100}\left[ (\beta_0 + \beta_1 x_i)^2 - 2 y_i (\beta_0 + \beta_1 x_i) + y_i^2\right] 
-\]
-!et
-and we want to find $\beta$ such that $C(\beta)$ is minimized.
-
-!split
-===== The derivative of the mean-squared error function =====
-
-Computing $\partial C(\beta) / \partial \beta_0$ and $\partial C(\beta) / \partial \beta_1$ we can show  that the gradient can be written as
-!bt
-\[
-\nabla_{\beta} C(\beta) = \frac{2}{n}\begin{bmatrix} \sum_{i=1}^{100} \left(\beta_0+\beta_1x_i-y_i\right) \\
-\sum_{i=1}^{100}\left( x_i (\beta_0+\beta_1x_i)-y_ix_i\right) \\
-\end{bmatrix} = \frac{2}{n}X^T(X\beta - \mathbf{y}), 
-\]
-!et
-where $X$ is the design matrix defined above.
-
-!split
-===== The Hessian matrix =====
-The Hessian matrix of $C(\beta)$ is given by 
-!bt
-\[
-\bm{H} \equiv \begin{bmatrix}
-\frac{\partial^2 C(\beta)}{\partial \beta_0^2} & \frac{\partial^2 C(\beta)}{\partial \beta_0 \partial \beta_1}  \\
-\frac{\partial^2 C(\beta)}{\partial \beta_0 \partial \beta_1} & \frac{\partial^2 C(\beta)}{\partial \beta_1^2} &  \\
-\end{bmatrix} = \frac{2}{n}X^T X.
-\]
-!et
-This result implies that $C(\beta)$ is a convex function since the matrix $X^T X$ always is positive semi-definite.
-
-
-
-
-!split
-===== Simple program =====
-
-We can now write a program that minimizes $C(\beta)$ using the gradient descent method with a constant learning rate $\gamma$ according to 
-!bt
-\[
-\beta_{k+1} = \beta_k - \gamma \nabla_\beta C(\beta_k), \ k=0,1,\cdots 
-\]
-!et
-
-We can use the expression we computed for the gradient and let use a
-$\beta_0$ be chosen randomly and let $\gamma = 0.001$. Stop iterating
-when $||\nabla_\beta C(\beta_k) || \leq \epsilon = 10^{-8}$. _Note that the code below does not include the latter stop criterion_.
-
-And finally we can compare our solution for $\beta$ with the analytic result given by 
-$\beta= (X^TX)^{-1} X^T \mathbf{y}$.
-
-!split
-===== Gradient Descent Example =====
-
-Here our simple example
-!bc pycod
-
-# Importing various packages
-from random import random, seed
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-import sys
-
-# the number of datapoints
-n = 100
-x = 2*np.random.rand(n,1)
-y = 4+3*x+np.random.randn(n,1)
-
-X = np.c_[np.ones((n,1)), x]
-# Hessian matrix
-H = (2.0/n)* X.T @ X
-# Get the eigenvalues
-EigValues, EigVectors = np.linalg.eig(H)
-print(f"Eigenvalues of Hessian Matrix:{EigValues}")
-
-beta_linreg = np.linalg.inv(X.T @ X) @ X.T @ y
-print(beta_linreg)
-beta = np.random.randn(2,1)
-
-eta = 1.0/np.max(EigValues)
-Niterations = 1000
-
-for iter in range(Niterations):
-    gradient = (2.0/n)*X.T @ (X @ beta-y)
-    beta -= eta*gradient
-
-print(beta)
-xnew = np.array([[0],[2]])
-xbnew = np.c_[np.ones((2,1)), xnew]
-ypredict = xbnew.dot(beta)
-ypredict2 = xbnew.dot(beta_linreg)
-plt.plot(xnew, ypredict, "r-")
-plt.plot(xnew, ypredict2, "b-")
-plt.plot(x, y ,'ro')
-plt.axis([0,2.0,0, 15.0])
-plt.xlabel(r'$x$')
-plt.ylabel(r'$y$')
-plt.title(r'Gradient descent example')
-plt.show()
-
-!ec
-
-!split
-===== Using gradient descent methods, limitations =====
-
-* _Gradient descent (GD) finds local minima of our function_. Since the GD algorithm is deterministic, if it converges, it will converge to a local minimum of our cost/loss/risk function. Because in ML we are often dealing with extremely rugged landscapes with many local minima, this can lead to poor performance.
-
-* _GD is sensitive to initial conditions_. One consequence of the local nature of GD is that initial conditions matter. Depending on where one starts, one will end up at a different local minima. Therefore, it is very important to think about how one initializes the training process. This is true for GD as well as more complicated variants of GD.
-
-* _Gradients are computationally expensive to calculate for large datasets_. In many cases in statistics and ML, the cost/loss/risk function is a sum of terms, with one term for each data point. For example, in linear regression, $E \propto \sum_{i=1}^n (y_i - \mathbf{w}^T\cdot\mathbf{x}_i)^2$; for logistic regression, the square error is replaced by the cross entropy. To calculate the gradient we have to sum over *all* $n$ data points. Doing this at every GD step becomes extremely computationally expensive. An ingenious solution to this, is to calculate the gradients using small subsets of the data called ``mini batches''. This has the added benefit of introducing stochasticity into our algorithm.
-
-* _GD is very sensitive to choices of learning rates_. GD is extremely sensitive to the choice of learning rates. If the learning rate is very small, the training process take an extremely long time. For larger learning rates, GD can diverge and give poor results. Furthermore, depending on what the local landscape looks like, we have to modify the learning rates to ensure convergence. Ideally, we would *adaptively* choose the learning rates to match the landscape.
-
-* _GD treats all directions in parameter space uniformly._ Another major drawback of GD is that unlike Newton's method, the learning rate for GD is the same in all directions in parameter space. For this reason, the maximum learning rate is set by the behavior of the steepest direction and this can significantly slow down training. Ideally, we would like to take large steps in flat directions and small steps in steep directions. Since we are exploring rugged landscapes where curvatures change, this requires us to keep track of not only the gradient but second derivatives. The ideal scenario would be to calculate the Hessian but this proves to be too computationally expensive. 
-	
-* GD can take exponential time to escape saddle points, even with random initialization. As we mentioned, GD is extremely sensitive to initial condition since it determines the particular local minimum GD would eventually reach. However, even with a good initialization scheme, through the introduction of randomness, GD can still take exponential time to escape saddle points.
-
 !split
 ===== Improving gradient descent with momentum =====
 
