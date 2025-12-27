@@ -88,9 +88,9 @@ to form small project groups of 2-3 participants, if possible.
 * _Office hours_: *Anytime*! 
 
 
-##  Teaching Assistants Spring Semester 2024
-* _Name_:  Ruben Guevara, 
-* _Email_: ruben.guevara@fys.uio.no
+##  Teaching Assistants Spring Semester 2026
+* _Name_:  Aleksander Nistad Sekkelsten
+* _Email_: aleksns@student.matnat.uio.no
 
 ## Practicalities
 
@@ -109,10 +109,10 @@ The textbooks we will use, in addition to our lecture notes, are
 
 ## Lectures and ComputerLab 
 
-- Lectures: Friday (10.15am-12pm). First time January 24. Last lecture session May 16 (can be changed).
-- Computerlab: Friday (12.15pm-3pm), first time January 24, last lab session May 16 (can be changed).
+- Lectures: Friday (9.15am-11am). First time January 23. Last lecture session May 15 (can be changed).
+- Computerlab: Friday (11.15am-2pm), first time January 23, last lab session May 15 (can be changed).
 - Weekly plans and all other information are on the webpage of the course
-- First project to be handed in March 21
+- First project to be handed in March 20
 - Second and final project to be handed in June 1.
 - There is no final exam, only project work.
 - Permanent Zoom link for the whole semester is https://uio.zoom.us/my/mortenhj
@@ -135,7 +135,7 @@ The final number of points is based on the average of all projects (including ev
 
 Course participants are expected to have their own laptops/PCs. We use _Git_ as version control software and the usage of providers like _GitHub_, _GitLab_ or similar are strongly recommended.
 
-We will make extensive use of Python and C++ as programming languages.
+We will make extensive use of Python and/or C++ as programming languages.
 
 
 If you have Python installed and you feel
@@ -148,12 +148,12 @@ For OSX users we recommend, after having installed Xcode, to
 install _brew_. Brew allows for a seamless installation of additional
 software via for example 
 
-* brew install python3
+* brew install python
 
 For Linux users, with its variety of distributions like for example the widely popular Ubuntu distribution,
 you can use _pip_ as well and simply install Python as 
 
-* sudo apt-get install python3
+* sudo apt-get install python
 
 ### Python installers
 
