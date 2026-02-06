@@ -1,0 +1,458 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usepackage{amsmath,amssymb,physics,bm}
+
+\title{Green's Function Solution of the Fokker--Planck Equation}
+\subtitle{Forward Equation in Higher Dimensions}
+\author{MHJ}
+\date{}
+
+\begin{document}
+
+%-------------------------------------------------
+\begin{frame}
+\titlepage
+\end{frame}
+
+%=================================================
+\section{Fokker--Planck Equation}
+
+\begin{frame}{Forward Fokker--Planck Equation}
+Let $p(\bm{x},t)$ be the probability density of a diffusion process
+$\bm{x}\in\mathbb{R}^d$.
+
+\vspace{0.3cm}
+
+The forward Fokker--Planck equation reads
+\[
+\partial_t p(\bm{x},t)
+=
+-\sum_{i=1}^d \partial_{x_i}
+\big[A_i(\bm{x},t)\,p(\bm{x},t)\big]
++
+\sum_{i,j=1}^d
+\partial_{x_i}\partial_{x_j}
+\big[D_{ij}(\bm{x},t)\,p(\bm{x},t)\big],
+\]
+where
+\begin{itemize}
+  \item $\bm{A}(\bm{x},t)$ is the drift vector,
+  \item $D_{ij}(\bm{x},t)$ is the diffusion tensor.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Operator form}
+Define the Fokker--Planck operator
+\[
+L^\dagger
+=
+-\sum_i \partial_{x_i} A_i(\bm{x},t)
++
+\sum_{i,j} \partial_{x_i}\partial_{x_j} D_{ij}(\bm{x},t).
+\]
+
+Then the equation becomes
+\[
+\partial_t p(\bm{x},t) = L^\dagger p(\bm{x},t).
+\]
+
+\vspace{0.3cm}
+
+This is a linear parabolic partial differential equation.
+\end{frame}
+
+%=================================================
+\section{Green's function}
+
+\begin{frame}{Definition of the Green's function}
+The Green's function (fundamental solution)
+$G(\bm{x},t\mid\bm{x}_0,t_0)$ is defined by
+\[
+\partial_t G = L^\dagger_{\bm{x}}\,G,
+\qquad
+G(\bm{x},t_0\mid\bm{x}_0,t_0)
+=
+\delta(\bm{x}-\bm{x}_0).
+\]
+
+\vspace{0.3cm}
+
+Physical interpretation:
+\begin{itemize}
+  \item $G$ is the transition probability density,
+  \item probability to go from $\bm{x}_0$ at $t_0$ to $\bm{x}$ at $t$.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Superposition principle}
+Because the Fokker--Planck equation is linear,
+the solution for a general initial condition
+$p(\bm{x},t_0)$ is
+\[
+p(\bm{x},t)
+=
+\int d^d\bm{x}_0\;
+G(\bm{x},t\mid\bm{x}_0,t_0)\,
+p(\bm{x}_0,t_0).
+\]
+
+\vspace{0.3cm}
+
+Thus the Green's function completely characterizes
+the time evolution.
+\end{frame}
+
+%=================================================
+\section{Derivation via Chapman--Kolmogorov}
+
+\begin{frame}{Chapman--Kolmogorov equation}
+Markov processes satisfy
+\[
+G(\bm{x},t+\Delta t\mid\bm{x}_0,t_0)
+=
+\int d^d\bm{y}\;
+G(\bm{x},t+\Delta t\mid\bm{y},t)\,
+G(\bm{y},t\mid\bm{x}_0,t_0).
+\]
+
+This identity encodes the semigroup property
+of the propagator.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Short-time expansion}
+For small $\Delta t$,
+\[
+G(\bm{x},t+\Delta t\mid\bm{y},t)
+=
+\delta(\bm{x}-\bm{y})
++
+\Delta t\,L^\dagger_{\bm{y}}
+\delta(\bm{x}-\bm{y})
++
+\mathcal{O}(\Delta t^2).
+\]
+
+Insert into the Chapman--Kolmogorov equation
+and expand to first order in $\Delta t$.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Emergence of the Fokker--Planck equation}
+After integration by parts and taking
+$\Delta t \to 0$, one finds
+\[
+\partial_t G(\bm{x},t\mid\bm{x}_0,t_0)
+=
+L^\dagger_{\bm{x}}\,G(\bm{x},t\mid\bm{x}_0,t_0),
+\]
+which is precisely the forward Fokker--Planck equation
+with a delta-function initial condition.
+
+\vspace{0.3cm}
+
+This establishes $G$ as the fundamental solution.
+\end{frame}
+
+%=================================================
+\section{Formal solution and properties}
+
+\begin{frame}{Formal operator solution}
+Formally, the Green's function can be written as
+\[
+G(\bm{x},t\mid\bm{x}_0,t_0)
+=
+\exp\!\big[(t-t_0)L^\dagger\big]\,
+\delta(\bm{x}-\bm{x}_0).
+\]
+
+\vspace{0.3cm}
+
+For constant drift and diffusion,
+this reduces to a Gaussian kernel;
+for general coefficients, it defines a semigroup.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Path-integral / stochastic interpretation}
+Using the underlying stochastic differential equation,
+\[
+d\bm{X}_t = \bm{A}(\bm{X}_t,t)\,dt
++ \bm{\sigma}(\bm{X}_t,t)\,d\bm{W}_t,
+\quad
+D = \tfrac{1}{2}\bm{\sigma}\bm{\sigma}^T,
+\]
+the Green's function satisfies
+\[
+G(\bm{x},t\mid\bm{x}_0,t_0)
+=
+\left\langle
+\delta\!\big(\bm{x}-\bm{X}_t\big)
+\right\rangle_{\bm{X}_{t_0}=\bm{x}_0}.
+\]
+
+This links the Fokker--Planck equation to stochastic paths.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Key properties of the Green's function}
+\begin{itemize}
+  \item \textbf{Normalization:}
+  \[
+  \int d^d\bm{x}\,G(\bm{x},t\mid\bm{x}_0,t_0)=1.
+  \]
+  \item \textbf{Positivity:} $G \ge 0$.
+  \item \textbf{Semigroup property:}
+  \[
+  \int d^d\bm{y}\;
+  G(\bm{x},t\mid\bm{y},s)\,
+  G(\bm{y},s\mid\bm{x}_0,t_0)
+  =
+  G(\bm{x},t\mid\bm{x}_0,t_0).
+  \]
+\end{itemize}
+\end{frame}
+
+%=================================================
+\section{Summary}
+
+\begin{frame}{Summary}
+\begin{itemize}
+  \item The forward Fokker--Planck equation governs probability evolution.
+  \item The Green's function is the fundamental solution with delta initial data.
+  \item It is derived via the Chapman--Kolmogorov equation and short-time expansion.
+  \item General solutions follow by convolution with the Green's function.
+  \item The propagator has a clear stochastic and physical interpretation.
+\end{itemize}
+\end{frame}
+
+
+%=================================================
+\section{Recap: Forward Fokker--Planck and Green's function}
+
+\begin{frame}{Forward Fokker--Planck equation (recap)}
+For $\bm{x}\in\mathbb{R}^d$, drift $\bm{A}(\bm{x},t)$ and diffusion tensor $D_{ij}(\bm{x},t)$:
+\[
+\partial_t p(\bm{x},t)
+=
+-\sum_{i=1}^d \partial_{x_i}\big[A_i(\bm{x},t)\,p(\bm{x},t)\big]
++
+\sum_{i,j=1}^d \partial_{x_i}\partial_{x_j}\big[D_{ij}(\bm{x},t)\,p(\bm{x},t)\big].
+\]
+
+Green's function (propagator) $G(\bm{x},t\mid \bm{x}_0,t_0)$ satisfies
+\[
+\partial_t G = L^\dagger_{\bm{x}} G,\qquad
+G(\bm{x},t_0\mid \bm{x}_0,t_0)=\delta(\bm{x}-\bm{x}_0),
+\]
+and general solutions follow from
+\[
+p(\bm{x},t) = \int d^d\bm{x}_0\;G(\bm{x},t\mid \bm{x}_0,t_0)\,p(\bm{x}_0,t_0).
+\]
+\end{frame}
+
+%=================================================
+\section{Worked Gaussian example: constant drift and diffusion}
+
+\begin{frame}{Constant-coefficient FPE (Ornstein-free drift)}
+Take constant drift $\bm{A}(\bm{x},t)=\bm{a}$ and constant diffusion $D_{ij}(\bm{x},t)=D_{ij}$ (symmetric, positive definite).
+Then
+\[
+\partial_t p(\bm{x},t)= -\bm{\nabla}\cdot(\bm{a}\,p) + \sum_{i,j}\partial_{x_i}\partial_{x_j}\big(D_{ij}p\big)
+= -\bm{a}\cdot \bm{\nabla}p + \bm{\nabla}\cdot\!\big(D\,\bm{\nabla}p\big),
+\]
+where $D$ is the diffusion matrix.
+
+\vspace{0.3cm}
+Goal: find the Green's function $G(\bm{x},t\mid\bm{x}_0,t_0)$.
+\end{frame}
+
+\begin{frame}{Shift to a comoving frame}
+Define the comoving coordinate
+\[
+\bm{y} = \bm{x}-\bm{a}(t-t_0),
+\qquad
+\tilde{G}(\bm{y},t) \equiv G(\bm{x},t\mid\bm{x}_0,t_0).
+\]
+
+Then using $\partial_t \bm{y}=-\bm{a}$ and $\bm{\nabla}_{\bm{x}}=\bm{\nabla}_{\bm{y}}$,
+\[
+\partial_t G = \partial_t \tilde{G} - \bm{a}\cdot \bm{\nabla}_{\bm{y}}\tilde{G}.
+\]
+Plugging into the constant-coefficient FPE gives cancellation of the drift term:
+\[
+\partial_t \tilde{G} = \bm{\nabla}_{\bm{y}}\cdot\!\big(D\,\bm{\nabla}_{\bm{y}}\tilde{G}\big).
+\]
+
+So drift converts the problem into pure diffusion in $\bm{y}$.
+\end{frame}
+
+\begin{frame}{Fourier-space solution (anisotropic diffusion)}
+Solve
+\[
+\partial_t \tilde{G}(\bm{y},t)=\bm{\nabla}\cdot(D\bm{\nabla}\tilde{G}),
+\qquad
+\tilde{G}(\bm{y},t_0)=\delta(\bm{y}-\bm{x}_0).
+\]
+
+Fourier transform in $\bm{y}$:
+\[
+\hat{G}(\bm{k},t)=\int d^d\bm{y}\;e^{-i\bm{k}\cdot\bm{y}}\,\tilde{G}(\bm{y},t).
+\]
+Then $\bm{\nabla}\mapsto i\bm{k}$ implies
+\[
+\partial_t \hat{G}(\bm{k},t)=-(\bm{k}^T D \bm{k})\,\hat{G}(\bm{k},t),
+\qquad
+\hat{G}(\bm{k},t_0)=e^{-i\bm{k}\cdot\bm{x}_0}.
+\]
+Hence
+\[
+\hat{G}(\bm{k},t)=\exp\!\Big(-i\bm{k}\cdot\bm{x}_0 - (t-t_0)\,\bm{k}^T D \bm{k}\Big).
+\]
+\end{frame}
+
+\begin{frame}{Inverse Fourier transform: Gaussian propagator}
+Invert the transform (Gaussian integral):
+\[
+\tilde{G}(\bm{y},t)=
+\frac{1}{(4\pi (t-t_0))^{d/2}\sqrt{\det D}}
+\exp\!\left(
+-\frac{1}{4(t-t_0)}(\bm{y}-\bm{x}_0)^T D^{-1}(\bm{y}-\bm{x}_0)
+\right).
+\]
+
+Transform back to $\bm{x}$ using $\bm{y}=\bm{x}-\bm{a}(t-t_0)$:
+\[
+G(\bm{x},t\mid\bm{x}_0,t_0)=
+\frac{1}{(4\pi \Delta t)^{d/2}\sqrt{\det D}}
+\exp\!\left(
+-\frac{1}{4\Delta t}\Big(\bm{x}-\bm{x}_0-\bm{a}\Delta t\Big)^T D^{-1}\Big(\bm{x}-\bm{x}_0-\bm{a}\Delta t\Big)
+\right),
+\]
+with $\Delta t=t-t_0>0$.
+
+\vspace{0.2cm}
+Mean: $\mathbb{E}[\bm{X}_t]=\bm{x}_0+\bm{a}\Delta t$, \quad Covariance: $\mathrm{Cov}(\bm{X}_t)=2D\,\Delta t$.
+\end{frame}
+
+%=================================================
+\section{Boundary conditions via probability current}
+
+\begin{frame}{Continuity equation and probability current}
+Write the FPE as a continuity equation
+\[
+\partial_t p + \bm{\nabla}\cdot \bm{J} = 0,
+\]
+with probability current
+\[
+J_i(\bm{x},t)=A_i(\bm{x},t)\,p(\bm{x},t)-\sum_{j=1}^d \partial_{x_j}\!\big(D_{ij}(\bm{x},t)\,p(\bm{x},t)\big).
+\]
+
+Integrating over a domain $\Omega$ gives
+\[
+\frac{d}{dt}\int_\Omega p\,d^d\bm{x}
+= -\int_{\partial\Omega} \bm{J}\cdot \bm{n}\,dS,
+\]
+so boundary conditions control probability loss/gain through $\partial\Omega$.
+\end{frame}
+
+\begin{frame}{Reflecting vs absorbing boundaries}
+\textbf{Reflecting (no-flux) boundary:}
+\[
+\bm{J}\cdot\bm{n}\big|_{\partial\Omega}=0.
+\]
+Interpretation: probability is conserved inside $\Omega$; trajectories reflect at the boundary.
+
+\vspace{0.4cm}
+\textbf{Absorbing boundary (killing):}
+\[
+p(\bm{x},t)\big|_{\partial\Omega}=0.
+\]
+Interpretation: probability reaching the boundary is removed; total probability in $\Omega$ decays.
+
+\vspace{0.2cm}
+In both cases, $G$ must satisfy the same boundary condition in $\bm{x}$.
+\end{frame}
+
+%=================================================
+\section{Absorbing states and killed propagators}
+
+\begin{frame}{Absorbing states and survival probability}
+If $\partial\Omega$ is absorbing, the total probability in $\Omega$ is the \emph{survival probability}
+\[
+S(t\mid \bm{x}_0,t_0)=\int_\Omega d^d\bm{x}\;G(\bm{x},t\mid \bm{x}_0,t_0).
+\]
+Its decay rate is the boundary flux:
+\[
+\frac{dS}{dt} = -\int_{\partial\Omega} \bm{J}\cdot\bm{n}\,dS.
+\]
+
+The corresponding \textbf{first-passage-time density} is
+\[
+f(t\mid \bm{x}_0,t_0) = -\frac{dS}{dt}.
+\]
+\end{frame}
+
+\begin{frame}{Method of images: 1D absorbing wall (worked example)}
+To illustrate absorbing boundaries explicitly, consider 1D drift--diffusion on $x>0$:
+\[
+\partial_t p = -a\,\partial_x p + D\,\partial_x^2 p,
+\qquad p(0,t)=0,
+\qquad p(x,t_0)=\delta(x-x_0),\;x_0>0.
+\]
+
+Free-space Green's function:
+\[
+G_0(x,t\mid x_0,t_0)=\frac{1}{\sqrt{4\pi D\Delta t}}
+\exp\!\left[-\frac{(x-x_0-a\Delta t)^2}{4D\Delta t}\right].
+\]
+
+Absorbing boundary enforced by images:
+\[
+G(x,t\mid x_0,t_0)=G_0(x,t\mid x_0,t_0)-G_0(x,t\mid -x_0,t_0).
+\]
+
+Then $G(0,t\mid x_0,t_0)=0$ holds identically.
+\end{frame}
+
+\begin{frame}{Remarks on higher-dimensional absorbing boundaries}
+In $d>1$, explicit closed forms are generally available only for special geometries:
+\begin{itemize}
+  \item half-space (planar boundary) $\rightarrow$ image methods (with modifications under drift/aniso diffusion),
+  \item sphere/ball $\rightarrow$ eigenfunction expansions,
+  \item general domains $\rightarrow$ spectral methods / numerical PDE / Monte Carlo.
+\end{itemize}
+
+\vspace{0.3cm}
+Conceptually, the Green's function in a domain $\Omega$ is the \textbf{killed transition density}:
+\[
+G_\Omega(\bm{x},t\mid \bm{x}_0,t_0)
+=
+\mathbb{E}\!\left[\delta(\bm{x}-\bm{X}_t)\,\mathbf{1}_{\{\tau_{\partial\Omega}>t\}}\;\middle|\;\bm{X}_{t_0}=\bm{x}_0\right],
+\]
+where $\tau_{\partial\Omega}$ is the first hitting time of the absorbing boundary.
+\end{frame}
+
+%=================================================
+\section{Summary}
+
+\begin{frame}{Summary}
+\begin{itemize}
+  \item Constant drift and diffusion yield an explicit Gaussian propagator:
+  \[
+  G(\bm{x},t\mid\bm{x}_0,t_0)\propto
+  \exp\!\left(-\frac{1}{4\Delta t}(\bm{x}-\bm{x}_0-\bm{a}\Delta t)^T D^{-1}(\bm{x}-\bm{x}_0-\bm{a}\Delta t)\right).
+  \]
+  \item Boundary conditions are imposed through the probability current $\bm{J}$:
+  \begin{itemize}
+    \item reflecting: $\bm{J}\cdot\bm{n}=0$,
+    \item absorbing: $p=0$ on $\partial\Omega$.
+  \end{itemize}
+  \item Absorbing boundaries define survival and first-passage-time distributions via boundary flux.
+\end{itemize}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,335 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usepackage{amsmath,amssymb,physics,bm}
+\usepackage{mathtools}
+
+\title{From Langevin Dynamics to the Fokker--Planck Equation}
+\subtitle{Derivation and Physical Interpretation}
+\author{MHJ}
+\date{}
+
+\begin{document}
+
+%-------------------------------------------------
+\begin{frame}
+\titlepage
+\end{frame}
+
+%=================================================
+\section{Motivation and setup}
+
+\begin{frame}{Goal and roadmap}
+\textbf{Goal:} Derive the forward Fokker--Planck equation (FPE) for the probability
+density of a stochastic process and link it to the Langevin equation.
+
+\vspace{0.3cm}
+We proceed in three steps:
+\begin{enumerate}
+  \item Write the (Ito) Langevin / stochastic differential equation (SDE).
+  \item Use the Chapman--Kolmogorov relation + Kramers--Moyal expansion.
+  \item Obtain the Fokker--Planck equation and identify drift/diffusion.
+\end{enumerate}
+
+\vspace{0.3cm}
+We emphasize the $d$-dimensional case.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Langevin equation: physical picture}
+A Langevin equation models the dynamics of a coarse-grained variable $\bm{X}_t$:
+\[
+\text{systematic forces} \;+\; \text{random kicks from the environment}.
+\]
+
+Example (overdamped Brownian motion in a medium):
+\[
+\gamma \dot{\bm{X}}_t = \bm{F}(\bm{X}_t,t) + \bm{\xi}(t),
+\qquad
+\langle \xi_i(t)\rangle=0,
+\qquad
+\langle \xi_i(t)\xi_j(t')\rangle = 2\gamma^2 D_{ij}\,\delta(t-t').
+\]
+
+After dividing by $\gamma$, this becomes a drift + noise equation.
+\end{frame}
+
+%=================================================
+\section{Ito Langevin / SDE formulation}
+
+\begin{frame}{Ito SDE in $d$ dimensions}
+We use the Ito SDE
+\[
+d\bm{X}_t = \bm{A}(\bm{X}_t,t)\,dt + \bm{\sigma}(\bm{X}_t,t)\,d\bm{W}_t,
+\]
+where
+\begin{itemize}
+  \item $\bm{A}(\bm{x},t)$ is the drift vector,
+  \item $\bm{W}_t$ is $m$-dimensional Wiener process,
+  \item $\bm{\sigma}(\bm{x},t)\in\mathbb{R}^{d\times m}$ sets noise amplitudes.
+\end{itemize}
+
+The diffusion tensor is
+\[
+D(\bm{x},t) \equiv \frac{1}{2}\,\bm{\sigma}(\bm{x},t)\bm{\sigma}(\bm{x},t)^{T},
+\qquad
+D_{ij} = \frac{1}{2}\sum_{k=1}^{m}\sigma_{ik}\sigma_{jk}.
+\]
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Transition density and what we want}
+Define the transition probability density (propagator)
+\[
+G(\bm{x},t\mid \bm{x}_0,t_0)
+=
+\mathbb{P}\big(\bm{X}_t\in d^d\bm{x}\,\big|\,\bm{X}_{t_0}=\bm{x}_0\big)/d^d\bm{x}.
+\]
+
+For an initial density $p(\bm{x},t_0)$, the density at later times is
+\[
+p(\bm{x},t)=\int d^d\bm{x}_0\;G(\bm{x},t\mid\bm{x}_0,t_0)\,p(\bm{x}_0,t_0).
+\]
+
+\textbf{Goal:} derive a PDE for $p(\bm{x},t)$ (the Fokker--Planck equation).
+\end{frame}
+
+%=================================================
+\section{Short-time expansion and Kramers--Moyal}
+
+\begin{frame}{Chapman--Kolmogorov (Markov property)}
+Markovity implies (for $t_0<s<t$)
+\[
+G(\bm{x},t\mid \bm{x}_0,t_0)
+=
+\int d^d\bm{y}\;
+G(\bm{x},t\mid \bm{y},s)\,
+G(\bm{y},s\mid \bm{x}_0,t_0).
+\]
+
+This semigroup property is the starting point for a short-time expansion.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Infinitesimal increment from the SDE}
+Over a short interval $\Delta t$,
+\[
+\Delta \bm{X} \equiv \bm{X}_{t+\Delta t}-\bm{X}_t
+=
+\bm{A}(\bm{X}_t,t)\,\Delta t
++
+\bm{\sigma}(\bm{X}_t,t)\,\Delta \bm{W},
+\]
+with $\Delta \bm{W}\sim \mathcal{N}(\bm{0},\Delta t\,I)$.
+
+Conditional moments (Ito):
+\[
+\mathbb{E}[\Delta X_i \mid \bm{X}_t=\bm{x}] = A_i(\bm{x},t)\,\Delta t + o(\Delta t),
+\]
+\[
+\mathbb{E}[\Delta X_i\Delta X_j\mid \bm{X}_t=\bm{x}]
+=
+(\bm{\sigma}\bm{\sigma}^T)_{ij}(\bm{x},t)\,\Delta t + o(\Delta t)
+= 2D_{ij}(\bm{x},t)\,\Delta t + o(\Delta t).
+\]
+Higher conditional moments are $o(\Delta t)$ for a diffusion process.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Kramers--Moyal expansion (idea)}
+For a Markov process with smooth transition density,
+expand $p(\bm{x},t+\Delta t)$ in terms of jump moments:
+\[
+p(\bm{x},t+\Delta t)
+=
+\int d^d\bm{y}\;p(\bm{y},t)\,G(\bm{x},t+\Delta t\mid \bm{y},t).
+\]
+
+Let $\bm{\xi}=\bm{x}-\bm{y}$ and expand around $\bm{\xi}=0$:
+\[
+p(\bm{y},t)=p(\bm{x}-\bm{\xi},t)
+=
+p(\bm{x},t)-\xi_i\partial_{x_i}p+\frac{1}{2}\xi_i\xi_j\partial_{x_i}\partial_{x_j}p+\cdots
+\]
+and average powers of $\bm{\xi}$ using the conditional moments from the SDE.
+\end{frame}
+
+%=================================================
+\section{Derivation of the Fokker--Planck equation}
+
+\begin{frame}{Derivation: keep terms up to $\mathcal{O}(\Delta t)$}
+Using the conditional moments:
+\[
+\langle \xi_i \rangle = A_i(\bm{x},t)\,\Delta t,
+\qquad
+\langle \xi_i\xi_j \rangle = 2D_{ij}(\bm{x},t)\,\Delta t,
+\]
+and neglecting higher moments ($o(\Delta t)$), we obtain
+\[
+p(\bm{x},t+\Delta t)-p(\bm{x},t)
+=
+-\partial_{x_i}\!\big(A_i(\bm{x},t)p(\bm{x},t)\big)\Delta t
++\partial_{x_i}\partial_{x_j}\!\big(D_{ij}(\bm{x},t)p(\bm{x},t)\big)\Delta t
++o(\Delta t).
+\]
+
+Divide by $\Delta t$ and take $\Delta t\to 0$.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Forward Fokker--Planck equation (result)}
+We arrive at the forward Fokker--Planck equation:
+\[
+\boxed{
+\partial_t p(\bm{x},t)
+=
+-\sum_{i=1}^d \partial_{x_i}\Big(A_i(\bm{x},t)\,p(\bm{x},t)\Big)
++
+\sum_{i,j=1}^d \partial_{x_i}\partial_{x_j}\Big(D_{ij}(\bm{x},t)\,p(\bm{x},t)\Big)
+}
+\]
+
+\vspace{0.3cm}
+Identification:
+\begin{itemize}
+  \item Drift $A_i$ comes from the mean increment of $\Delta X_i$.
+  \item Diffusion $D_{ij}$ comes from the covariance of increments.
+\end{itemize}
+\end{frame}
+
+%=================================================
+\section{Generator and Ito's formula connection}
+
+\begin{frame}{Backward generator and Ito's formula}
+For a smooth test function $f(\bm{x},t)$, Ito's formula gives
+\[
+df(\bm{X}_t,t)
+=
+\left(\partial_t f + A_i\partial_{x_i}f + D_{ij}\partial_{x_i}\partial_{x_j}f\right)dt
++
+(\partial_{x_i}f)\,\sigma_{ik}\,dW_k.
+\]
+
+Define the (backward) generator
+\[
+(Lf)(\bm{x},t)=A_i(\bm{x},t)\partial_{x_i}f(\bm{x},t)
++
+D_{ij}(\bm{x},t)\partial_{x_i}\partial_{x_j}f(\bm{x},t).
+\]
+
+Then $\mathbb{E}[f(\bm{X}_t,t)]$ evolves according to $L$.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Adjoint relation: generator vs Fokker--Planck}
+The Fokker--Planck operator $L^\dagger$ is the adjoint of $L$:
+\[
+\int d^d\bm{x}\; (Lf)\,p
+=
+\int d^d\bm{x}\; f\,(L^\dagger p)
+\quad \text{(up to boundary terms)}.
+\]
+
+Explicitly,
+\[
+(L^\dagger p)(\bm{x},t)
+=
+-\partial_{x_i}\big(A_i p\big)
++
+\partial_{x_i}\partial_{x_j}\big(D_{ij}p\big),
+\]
+so that $\partial_t p=L^\dagger p$.
+
+\vspace{0.3cm}
+This is the clean operator link between Langevin (SDE) and FPE (PDE).
+\end{frame}
+
+%=================================================
+\section{Continuity equation and current}
+
+\begin{frame}{Probability current and boundary conditions}
+Write the FPE as a continuity equation:
+\[
+\partial_t p + \bm{\nabla}\cdot \bm{J}=0,
+\]
+with current
+\[
+J_i(\bm{x},t)=A_i(\bm{x},t)\,p(\bm{x},t)
+-\partial_{x_j}\big(D_{ij}(\bm{x},t)\,p(\bm{x},t)\big).
+\]
+
+Boundary conditions are formulated in terms of $\bm{J}$:
+\begin{itemize}
+  \item Reflecting: $\bm{J}\cdot \bm{n}=0$ on $\partial\Omega$,
+  \item Absorbing: $p=0$ on $\partial\Omega$.
+\end{itemize}
+\end{frame}
+
+%=================================================
+\section{Worked example: overdamped Brownian motion}
+
+\begin{frame}{Example: overdamped Brownian motion in a potential}
+Overdamped Langevin equation:
+\[
+\gamma \dot{\bm{X}}_t = -\bm{\nabla}U(\bm{X}_t) + \bm{\xi}(t),
+\qquad
+\langle \xi_i(t)\xi_j(t')\rangle = 2\gamma k_BT\,\delta_{ij}\delta(t-t').
+\]
+
+Equivalently (Ito SDE),
+\[
+d\bm{X}_t = -\frac{1}{\gamma}\bm{\nabla}U(\bm{X}_t)\,dt + \sqrt{2D}\,d\bm{W}_t,
+\qquad D=\frac{k_BT}{\gamma}.
+\]
+
+Thus
+\[
+\bm{A}(\bm{x})=-\frac{1}{\gamma}\bm{\nabla}U(\bm{x}),
+\qquad
+D_{ij}=D\,\delta_{ij}.
+\]
+\end{frame}
+
+\begin{frame}{Corresponding Fokker--Planck equation}
+Insert $\bm{A},D$:
+\[
+\partial_t p(\bm{x},t)
+=
+\bm{\nabla}\cdot\!\left(\frac{1}{\gamma}\bm{\nabla}U(\bm{x})\,p(\bm{x},t)\right)
++
+D\,\nabla^2 p(\bm{x},t).
+\]
+
+In equilibrium (detailed balance), the stationary solution is the Gibbs density
+\[
+p_{\mathrm{eq}}(\bm{x})
+\propto e^{-\beta U(\bm{x})},\qquad \beta=(k_BT)^{-1},
+\]
+which satisfies $\bm{J}=0$.
+\end{frame}
+
+%=================================================
+\section{Summary}
+
+\begin{frame}{Summary}
+\begin{itemize}
+  \item Start from Ito Langevin dynamics:
+  \[
+  d\bm{X}_t=\bm{A}(\bm{X}_t,t)\,dt+\bm{\sigma}(\bm{X}_t,t)\,d\bm{W}_t,
+  \quad
+  D=\tfrac12 \bm{\sigma}\bm{\sigma}^T.
+  \]
+  \item Short-time increment statistics imply:
+  \[
+  \mathbb{E}[\Delta X_i]=A_i\Delta t,\qquad
+  \mathbb{E}[\Delta X_i\Delta X_j]=2D_{ij}\Delta t.
+  \]
+  \item Keeping terms up to $\mathcal{O}(\Delta t)$ yields the forward FPE:
+  \[
+  \partial_t p = -\partial_i(A_i p)+\partial_i\partial_j(D_{ij}p).
+  \]
+  \item Operator viewpoint: $L$ (Ito generator) and $L^\dagger$ (Fokker--Planck) are adjoints.
+\end{itemize}
+\end{frame}
+
+\end{document}
