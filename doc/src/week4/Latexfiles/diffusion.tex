@@ -1,0 +1,284 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{physics}
+
+\title{From Markov Chains to the 1D Diffusion Equation}
+\subtitle{Master Equation $\rightarrow$ Continuum Limit $\rightarrow$ Fick's Law}
+\author{Morten Hjorth-Jensen}
+\date{Spring 2026}
+
+\begin{document}
+
+%-------------------------------------------------
+\begin{frame}
+\titlepage
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Goal and roadmap}
+\textbf{Goal:} derive the 1D diffusion equation
+\[
+\partial_t \rho(x,t)=D\,\partial_x^2 \rho(x,t)
+\]
+starting from a discrete-time/discrete-space \textbf{Markov chain}.
+
+\vspace{0.3cm}
+\textbf{Roadmap:}
+\begin{enumerate}
+  \item Random walk as a Markov chain on a lattice
+  \item Chapman--Kolmogorov / master equation
+  \item Taylor expansion and scaling limit
+  \item Identify diffusion coefficient $D$
+  \item Continuity equation and Fick's law
+\end{enumerate}
+\end{frame}
+
+%=================================================
+\section{Markov chain on a 1D lattice}
+
+\begin{frame}{Random walk as a Markov chain}
+Consider a particle on a 1D lattice with spacing $a$:
+\[
+x_n = n a,\qquad n\in\mathbb{Z}.
+\]
+Let $P_n(k)$ be the probability to be at site $n$ after $k$ time steps.
+
+\vspace{0.3cm}
+Assume a nearest-neighbor Markov chain:
+\[
+\mathbb{P}(n\to n+1)=p,\qquad \mathbb{P}(n\to n-1)=q,\qquad p+q=1.
+\]
+
+\textbf{Markov property:} the next state depends only on the current state.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Transition matrix and Chapman--Kolmogorov}
+The one-step transition probabilities define a stochastic matrix $T$:
+\[
+P_n(k+1)=\sum_m T_{nm}\,P_m(k),
+\]
+with (nearest-neighbor)
+\[
+T_{n,n-1}=p,\qquad T_{n,n+1}=q,\qquad T_{n,n}=0.
+\]
+
+The Chapman--Kolmogorov property for $r$ steps:
+\[
+T^{(r+s)} = T^{(r)}T^{(s)}.
+\]
+This semigroup property underlies the continuum limit.
+\end{frame}
+
+%=================================================
+\section{Master equation (discrete)}
+
+\begin{frame}{Discrete master equation}
+From the transition rule:
+\[
+P_n(k+1)=p\,P_{n-1}(k)+q\,P_{n+1}(k).
+\]
+Rewrite as an increment equation:
+\[
+P_n(k+1)-P_n(k)
+=
+p\big(P_{n-1}(k)-P_n(k)\big)
++
+q\big(P_{n+1}(k)-P_n(k)\big).
+\]
+
+Interpretation:
+\begin{itemize}
+  \item gain from neighbors $n\pm 1$,
+  \item loss from leaving site $n$.
+\end{itemize}
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Continuous-time version (optional but standard)}
+Let steps occur in continuous time with rate $\gamma$.
+Define $P_n(t)$ and assume exponential waiting times (continuous-time Markov chain).
+Then
+\[
+\frac{dP_n(t)}{dt}
+=
+\gamma\Big[pP_{n-1}(t)+qP_{n+1}(t)-(p+q)P_n(t)\Big].
+\]
+Since $p+q=1$:
+\[
+\boxed{
+\frac{dP_n}{dt}
+=
+\gamma\Big[pP_{n-1}+qP_{n+1}-P_n\Big].
+}
+\]
+This is the \textbf{master equation} for a nearest-neighbor jump process.
+\end{frame}
+
+%=================================================
+\section{Continuum limit and diffusion}
+
+\begin{frame}{From lattice probabilities to a density}
+Define a smooth probability density $\rho(x,t)$ such that
+\[
+P_n(t)\approx a\,\rho(x,t)\Big|_{x=na}.
+\]
+Assume $\rho$ varies slowly on the scale of $a$.
+
+\vspace{0.3cm}
+We expand
+\[
+\rho(x\pm a,t)
+=
+\rho(x,t)\pm a\,\partial_x\rho(x,t)
++\frac{a^2}{2}\partial_x^2\rho(x,t)
++\mathcal{O}(a^3).
+\]
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Taylor expansion of the master equation}
+Start from
+\[
+\frac{dP_n}{dt}=\gamma\Big[pP_{n-1}+qP_{n+1}-P_n\Big].
+\]
+Divide by $a$ and use $P_n\approx a\rho(x,t)$:
+\[
+\partial_t \rho(x,t)
+=
+\gamma\Big[p\rho(x-a,t)+q\rho(x+a,t)-\rho(x,t)\Big].
+\]
+
+Insert Taylor expansions:
+\begin{align*}
+p\rho(x-a)+q\rho(x+a)
+&=
+(p+q)\rho
++(q-p)a\,\partial_x\rho
++\frac{a^2}{2}(p+q)\partial_x^2\rho
++\mathcal{O}(a^3)\\
+&=
+\rho +(q-p)a\,\partial_x\rho+\frac{a^2}{2}\partial_x^2\rho+\mathcal{O}(a^3).
+\end{align*}
+
+Hence
+\[
+\partial_t\rho
+=
+\gamma\Big[(q-p)a\,\partial_x\rho+\frac{a^2}{2}\partial_x^2\rho\Big]
++\mathcal{O}(a^3).
+\]
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Drift--diffusion equation and unbiased diffusion}
+Define drift velocity and diffusion coefficient
+\[
+v \equiv \gamma (q-p)a,
+\qquad
+D \equiv \frac{\gamma a^2}{2}.
+\]
+Then, to leading order,
+\[
+\boxed{
+\partial_t\rho(x,t)= -v\,\partial_x\rho(x,t) + D\,\partial_x^2\rho(x,t).
+}
+\]
+
+\textbf{Unbiased random walk:} $p=q=\tfrac{1}{2}$ $\Rightarrow$ $v=0$:
+\[
+\boxed{
+\partial_t\rho(x,t)= D\,\partial_x^2\rho(x,t).
+}
+\]
+This is the 1D diffusion equation.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Scaling limit (diffusive scaling)}
+To obtain a nontrivial continuum PDE as $a\to 0$, we keep $D$ finite:
+\[
+D=\frac{\gamma a^2}{2}=\text{fixed}.
+\]
+This is achieved by letting the jump rate scale as
+\[
+\gamma \sim \frac{2D}{a^2}.
+\]
+
+Interpretation:
+\begin{itemize}
+  \item steps become smaller ($a\to 0$),
+  \item jumps become more frequent ($\gamma\to\infty$),
+  \item their combined effect yields finite diffusion.
+\end{itemize}
+\end{frame}
+
+%=================================================
+\section{Continuity equation and Fick's law}
+
+\begin{frame}{Continuity equation form}
+Write diffusion as conservation of probability:
+\[
+\partial_t \rho + \partial_x J = 0.
+\]
+For the diffusion equation $\partial_t\rho=D\partial_x^2\rho$,
+choose
+\[
+J(x,t) = -D\,\partial_x\rho(x,t).
+\]
+Then
+\[
+\partial_t\rho + \partial_x(-D\partial_x\rho)=0
+\;\Rightarrow\;
+\partial_t\rho=D\partial_x^2\rho.
+\]
+
+\textbf{This is Fick's first law:} $J=-D\nabla\rho$ in 1D.
+\end{frame}
+
+%-------------------------------------------------
+\begin{frame}{Physical interpretation and mean-square displacement}
+For unbiased diffusion, the second moment grows linearly:
+\[
+\langle x^2(t)\rangle - \langle x(t)\rangle^2 = 2Dt.
+\]
+
+From the Markov chain viewpoint:
+after $k$ steps with step length $a$ and time step $\Delta t$,
+\[
+\mathrm{Var}(x_k)=k a^2,
+\qquad t=k\Delta t,
+\qquad D=\frac{a^2}{2\Delta t}.
+\]
+This matches $2Dt$ and provides an empirical route to estimate $D$.
+\end{frame}
+
+%=================================================
+\section{Summary}
+
+\begin{frame}{Summary}
+\begin{itemize}
+  \item A nearest-neighbor random walk is a Markov chain with transition probabilities $p,q$.
+  \item The master equation reads
+  \[
+  \frac{dP_n}{dt}=\gamma\big[pP_{n-1}+qP_{n+1}-P_n\big].
+  \]
+  \item With $P_n\approx a\rho(na,t)$ and Taylor expansion,
+  \[
+  \partial_t\rho=-v\partial_x\rho+D\partial_x^2\rho,
+  \quad
+  v=\gamma(q-p)a,
+  \quad
+  D=\frac{\gamma a^2}{2}.
+  \]
+  \item For $p=q$, one obtains the 1D diffusion equation
+  \[
+  \partial_t\rho=D\,\partial_x^2\rho,
+  \]
+  equivalent to $\partial_t\rho+\partial_x J=0$ with $J=-D\partial_x\rho$ (Fick's law).
+\end{itemize}
+\end{frame}
+
+\end{document}
