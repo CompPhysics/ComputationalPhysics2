@@ -1,0 +1,44 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+c1}{\PYGZsh{} 2\PYGZhy{}electron VMC code for 2dim quantum dot with importance sampling}
+\PYG{c+c1}{\PYGZsh{} Using gaussian rng for new positions and Metropolis\PYGZhy{} Hastings}
+\PYG{c+c1}{\PYGZsh{} No energy minimization}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{math}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{exp}\PYG{p}{,} \PYG{n}{sqrt}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{random}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{random}\PYG{p}{,} \PYG{n}{seed}\PYG{p}{,} \PYG{n}{normalvariate}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{np}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{matplotlib}\PYG{n+nn}{.}\PYG{n+nn}{pyplot}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{plt}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{mpl\PYGZus{}toolkits}\PYG{n+nn}{.}\PYG{n+nn}{mplot3d}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{Axes3D}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{matplotlib}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{cm}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{matplotlib}\PYG{n+nn}{.}\PYG{n+nn}{ticker}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{LinearLocator}\PYG{p}{,} \PYG{n}{FormatStrFormatter}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{sys}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numba}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{jit}\PYG{p}{,}\PYG{n}{njit}
+
+
+\PYG{c+c1}{\PYGZsh{} Trial wave function for the 2\PYGZhy{}electron quantum dot in two dims}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{WaveFunction}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{n}{alpha}\PYG{p}{,}\PYG{n}{beta}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{r1} \PYG{o}{=} \PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}
+    \PYG{n}{r2} \PYG{o}{=} \PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}
+    \PYG{n}{r12} \PYG{o}{=} \PYG{n}{sqrt}\PYG{p}{(}\PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{)}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{p}{)}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}
+    \PYG{n}{deno} \PYG{o}{=} \PYG{n}{r12}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{+}\PYG{n}{beta}\PYG{o}{*}\PYG{n}{r12}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{exp}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{n}{alpha}\PYG{o}{*}\PYG{p}{(}\PYG{n}{r1}\PYG{o}{+}\PYG{n}{r2}\PYG{p}{)}\PYG{o}{+}\PYG{n}{deno}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Local energy  for the 2\PYGZhy{}electron quantum dot in two dims, using analytical local energy}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{LocalEnergy}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{n}{alpha}\PYG{p}{,}\PYG{n}{beta}\PYG{p}{)}\PYG{p}{:}
+
+    \PYG{n}{r1} \PYG{o}{=} \PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}
+    \PYG{n}{r2} \PYG{o}{=} \PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}
+    \PYG{n}{r12} \PYG{o}{=} \PYG{n}{sqrt}\PYG{p}{(}\PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{)}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{p}{)}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}
+    \PYG{n}{deno} \PYG{o}{=} \PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{+}\PYG{n}{beta}\PYG{o}{*}\PYG{n}{r12}\PYG{p}{)}
+    \PYG{n}{deno2} \PYG{o}{=} \PYG{n}{deno}\PYG{o}{*}\PYG{n}{deno}
+    \PYG{k}{return} \PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{alpha}\PYG{o}{*}\PYG{n}{alpha}\PYG{p}{)}\PYG{o}{*}\PYG{p}{(}\PYG{n}{r1} \PYG{o}{+} \PYG{n}{r2}\PYG{p}{)} \PYG{o}{+}\PYG{l+m+mf}{2.0}\PYG{o}{*}\PYG{n}{alpha} \PYG{o}{+} \PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{r12}\PYG{o}{+}\PYG{n}{deno2}\PYG{o}{*}\PYG{p}{(}\PYG{n}{alpha}\PYG{o}{*}\PYG{n}{r12}\PYG{o}{\PYGZhy{}}\PYG{n}{deno2}\PYG{o}{+}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{beta}\PYG{o}{*}\PYG{n}{deno}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{r12}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Setting up the quantum force for the two\PYGZhy{}electron quantum dot, recall that it is a vector}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{QuantumForce}\PYG{p}{(}\PYG{n}{r}\PYG{p}{,}\PYG{n}{alpha}\PYG{p}{,}\PYG{n}{beta}\PYG{p}{)}\PYG{p}{:}
+
+    \PYG{n}{qforce} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{p}{(}\PYG{n}{NumberParticles}\PYG{p}{,}\PYG{n}{Dimension}\PYG{p}{)}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{double}\PYG{p}{)}
+    \PYG{n}{r12} \PYG{o}{=} \PYG{n}{sqrt}\PYG{p}{(}\PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{)}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{p}{)}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}
+    \PYG{n}{deno} \PYG{o}{=} \PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{o}{+}\PYG{n}{beta}\PYG{o}{*}\PYG{n}{r12}\PYG{p}{)}
+    \PYG{n}{qforce}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{p}{:}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{p}{:}\PYG{p}{]}\PYG{o}{*}\PYG{n}{alpha}\PYG{o}{*}\PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{p}{:}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{p}{:}\PYG{p}{]}\PYG{p}{)}\PYG{o}{*}\PYG{n}{deno}\PYG{o}{*}\PYG{n}{deno}\PYG{o}{/}\PYG{n}{r12}
+    \PYG{n}{qforce}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{p}{:}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{p}{:}\PYG{p}{]}\PYG{o}{*}\PYG{n}{alpha}\PYG{o}{*}\PYG{p}{(}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{p}{:}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{r}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{p}{:}\PYG{p}{]}\PYG{p}{)}\PYG{o}{*}\PYG{n}{deno}\PYG{o}{*}\PYG{n}{deno}\PYG{o}{/}\PYG{n}{r12}
+    \PYG{k}{return} \PYG{n}{qforce}
+
+\end{MintedVerbatim}
