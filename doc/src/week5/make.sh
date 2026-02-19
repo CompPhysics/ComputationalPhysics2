@@ -27,24 +27,6 @@ opt="--no_mako"
 rm -f *.aux
 
 
-html=${name}-reveal
-system doconce format html $name --pygments_html_style=perldoc --keep_pygments_html_bg --html_links_in_new_window --html_output=$html $opt
-system doconce slides_html $html reveal --html_slide_theme=beige
-
-# Plain HTML documents
-
-html=${name}-solarized
-system doconce format html $name --pygments_html_style=perldoc --html_style=solarized3 --html_links_in_new_window --html_output=$html $opt
-system doconce split_html $html.html --method=space10
-
-html=${name}
-system doconce format html $name --pygments_html_style=default --html_style=bloodish --html_links_in_new_window --html_output=$html $opt
-system doconce split_html $html.html --method=space10
-
-# Bootstrap style
-html=${name}-bs
-system doconce format html $name --html_style=bootstrap --pygments_html_style=default --html_admon=bootstrap_panel --html_output=$html $opt
-system doconce split_html $html.html --method=split --pagination --nav_button=bottom
 
 # IPython notebook
 system doconce format ipynb $name $opt  --no_abort
