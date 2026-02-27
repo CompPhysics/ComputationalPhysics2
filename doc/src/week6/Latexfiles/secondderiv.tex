@@ -1,0 +1,341 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{physics}
+\usepackage{bm}
+
+\title{Derivatives of the Variational Energy}
+\subtitle{Gradient and Hessian formulas used in Variational Monte Carlo}
+\author{Morten Hjorth-Jensen}
+\date{Spring 2026}
+
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\psia}{\psi_{\bm{\alpha}}}
+\newcommand{\El}{E_L}
+\newcommand{\Oa}{O_\alpha}
+\newcommand{\Ob}{O_\beta}
+\newcommand{\Oab}{O_{\alpha\beta}}
+
+\begin{document}
+
+%========================================================
+\begin{frame}
+\titlepage
+\end{frame}
+
+%========================================================
+\begin{frame}{Setup and notation}
+Let $\psia(x)$ be a (real-valued) variational wavefunction depending on parameters
+$\bm{\alpha}=(\alpha_1,\dots,\alpha_P)$ and $x$ denote many-body coordinates.
+
+\begin{block}{Variational energy (Rayleigh quotient)}
+\[
+E(\bm{\alpha})=\frac{\bra{\psia}H\ket{\psia}}{\bra{\psia}\psia\rangle}
+=
+\frac{\int dx\, \psia(x)\, [H\psia](x)}{\int dx\, \psia(x)^2}.
+\]
+\end{block}
+
+Define normalization $\mathcal{N}(\bm{\alpha}) := \int dx\, \psia(x)^2$.
+\end{frame}
+
+%========================================================
+\begin{frame}{Local energy and sampling distribution}
+\textbf{Local energy:}
+\[
+\El(x;\bm{\alpha}) := \frac{[H\psia](x)}{\psia(x)}.
+\]
+
+\textbf{Sampling distribution:}
+\[
+p_{\bm{\alpha}}(x) := \frac{\psia(x)^2}{\mathcal{N}(\bm{\alpha})},
+\qquad
+\int dx\, p_{\bm{\alpha}}(x)=1.
+\]
+
+Then
+\[
+E(\bm{\alpha})=\int dx\, p_{\bm{\alpha}}(x)\, \El(x;\bm{\alpha})
+=\avg{\El}.
+\]
+\end{frame}
+
+%========================================================
+\section{First derivative (gradient)}
+
+%========================================================
+\begin{frame}{Differentiate the Rayleigh quotient}
+Write
+\[
+E=\frac{A}{B},
+\qquad
+A=\int dx\, \psia\,H\psia,\quad B=\int dx\,\psia^2.
+\]
+Then
+\[
+\partial_\alpha E = \frac{(\partial_\alpha A)B - A(\partial_\alpha B)}{B^2}.
+\]
+
+Compute
+\[
+\partial_\alpha B = \int dx\, 2\psia\,\partial_\alpha \psia,
+\]
+and using Hermiticity of $H$,
+\[
+\partial_\alpha A
+=
+\int dx\, \Big[(\partial_\alpha \psia)(H\psia)+\psia\,H(\partial_\alpha\psia)\Big]
+=
+2\int dx\, (\partial_\alpha\psia)\,H\psia.
+\]
+\end{frame}
+
+%========================================================
+\begin{frame}{Gradient in expectation-value form}
+Insert into the quotient rule and use $A=EB$:
+\[
+\partial_\alpha E
+=
+2\left[
+\frac{\int dx\, (\partial_\alpha \psia)\,H\psia}{\int dx\,\psia^2}
+-
+E\,\frac{\int dx\, \psia\,\partial_\alpha\psia}{\int dx\,\psia^2}
+\right].
+\]
+
+Rewrite with $\El=(H\psia)/\psia$:
+\[
+\frac{\int dx\, (\partial_\alpha \psia)\,H\psia}{\int dx\,\psia^2}
+=
+\frac{\int dx\, \psia^2\left(\frac{\partial_\alpha\psia}{\psia}\right)\El}{\int dx\,\psia^2}
+=
+\avg{\left(\frac{\partial_\alpha\psia}{\psia}\right)\El}.
+\]
+
+Thus
+\[
+\boxed{
+\partial_\alpha E
+=
+2\left(
+\avg{\left(\frac{\partial_\alpha\psia}{\psia}\right)\El}
+-\avg{\frac{\partial_\alpha\psia}{\psia}}\avg{\El}
+\right).
+}
+\]
+\end{frame}
+
+%========================================================
+\begin{frame}{Log-derivative identity (important simplification)}
+A key algebraic identity is
+\[
+\boxed{\frac{\partial_\alpha \psia(x)}{\psia(x)} = \partial_\alpha \ln \psia(x).}
+\]
+
+\begin{block}{Definition (log-derivative observable)}
+\[
+\Oa(x):=\partial_\alpha \ln \psia(x).
+\]
+Then the gradient becomes the covariance form
+\[
+\boxed{
+\partial_\alpha E = 2\left(\avg{\Oa \El}-\avg{\Oa}\avg{\El}\right)
+=2\,\mathrm{Cov}(\Oa,\El).
+}
+\]
+\end{block}
+
+\smallskip
+\emph{Complex case (brief remark):} if $\psi$ is complex, define $O_\alpha=\partial_\alpha\ln\psi$ and use
+\[
+\partial_\alpha E = 2\,\Re\!\left(\avg{O_\alpha^\ast \El}-\avg{O_\alpha^\ast}\avg{\El}\right).
+\]
+\end{frame}
+
+%========================================================
+\section{Second derivative (Hessian)}
+
+%========================================================
+\begin{frame}{Key identity: derivative of an expectation value}
+Let
+\[
+\avg{A}=\int dx\, p_{\bm{\alpha}}(x)\,A(x;\bm{\alpha}),
+\qquad
+p_{\bm{\alpha}}(x)=\frac{\psia(x)^2}{\mathcal{N}}.
+\]
+
+Then for real $\psia$ one can show
+\[
+\boxed{
+\partial_\beta \avg{A}
+=
+\avg{\partial_\beta A}
++2\left(\avg{A\,\Ob}-\avg{A}\avg{\Ob}\right),
+}
+\qquad
+\Ob=\partial_\beta \ln \psia.
+\]
+
+\begin{itemize}
+\item The first term accounts for explicit $\bm{\alpha}$-dependence of $A$.
+\item The second term accounts for how the sampling distribution changes with $\bm{\alpha}$.
+\end{itemize}
+\end{frame}
+
+%========================================================
+\begin{frame}{Useful derivative: $\partial_\beta E_L$}
+Since $\El=(H\psia)/\psia$, its parameter derivative is
+\[
+\partial_\beta \El
+=
+\partial_\beta\left(\frac{H\psia}{\psia}\right)
+=
+\frac{H(\partial_\beta \psia)}{\psia}
+-\El\,\frac{\partial_\beta \psia}{\psia}.
+\]
+
+Using $\Ob=\partial_\beta\ln\psia=(\partial_\beta\psia)/\psia$:
+\[
+\boxed{
+\partial_\beta \El
+=
+\frac{H(\partial_\beta \psia)}{\psia}
+-\El\,\Ob.
+}
+\]
+
+\begin{block}{Notation}
+Also define the second log-derivative
+\[
+\boxed{
+\Oab(x):=\partial_\beta \Oa(x)=\partial_\alpha\partial_\beta \ln \psia(x).
+}
+\]
+\end{block}
+\end{frame}
+
+%========================================================
+\begin{frame}{Hessian: start from the covariance gradient}
+We have
+\[
+\partial_\alpha E = 2\left(\avg{\Oa \El}-\avg{\Oa}\avg{\El}\right).
+\]
+
+Differentiate w.r.t.\ $\beta$:
+\[
+\partial_\beta\partial_\alpha E
+=
+2\left[
+\partial_\beta \avg{\Oa \El}
+-\partial_\beta(\avg{\Oa}\avg{\El})
+\right].
+\]
+
+We now apply the expectation-derivative identity to each expectation value.
+\end{frame}
+
+%========================================================
+\begin{frame}{Explicit Hessian formula (practical VMC form)}
+Using
+\(
+\partial_\beta\avg{A}=\avg{\partial_\beta A}+2(\avg{A\Ob}-\avg{A}\avg{\Ob}),
+\)
+with $A=\Oa\El$, $A=\Oa$, and $A=\El$, we obtain:
+
+\[
+\boxed{
+\begin{aligned}
+\partial_\beta\partial_\alpha E
+=2\Big[&
+\avg{\Oab\,\El}+\avg{\Oa\,\partial_\beta \El}
+-\avg{\Oab}\avg{\El}-\avg{\Oa}\avg{\partial_\beta \El} \\
+&\quad
++2\Big(
+\avg{\Oa\,\El\,\Ob}-\avg{\Oa\,\El}\avg{\Ob}
+-\avg{\Oa\,\Ob}\avg{\El}-\avg{\Oa}\avg{\El\,\Ob}
++2\,\avg{\Oa}\avg{\Ob}\avg{\El}
+\Big)
+\Big].
+\end{aligned}
+}
+\]
+
+\begin{itemize}
+\item First line: ``explicit'' derivatives ($\Oab$ and $\partial_\beta \El$).
+\item Second line: ``distribution-derivative'' terms (a third-order cumulant-like combination).
+\end{itemize}
+\end{frame}
+
+%========================================================
+\begin{frame}{Compact cumulant interpretation (optional)}
+Define centered variables
+\[
+\delta \Oa = \Oa-\avg{\Oa},\quad
+\delta \Ob=\Ob-\avg{\Ob},\quad
+\delta \El=\El-\avg{\El}.
+\]
+
+Then the gradient is
+\[
+\partial_\alpha E = 2\,\avg{\delta\Oa\,\delta\El}.
+\]
+
+The Hessian can be viewed as
+\[
+\partial_\beta\partial_\alpha E
+=
+2\,\mathrm{Cov}(\Oab,\El)
++2\,\mathrm{Cov}(\Oa,\partial_\beta \El)
++4\,\kappa_3(\Oa,\Ob,\El),
+\]
+where $\kappa_3$ denotes the third cumulant (connected three-point function)
+\[
+\kappa_3(\Oa,\Ob,\El)=\avg{\delta\Oa\,\delta\Ob\,\delta\El}.
+\]
+
+\smallskip
+This form highlights why Hessian estimates are typically noisier than gradients in Monte Carlo.
+\end{frame}
+
+%========================================================
+\begin{frame}{Monte Carlo estimators (implementation hint)}
+Given samples $\{x^{(m)}\}_{m=1}^M \sim p_{\bm{\alpha}}$,
+compute
+\[
+\Oa^{(m)}=\partial_\alpha \ln\psia(x^{(m)}),\quad
+\Ob^{(m)}=\partial_\beta \ln\psia(x^{(m)}),\quad
+\El^{(m)}=\El(x^{(m)}),
+\]
+and, if needed,
+\[
+\Oab^{(m)}=\partial_\alpha\partial_\beta \ln\psia(x^{(m)}),\qquad
+(\partial_\beta \El)^{(m)}=\left.\partial_\beta \El\right|_{x^{(m)}}.
+\]
+
+\begin{block}{Practical remark}
+Many VMC optimizers avoid explicit Hessians (noisy) and instead use
+stochastic reconfiguration / natural-gradient methods that only require first derivatives.
+\end{block}
+\end{frame}
+
+%========================================================
+\begin{frame}{Summary}
+\begin{itemize}
+\item Define $p(x)\propto \psi(x)^2$ and $\El=(H\psi)/\psi$ so $E=\avg{\El}$.
+\item Log-derivative identity:
+\[
+\frac{\partial_\alpha\psi}{\psi}=\partial_\alpha\ln\psi.
+\]
+\item Gradient:
+\[
+\partial_\alpha E = 2\left(\avg{\Oa\El}-\avg{\Oa}\avg{\El}\right)=2\,\mathrm{Cov}(\Oa,\El).
+\]
+\item Hessian: obtained by differentiating the covariance and accounting for changes in $p(x)$,
+yielding an explicit VMC-ready expression involving $\Oab$ and $\partial_\beta \El$.
+\end{itemize}
+\end{frame}
+
+\end{document}
