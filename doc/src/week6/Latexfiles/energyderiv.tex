@@ -1,0 +1,284 @@
+% !TEX program = pdflatex
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{physics}
+\usepackage{bm}
+
+\title{Derivative of the Variational Energy}
+\subtitle{Deriving the Monte Carlo Gradient Formula}
+\author{Morten Hjorth-Jensen}
+\date{Spring 2026}
+
+\newcommand{\avg}[1]{\left\langle #1 \right\rangle}
+\newcommand{\psia}{\psi_{\bm{\alpha}}}
+\newcommand{\dalpha}{\partial_{\alpha}}
+\newcommand{\El}{E_L}
+
+\begin{document}
+
+%========================================================
+\begin{frame}
+\titlepage
+\end{frame}
+
+%========================================================
+\begin{frame}{Setup and notation}
+Let $\psia(x)$ be a (real-valued) variational wavefunction depending on parameters
+$\bm{\alpha}=(\alpha_1,\dots,\alpha_P)$ and $x$ denote the many-body coordinates (continuous or discrete).
+
+\begin{block}{Variational energy}
+\[
+E(\bm{\alpha})=\frac{\bra{\psia}H\ket{\psia}}{\bra{\psia}\psia\rangle}
+=
+\frac{\int dx\, \psia(x)\, [H\psia](x)}{\int dx\, |\psia(x)|^2}.
+\]
+\end{block}
+
+Define the normalization:
+\[
+\mathcal{N}(\bm{\alpha}) := \int dx\, |\psia(x)|^2.
+\]
+\end{frame}
+
+%========================================================
+\begin{frame}{Local energy and sampling distribution}
+Introduce the \textbf{local energy}
+\[
+\El(x;\bm{\alpha}) := \frac{[H\psia](x)}{\psia(x)}.
+\]
+
+Define the normalized probability density
+\[
+p_{\bm{\alpha}}(x) := \frac{|\psia(x)|^2}{\mathcal{N}(\bm{\alpha})},
+\qquad
+\int dx\, p_{\bm{\alpha}}(x)=1.
+\]
+
+Then the energy can be written as an expectation value:
+\[
+E(\bm{\alpha}) = \int dx\, p_{\bm{\alpha}}(x)\, \El(x;\bm{\alpha})
+= \avg{\El}.
+\]
+
+\begin{block}{Monte Carlo viewpoint}
+We estimate $E(\bm{\alpha})$ by sampling $x\sim p_{\bm{\alpha}}$ and averaging $\El(x)$.
+\end{block}
+\end{frame}
+
+%========================================================
+\section{Derivative of the energy}
+
+%========================================================
+\begin{frame}{Differentiate $E(\bm{\alpha})$ in quotient form}
+Start from
+\[
+E(\bm{\alpha})=\frac{\int dx\, \psia(x)\, [H\psia](x)}{\int dx\, \psia(x)^2}
+\]
+(assume $\psia$ real; complex case is similar with conjugation).
+
+Let
+\[
+A(\bm{\alpha}) := \int dx\, \psia\, H\psia,
+\qquad
+B(\bm{\alpha}) := \int dx\, \psia^2.
+\]
+Then $E=A/B$ and
+\[
+\dalpha E = \frac{(\dalpha A)B - A(\dalpha B)}{B^2}.
+\]
+\end{frame}
+
+%========================================================
+\begin{frame}{Compute $\partial_\alpha A$ and $\partial_\alpha B$}
+Compute
+\[
+\dalpha B = \dalpha \int dx\, \psia^2
+= \int dx\, 2\psia\, (\dalpha \psia).
+\]
+
+For $A$:
+\[
+\dalpha A
+= \dalpha \int dx\, \psia\, (H\psia)
+= \int dx\, \Big[(\dalpha \psia)(H\psia) + \psia\, H(\dalpha \psia)\Big].
+\]
+
+\begin{block}{Use Hermiticity of $H$}
+Assuming suitable boundary conditions, $H$ is Hermitian:
+\[
+\int dx\, \psia\, H(\dalpha \psia) = \int dx\, (\dalpha \psia)\, H\psia.
+\]
+Thus
+\[
+\dalpha A = 2\int dx\, (\dalpha \psia)\, H\psia.
+\]
+\end{block}
+\end{frame}
+
+%========================================================
+\begin{frame}{Insert into quotient rule}
+Insert $\dalpha A$ and $\dalpha B$ into
+\[
+\dalpha E = \frac{(\dalpha A)B - A(\dalpha B)}{B^2}.
+\]
+
+Using $A = EB$:
+\[
+\dalpha E
+= \frac{2\left(\int dx\, (\dalpha \psia)\, H\psia\right)B
+- (EB)\left(\int dx\, 2\psia\, \dalpha\psia\right)}{B^2}.
+\]
+
+Cancel $B$:
+\[
+\dalpha E
+= 2\left[
+\frac{\int dx\, (\dalpha \psia)\, H\psia}{\int dx\, \psia^2}
+- E\,\frac{\int dx\, \psia\, \dalpha\psia}{\int dx\, \psia^2}
+\right].
+\]
+\end{frame}
+
+%========================================================
+\begin{frame}{Rewrite using $p_{\alpha}(x)$ and local energy}
+Divide and multiply by $\psia$:
+\[
+\frac{\int dx\, (\dalpha \psia)\, H\psia}{\int dx\, \psia^2}
+=
+\frac{\int dx\, \psia^2 \left(\frac{\dalpha \psia}{\psia}\right)
+\left(\frac{H\psia}{\psia}\right)}{\int dx\, \psia^2}.
+\]
+
+Recognize:
+\[
+\frac{H\psia}{\psia}=\El,
+\qquad
+\frac{\dalpha\psia}{\psia} = \dalpha \ln \psia.
+\]
+
+Thus:
+\[
+\dalpha E
+= 2\left[
+\avg{\left(\frac{\dalpha\psia}{\psia}\right)\El}
+- E\,\avg{\frac{\dalpha\psia}{\psia}}
+\right],
+\qquad E=\avg{\El}.
+\]
+\end{frame}
+
+%========================================================
+\begin{frame}{Final covariance form}
+Since $E=\avg{\El}$,
+\[
+\dalpha E
+=
+2\left(
+\avg{\left(\frac{\dalpha\psia}{\psia}\right)\El}
+-\avg{\frac{\dalpha\psia}{\psia}}\avg{\El}
+\right).
+\]
+
+\begin{block}{Compact form (covariance)}
+Define the ``log-derivative observable''
+\[
+O_\alpha(x):=\frac{\dalpha\psia(x)}{\psia(x)}=\dalpha \ln \psia(x),
+\]
+then
+\[
+\boxed{
+\dalpha E = 2\,\mathrm{Cov}\!\left(O_\alpha,\El\right)
+=2\left(\avg{O_\alpha \El}-\avg{O_\alpha}\avg{\El}\right).
+}
+\]
+\end{block}
+\end{frame}
+
+%========================================================
+\section{Interpretation and the ``three integrals''}
+
+%========================================================
+\begin{frame}{The three expectation values / integrals}
+Written explicitly in terms of $p_{\bm{\alpha}}(x)$, the gradient contains:
+
+\[
+\avg{O_\alpha \El}=\int dx\, p_{\bm{\alpha}}(x)\,
+\left(\frac{\dalpha\psia(x)}{\psia(x)}\right)\El(x),
+\]
+
+\[
+\avg{O_\alpha}=\int dx\, p_{\bm{\alpha}}(x)\,
+\left(\frac{\dalpha\psia(x)}{\psia(x)}\right),
+\]
+
+\[
+\avg{\El}=\int dx\, p_{\bm{\alpha}}(x)\,\El(x).
+\]
+
+\begin{block}{Why this is useful}
+Each integral is an expectation value with respect to the \emph{same} sampling distribution
+$p_{\bm{\alpha}}(x)\propto \psia(x)^2$, so all three are estimated from the \emph{same} Monte Carlo run.
+\end{block}
+\end{frame}
+
+%========================================================
+\begin{frame}{Practical Monte Carlo estimator}
+Given samples $\{x^{(m)}\}_{m=1}^M \sim p_{\bm{\alpha}}$, define
+\[
+O_\alpha^{(m)} := \left.\frac{\dalpha\psia}{\psia}\right|_{x^{(m)}},
+\qquad
+\El^{(m)} := \El(x^{(m)}).
+\]
+
+Then the unbiased (up to sampling error) estimator is
+\[
+\widehat{\dalpha E}
+=
+2\left(
+\frac{1}{M}\sum_{m=1}^M O_\alpha^{(m)}\El^{(m)}
+-\left(\frac{1}{M}\sum_{m=1}^M O_\alpha^{(m)}\right)
+\left(\frac{1}{M}\sum_{m=1}^M \El^{(m)}\right)
+\right).
+\]
+
+\begin{block}{Interpretation}
+The gradient is proportional to the covariance between the log-derivative of the wavefunction
+and the local energy.
+\end{block}
+\end{frame}
+
+%========================================================
+\begin{frame}{Remarks and extensions}
+\begin{itemize}
+\item If $\psia$ is complex, replace $\psia^2$ by $|\psia|^2$ and
+\[
+O_\alpha \equiv \partial_\alpha \ln \psia \quad \text{is generally complex.}
+\]
+The physically relevant gradient involves the \emph{real part}:
+\[
+\partial_\alpha E = 2\,\Re\left(\avg{O_\alpha^\ast \El}-\avg{O_\alpha^\ast}\avg{\El}\right).
+\]
+\item The same derivation applies to excited-state functionals and generalized cost functions.
+\item This identity underlies stochastic reconfiguration / natural gradient methods in VMC.
+\end{itemize}
+\end{frame}
+
+%========================================================
+\begin{frame}{Summary}
+\begin{itemize}
+\item Start from the Rayleigh quotient $E=\langle \psi|H|\psi\rangle/\langle\psi|\psi\rangle$.
+\item Differentiate using quotient rule and Hermiticity of $H$.
+\item Introduce $p(x)\propto |\psi(x)|^2$ and the local energy $\El=(H\psi)/\psi$.
+\item Obtain the VMC gradient:
+\[
+\partial_\alpha E =
+2\left(\avg{O_\alpha \El}-\avg{O_\alpha}\avg{\El}\right).
+\]
+\end{itemize}
+\end{frame}
+
+\end{document}
