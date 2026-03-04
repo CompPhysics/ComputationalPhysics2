@@ -1,0 +1,524 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+\usepackage{physics}
+\usepackage{graphicx}
+
+\title{Stochastic Reconfiguration in Quantum Monte Carlo}
+\subtitle{Variational Optimization, TDVP and Natural Gradients}
+\author{Morten Hjorth-Jensen}
+\date{Spring 2026}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%------------------------------------------------
+\section{Introduction}
+
+\begin{frame}{Quantum Many-Body Problem}
+
+Goal: Solve the Schrödinger equation
+
+\[
+H|\Psi_0\rangle = E_0 |\Psi_0\rangle
+\]
+
+for interacting many-body systems.
+
+Examples:
+
+\begin{itemize}
+\item Hubbard model
+\item Heisenberg spin model
+\item Nuclear many-body systems
+\item Quantum chemistry
+\end{itemize}
+
+Exact diagonalization scales exponentially.
+
+Need stochastic methods.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Quantum Monte Carlo}
+
+Quantum Monte Carlo methods include
+
+\begin{itemize}
+\item Variational Monte Carlo (VMC)
+\item Diffusion Monte Carlo
+\item Auxiliary-field Monte Carlo
+\end{itemize}
+
+VMC strategy:
+
+\begin{enumerate}
+\item Choose parameterized wavefunction
+\item Evaluate expectation values stochastically
+\item Optimize parameters
+\end{enumerate}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Variational Principle}
+
+For any trial state
+
+\[
+|\Psi(\bm{\alpha})\rangle
+\]
+
+energy is
+
+\[
+E(\bm{\alpha}) =
+\frac{\langle \Psi|H|\Psi\rangle}
+{\langle \Psi|\Psi\rangle}
+\]
+
+Variational bound:
+
+\[
+E(\bm{\alpha}) \ge E_0
+\]
+
+Optimization problem:
+
+\[
+\min_{\bm{\alpha}} E(\bm{\alpha})
+\]
+\end{frame}
+
+%------------------------------------------------
+\section{Variational Monte Carlo}
+
+\begin{frame}{Local Energy}
+
+Define local energy
+
+\[
+E_L(x) =
+\frac{H\Psi(x)}{\Psi(x)}
+\]
+
+Expectation value
+
+\[
+E = \frac{\int dx |\Psi(x)|^2 E_L(x)}
+{\int dx |\Psi(x)|^2}
+\]
+
+Monte Carlo sampling distribution
+
+\[
+P(x) = \frac{|\Psi(x)|^2}{\langle\Psi|\Psi\rangle}
+\]
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Metropolis Sampling}
+
+Generate samples
+
+\[
+x_1,x_2,\dots,x_M
+\]
+
+using Metropolis algorithm.
+
+Estimate expectation value
+
+\[
+E \approx
+\frac{1}{M}\sum_{m=1}^{M} E_L(x_m)
+\]
+
+Statistical error
+
+\[
+\sigma_E \sim \frac{\sqrt{\text{Var}(E_L)}}{\sqrt{M}}
+\]
+\end{frame}
+
+%------------------------------------------------
+\section{Optimization Problem}
+
+\begin{frame}{Energy Gradient}
+
+Define logarithmic derivatives
+
+\[
+O_k(x)=
+\frac{\partial \ln \Psi(x)}{\partial \alpha_k}
+\]
+
+Energy gradient
+
+\[
+\frac{\partial E}{\partial \alpha_k}
+=
+2(\langle O_k E_L\rangle
+-
+\langle O_k\rangle\langle E_L\rangle)
+\]
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Gradient Descent}
+
+Standard update
+
+\[
+\alpha_k^{(n+1)}
+=
+\alpha_k^{(n)} - \eta
+\frac{\partial E}{\partial \alpha_k}
+\]
+
+Problems:
+
+\begin{itemize}
+\item Parameter correlations
+\item Ill-conditioned landscape
+\item Large statistical noise
+\end{itemize}
+
+Better optimization required.
+\end{frame}
+
+%------------------------------------------------
+\section{Imaginary-Time Projection}
+
+\begin{frame}{Imaginary-Time Evolution}
+
+Ground state projection
+
+\[
+|\Psi(\tau)\rangle =
+e^{-\tau H} |\Psi(0)\rangle
+\]
+
+For small step
+
+\[
+|\Psi(\tau+\delta\tau)\rangle
+=
+(1-\delta\tau H)|\Psi(\tau)\rangle
+\]
+
+Idea:
+
+project evolution onto variational manifold.
+\end{frame}
+
+%------------------------------------------------
+\section{Time Dependent Variational Principle}
+
+\begin{frame}{TDVP}
+
+TDVP minimizes distance between
+
+\[
+\partial_\tau |\Psi\rangle
+\]
+
+and
+
+\[
+-H|\Psi\rangle
+\]
+
+within variational manifold.
+
+Resulting equation
+
+\[
+\sum_j S_{ij} \dot{\alpha}_j = -g_i
+\]
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Covariance Matrix}
+
+Define
+
+\[
+S_{ij}
+=
+\langle O_i O_j\rangle
+-
+\langle O_i\rangle\langle O_j\rangle
+\]
+
+and
+
+\[
+g_i =
+\langle O_i E_L\rangle
+-
+\langle O_i\rangle\langle E_L\rangle
+\]
+
+Update rule
+
+\[
+\delta\alpha = -\delta\tau S^{-1} g
+\]
+\end{frame}
+
+%------------------------------------------------
+\section{Stochastic Reconfiguration}
+
+\begin{frame}{SR Method}
+
+Stochastic Reconfiguration equation
+
+\[
+\sum_j S_{ij}\delta\alpha_j = -\delta\tau g_i
+\]
+
+Interpretation:
+
+\begin{itemize}
+\item Imaginary-time evolution
+\item Natural gradient descent
+\item TDVP projection
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Geometric Interpretation}
+
+Wavefunctions form a manifold.
+
+Metric:
+
+\[
+ds^2 =
+\sum_{ij} S_{ij} d\alpha_i d\alpha_j
+\]
+
+This is the
+
+\textbf{quantum Fisher information metric}.
+\end{frame}
+
+%------------------------------------------------
+\section{Quantum Information Geometry}
+
+\begin{frame}{Quantum Fisher Information}
+
+For normalized wavefunction
+
+\[
+|\psi(\bm{\alpha})\rangle
+\]
+
+Fisher matrix
+
+\[
+F_{ij} =
+4(\langle O_i O_j\rangle
+-
+\langle O_i\rangle\langle O_j\rangle)
+\]
+
+Thus
+
+\[
+S_{ij} = F_{ij}/4
+\]
+
+SR corresponds to natural gradient.
+\end{frame}
+
+%------------------------------------------------
+\section{Regularization}
+
+\begin{frame}{Ill Conditioning}
+
+Matrix \(S\) may become singular.
+
+Regularization:
+
+\[
+S_{ij} \rightarrow S_{ij} + \lambda \delta_{ij}
+\]
+
+Typical
+
+\[
+\lambda \sim 10^{-3}
+\]
+\end{frame}
+
+%------------------------------------------------
+\section{Algorithm}
+
+\begin{frame}{SR Algorithm}
+
+\begin{enumerate}
+\item Sample configurations
+\item Compute \(O_k(x)\)
+\item Compute local energies
+\item Estimate \(S\) and \(g\)
+\item Solve linear system
+\item Update parameters
+\end{enumerate}
+\end{frame}
+
+%------------------------------------------------
+\section{Python Implementation}
+
+\begin{frame}[fragile]{Example: Variational Monte Carlo}
+
+\begin{verbatim}
+import numpy as np
+
+def local_energy(x, psi, Hpsi):
+    return Hpsi(x)/psi(x)
+
+def O_k(x, psi, dpsi):
+    return dpsi(x)/psi(x)
+\end{verbatim}
+
+This structure is used in VMC codes.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}[fragile]{SR Linear System}
+
+\begin{verbatim}
+S = np.zeros((p,p))
+g = np.zeros(p)
+
+for x in samples:
+
+    O = compute_log_derivatives(x)
+
+    EL = local_energy(x)
+
+    S += np.outer(O,O)
+
+    g += O*EL
+
+S /= M
+g /= M
+
+delta = np.linalg.solve(S + lam*np.eye(p), -g)
+\end{verbatim}
+
+Parameter update
+
+\begin{verbatim}
+alpha += dt*delta
+\end{verbatim}
+\end{frame}
+
+%------------------------------------------------
+\section{Example Systems}
+
+\begin{frame}{Heisenberg Model}
+
+Hamiltonian
+
+\[
+H = J\sum_{\langle ij\rangle}
+\mathbf{S}_i\cdot\mathbf{S}_j
+\]
+
+Typical variational states
+
+\begin{itemize}
+\item Jastrow wavefunctions
+\item Neural network states
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Hubbard Model}
+
+Hamiltonian
+
+\[
+H =
+-t\sum_{\langle ij\rangle\sigma}
+c^\dagger_{i\sigma}c_{j\sigma}
++
+U\sum_i n_{i\uparrow}n_{i\downarrow}
+\]
+
+Applications
+
+\begin{itemize}
+\item strongly correlated electrons
+\item high-Tc superconductivity
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\section{Neural Quantum States}
+
+\begin{frame}{Neural Network Wavefunctions}
+
+Example RBM wavefunction
+
+\[
+\Psi(\sigma)
+=
+\exp(\sum_i a_i\sigma_i)
+\prod_j 2\cosh(b_j + W_{ij}\sigma_i)
+\]
+
+SR used to train network parameters.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Modern Applications}
+
+\begin{itemize}
+\item Neural quantum states
+\item Tensor network variational states
+\item Quantum chemistry wavefunctions
+\item Nuclear many-body systems
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Summary}
+
+\begin{itemize}
+\item Stochastic reconfiguration derived from TDVP
+\item Equivalent to natural gradient
+\item Robust optimization for VMC
+\item Essential in modern neural quantum states
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{References}
+
+\begin{itemize}
+
+\item S. Sorella, Phys. Rev. B 71 (2005)
+
+\item F. Becca and S. Sorella  
+Quantum Monte Carlo Approaches for Correlated Systems
+
+\item G. Carleo and M. Troyer, Science (2017)
+
+\end{itemize}
+
+\end{frame}
+
+\end{document}
+To add
+	•	full derivation of TDVP from Dirac–Frenkel principle
+	•	SR vs linear method optimization
+	•	complete VMC + SR code for the Heisenberg model
+	•	example training of a neural quantum state
+	•	connection to quantum natural gradient in quantum computing
