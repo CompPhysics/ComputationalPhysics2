@@ -1,95 +1,770 @@
-\documentclass[12pt]{article}
-\usepackage{amsmath,amsfonts,amssymb}
+% !TEX program = pdflatex
+\documentclass[aspectratio=169]{beamer}
 
-\title{The Broyden-Fletcher-Goldfarb-Shanno (BFGS) Algorithm}
-\author{}
-\date{}
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{physics}
+\usepackage{bm}
+\usepackage{booktabs}
+
+\title{Quasi-Newton Methods for Nonlinear Equations and Optimization}
+\subtitle{Deriving Broyden's Algorithm and the BFGS Update}
+\author{Morten Hjorth-Jensen}
+\date{Sring 2026}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\ip}[2]{\left\langle #1,#2\right\rangle}
 
 \begin{document}
 
-\maketitle
+%========================================================
+\begin{frame}
+\titlepage
+\end{frame}
 
-\section{Introduction}
+%========================================================
+\section{Newton and the Quasi-Newton Idea}
 
-The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is an iterative method for solving unconstrained nonlinear optimization problems. It belongs to the family of quasi-Newton methods, which aim to approximate the inverse Hessian matrix used in Newton's method for optimization. BFGS is widely used due to its efficiency and the fact that it does not require the computation of second derivatives.
-
-Given an objective function \( f(\mathbf{x}) \), the goal is to minimize \( f(\mathbf{x}) \) with respect to the vector \( \mathbf{x} \). The BFGS method iteratively updates an estimate of the inverse Hessian matrix and a search direction to find the minimum of \( f(\mathbf{x}) \).
-
-\section{Optimization Problem}
-
-We are given the following unconstrained optimization problem:
-
+%--------------------------------------------------------
+\begin{frame}{Newton's method for $F(x)=0$}
+Given iterate $x_k$, linearize:
 \[
-\mathbf{x}^* = \arg \min_{\mathbf{x}} f(\mathbf{x})
+F(x_k+s)\approx F(x_k)+J_k s,\qquad J_k = \nabla F(x_k)\in\R^{n\times n}.
 \]
-
-where \( f: \mathbb{R}^n \to \mathbb{R} \) is a differentiable objective function, and \( \mathbf{x} \in \mathbb{R}^n \) is the vector of decision variables.
-
-The first-order necessary conditions for optimality are given by:
-
+Newton step solves
 \[
-\nabla f(\mathbf{x}^*) = 0
+J_k s_k = -F(x_k),\qquad x_{k+1}=x_k+s_k.
 \]
+\begin{block}{Why quasi-Newton?}
+Computing and factorizing $J_k$ (or the Hessian in optimization) can be expensive.
+Quasi-Newton methods build \emph{approximations} $B_k\approx J_k$ or $H_k\approx J_k^{-1}$ from secant information.
+\end{block}
+\end{frame}
 
-where \( \nabla f(\mathbf{x}) \) denotes the gradient of \( f(\mathbf{x}) \).
-
-\section{BFGS Algorithm Overview}
-
-The BFGS method is an iterative procedure that approximates the inverse Hessian matrix \( H_k \) at each iteration. The update of the current solution \( \mathbf{x}_k \) involves computing a search direction and step length. The general steps of the BFGS algorithm are as follows:
-
-\begin{enumerate}
-   \item Initialize \( \mathbf{x}_0 \) and choose an initial guess for the inverse Hessian approximation \( H_0 \), typically \( H_0 = I \) (the identity matrix).
-   \item For each iteration \( k \), do the following:
-   \begin{enumerate}
-       \item Compute the gradient at the current point: \( \nabla f(\mathbf{x}_k) \).
-       \item Compute the search direction:
-       \[
-       \mathbf{p}_k = -H_k \nabla f(\mathbf{x}_k)
-       \]
-       \item Perform a line search to find an appropriate step size \( \alpha_k \), which minimizes \( f(\mathbf{x}_k + \alpha_k \mathbf{p}_k) \).
-       \item Update the current point:
-       \[
-       \mathbf{x}_{k+1} = \mathbf{x}_k + \alpha_k \mathbf{p}_k
-       \]
-       \item Compute the new gradient \( \nabla f(\mathbf{x}_{k+1}) \).
-       \item Update the inverse Hessian approximation using the following formula:
-       \[
-       s_k = \mathbf{x}_{k+1} - \mathbf{x}_k, \quad y_k = \nabla f(\mathbf{x}_{k+1}) - \nabla f(\mathbf{x}_k)
-       \]
-       \[
-       H_{k+1} = H_k + \frac{s_k s_k^T}{s_k^T y_k} - \frac{H_k y_k y_k^T H_k}{y_k^T H_k y_k}
-       \]
-   \end{enumerate}
-   \item Repeat the process until convergence, i.e., \( \|\nabla f(\mathbf{x}_k)\| \) is sufficiently small.
-\end{enumerate}
-
-\section{Convergence and Termination Criteria}
-
-The BFGS algorithm is guaranteed to converge to a local minimum under certain conditions, such as the objective function being smooth and convex. The algorithm terminates when the gradient \( \nabla f(\mathbf{x}_k) \) is sufficiently close to zero, or when a maximum number of iterations is reached.
-
-A typical convergence criterion is:
-
+%--------------------------------------------------------
+\begin{frame}{Secant condition (multi-dimensional)}
+Define step and residual differences:
 \[
-\|\nabla f(\mathbf{x}_k)\| \leq \epsilon
+s_k = x_{k+1}-x_k,\qquad y_k = F(x_{k+1})-F(x_k).
 \]
+For the true Jacobian,
+\[
+y_k \approx J(x_k)\, s_k.
+\]
+Quasi-Newton methods enforce the \textbf{secant equation}
+\[
+\boxed{B_{k+1}s_k = y_k}
+\]
+with $B_{k+1}$ ``close'' to $B_k$ in a chosen sense.
+\end{frame}
 
-where \( \epsilon \) is a small tolerance value.
+%========================================================
+\section{Derivation of Broyden's Algorithm}
 
-\section{Properties of BFGS}
+%--------------------------------------------------------
+\begin{frame}{Broyden's method: problem statement}
+Goal: update $B_k\approx J_k$ (or $H_k\approx J_k^{-1}$) using \textbf{one} new secant equation,
+avoiding full Jacobian evaluations.
 
-The BFGS algorithm has several key properties that make it widely used:
+We will derive the \textbf{good Broyden} update:
+\[
+\boxed{
+B_{k+1} = B_k + \frac{(y_k - B_k s_k)s_k^\top}{s_k^\top s_k}
+}
+\]
+and its inverse form.
 
+\medskip
+(This is the minimum-change update in Frobenius norm satisfying the secant equation.)
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Derivation: minimum-change Jacobian update}
+We want $B_{k+1}$ such that:
+\[
+B_{k+1}s_k=y_k
+\]
+and $B_{k+1}$ is as close as possible to $B_k$.
+
+Let $\Delta B = B_{k+1}-B_k$.
+Optimization problem:
+\[
+\min_{\Delta B}\ \|\Delta B\|_F^2
+\quad\text{s.t.}\quad
+(B_k+\Delta B)s_k=y_k.
+\]
+Constraint becomes:
+\[
+\Delta B\, s_k = r_k,\qquad r_k := y_k - B_k s_k.
+\]
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Solve the constrained problem}
+We minimize $\|\Delta B\|_F^2=\mathrm{Tr}(\Delta B^\top \Delta B)$ subject to $\Delta B s_k=r_k$.
+
+Use Lagrangian with multiplier $\lambda\in\R^n$:
+\[
+\mathcal{L}(\Delta B,\lambda)=\mathrm{Tr}(\Delta B^\top \Delta B) + 2\,\lambda^\top(\Delta B s_k-r_k).
+\]
+Stationarity w.r.t. $\Delta B$:
+\[
+\frac{\partial \mathcal{L}}{\partial \Delta B}=2\Delta B + 2\lambda s_k^\top =0
+\quad\Rightarrow\quad
+\Delta B = -\lambda s_k^\top.
+\]
+Impose constraint:
+\[
+\Delta B s_k = -\lambda (s_k^\top s_k)=r_k
+\quad\Rightarrow\quad
+\lambda = -\frac{r_k}{s_k^\top s_k}.
+\]
+Thus
+\[
+\boxed{
+\Delta B = \frac{r_k s_k^\top}{s_k^\top s_k}
+}
+\]
+and therefore
+\[
+\boxed{
+B_{k+1}=B_k+\frac{(y_k-B_k s_k)s_k^\top}{s_k^\top s_k}.
+}
+\]
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Rank-one structure and interpretation}
+\[
+B_{k+1} = B_k + \frac{(y_k - B_k s_k)s_k^\top}{s_k^\top s_k}.
+\]
 \begin{itemize}
-   \item \textbf{No need for second derivatives:} The BFGS method approximates the Hessian matrix and avoids the direct computation of second derivatives.
-   \item \textbf{Superlinear convergence:} The BFGS method typically converges faster than gradient descent methods, especially near the optimum.
-   \item \textbf{Memory efficiency:} The BFGS algorithm maintains a low-rank approximation of the inverse Hessian, making it computationally efficient.
-   \item \textbf{Positive definiteness:} If the initial Hessian approximation is positive definite, the BFGS update preserves this property.
+\item Update is \textbf{rank-one} (outer product).
+\item Corrects $B_k$ only along direction $s_k$ to satisfy secant equation.
+\item Minimum change in Frobenius norm: most conservative correction consistent with new data.
 \end{itemize}
 
-\section{Conclusion}
+\begin{block}{Practical note}
+If $s_k^\top s_k$ is tiny, the step is unreliable; damping/regularization or restarting is used.
+\end{block}
+\end{frame}
 
-The Broyden-Fletcher-Goldfarb-Shanno (BFGS) algorithm is an effective and widely used method for solving unconstrained optimization problems. By iteratively approximating the inverse Hessian matrix, BFGS achieves efficient convergence without requiring the explicit computation of second derivatives. Its performance is highly dependent on the choice of the initial guess and the line search strategy.
+%--------------------------------------------------------
+\begin{frame}{Broyden step computation}
+Given $B_k$, we compute a quasi-Newton step by solving:
+\[
+B_k\, p_k = -F(x_k),
+\qquad x_{k+1}=x_k+p_k.
+\]
+\begin{itemize}
+\item If solving linear systems is costly, update an inverse approximation $H_k\approx B_k^{-1}$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Inverse (good) Broyden update}
+Enforce inverse secant:
+\[
+H_{k+1} y_k = s_k,
+\]
+and apply a minimum-change update in Frobenius norm:
+\[
+\min_{\Delta H}\ \|\Delta H\|_F^2\quad \text{s.t.}\quad (H_k+\Delta H)y_k=s_k.
+\]
+Let $q_k := s_k - H_k y_k$. Then $\Delta H y_k=q_k$.
+As before, solution is rank-one:
+\[
+\boxed{
+H_{k+1}=H_k + \frac{(s_k - H_k y_k)\, y_k^\top}{y_k^\top y_k}.
+}
+\]
+\end{frame}
+
+
+%--------------------------------------------------------
+\begin{frame}{Inverse (good) Broyden update}
+
+\begin{block}{Algorithmic use}
+Step is $p_k=-H_k F(x_k)$ (matrix-vector product only).
+\end{block}
+\end{frame}
+
+
+
+
+%--------------------------------------------------------
+\begin{frame}{Good vs bad Broyden (brief remark)}
+There is another rank-one update (``bad Broyden'') that minimizes a different measure
+(e.g. the change in the inverse, or weighted norms). In practice:
+\begin{itemize}
+\item ``Good'' Broyden is often preferred for robustness in Jacobian updates.
+\item Powell damping and trust-region strategies can stabilize both variants.
+\end{itemize}
+\end{frame}
+
+%========================================================
+\section{From Broyden to Quasi-Newton Optimization}
+
+%--------------------------------------------------------
+\begin{frame}{Optimization: Newton and quasi-Newton}
+For minimizing $f(x)$:
+\[
+\nabla f(x^\star)=0.
+\]
+Newton step:
+\[
+\nabla^2 f(x_k) p_k = -\nabla f(x_k).
+\]
+Quasi-Newton methods build $B_k\approx \nabla^2 f(x_k)$ or $H_k\approx (\nabla^2 f(x_k))^{-1}$.
+
+Define:
+\[
+s_k = x_{k+1}-x_k,\qquad y_k = \nabla f(x_{k+1})-\nabla f(x_k).
+\]
+Secant condition (for Hessian approximation):
+\[
+\boxed{B_{k+1}s_k = y_k.}
+\]
+\end{frame}
+
+%========================================================
+\section{Derivation of BFGS}
+
+%--------------------------------------------------------
+\begin{frame}{Why BFGS?}
+In optimization we want:
+\begin{itemize}
+\item symmetry: $B_{k+1}=B_{k+1}^\top$ (Hessian is symmetric),
+\item positive definiteness: $B_{k+1}\succ 0$ to guarantee descent directions,
+\item secant condition: $B_{k+1}s_k=y_k$.
+\end{itemize}
+
+BFGS is the most widely used quasi-Newton update satisfying these properties under mild conditions.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Curvature condition}
+Assume
+\[
+\boxed{s_k^\top y_k>0}
+\]
+(curvature condition). It holds automatically if:
+\begin{itemize}
+\item $f$ is strongly convex in a neighborhood and $x_{k+1}$ is obtained by an appropriate line search,
+\item in practice, Wolfe conditions enforce it.
+\end{itemize}
+
+This condition ensures that BFGS preserves positive definiteness.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Derivation strategy for BFGS}
+We want an update $B_{k+1}=B_k+\Delta B$ that:
+\begin{enumerate}
+\item is symmetric,
+\item satisfies secant: $(B_k+\Delta B)s=y$,
+\item is ``closest'' to $B_k$ in a suitable metric.
+\end{enumerate}
+
+A standard derivation constructs the inverse-Hessian update first (simpler),
+then inverts it to get $B_{k+1}$.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{BFGS inverse update: statement}
+Let $H_k\approx (\nabla^2 f(x_k))^{-1}$ symmetric positive definite.
+Define $\rho_k := 1/(y_k^\top s_k)$.
+Then BFGS inverse update is:
+\[
+\boxed{
+H_{k+1} =
+\left(I-\rho_k s_k y_k^\top\right)H_k\left(I-\rho_k y_k s_k^\top\right)
++\rho_k s_k s_k^\top.
+}
+\]
+\begin{itemize}
+\item $H_{k+1}$ is symmetric.
+\item If $H_k\succ 0$ and $y_k^\top s_k>0$, then $H_{k+1}\succ 0$.
+\item It satisfies the inverse secant equation $H_{k+1}y_k=s_k$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Proof: inverse secant property}
+We show $H_{k+1}y=s$ (drop $k$ subscripts).
+Let $\rho=1/(y^\top s)$ and define $V=I-\rho s y^\top$.
+Then
+\[
+H_{+} = V H V^\top + \rho s s^\top.
+\]
+Compute $H_{+}y$:
+\[
+H_{+}y = V H V^\top y + \rho s(s^\top y).
+\]
+Since $V^\top y = (I-\rho y s^\top)y = y-\rho y(s^\top y)=y-y=0$,
+we get $VHV^\top y=0$. Also $\rho s(s^\top y)=\rho s(y^\top s)=s$.
+Thus $H_{+}y=s$.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Proof: symmetry and positive definiteness}
+Symmetry is immediate from
+\[
+H_{+}=VHV^\top+\rho ss^\top
+\]
+since both terms are symmetric if $H$ is symmetric.
+
+For positive definiteness, for any nonzero $z$:
+\[
+z^\top H_{+} z = (V^\top z)^\top H (V^\top z) + \rho (s^\top z)^2.
+\]
+If $H\succ 0$ and $\rho>0$ (i.e.\ $y^\top s>0$), then both terms are $\ge 0$ and not both zero
+unless $z=0$. Hence $H_{+}\succ 0$.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{BFGS Hessian update (direct form)}
+Inverting the inverse update yields the standard BFGS update for $B_k\approx \nabla^2 f(x_k)$:
+\[
+\boxed{
+B_{k+1} = B_k
+-\frac{B_k s_k s_k^\top B_k}{s_k^\top B_k s_k}
++\frac{y_k y_k^\top}{y_k^\top s_k}.
+}
+\]
+\begin{itemize}
+\item Symmetric by construction.
+\item Preserves positive definiteness if $B_k\succ 0$ and $y_k^\top s_k>0$.
+\item Satisfies $B_{k+1}s_k=y_k$.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{How BFGS relates to Broyden family}
+Broyden family (for optimization) is a one-parameter set of secant updates
+interpolating between rank-one (Broyden) and rank-two (DFP/BFGS) updates.
+
+\begin{itemize}
+\item BFGS is a particular member chosen for strong numerical behavior.
+\item In practice, BFGS (and limited-memory L-BFGS) is the default workhorse
+in large-scale optimization in physics and ML.
+\end{itemize}
+\end{frame}
+
+%========================================================
+\section{Algorithms and Practicalities}
+
+%--------------------------------------------------------
+\begin{frame}{Broyden (for $F(x)=0$): algorithm sketch}
+\textbf{Input:} $x_0$, $B_0$ (or $H_0$), tolerance $\varepsilon$.
+
+For $k=0,1,\dots$:
+\begin{enumerate}
+\item Solve $B_k p_k=-F(x_k)$ (or $p_k=-H_k F(x_k)$).
+\item Set $x_{k+1}=x_k+p_k$.
+\item Compute $s_k=x_{k+1}-x_k$, $y_k=F(x_{k+1})-F(x_k)$.
+\item Update $B_{k+1}=B_k+\frac{(y_k-B_k s_k)s_k^\top}{s_k^\top s_k}$ \\
+(or $H_{k+1}=H_k+\frac{(s_k-H_k y_k)y_k^\top}{y_k^\top y_k}$).
+\end{enumerate}
+Stop if $\|F(x_k)\|\le\varepsilon$.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{BFGS (for minimizing $f$): algorithm sketch}
+\textbf{Input:} $x_0$, $H_0\succ 0$.
+
+For $k=0,1,\dots$:
+\begin{enumerate}
+\item Search direction: $p_k=-H_k \nabla f(x_k)$.
+\item Line search: choose $\alpha_k$ satisfying Wolfe conditions.
+\item Update iterate: $x_{k+1}=x_k+\alpha_k p_k$.
+\item Set $s_k=x_{k+1}-x_k$, $y_k=\nabla f(x_{k+1})-\nabla f(x_k)$.
+\item Update $H_{k+1}$ via BFGS inverse formula.
+\end{enumerate}
+Stop if $\|\nabla f(x_k)\|\le\varepsilon$.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Physics-flavored remarks}
+\begin{itemize}
+\item \textbf{Self-consistency:} Broyden mixing is standard in DFT/SCF iterations where $F(x)=0$ is a fixed-point condition.
+\item \textbf{Energy minimization:} BFGS/L-BFGS is common for geometry optimization, variational parameters (VQE), and inverse problems.
+\item \textbf{Stability:} damping/trust regions mitigate nonlinearity and noise.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Summary}
+\begin{itemize}
+\item Broyden: secant + minimum-change update $\Rightarrow$ rank-one Jacobian (or inverse) approximation.
+\item BFGS: symmetric, positive definite secant update $\Rightarrow$ robust optimization workhorse.
+\item Both replace expensive exact Jacobians/Hessians by learning curvature from iterates.
+\end{itemize}
+
+\begin{block}{Takeaway}
+Quasi-Newton methods are ``physics-like'': they build an effective linear response model from observations.
+\end{block}
+\end{frame}
+
+
+%------------------------------------------------
+\begin{frame}{Powell's method: Why Derivative-Free Methods?}
+
+Gradients may be unavailable or expensive:
+
+\begin{itemize}
+\item Monte Carlo noise
+\item Complex simulations
+\item Black-box models
+\end{itemize}
+
+Derivative-free methods include:
+
+\begin{itemize}
+\item Nelder-Mead simplex
+\item Powell's method
+\item Pattern search
+\end{itemize}
+
+Powell's method is particularly efficient for smooth functions.
+\end{frame}
+
+%------------------------------------------------
+\section{Basic Idea}
+
+\begin{frame}{Concept of Direction Set Methods}
+
+Goal: minimize
+
+\[
+f(\mathbf{x})
+\]
+
+Iteratively perform
+
+\textbf{line minimizations}
+
+along chosen directions.
+
+Starting point
+
+\[
+\mathbf{x}_0
+\]
+
+Move along direction
+
+\[
+\mathbf{d}
+\]
+
+by minimizing
+
+\[
+\phi(\alpha) = f(\mathbf{x}_0 + \alpha \mathbf{d})
+\]
+
+This reduces a multidimensional problem to a sequence of 1D problems.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Line Minimization}
+
+For a given direction $\mathbf{d}$:
+
+\[
+\phi(\alpha) = f(\mathbf{x} + \alpha \mathbf{d})
+\]
+
+Goal:
+
+\[
+\alpha^* = \arg\min_\alpha \phi(\alpha)
+\]
+
+Methods:
+
+\begin{itemize}
+\item Golden section search
+\item Brent's method
+\end{itemize}
+
+Update
+
+\[
+\mathbf{x}_{new} = \mathbf{x} + \alpha^* \mathbf{d}
+\]
+\end{frame}
+
+%------------------------------------------------
+\section{Powell's Method}
+
+\begin{frame}{Direction Set}
+
+Powell's method maintains a set of directions
+
+\[
+\{\mathbf{d}_1,\mathbf{d}_2,\dots,\mathbf{d}_n\}
+\]
+
+Initially chosen as unit vectors:
+
+\[
+\mathbf{d}_1 = (1,0,0,\dots)
+\]
+
+\[
+\mathbf{d}_2 = (0,1,0,\dots)
+\]
+
+etc.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{One Iteration}
+
+Starting at point $\mathbf{x}_0$.
+
+Perform line minimizations sequentially:
+
+\[
+\mathbf{x}_1 = \mathbf{x}_0 + \alpha_1 \mathbf{d}_1
+\]
+
+\[
+\mathbf{x}_2 = \mathbf{x}_1 + \alpha_2 \mathbf{d}_2
+\]
+
+\[
+\dots
+\]
+
+\[
+\mathbf{x}_n = \mathbf{x}_{n-1} + \alpha_n \mathbf{d}_n
+\]
+
+Each step minimizes along a direction.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{New Direction}
+
+After completing the cycle define
+
+\[
+\mathbf{d}_{new} =
+\mathbf{x}_n - \mathbf{x}_0
+\]
+
+This direction approximates the direction of largest improvement.
+
+Replace one of the existing directions with $\mathbf{d}_{new}$.
+\end{frame}
+
+%------------------------------------------------
+\section{Derivation and Motivation}
+
+\begin{frame}{Quadratic Functions}
+
+Consider quadratic function
+
+\[
+f(\mathbf{x}) =
+\frac12 \mathbf{x}^T A \mathbf{x}
++ \mathbf{b}^T \mathbf{x} + c
+\]
+
+For such functions
+
+\begin{itemize}
+\item conjugate directions allow exact minimization
+\item minimum found in $n$ steps
+\end{itemize}
+
+Powell's method approximates conjugate directions without gradients.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Conjugate Directions}
+
+Two directions $\mathbf{d}_i$ and $\mathbf{d}_j$ are conjugate if
+
+\[
+\mathbf{d}_i^T A \mathbf{d}_j = 0
+\]
+
+For quadratic functions this ensures
+
+successive minimizations do not undo previous ones.
+
+Powell's algorithm attempts to generate such directions adaptively.
+\end{frame}
+
+%------------------------------------------------
+\section{Full Algorithm}
+
+\begin{frame}{Powell Iteration}
+
+Given
+
+\[
+\mathbf{x}_0
+\]
+
+and directions
+
+\[
+\mathbf{d}_1,\dots,\mathbf{d}_n
+\]
+
+\begin{enumerate}
+\item Perform line minimizations along each direction
+\item Record largest decrease in function
+\item Construct new direction
+\[
+\mathbf{d}_{new} = \mathbf{x}_n - \mathbf{x}_0
+\]
+\item Replace direction with largest decrease
+\item Repeat
+\end{enumerate}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Stopping Criteria}
+
+Terminate when
+
+\begin{itemize}
+\item function change small
+\[
+|f_{new}-f_{old}| < \epsilon
+\]
+
+\item step size small
+
+\[
+||\mathbf{x}_{new}-\mathbf{x}_{old}|| < \epsilon
+\]
+
+\item maximum iterations reached
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\section{Numerical Aspects}
+
+\begin{frame}{Advantages}
+
+\begin{itemize}
+\item No derivatives required
+\item Efficient for moderate dimensions
+\item Works well for smooth functions
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Limitations}
+
+\begin{itemize}
+\item Not robust for noisy functions
+\item May fail for non-smooth problems
+\item Performance deteriorates in high dimensions
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\section{Pseudocode}
+
+\begin{frame}[fragile]{Powell Algorithm}
+
+\begin{verbatim}
+initialize x
+initialize directions d_i
+
+repeat:
+
+    x_start = x
+
+    for i in directions:
+
+        alpha = line_minimize(f,x,d_i)
+
+        x = x + alpha*d_i
+
+    d_new = x - x_start
+
+    replace direction with largest decrease
+
+until convergence
+\end{verbatim}
+
+\end{frame}
+
+%------------------------------------------------
+\section{Python Example}
+
+\begin{frame}[fragile]{Example Implementation}
+
+\begin{verbatim}
+import numpy as np
+from scipy.optimize import minimize
+
+def f(x):
+    return x[0]**2 + 5*x[1]**2
+
+x0 = np.array([3,4])
+
+res = minimize(f, x0, method='Powell')
+
+print(res.x)
+\end{verbatim}
+
+Uses SciPy's Powell implementation.
+\end{frame}
+
+%------------------------------------------------
+\section{Applications}
+
+\begin{frame}{Applications in Physics}
+
+Powell's method used in:
+
+\begin{itemize}
+\item Variational parameter optimization
+\item Molecular geometry optimization
+\item Monte Carlo parameter fitting
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Example}
+
+Minimization of
+
+\[
+f(x,y) = x^2 + 5y^2
+\]
+
+Powell method converges in few iterations
+
+because function is quadratic.
+\end{frame}
+
+%------------------------------------------------
+\section{Summary}
+
+\begin{frame}{Summary}
+
+\begin{itemize}
+\item Powell's method is a derivative-free optimization algorithm
+\item Uses sequential line minimizations
+\item Updates search directions dynamically
+\item Approximates conjugate directions
+\item Efficient for moderate dimensional smooth problems
+\end{itemize}
+\end{frame}
+
 
 \end{document}
-
-
