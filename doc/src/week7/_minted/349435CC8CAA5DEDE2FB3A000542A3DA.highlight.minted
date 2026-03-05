@@ -1,0 +1,59 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{asarray}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{arange}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{n+nn}{.}\PYG{n+nn}{random}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{rand}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{n+nn}{.}\PYG{n+nn}{random}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{seed}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{matplotlib}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{pyplot}
+
+\PYG{c+c1}{\PYGZsh{} objective function}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{objective}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{p}{:}
+	\PYG{k}{return} \PYG{n}{x}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mf}{2.0}
+
+\PYG{c+c1}{\PYGZsh{} derivative of objective function}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{derivative}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{p}{:}
+	\PYG{k}{return} \PYG{n}{x} \PYG{o}{*} \PYG{l+m+mf}{2.0}
+
+\PYG{c+c1}{\PYGZsh{} gradient descent algorithm}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{gradient\PYGZus{}descent}\PYG{p}{(}\PYG{n}{objective}\PYG{p}{,} \PYG{n}{derivative}\PYG{p}{,} \PYG{n}{bounds}\PYG{p}{,} \PYG{n}{n\PYGZus{}iter}\PYG{p}{,} \PYG{n}{step\PYGZus{}size}\PYG{p}{)}\PYG{p}{:}
+	\PYG{c+c1}{\PYGZsh{} track all solutions}
+	\PYG{n}{solutions}\PYG{p}{,} \PYG{n}{scores} \PYG{o}{=} \PYG{n+nb}{list}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,} \PYG{n+nb}{list}\PYG{p}{(}\PYG{p}{)}
+	\PYG{c+c1}{\PYGZsh{} generate an initial point}
+	\PYG{n}{solution} \PYG{o}{=} \PYG{n}{bounds}\PYG{p}{[}\PYG{p}{:}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{+} \PYG{n}{rand}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{bounds}\PYG{p}{)}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{n}{bounds}\PYG{p}{[}\PYG{p}{:}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{bounds}\PYG{p}{[}\PYG{p}{:}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{)}
+	\PYG{c+c1}{\PYGZsh{} run the gradient descent}
+	\PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{n\PYGZus{}iter}\PYG{p}{)}\PYG{p}{:}
+		\PYG{c+c1}{\PYGZsh{} calculate gradient}
+		\PYG{n}{gradient} \PYG{o}{=} \PYG{n}{derivative}\PYG{p}{(}\PYG{n}{solution}\PYG{p}{)}
+		\PYG{c+c1}{\PYGZsh{} take a step}
+		\PYG{n}{solution} \PYG{o}{=} \PYG{n}{solution} \PYG{o}{\PYGZhy{}} \PYG{n}{step\PYGZus{}size} \PYG{o}{*} \PYG{n}{gradient}
+		\PYG{c+c1}{\PYGZsh{} evaluate candidate point}
+		\PYG{n}{solution\PYGZus{}eval} \PYG{o}{=} \PYG{n}{objective}\PYG{p}{(}\PYG{n}{solution}\PYG{p}{)}
+		\PYG{c+c1}{\PYGZsh{} store solution}
+		\PYG{n}{solutions}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{solution}\PYG{p}{)}
+		\PYG{n}{scores}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{solution\PYGZus{}eval}\PYG{p}{)}
+		\PYG{c+c1}{\PYGZsh{} report progress}
+		\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZgt{}}\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s1}{ f(}\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s1}{) = }\PYG{l+s+si}{\PYGZpc{}.5f}\PYG{l+s+s1}{\PYGZsq{}} \PYG{o}{\PYGZpc{}} \PYG{p}{(}\PYG{n}{i}\PYG{p}{,} \PYG{n}{solution}\PYG{p}{,} \PYG{n}{solution\PYGZus{}eval}\PYG{p}{)}\PYG{p}{)}
+	\PYG{k}{return} \PYG{p}{[}\PYG{n}{solutions}\PYG{p}{,} \PYG{n}{scores}\PYG{p}{]}
+
+\PYG{c+c1}{\PYGZsh{} seed the pseudo random number generator}
+\PYG{n}{seed}\PYG{p}{(}\PYG{l+m+mi}{4}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} define range for input}
+\PYG{n}{bounds} \PYG{o}{=} \PYG{n}{asarray}\PYG{p}{(}\PYG{p}{[}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}\PYG{p}{,} \PYG{l+m+mf}{1.0}\PYG{p}{]}\PYG{p}{]}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} define the total iterations}
+\PYG{n}{n\PYGZus{}iter} \PYG{o}{=} \PYG{l+m+mi}{30}
+\PYG{c+c1}{\PYGZsh{} define the step size}
+\PYG{n}{step\PYGZus{}size} \PYG{o}{=} \PYG{l+m+mf}{0.1}
+\PYG{c+c1}{\PYGZsh{} perform the gradient descent search}
+\PYG{n}{solutions}\PYG{p}{,} \PYG{n}{scores} \PYG{o}{=} \PYG{n}{gradient\PYGZus{}descent}\PYG{p}{(}\PYG{n}{objective}\PYG{p}{,} \PYG{n}{derivative}\PYG{p}{,} \PYG{n}{bounds}\PYG{p}{,} \PYG{n}{n\PYGZus{}iter}\PYG{p}{,} \PYG{n}{step\PYGZus{}size}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} sample input range uniformly at 0.1 increments}
+\PYG{n}{inputs} \PYG{o}{=} \PYG{n}{arange}\PYG{p}{(}\PYG{n}{bounds}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{,} \PYG{n}{bounds}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{o}{+}\PYG{l+m+mf}{0.1}\PYG{p}{,} \PYG{l+m+mf}{0.1}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} compute targets}
+\PYG{n}{results} \PYG{o}{=} \PYG{n}{objective}\PYG{p}{(}\PYG{n}{inputs}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} create a line plot of input vs result}
+\PYG{n}{pyplot}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{inputs}\PYG{p}{,} \PYG{n}{results}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} plot the solutions found}
+\PYG{n}{pyplot}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{solutions}\PYG{p}{,} \PYG{n}{scores}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{.\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{red}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} show the plot}
+\PYG{n}{pyplot}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+
+
+\end{MintedVerbatim}
