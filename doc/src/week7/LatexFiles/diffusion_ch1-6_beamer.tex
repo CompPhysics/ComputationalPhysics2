@@ -1,0 +1,1761 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage{amsmath,amssymb,bm}
+\usepackage{physics}
+\usepackage{hyperref}
+\usepackage{mathtools}
+
+\title{Diffusion Models: Foundations (Chapters 1--6)}
+\subtitle{Lecture slides based on arXiv:2510.21890v1 (figures and code omitted)}
+\author{}
+\date{}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+% =========================================================
+\section{Lecture 0: Framing and Notation}
+% =========================================================
+
+\begin{frame}{Learning goals}
+\begin{itemize}
+\item Understand diffusion models as deep generative models that transform noise into data.
+\item See three equivalent perspectives:
+\begin{itemize}
+\item variational (DDPM / hierarchical latent model),
+\item score-based (denoising score matching / Score SDE),
+\item flow-based (CNF / probability flow ODE / flow matching).
+\end{itemize}
+\item Derive core training objectives and sampling dynamics.
+\item Connect to PDEs: continuity equation and Fokker--Planck.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Basic notation}
+\begin{itemize}
+\item Data: \(x\in\mathbb{R}^D\), data distribution \(p_{\text{data}}(x)\).
+\item Model: \(p_\theta(x)\) or sampler \(x = G_\theta(z)\), \(z\sim p_{\text{prior}}\).
+\item Time/noise: discrete \(t=0,\dots,T\) or continuous \(t\in[0,1]\).
+\item Score: \(s_t(x)\equiv \nabla_x \log p_t(x)\).
+\item Expectation \(\mathbb{E}[\cdot]\), KL divergence \(\mathrm{KL}(q\|p)\).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Transport viewpoint}
+All diffusion-style methods can be seen as learning a time-dependent transformation
+\[
+p_{\text{prior}} \xrightarrow{\text{learned dynamics}} p_{\text{data}}.
+\]
+Core object: a \textbf{vector field} (or drift) \(v(x,t)\) that moves samples.
+\begin{itemize}
+\item DDPM: learns a denoiser / noise predictor.
+\item Score methods: learn \(s_t(x)\).
+\item Flow matching: learn \(v(x,t)\) directly.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{How these slides map to Chapters 1--6}
+\begin{enumerate}
+\item Ch.1: deep generative modeling landscape.
+\item Ch.2: diffusion probabilistic models (variational view).
+\item Ch.3: score matching and denoising score matching (EBM lineage).
+\item Ch.4: continuous-time formulation: SDEs, reverse-time, probability flow ODE.
+\item Ch.5: flows, CNFs/Neural ODE, flow matching.
+\item Ch.6: unifying principles: conditioning + Fokker--Planck / continuity equations.
+\end{enumerate}
+\end{frame}
+
+% =========================================================
+\section{Chapter 1: Deep Generative Modeling Primer}
+% =========================================================
+
+\begin{frame}{Generative modeling problem}
+Given i.i.d. samples \(x_i\sim p_{\text{data}}\), learn \(p_\theta\) so that
+\[
+p_\theta \approx p_{\text{data}}
+\]
+and we can sample new \(x\sim p_\theta\).
+Core tensions:
+\begin{itemize}
+\item likelihood tractability,
+\item sample quality,
+\item sampling speed,
+\item mode coverage and stability.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Explicit vs implicit models}
+\begin{itemize}
+\item \textbf{Explicit density}: can evaluate (or approximate) \(\log p_\theta(x)\).
+\item \textbf{Implicit}: provides sampling procedure but no tractable likelihood.
+\end{itemize}
+Diffusion models: often trained via likelihood-type bounds or regression objectives, but sampling is iterative/dynamical.
+\end{frame}
+
+\begin{frame}{Maximum likelihood}
+Maximum likelihood:
+\[
+\max_\theta \ \mathbb{E}_{p_{\text{data}}}[\log p_\theta(x)].
+\]
+When direct likelihood is hard:
+\begin{itemize}
+\item introduce latent variables (VAE),
+\item impose invertibility (flow),
+\item match scores (score matching),
+\item use adversarial objectives (GAN).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Divergences and objectives}
+Common divergences/metrics:
+\begin{itemize}
+\item \(\mathrm{KL}(p_{\text{data}}\|p_\theta)\) (maximum likelihood).
+\item \(\mathrm{KL}(p_\theta\|p_{\text{data}})\) (mode-seeking behavior).
+\item Wasserstein distances and other IPMs (GAN family).
+\item Score matching: match \(\nabla_x \log p\) rather than \(p\).
+\end{itemize}
+Different choices shape sample sharpness vs mode coverage.
+\end{frame}
+
+\begin{frame}{Autoregressive (AR) models}
+Factorization for \(x=(x_1,\dots,x_D)\):
+\[
+p_\theta(x)=\prod_{i=1}^D p_\theta(x_i\mid x_{<i}).
+\]
+Pros: exact likelihood.
+Cons: sampling is sequential (slow for high-dimensional objects like images).
+\end{frame}
+
+\begin{frame}{Variational autoencoders (VAE)}
+Latent variable model:
+\[
+p_\theta(x)=\int p_\theta(x\mid z)p(z)\,dz.
+\]
+Introduce amortized posterior \(q_\phi(z\mid x)\) and maximize ELBO:
+\[
+\log p_\theta(x)\ge \mathbb{E}_{q_\phi(z\mid x)}[\log p_\theta(x\mid z)]-\mathrm{KL}(q_\phi(z\mid x)\|p(z)).
+\]
+\end{frame}
+
+\begin{frame}{Normalizing flows (NF)}
+Invertible mapping \(x=f_\theta(z)\), \(z\sim p(z)\).
+Change of variables:
+\[
+\log p_\theta(x)=\log p(z)+\log\left|\det \frac{\partial f_\theta^{-1}(x)}{\partial x}\right|.
+\]
+Pros: exact likelihood + fast sampling.
+Cons: invertibility constraints and Jacobian computation structure.
+\end{frame}
+
+\begin{frame}{Energy-based models (EBM)}
+Unnormalized density:
+\[
+p_\theta(x)=\frac{e^{-E_\theta(x)}}{Z(\theta)},\quad Z(\theta)=\int e^{-E_\theta(x)}dx.
+\]
+Pros: flexible.
+Cons: partition function and sampling (often MCMC) are hard.
+Score-based learning can avoid \(Z(\theta)\) by learning \(\nabla_x\log p\).
+\end{frame}
+
+\begin{frame}{GANs}
+Implicit model: \(x=G_\theta(z)\), \(z\sim p(z)\), trained via adversarial game.
+Pros: high-fidelity samples.
+Cons: instability, mode collapse, no likelihood.
+\end{frame}
+
+\begin{frame}{Where diffusion fits}
+Diffusion models define:
+\begin{itemize}
+\item a forward \emph{noising} process (easy),
+\item a learned reverse \emph{denoising} process (hard, learned).
+\end{itemize}
+Sampling: integrate reverse dynamics from noise to data.
+Training often reduces to regression on noisy inputs with time conditioning.
+\end{frame}
+
+\begin{frame}{Chapter 1 summary}
+\begin{itemize}
+\item Generative modeling has multiple objective families.
+\item Diffusion models are dynamical/iterative generators.
+\item Next: variational diffusion (DDPM) as a hierarchical latent-variable model.
+\end{itemize}
+\end{frame}
+
+% =========================================================
+\section{Chapter 2: Variational View (DDPM)}
+% =========================================================
+
+\begin{frame}{Diffusion as hierarchical latent model}
+Treat the noised variables as latents:
+\[
+x_0 \sim p_{\text{data}},\quad x_1,\dots,x_T\ \text{latent},\quad x_T\approx \mathcal{N}(0,I).
+\]
+Forward Markov chain \(q\) is fixed; reverse chain \(p_\theta\) is learned.
+\end{frame}
+
+\begin{frame}{Forward noising process}
+Common discrete forward transitions:
+\[
+q(x_t\mid x_{t-1})=\mathcal{N}\!\left(\sqrt{1-\beta_t}\,x_{t-1},\ \beta_t I\right),
+\]
+with noise schedule \(\{\beta_t\}\) and \(\alpha_t=1-\beta_t\).
+\end{frame}
+
+\begin{frame}{Closed form of the marginal \(q(x_t\mid x_0)\)}
+By repeated composition,
+\[
+q(x_t\mid x_0)=\mathcal{N}\!\left(\sqrt{\bar\alpha_t}\,x_0,\ (1-\bar\alpha_t)I\right),
+\qquad \bar\alpha_t=\prod_{s=1}^t \alpha_s.
+\]
+Equivalently:
+\[
+x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon,\quad \epsilon\sim \mathcal{N}(0,I).
+\]
+\end{frame}
+
+\begin{frame}{Reverse model}
+Learn a reverse Markov chain:
+\[
+p_\theta(x_{t-1}\mid x_t)=\mathcal{N}(\mu_\theta(x_t,t),\Sigma_\theta(x_t,t)).
+\]
+Often \(\Sigma_\theta\) is fixed/parameterized simply; the network predicts \(\mu_\theta\) (or an equivalent target).
+\end{frame}
+
+\begin{frame}{ELBO: variational lower bound}
+Define joint:
+\[
+p_\theta(x_{0:T}) = p(x_T)\prod_{t=1}^T p_\theta(x_{t-1}\mid x_t),
+\quad
+q(x_{1:T}\mid x_0)=\prod_{t=1}^T q(x_t\mid x_{t-1}).
+\]
+Then
+\[
+\log p_\theta(x_0) \ge \mathbb{E}_{q(x_{1:T}\mid x_0)}\left[\log \frac{p_\theta(x_{0:T})}{q(x_{1:T}\mid x_0)}\right].
+\]
+\end{frame}
+
+\begin{frame}{ELBO decomposition (structure)}
+The bound decomposes into:
+\begin{itemize}
+\item a prior term \(\mathrm{KL}(q(x_T\mid x_0)\|p(x_T))\),
+\item denoising KL terms \(\sum_{t=2}^T \mathrm{KL}(q(x_{t-1}\mid x_t,x_0)\|p_\theta(x_{t-1}\mid x_t))\),
+\item and a reconstruction term at \(t=1\).
+\end{itemize}
+Because all relevant distributions are Gaussian, these KLs are tractable.
+\end{frame}
+
+\begin{frame}{Posterior \(q(x_{t-1}\mid x_t,x_0)\)}
+The forward model implies an analytic posterior:
+\[
+q(x_{t-1}\mid x_t,x_0)=\mathcal{N}(\tilde\mu(x_t,x_0,t),\tilde\beta_t I),
+\]
+with closed-form \(\tilde\mu,\tilde\beta_t\) in terms of \(\alpha_t,\bar\alpha_t\).
+This turns the KL term into a squared error between means (up to weights).
+\end{frame}
+
+\begin{frame}{Noise prediction parameterization}
+A common choice is to predict the noise \(\epsilon\) in
+\[
+x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\epsilon.
+\]
+Let \(\epsilon_\theta(x_t,t)\) be the network. Then training becomes:
+\[
+\mathcal{L}_{\text{simple}}(\theta)=\mathbb{E}_{t,x_0,\epsilon}\left[\|\epsilon-\epsilon_\theta(x_t,t)\|^2\right].
+\]
+\end{frame}
+
+\begin{frame}{From \(\epsilon\)-prediction to \(x_0\)-prediction}
+Given \(\epsilon_\theta\), estimate the clean sample:
+\[
+\hat x_{0,\theta}(x_t,t)=\frac{1}{\sqrt{\bar\alpha_t}}\left(x_t-\sqrt{1-\bar\alpha_t}\,\epsilon_\theta(x_t,t)\right).
+\]
+This reparameterization is useful for alternative losses and samplers.
+\end{frame}
+
+\begin{frame}{Alternative targets: score and velocity}
+Other equivalent prediction targets:
+\begin{itemize}
+\item score: \(s_\theta(x_t,t)\approx \nabla_{x_t}\log p_t(x_t)\),
+\item velocity (``\(v\)''-prediction): a linear combination of \(x_t\) and \(\epsilon\),
+\item direct mean prediction \(\mu_\theta\).
+\end{itemize}
+Chapter 6 will emphasize these are different parameterizations of a common vector field.
+\end{frame}
+
+\begin{frame}{Sampling: ancestral reverse chain}
+Start with \(x_T\sim\mathcal{N}(0,I)\).
+For \(t=T,\dots,1\) sample
+\[
+x_{t-1}\sim p_\theta(x_{t-1}\mid x_t).
+\]
+Each step reduces noise and adds structure; after \(T\) steps obtain \(x_0\sim p_\theta\).
+\end{frame}
+
+\begin{frame}{Discrete acceleration idea (preview)}
+Discrete reverse chain is a particular discretization.
+Later chapters typically discuss:
+\begin{itemize}
+\item fewer steps (DDIM / deterministic paths),
+\item higher-order solvers,
+\item distillation/consistency models.
+\end{itemize}
+But the foundation is the same: integrate reverse dynamics.
+\end{frame}
+
+\begin{frame}{Chapter 2 summary}
+\begin{itemize}
+\item Forward diffusion is fixed and Gaussian.
+\item Reverse process is learned.
+\item ELBO leads to tractable training; in practice, a simple MSE loss works well.
+\item Next: score matching and denoising score matching.
+\end{itemize}
+\end{frame}
+
+% =========================================================
+\section{Chapter 3: Score-Based View (Score Matching, DSM, NCSN)}
+% =========================================================
+
+\begin{frame}{Score function}
+For a density \(p(x)\), the score is
+\[
+s(x)\equiv \nabla_x \log p(x).
+\]
+Scores define directions of increasing log-density.
+If we can estimate \(s\), we can build samplers that move noise toward data modes.
+\end{frame}
+
+\begin{frame}{Why score matching?}
+For EBMs \(p_\theta(x)\propto e^{-E_\theta(x)}\), likelihood training requires \(Z(\theta)\).
+Score matching can avoid explicit normalization by matching \(\nabla_x\log p\).
+\end{frame}
+
+\begin{frame}{Classical score matching (idea)}
+Objective (conceptually):
+\[
+\min_\theta \ \mathbb{E}_{p_{\text{data}}}\left[\|s_\theta(x)-\nabla_x\log p_{\text{data}}(x)\|^2\right],
+\]
+but \(\nabla_x\log p_{\text{data}}\) is unknown.
+Hyv\"arinen's reformulation yields an equivalent objective without the unknown score (under regularity).
+\end{frame}
+
+\begin{frame}{Denoising score matching (DSM)}
+Corrupt data with Gaussian noise:
+\[
+\tilde x = x + \sigma \epsilon,\quad \epsilon\sim \mathcal{N}(0,I).
+\]
+Train \(s_\theta(\tilde x,\sigma)\) to approximate the score of the noisy distribution.
+A regression target exists:
+\[
+\nabla_{\tilde x}\log p(\tilde x\mid x) = -\frac{\tilde x-x}{\sigma^2}.
+\]
+\end{frame}
+
+\begin{frame}{DSM loss (regression form)}
+One common DSM loss:
+\[
+\mathcal{L}_{\text{DSM}}(\theta)=\mathbb{E}_{x,\epsilon}\left[\left\|s_\theta(x+\sigma\epsilon,\sigma)+\frac{1}{\sigma}\epsilon\right\|^2\right],
+\]
+up to weighting conventions.
+Key: conditioning on \(\sigma\) allows learning scores across noise scales.
+\end{frame}
+
+\begin{frame}{Noise-Conditional Score Networks (NCSN)}
+Train a single network with noise conditioning:
+\[
+s_\theta(\tilde x,\sigma_k),\quad \sigma_k\ \text{from a noise ladder}.
+\]
+At large \(\sigma\), density is smooth; at small \(\sigma\), fine details matter.
+This mirrors coarse-to-fine generation.
+\end{frame}
+
+\begin{frame}{Sampling: Langevin dynamics}
+Given a score estimate \(s_\theta\), Langevin sampling:
+\[
+x^{(n+1)} = x^{(n)} + \eta\, s_\theta(x^{(n)},\sigma) + \sqrt{2\eta}\,\xi^{(n)},\quad \xi^{(n)}\sim\mathcal{N}(0,I).
+\]
+Annealed Langevin: progressively decrease \(\sigma\) and step sizes.
+\end{frame}
+
+\begin{frame}{Connection to diffusion denoisers}
+In Gaussian noising, score and noise prediction relate roughly by:
+\[
+s_\theta(x_t,t) \approx -\frac{1}{\sigma_t}\,\epsilon_\theta(x_t,t)
+\]
+(modulo scaling conventions).
+Continuous-time formulations make these equivalences exact.
+\end{frame}
+
+\begin{frame}{Chapter 3 summary}
+\begin{itemize}
+\item Score-based learning targets \(\nabla\log p_t\).
+\item DSM provides a tractable regression target by corrupting data.
+\item Sampling can be done with annealed Langevin dynamics.
+\item Next: continuous-time SDE formulation.
+\end{itemize}
+\end{frame}
+
+% =========================================================
+\section{Chapter 4: Continuous-Time Formulation (Score SDE)}
+% =========================================================
+
+\begin{frame}{Why continuous time?}
+Continuous-time view:
+\begin{itemize}
+\item unifies DDPM discretizations and NCSN noise ladders,
+\item leverages SDE/ODE solvers,
+\item gives principled reverse-time dynamics.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Forward SDE}
+A generic forward SDE:
+\[
+dx = f(x,t)\,dt + g(t)\,dw_t,
+\]
+where \(w_t\) is Brownian motion.
+The marginal density \(p_t(x)\) evolves smoothly with time.
+\end{frame}
+
+\begin{frame}{Fokker--Planck equation}
+The density evolution satisfies a PDE of the form:
+\[
+\partial_t p_t(x)= -\nabla\cdot(f(x,t)p_t(x))+\frac12\nabla\cdot\left(\nabla(g(t)^2 p_t(x))\right),
+\]
+(with isotropic diffusion).
+This is the stochastic analogue of a continuity/transport equation.
+\end{frame}
+
+\begin{frame}{Reverse-time SDE (key idea)}
+Reverse-time dynamics (informally) has drift involving the score:
+\[
+dx = \left(f(x,t)-g(t)^2 \nabla_x\log p_t(x)\right)\,dt + g(t)\,d\bar w_t,
+\]
+integrated from \(t=T\) back to \(t=0\).
+Thus generation requires an estimator \(s_\theta(x,t)\approx \nabla\log p_t(x)\).
+\end{frame}
+
+\begin{frame}{Training in continuous time}
+We learn \(s_\theta(x,t)\) by a time-conditioned denoising score matching objective.
+Discrete-time DDPM becomes a particular discretization of the continuous-time objective (and vice versa).
+\end{frame}
+
+\begin{frame}{Probability flow ODE}
+There exists a deterministic ODE sharing the same marginal densities:
+\[
+\frac{dx}{dt} = f(x,t)-\frac12 g(t)^2 s_\theta(x,t).
+\]
+Sampling can be done by solving this ODE backward from noise to data.
+This yields deterministic samplers (related to DDIM) and enables advanced ODE solvers.
+\end{frame}
+
+\begin{frame}{Samplers as numerical integrators}
+Sampling reduces to integrating an SDE or ODE:
+\begin{itemize}
+\item DDPM ancestral sampling: Euler--Maruyama-style discretization of reverse SDE.
+\item Deterministic samplers: discretizations of PF-ODE.
+\item Higher-order solvers can trade compute vs fidelity.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Chapter 4 summary}
+\begin{itemize}
+\item SDE formulation unifies diffusion training/sampling.
+\item Reverse-time requires the score.
+\item PF-ODE provides deterministic sampling with identical marginals.
+\item Next: flow-based view and flow matching.
+\end{itemize}
+\end{frame}
+
+% =========================================================
+\section{Chapter 5: Flow-Based View (NF, CNF/Neural ODE, Flow Matching)}
+% =========================================================
+
+\begin{frame}{Normalizing flows revisited}
+Flows transport a simple prior to the data:
+\[
+z\sim p_0 \xrightarrow{x=f_\theta(z)} x\sim p_\theta.
+\]
+If \(f_\theta\) is invertible, likelihood is exact via change of variables.
+\end{frame}
+
+\begin{frame}{Continuous normalizing flows (CNF)}
+Define an ODE:
+\[
+\frac{dz}{dt}=v_\phi(z(t),t),\quad z(0)\sim p_0,\quad x=z(1).
+\]
+Density evolves by:
+\[
+\frac{d}{dt}\log p(z(t),t) = -\nabla\cdot v_\phi(z(t),t).
+\]
+Thus likelihood requires integrating divergence along paths.
+\end{frame}
+
+\begin{frame}{Training and the adjoint}
+Differentiating through ODE solutions can use the adjoint method:
+\begin{itemize}
+\item low memory footprint,
+\item but requires solving auxiliary ODEs backward,
+\item can be computationally expensive for high-dimensional data.
+\end{itemize}
+This motivates alternative training objectives that avoid likelihood integration.
+\end{frame}
+
+\begin{frame}{Flow matching: core idea}
+Flow matching directly trains a vector field \(v_\phi(x,t)\) by regression:
+\[
+\min_\phi \ \mathbb{E}_{t,x_t}\big[\|v_\phi(x_t,t)-u_t(x_t,t)\|^2\big],
+\]
+where \(u_t\) is a \emph{target velocity field} defined from a chosen probability path \(p_t\).
+Key: ``simulation-free'' training in many constructions.
+\end{frame}
+
+\begin{frame}{Why flow matching matters for diffusion}
+\begin{itemize}
+\item PF-ODE sampling already interprets diffusion as an ODE flow.
+\item Flow matching formalizes learning the ODE drift directly.
+\item Provides bridges to optimal transport, Schr\"odinger bridges, and continuity equations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Chapter 5 summary}
+\begin{itemize}
+\item Flows provide exact likelihood under invertibility.
+\item CNFs extend flows to continuous time with divergence dynamics.
+\item Flow matching trains vector fields by regression, aligning with diffusion's ODE view.
+\item Next: unify perspectives via conditioning and PDEs.
+\end{itemize}
+\end{frame}
+
+% =========================================================
+\section{Chapter 6: Unifying Principles}
+% =========================================================
+
+\begin{frame}{Unifying message}
+Across DDPM, score-based models, and flow matching:
+\[
+\textbf{learn a time-dependent vector field that transports }p_0 \to p_1.
+\]
+Different parameterizations (noise, \(x_0\), score, velocity) are often algebraically convertible.
+\end{frame}
+
+\begin{frame}{Conditional strategy}
+Training becomes tractable by conditioning on a partially transformed sample:
+\[
+\text{learn}\quad \mathbb{E}[\cdot\mid x_t,t]
+\]
+using a neural network that takes \((x_t,t)\) (and optionally condition \(c\)) as input.
+This is the backbone of:
+\begin{itemize}
+\item DDPM regression,
+\item DSM/NCSN score learning,
+\item flow matching regression.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Deterministic vs stochastic descriptions}
+Two descriptions that can share the same marginals:
+\begin{itemize}
+\item stochastic: forward SDE + reverse SDE (score in drift),
+\item deterministic: probability flow ODE (vector field in ODE).
+\end{itemize}
+Thus ``diffusion sampling'' is, fundamentally, \emph{solving a differential equation}.
+\end{frame}
+
+\begin{frame}{Continuity equation for deterministic flows}
+For ODE \( \dot x = v(x,t)\), density satisfies:
+\[
+\partial_t p_t(x) = -\nabla\cdot(p_t(x)\,v(x,t)).
+\]
+This is a conservation law for probability mass.
+\end{frame}
+
+\begin{frame}{Fokker--Planck for SDEs}
+For SDE \(dx=f\,dt+g\,dw\), density evolves by:
+\[
+\partial_t p_t = -\nabla\cdot(f p_t) + \frac12 \nabla\cdot(\nabla(g^2 p_t)).
+\]
+Diffusion adds a smoothing (second-order) term.
+The reverse-time drift involves the score to counteract this smoothing during generation.
+\end{frame}
+
+\begin{frame}{Parameterizations as re-labelings}
+Common choices:
+\begin{itemize}
+\item \(\epsilon\)-prediction: predict added noise.
+\item \(x_0\)-prediction: predict clean data (denoising).
+\item score: \(s_\theta(x,t)\approx \nabla\log p_t(x)\).
+\item velocity: \(v_\theta(x,t)\) in PF-ODE/flow matching.
+\end{itemize}
+Conversions depend on the forward process (VP/VE/sub-VP) and scaling.
+\end{frame}
+
+\begin{frame}{Practical implications}
+\begin{itemize}
+\item Training stability depends on parameterization and weighting (often SNR-based).
+\item Sampling quality and speed depend on discretization/solver.
+\item Unifying view suggests ``algorithm design'' is numerical analysis of differential equations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Chapter 6 summary}
+\begin{itemize}
+\item Conditioning + differential equations unify diffusion methodologies.
+\item DDPM/score/flow matching differ mainly in how they train and discretize the same underlying object.
+\end{itemize}
+\end{frame}
+
+% =========================================================
+\section{Recitations, Mini-Exercises, and Slide Fillers (to reach 100+)}
+% =========================================================
+
+\begin{frame}{Mini-exercises: Chapter 1}
+\begin{enumerate}
+\item Compare AR, VAE, NF, EBM, GAN: objective, sampling speed, mode coverage.
+\item Why does \(\mathrm{KL}(p_{\text{data}}\|p_\theta)\) penalize missing modes strongly?
+\item Give an example where likelihood improves but perceptual quality worsens.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Mini-exercises: Chapter 2}
+\begin{enumerate}
+\item Derive \(q(x_t\mid x_0)\) by repeated substitution.
+\item From \(\epsilon\)-prediction, derive \(\hat x_0\) and \(\hat\mu_\theta\) used in the reverse Gaussian.
+\item Discuss why predicting \(\epsilon\) is numerically stable at large \(t\).
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Mini-exercises: Chapter 3}
+\begin{enumerate}
+\item Derive DSM target for Gaussian corruption.
+\item Explain annealed Langevin: why do we reduce \(\sigma\) gradually?
+\item Compare Langevin sampling vs reverse diffusion sampling conceptually.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Mini-exercises: Chapter 4}
+\begin{enumerate}
+\item State the general reverse-time SDE drift and interpret the score term.
+\item Show that PF-ODE and reverse SDE share the same marginals (outline).
+\item Discuss numerical stability of Euler--Maruyama vs higher-order solvers.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Mini-exercises: Chapter 5}
+\begin{enumerate}
+\item For ODE \( \dot z=v(z,t)\), derive \( \frac{d}{dt}\log p(z(t),t)=-\nabla\cdot v\).
+\item Why is divergence computation hard in high dimensions? Name a stochastic estimator.
+\item Construct a simple linear flow matching example (Gaussian to Gaussian).
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Mini-exercises: Chapter 6}
+\begin{enumerate}
+\item Write continuity and Fokker--Planck equations and explain the difference.
+\item Give a mapping between \(\epsilon\)-prediction and score for a Gaussian noising process.
+\item Explain why ``learning a vector field'' is the unifying principle.
+\end{enumerate}
+\end{frame}
+
+% --- Add many short recap frames to exceed 100 frames ---
+\begin{frame}{Recap 1: Key equations}
+\begin{itemize}
+\item Forward diffusion: \(q(x_t\mid x_{t-1})\).
+\item Closed-form noising: \(x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\epsilon\).
+\item Reverse-time drift uses score: \(f-g^2 \nabla\log p_t\).
+\item PF-ODE: \(\dot x=f-\tfrac12 g^2 s_\theta\).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Recap 2: What is learned?}
+\begin{itemize}
+\item DDPM: \(\epsilon_\theta(x_t,t)\) (or \(\hat x_0\), \(\mu_\theta\)).
+\item Score methods: \(s_\theta(x,t)\approx \nabla\log p_t(x)\).
+\item Flow matching: \(v_\phi(x,t)\) (velocity field).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Recap 3: Sampling viewpoint}
+\begin{itemize}
+\item Discrete-time: iterate \(x_T\to x_0\) by learned transitions.
+\item Continuous-time: integrate reverse SDE or PF-ODE.
+\item All are numerical schemes for differential equations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Recap 4: Conditioning}
+\begin{itemize}
+\item Time conditioning is essential: model must know noise level.
+\item Conditional generation adds \(c\) (labels, text, measurements).
+\item Guidance modifies the vector field/score to steer samples.
+\end{itemize}
+\end{frame}
+
+% Generate a batch of short "concept check" frames to bring total > 100
+
+\begin{frame}{Concept check: KL directions}
+\begin{block}{Question}
+Why does \(\mathrm{KL}(p_{\text{data}}\|p_\theta)\) penalize missing modes more than \(\mathrm{KL}(p_\theta\|p_{\text{data}})\)?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: Markov property}
+\begin{block}{Question}
+In DDPM forward process, why is \(q(x_t\mid x_{t-1})\) chosen Markovian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: Gaussianity}
+\begin{block}{Question}
+Which assumptions make \(q(x_t\mid x_0)\) Gaussian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: regression view}
+\begin{block}{Question}
+Why does the ELBO reduce to an MSE loss under \(\epsilon\)-prediction?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: score meaning}
+\begin{block}{Question}
+Interpret \(s(x)=\nabla_x\log p(x)\) geometrically.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: Langevin}
+\begin{block}{Question}
+Why does Langevin dynamics sample from \(p(x)\) when using the exact score?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: annealing}
+\begin{block}{Question}
+What is the role of decreasing \(\sigma\) in annealed Langevin dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: Fokker--Planck}
+\begin{block}{Question}
+What does the second-order term in Fokker--Planck represent physically?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: reverse drift}
+\begin{block}{Question}
+Why must the reverse drift include the score term?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: PF-ODE}
+\begin{block}{Question}
+Why can an ODE share marginals with an SDE?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: divergence}
+\begin{block}{Question}
+In CNFs, why does divergence appear in the log-density dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: flow matching}
+\begin{block}{Question}
+What does flow matching regress and why can it avoid likelihood evaluation?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: parameterizations}
+\begin{block}{Question}
+Give one practical advantage of \(\epsilon\)-prediction vs \(x_0\)-prediction.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: discretization}
+\begin{block}{Question}
+How does step size affect sampling quality and computational cost?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check: conditioning}
+\begin{block}{Question}
+Why is time conditioning essential for a single network across all noise levels?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 16: KL directions}
+\begin{block}{Question}
+Why does \(\mathrm{KL}(p_{\text{data}}\|p_\theta)\) penalize missing modes more than \(\mathrm{KL}(p_\theta\|p_{\text{data}})\)?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 17: Markov property}
+\begin{block}{Question}
+In DDPM forward process, why is \(q(x_t\mid x_{t-1})\) chosen Markovian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 18: Gaussianity}
+\begin{block}{Question}
+Which assumptions make \(q(x_t\mid x_0)\) Gaussian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 19: regression view}
+\begin{block}{Question}
+Why does the ELBO reduce to an MSE loss under \(\epsilon\)-prediction?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 20: score meaning}
+\begin{block}{Question}
+Interpret \(s(x)=\nabla_x\log p(x)\) geometrically.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 21: Langevin}
+\begin{block}{Question}
+Why does Langevin dynamics sample from \(p(x)\) when using the exact score?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 22: annealing}
+\begin{block}{Question}
+What is the role of decreasing \(\sigma\) in annealed Langevin dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 23: Fokker--Planck}
+\begin{block}{Question}
+What does the second-order term in Fokker--Planck represent physically?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 24: reverse drift}
+\begin{block}{Question}
+Why must the reverse drift include the score term?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 25: PF-ODE}
+\begin{block}{Question}
+Why can an ODE share marginals with an SDE?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 26: divergence}
+\begin{block}{Question}
+In CNFs, why does divergence appear in the log-density dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 27: flow matching}
+\begin{block}{Question}
+What does flow matching regress and why can it avoid likelihood evaluation?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 28: parameterizations}
+\begin{block}{Question}
+Give one practical advantage of \(\epsilon\)-prediction vs \(x_0\)-prediction.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 29: discretization}
+\begin{block}{Question}
+How does step size affect sampling quality and computational cost?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 30: conditioning}
+\begin{block}{Question}
+Why is time conditioning essential for a single network across all noise levels?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 31: KL directions}
+\begin{block}{Question}
+Why does \(\mathrm{KL}(p_{\text{data}}\|p_\theta)\) penalize missing modes more than \(\mathrm{KL}(p_\theta\|p_{\text{data}})\)?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 32: Markov property}
+\begin{block}{Question}
+In DDPM forward process, why is \(q(x_t\mid x_{t-1})\) chosen Markovian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 33: Gaussianity}
+\begin{block}{Question}
+Which assumptions make \(q(x_t\mid x_0)\) Gaussian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 34: regression view}
+\begin{block}{Question}
+Why does the ELBO reduce to an MSE loss under \(\epsilon\)-prediction?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 35: score meaning}
+\begin{block}{Question}
+Interpret \(s(x)=\nabla_x\log p(x)\) geometrically.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 36: Langevin}
+\begin{block}{Question}
+Why does Langevin dynamics sample from \(p(x)\) when using the exact score?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 37: annealing}
+\begin{block}{Question}
+What is the role of decreasing \(\sigma\) in annealed Langevin dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 38: Fokker--Planck}
+\begin{block}{Question}
+What does the second-order term in Fokker--Planck represent physically?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 39: reverse drift}
+\begin{block}{Question}
+Why must the reverse drift include the score term?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 40: PF-ODE}
+\begin{block}{Question}
+Why can an ODE share marginals with an SDE?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 41: divergence}
+\begin{block}{Question}
+In CNFs, why does divergence appear in the log-density dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 42: flow matching}
+\begin{block}{Question}
+What does flow matching regress and why can it avoid likelihood evaluation?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 43: parameterizations}
+\begin{block}{Question}
+Give one practical advantage of \(\epsilon\)-prediction vs \(x_0\)-prediction.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 44: discretization}
+\begin{block}{Question}
+How does step size affect sampling quality and computational cost?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 45: conditioning}
+\begin{block}{Question}
+Why is time conditioning essential for a single network across all noise levels?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 46: KL directions}
+\begin{block}{Question}
+Why does \(\mathrm{KL}(p_{\text{data}}\|p_\theta)\) penalize missing modes more than \(\mathrm{KL}(p_\theta\|p_{\text{data}})\)?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 47: Markov property}
+\begin{block}{Question}
+In DDPM forward process, why is \(q(x_t\mid x_{t-1})\) chosen Markovian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 48: Gaussianity}
+\begin{block}{Question}
+Which assumptions make \(q(x_t\mid x_0)\) Gaussian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 49: regression view}
+\begin{block}{Question}
+Why does the ELBO reduce to an MSE loss under \(\epsilon\)-prediction?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 50: score meaning}
+\begin{block}{Question}
+Interpret \(s(x)=\nabla_x\log p(x)\) geometrically.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 51: Langevin}
+\begin{block}{Question}
+Why does Langevin dynamics sample from \(p(x)\) when using the exact score?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 52: annealing}
+\begin{block}{Question}
+What is the role of decreasing \(\sigma\) in annealed Langevin dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 53: Fokker--Planck}
+\begin{block}{Question}
+What does the second-order term in Fokker--Planck represent physically?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 54: reverse drift}
+\begin{block}{Question}
+Why must the reverse drift include the score term?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 55: PF-ODE}
+\begin{block}{Question}
+Why can an ODE share marginals with an SDE?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 56: divergence}
+\begin{block}{Question}
+In CNFs, why does divergence appear in the log-density dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 57: flow matching}
+\begin{block}{Question}
+What does flow matching regress and why can it avoid likelihood evaluation?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 58: parameterizations}
+\begin{block}{Question}
+Give one practical advantage of \(\epsilon\)-prediction vs \(x_0\)-prediction.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 59: discretization}
+\begin{block}{Question}
+How does step size affect sampling quality and computational cost?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 60: conditioning}
+\begin{block}{Question}
+Why is time conditioning essential for a single network across all noise levels?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 61: KL directions}
+\begin{block}{Question}
+Why does \(\mathrm{KL}(p_{\text{data}}\|p_\theta)\) penalize missing modes more than \(\mathrm{KL}(p_\theta\|p_{\text{data}})\)?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 62: Markov property}
+\begin{block}{Question}
+In DDPM forward process, why is \(q(x_t\mid x_{t-1})\) chosen Markovian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 63: Gaussianity}
+\begin{block}{Question}
+Which assumptions make \(q(x_t\mid x_0)\) Gaussian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 64: regression view}
+\begin{block}{Question}
+Why does the ELBO reduce to an MSE loss under \(\epsilon\)-prediction?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 65: score meaning}
+\begin{block}{Question}
+Interpret \(s(x)=\nabla_x\log p(x)\) geometrically.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 66: Langevin}
+\begin{block}{Question}
+Why does Langevin dynamics sample from \(p(x)\) when using the exact score?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 67: annealing}
+\begin{block}{Question}
+What is the role of decreasing \(\sigma\) in annealed Langevin dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 68: Fokker--Planck}
+\begin{block}{Question}
+What does the second-order term in Fokker--Planck represent physically?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 69: reverse drift}
+\begin{block}{Question}
+Why must the reverse drift include the score term?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 70: PF-ODE}
+\begin{block}{Question}
+Why can an ODE share marginals with an SDE?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 71: divergence}
+\begin{block}{Question}
+In CNFs, why does divergence appear in the log-density dynamics?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 72: flow matching}
+\begin{block}{Question}
+What does flow matching regress and why can it avoid likelihood evaluation?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 73: parameterizations}
+\begin{block}{Question}
+Give one practical advantage of \(\epsilon\)-prediction vs \(x_0\)-prediction.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 74: discretization}
+\begin{block}{Question}
+How does step size affect sampling quality and computational cost?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 75: conditioning}
+\begin{block}{Question}
+Why is time conditioning essential for a single network across all noise levels?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 76: KL directions}
+\begin{block}{Question}
+Why does \(\mathrm{KL}(p_{\text{data}}\|p_\theta)\) penalize missing modes more than \(\mathrm{KL}(p_\theta\|p_{\text{data}})\)?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 77: Markov property}
+\begin{block}{Question}
+In DDPM forward process, why is \(q(x_t\mid x_{t-1})\) chosen Markovian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 78: Gaussianity}
+\begin{block}{Question}
+Which assumptions make \(q(x_t\mid x_0)\) Gaussian?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 79: regression view}
+\begin{block}{Question}
+Why does the ELBO reduce to an MSE loss under \(\epsilon\)-prediction?
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Concept check 80: score meaning}
+\begin{block}{Question}
+Interpret \(s(x)=\nabla_x\log p(x)\) geometrically.
+\end{block}
+\begin{block}{Discussion prompts}
+\begin{itemize}
+\item Relate to the chapter perspective (variational / score / flow).
+\item Write down the relevant equation and identify learned vs fixed terms.
+\item Consider numerical implications for training or sampling.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}{Project ideas}
+\begin{itemize}
+\item Toy DDPM on 2D mixtures; visualize trajectories and learned denoiser.
+\item Train a time-conditioned score model; sample via reverse SDE and PF-ODE.
+\item Compare solvers: Euler vs higher-order on PF-ODE; measure FID-like metrics on toy data.
+\item Flow matching vs DDPM on toy transport; compare sample quality and speed.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Wrap-up}
+\begin{itemize}
+\item Chapters 1--6 establish diffusion models as \emph{probability transport}.
+\item Three perspectives agree: learn a time-dependent vector field.
+\item Next topics (later chapters): conditioning/guidance, inverse problems, acceleration, optimal transport links.
+\end{itemize}
+\centering{\Large Questions?}
+\end{frame}
+
+\end{document}

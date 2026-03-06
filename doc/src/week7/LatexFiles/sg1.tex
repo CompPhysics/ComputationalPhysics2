@@ -1,0 +1,540 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage{amsmath,amssymb,amsfonts,bm}
+\usepackage{physics}
+\usepackage{mathtools}
+
+\title{Stochastic Reconfiguration in Quantum Monte Carlo}
+\author{Morten Hjorth-Jensen}
+\date{FYS4411/9411 Spring 2026}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Content}
+\begin{itemize}
+\item imaginary-time evolution and variational projection,
+\item tangent-space expansion of the trial state,
+\item derivation of the linear system \(S \, \delta \bm{\alpha} = -\delta\tau \, \bm{g}\),
+\item interpretation of the covariance matrix \(S\),
+\item relation to the natural gradient.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Setup and notation}
+We consider a variational wave function
+\[
+\ket{\Psi(\bm{\alpha})},
+\qquad
+\bm{\alpha}=(\alpha_1,\alpha_2,\dots,\alpha_p),
+\]
+depending on \(p\) real parameters.
+
+\medskip
+
+The normalized state is
+\[
+\ket{\overline{\Psi}(\bm{\alpha})}
+=
+\frac{\ket{\Psi(\bm{\alpha})}}
+{\sqrt{\braket{\Psi(\bm{\alpha})}{\Psi(\bm{\alpha})}}}.
+\]
+
+We wish to optimize the parameters such that the energy
+\[
+E(\bm{\alpha})
+=
+\frac{\bra{\Psi(\bm{\alpha})}H\ket{\Psi(\bm{\alpha})}}
+{\braket{\Psi(\bm{\alpha})}{\Psi(\bm{\alpha})}}
+\]
+is minimized.
+\end{frame}
+
+\begin{frame}{Imaginary-time evolution as a route to the ground state}
+The exact imaginary-time evolution of a state is
+\[
+\ket{\Psi(\tau)}
+=
+e^{-\tau H}\ket{\Psi(0)}.
+\]
+
+Expanding the initial state in energy eigenstates,
+\[
+\ket{\Psi(0)}=\sum_n c_n \ket{n},
+\qquad
+H\ket{n}=E_n\ket{n},
+\]
+gives
+\[
+\ket{\Psi(\tau)}
+=
+\sum_n c_n e^{-\tau E_n}\ket{n}.
+\]
+
+If \(c_0\neq 0\), then for large \(\tau\),
+\[
+\ket{\Psi(\tau)} \propto e^{-\tau E_0}\ket{0},
+\]
+so imaginary-time propagation filters out the ground state.
+\end{frame}
+
+\begin{frame}{Why a variational projection is needed}
+In Variational Monte Carlo we do not evolve an arbitrary state in the full Hilbert space.
+Instead, we restrict ourselves to the variational manifold
+\[
+\mathcal{M}
+=
+\left\{
+\ket{\Psi(\bm{\alpha})} \; \middle| \; \bm{\alpha}\in\mathbb{R}^p
+\right\}.
+\]
+
+The exact state
+\[
+(1-\delta\tau H)\ket{\Psi(\bm{\alpha})}
+\]
+will in general \emph{not} belong to \(\mathcal{M}\).
+
+\medskip
+
+Idea of stochastic reconfiguration:
+\begin{itemize}
+\item apply one infinitesimal imaginary-time step,
+\item project the resulting state back onto the variational manifold,
+\item interpret the projection as a parameter update \(\bm{\alpha}\to \bm{\alpha}+\delta\bm{\alpha}\).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{First-order imaginary-time step}
+For a small time step \(\delta\tau\),
+\[
+e^{-\delta\tau H}
+=
+1-\delta\tau H + \mathcal{O}(\delta\tau^2).
+\]
+
+Thus the exact propagated state is approximated by
+\[
+\ket{\Psi_{\mathrm{exact}}'}
+\approx
+(1-\delta\tau H)\ket{\Psi(\bm{\alpha})}.
+\]
+
+A convenient first-order, norm-preserving form is
+\[
+\ket{\Psi_{\mathrm{exact}}'}
+\approx
+\left[1-\delta\tau\bigl(H-E(\bm{\alpha})\bigr)\right]\ket{\Psi(\bm{\alpha})}.
+\]
+
+Subtracting \(E(\bm{\alpha})\) removes the trivial component parallel to \(\ket{\Psi}\).
+\end{frame}
+
+\begin{frame}{Why subtract \(E(\bm{\alpha})\)?}
+Let
+\[
+E=\frac{\bra{\Psi}H\ket{\Psi}}{\braket{\Psi}{\Psi}}.
+\]
+
+Then
+\[
+\bra{\Psi}(H-E)\ket{\Psi}=0.
+\]
+
+Hence the vector
+\[
+(H-E)\ket{\Psi}
+\]
+is orthogonal to \(\ket{\Psi}\) in the sense relevant for norm changes to first order.
+
+\medskip
+
+Therefore,
+\[
+\left[1-\delta\tau(H-E)\right]\ket{\Psi}
+\]
+moves the state in a direction tangent to projective Hilbert space, removing the trivial norm-rescaling component.
+\end{frame}
+
+\begin{frame}{Variational state after a parameter update}
+We now expand the variational state at shifted parameters:
+\[
+\ket{\Psi(\bm{\alpha}+\delta\bm{\alpha})}
+=
+\ket{\Psi(\bm{\alpha})}
++
+\sum_k \delta\alpha_k
+\pdv{}{\alpha_k}\ket{\Psi(\bm{\alpha})}
++\mathcal{O}(\delta\alpha^2).
+\]
+
+Define the tangent vectors
+\[
+\ket{\Psi_k}
+\equiv
+\pdv{}{\alpha_k}\ket{\Psi(\bm{\alpha})}.
+\]
+
+Then
+\[
+\ket{\Psi(\bm{\alpha}+\delta\bm{\alpha})}
+=
+\ket{\Psi}
++
+\sum_k \delta\alpha_k \ket{\Psi_k}
++\mathcal{O}(\delta\alpha^2).
+\]
+\end{frame}
+
+\begin{frame}{Projection principle: minimize the distance}
+We compare
+\[
+\ket{\Psi_{\mathrm{var}}'}
+=
+\ket{\Psi}
++
+\sum_k \delta\alpha_k \ket{\Psi_k}
+\]
+with
+\[
+\ket{\Psi_{\mathrm{exact}}'}
+=
+\left[1-\delta\tau(H-E)\right]\ket{\Psi}.
+\]
+
+Define the mismatch vector
+\[
+\ket{\Delta}
+=
+\ket{\Psi_{\mathrm{var}}'}
+-
+\ket{\Psi_{\mathrm{exact}}'}.
+\]
+
+To first order,
+\[
+\ket{\Delta}
+=
+\sum_k \delta\alpha_k \ket{\Psi_k}
++
+\delta\tau(H-E)\ket{\Psi}.
+\]
+
+The SR update is obtained by minimizing
+\[
+\mathcal{D}
+=
+\braket{\Delta}{\Delta}.
+\]
+\end{frame}
+
+\begin{frame}{Expansion of the distance functional}
+Using
+\[
+\ket{\Delta}
+=
+\sum_k \delta\alpha_k \ket{\Psi_k}
++
+\delta\tau(H-E)\ket{\Psi},
+\]
+we obtain
+\[
+\mathcal{D}
+=
+\left(
+\sum_i \delta\alpha_i \bra{\Psi_i}
++
+\delta\tau \bra{\Psi}(H-E)
+\right)
+\left(
+\sum_j \delta\alpha_j \ket{\Psi_j}
++
+\delta\tau (H-E)\ket{\Psi}
+\right).
+\]
+
+Expanding and keeping terms up to first order in \(\delta\tau\),
+\[
+\mathcal{D}
+=
+\sum_{ij}\delta\alpha_i \delta\alpha_j \braket{\Psi_i}{\Psi_j}
++
+2\delta\tau \sum_i \delta\alpha_i \Re \bra{\Psi_i}(H-E)\ket{\Psi}
++\mathcal{O}(\delta\tau^2).
+\]
+\end{frame}
+
+\begin{frame}{Stationarity condition}
+Differentiate \(\mathcal{D}\) with respect to \(\delta\alpha_i\):
+\[
+\pdv{\mathcal{D}}{(\delta\alpha_i)}
+=
+2\sum_j \braket{\Psi_i}{\Psi_j}\,\delta\alpha_j
++
+2\delta\tau \Re \bra{\Psi_i}(H-E)\ket{\Psi}.
+\]
+
+Setting this equal to zero gives
+\[
+\sum_j \braket{\Psi_i}{\Psi_j}\,\delta\alpha_j
+=
+-\delta\tau \Re \bra{\Psi_i}(H-E)\ket{\Psi}.
+\]
+
+This is the projected imaginary-time equation in the tangent basis \(\{\ket{\Psi_i}\}\).
+\end{frame}
+
+\begin{frame}{Normalized-state formulation}
+To remove the redundant component parallel to \(\ket{\Psi}\), introduce
+\[
+\ket{\overline{\Psi}}=\frac{\ket{\Psi}}{\sqrt{\braket{\Psi}{\Psi}}}.
+\]
+
+Define normalized tangent vectors:
+\[
+\ket{\overline{\Psi}_k}
+=
+\pdv{}{\alpha_k}\ket{\overline{\Psi}}.
+\]
+
+Then the projected equation becomes
+\[
+\sum_j
+\braket{\overline{\Psi}_i}{\overline{\Psi}_j}
+\,\delta\alpha_j
+=
+-\delta\tau
+\bra{\overline{\Psi}_i}(H-E)\ket{\overline{\Psi}}.
+\]
+
+This form leads directly to the SR metric matrix.
+\end{frame}
+
+\begin{frame}{Logarithmic derivatives in configuration space}
+Let \(x\) denote a many-body configuration and write the wave function as \(\Psi(x)\).
+
+Define the logarithmic derivative operators
+\[
+O_k(x)
+=
+\frac{1}{\Psi(x)}
+\pdv{\Psi(x)}{\alpha_k}
+=
+\pdv{\ln \Psi(x)}{\alpha_k}.
+\]
+
+Then
+\[
+\pdv{\Psi(x)}{\alpha_k}=O_k(x)\Psi(x).
+\]
+
+For Monte Carlo sampling with probability
+\[
+P(x)=\frac{|\Psi(x)|^2}{\braket{\Psi}{\Psi}},
+\]
+expectation values are
+\[
+\langle A \rangle = \sum_x P(x)\, A(x)
+\]
+(or integrals in the continuous case).
+\end{frame}
+
+\begin{frame}{Deriving the metric matrix \(S_{ij}\)}
+Using normalized states, one finds
+\[
+\braket{\overline{\Psi}_i}{\overline{\Psi}_j}
+=
+\langle O_i^\ast O_j\rangle
+-
+\langle O_i^\ast\rangle \langle O_j\rangle.
+\]
+
+For real wave functions and real parameters this becomes
+\[
+S_{ij}
+=
+\langle O_i O_j\rangle
+-
+\langle O_i\rangle \langle O_j\rangle.
+\]
+
+Thus \(S_{ij}\) is the covariance matrix of the logarithmic derivatives.
+
+\medskip
+
+Interpretation:
+\begin{itemize}
+\item \(S\) measures how parameter changes alter the normalized state,
+\item \(S\) is the metric tensor on the variational manifold,
+\item \(S\) is positive semidefinite.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Deriving the generalized force \(g_i\)}
+The right-hand side is
+\[
+\bra{\overline{\Psi}_i}(H-E)\ket{\overline{\Psi}}.
+\]
+
+Define the local energy
+\[
+E_{\mathrm{loc}}(x)=\frac{(H\Psi)(x)}{\Psi(x)}.
+\]
+
+Then
+\[
+g_i
+=
+\Re\left[
+\bra{\overline{\Psi}_i}(H-E)\ket{\overline{\Psi}}
+\right]
+=
+\langle O_i E_{\mathrm{loc}}\rangle
+-
+\langle O_i\rangle \langle E_{\mathrm{loc}}\rangle
+\]
+for real-valued states.
+
+Thus \(g_i\) is the covariance between the logarithmic derivative and the local energy.
+\end{frame}
+
+\begin{frame}{Final SR linear system}
+Putting everything together yields
+\[
+\sum_j S_{ij}\,\delta\alpha_j = -\delta\tau\, g_i,
+\]
+with
+\[
+S_{ij}
+=
+\langle O_i O_j\rangle
+-
+\langle O_i\rangle \langle O_j\rangle,
+\]
+and
+\[
+g_i
+=
+\langle O_i E_{\mathrm{loc}}\rangle
+-
+\langle O_i\rangle \langle E_{\mathrm{loc}}\rangle.
+\]
+
+In vector form:
+\[
+S\,\delta\bm{\alpha} = -\delta\tau\, \bm{g},
+\qquad
+\delta\bm{\alpha} = -\delta\tau\, S^{-1}\bm{g}.
+\]
+\end{frame}
+
+\begin{frame}{Why this differs from ordinary gradient descent}
+Ordinary gradient descent updates
+\[
+\delta\bm{\alpha}_{\mathrm{GD}} = -\eta \,\bm{g}.
+\]
+
+SR instead uses
+\[
+\delta\bm{\alpha}_{\mathrm{SR}} = -\eta \, S^{-1}\bm{g}.
+\]
+
+The inverse metric \(S^{-1}\) rescales and mixes parameter directions according to the geometry of the wave-function manifold.
+
+\medskip
+
+Consequences:
+\begin{itemize}
+\item reduced sensitivity to redundant parameterizations,
+\item better conditioning,
+\item close relation to imaginary-time evolution.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Connection to the natural gradient}
+The squared distance between nearby normalized states is
+\[
+ds^2
+=
+\sum_{ij} S_{ij}\, d\alpha_i\, d\alpha_j.
+\]
+
+Thus \(S\) defines a Riemannian metric in parameter space.
+
+\medskip
+
+Steepest descent in this metric gives
+\[
+\delta\bm{\alpha} \propto -S^{-1}\bm{g},
+\]
+which is exactly the \textbf{natural gradient} update.
+
+Therefore SR is the natural-gradient method specialized to variational quantum states.
+\end{frame}
+
+\begin{frame}{Regularization and practical solution}
+In practice \(S\) may be singular or ill-conditioned.
+
+A standard fix is diagonal regularization:
+\[
+S \;\to\; S + \lambda I,
+\qquad \lambda>0.
+\]
+
+Then solve
+\[
+(S+\lambda I)\,\delta\bm{\alpha} = -\delta\tau\,\bm{g}.
+\]
+
+Interpretation:
+\begin{itemize}
+\item stabilizes inversion,
+\item damps noisy directions,
+\item interpolates between SR and ordinary gradient descent for large \(\lambda\).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Algorithmic summary}
+At each iteration:
+\begin{enumerate}
+\item Sample configurations \(x\) from \(P(x)=|\Psi(x)|^2/\braket{\Psi}{\Psi}\).
+\item Compute logarithmic derivatives \(O_k(x)\).
+\item Compute local energies \(E_{\mathrm{loc}}(x)\).
+\item Estimate
+\[
+S_{ij}=\langle O_i O_j\rangle - \langle O_i\rangle\langle O_j\rangle,
+\]
+\[
+g_i=\langle O_i E_{\mathrm{loc}}\rangle - \langle O_i\rangle\langle E_{\mathrm{loc}}\rangle.
+\]
+\item Solve
+\[
+(S+\lambda I)\delta\bm{\alpha}=-\delta\tau\,\bm{g}.
+\]
+\item Update \(\bm{\alpha}\leftarrow \bm{\alpha}+\delta\bm{\alpha}\).
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Summary of the derivation}
+\begin{itemize}
+\item Imaginary-time evolution suggests the optimal direction toward the ground state.
+\item The variational manifold restricts admissible states to \(\ket{\Psi(\bm{\alpha})}\).
+\item Projecting the infinitesimal imaginary-time step onto the tangent space yields
+\[
+S\,\delta\bm{\alpha}=-\delta\tau\,\bm{g}.
+\]
+\item \(S\) is the covariance matrix of logarithmic derivatives.
+\item \(\bm{g}\) is the covariance of logarithmic derivatives with the local energy.
+\item SR is both:
+\begin{itemize}
+\item a projected imaginary-time evolution,
+\item and a natural-gradient optimization method.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\end{document}
