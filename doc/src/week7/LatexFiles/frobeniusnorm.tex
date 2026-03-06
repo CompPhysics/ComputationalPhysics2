@@ -1,0 +1,291 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage{amsmath,amssymb,amsfonts,bm}
+\usepackage{mathtools}
+
+\title{The Frobenius Norm and the Trace Identity}
+\author{Morten Hjorth-Jensen}
+\date{Spring 2026}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Goal}
+For a real matrix \(A\in\mathbb{R}^{m\times n}\), we want to show that
+\[
+\|A\|_F^2=\operatorname{Tr}(A^T A),
+\qquad
+\text{equivalently}
+\qquad
+\|A\|_F=\sqrt{\operatorname{Tr}(A^T A)}.
+\]
+
+We will present two proofs:
+\begin{enumerate}
+\item a direct component-wise proof,
+\item a proof using vectorization and inner products.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Definition of the Frobenius norm}
+Let
+\[
+A=(a_{ij}) \in \mathbb{R}^{m\times n}.
+\]
+
+The Frobenius norm is defined by
+\[
+\|A\|_F
+=
+\sqrt{\sum_{i=1}^{m}\sum_{j=1}^{n} a_{ij}^2 }.
+\]
+
+Therefore,
+\[
+\|A\|_F^2
+=
+\sum_{i=1}^{m}\sum_{j=1}^{n} a_{ij}^2.
+\]
+
+So the Frobenius norm is simply the Euclidean norm of the matrix entries viewed as one long vector.
+\end{frame}
+
+\begin{frame}{Step 1: Entries of \(A^T A\)}
+The matrix \(A^T A\) is an \(n\times n\) matrix.
+
+Its \((j,k)\)-entry is
+\[
+(A^T A)_{jk}
+=
+\sum_{i=1}^{m} a_{ij}a_{ik}.
+\]
+
+In particular, the diagonal entries are
+\[
+(A^T A)_{jj}
+=
+\sum_{i=1}^{m} a_{ij}^2.
+\]
+\end{frame}
+
+\begin{frame}{Step 2: Take the trace}
+By definition, the trace is the sum of the diagonal entries:
+\[
+\operatorname{Tr}(A^T A)
+=
+\sum_{j=1}^{n}(A^T A)_{jj}.
+\]
+
+Using the previous expression,
+\[
+\operatorname{Tr}(A^T A)
+=
+\sum_{j=1}^{n}\sum_{i=1}^{m} a_{ij}^2.
+\]
+
+Reordering the sums gives
+\[
+\operatorname{Tr}(A^T A)
+=
+\sum_{i=1}^{m}\sum_{j=1}^{n} a_{ij}^2.
+\]
+\end{frame}
+
+\begin{frame}{Conclusion of the direct proof}
+But
+\[
+\sum_{i=1}^{m}\sum_{j=1}^{n} a_{ij}^2
+=
+\|A\|_F^2.
+\]
+
+Hence
+\[
+\boxed{\|A\|_F^2=\operatorname{Tr}(A^T A)}.
+\]
+
+Taking square roots yields
+\[
+\boxed{\|A\|_F=\sqrt{\operatorname{Tr}(A^T A)}}.
+\]
+\end{frame}
+
+\begin{frame}{Frobenius inner product}
+Define the Frobenius inner product of two matrices \(A,B\in\mathbb{R}^{m\times n}\) by
+\[
+\langle A,B\rangle_F
+=
+\operatorname{Tr}(A^T B).
+\]
+
+In components,
+\[
+\operatorname{Tr}(A^T B)
+=
+\sum_{i=1}^{m}\sum_{j=1}^{n} a_{ij}b_{ij}.
+\]
+
+So this is exactly the standard Euclidean inner product of the entries of the two matrices.
+\end{frame}
+
+\begin{frame}{The norm induced by the Frobenius inner product}
+Every inner product induces a norm:
+\[
+\|A\|=\sqrt{\langle A,A\rangle}.
+\]
+
+For the Frobenius inner product,
+\[
+\|A\|_F
+=
+\sqrt{\langle A,A\rangle_F}
+=
+\sqrt{\operatorname{Tr}(A^T A)}.
+\]
+
+Thus the identity
+\[
+\|A\|_F^2=\operatorname{Tr}(A^T A)
+\]
+can be viewed as a direct consequence of the fact that the Frobenius norm is the norm induced by the Frobenius inner product.
+\end{frame}
+
+\begin{frame}{Vectorization of a matrix}
+Define the vectorization map
+\[
+\operatorname{vec}: \mathbb{R}^{m\times n}\to \mathbb{R}^{mn}
+\]
+by stacking the columns of \(A\) into one long vector:
+\[
+\operatorname{vec}(A)
+=
+\begin{pmatrix}
+a_{11}\\
+a_{21}\\
+\vdots\\
+a_{m1}\\
+a_{12}\\
+a_{22}\\
+\vdots\\
+a_{mn}
+\end{pmatrix}.
+\]
+
+The precise ordering is not important for the norm, as long as every matrix entry appears exactly once.
+\end{frame}
+
+\begin{frame}{Proof using vectorization}
+The Euclidean norm of \(\operatorname{vec}(A)\) is
+\[
+\|\operatorname{vec}(A)\|_2^2
+=
+\sum_{i=1}^{m}\sum_{j=1}^{n} a_{ij}^2.
+\]
+
+But by definition, this is exactly the Frobenius norm squared:
+\[
+\|\operatorname{vec}(A)\|_2^2=\|A\|_F^2.
+\]
+
+On the other hand, the Euclidean inner product of \(\operatorname{vec}(A)\) with itself is
+\[
+\operatorname{vec}(A)^T\operatorname{vec}(A).
+\]
+
+So
+\[
+\|A\|_F^2=\operatorname{vec}(A)^T\operatorname{vec}(A).
+\]
+\end{frame}
+
+\begin{frame}{Vectorization and the trace}
+A standard identity is
+\[
+\operatorname{vec}(A)^T\operatorname{vec}(B)=\operatorname{Tr}(A^T B).
+\]
+
+Setting \(B=A\), we get
+\[
+\operatorname{vec}(A)^T\operatorname{vec}(A)=\operatorname{Tr}(A^T A).
+\]
+
+Since
+\[
+\|A\|_F^2=\operatorname{vec}(A)^T\operatorname{vec}(A),
+\]
+it follows immediately that
+\[
+\boxed{\|A\|_F^2=\operatorname{Tr}(A^T A)}.
+\]
+\end{frame}
+
+\begin{frame}{Why the vectorization identity is true}
+Let \(A=(a_{ij})\) and \(B=(b_{ij})\). Then
+\[
+\operatorname{vec}(A)^T\operatorname{vec}(B)
+=
+\sum_{i=1}^{m}\sum_{j=1}^{n} a_{ij}b_{ij}.
+\]
+
+But from the definition of the trace,
+\[
+\operatorname{Tr}(A^T B)
+=
+\sum_{j=1}^{n}(A^T B)_{jj}
+=
+\sum_{j=1}^{n}\sum_{i=1}^{m} a_{ij}b_{ij}.
+\]
+
+Hence
+\[
+\operatorname{vec}(A)^T\operatorname{vec}(B)=\operatorname{Tr}(A^T B).
+\]
+
+So vectorization turns the Frobenius inner product into the standard Euclidean inner product in \(\mathbb{R}^{mn}\).
+\end{frame}
+
+\begin{frame}{Geometric interpretation}
+The matrix space \(\mathbb{R}^{m\times n}\) is itself a Euclidean vector space.
+
+Under vectorization,
+\[
+A \longmapsto \operatorname{vec}(A),
+\]
+the Frobenius norm becomes the ordinary Euclidean norm:
+\[
+\|A\|_F=\|\operatorname{vec}(A)\|_2.
+\]
+
+Thus
+\[
+\operatorname{Tr}(A^T A)
+\]
+is nothing but the squared Euclidean length of the matrix when viewed as a vector of all its entries.
+\end{frame}
+
+\begin{frame}{Summary}
+We have shown that for any real matrix \(A\in\mathbb{R}^{m\times n}\),
+\[
+\boxed{\|A\|_F^2=\operatorname{Tr}(A^T A)}.
+\]
+
+Two proofs were given:
+\begin{itemize}
+\item a direct component-wise proof using the diagonal entries of \(A^T A\),
+\item a conceptual proof using
+\[
+\operatorname{vec}(A)^T\operatorname{vec}(B)=\operatorname{Tr}(A^T B).
+\]
+\end{itemize}
+
+Equivalently,
+\[
+\boxed{\|A\|_F=\sqrt{\operatorname{Tr}(A^T A)}}.
+\]
+\end{frame}
+
+\end{document}
