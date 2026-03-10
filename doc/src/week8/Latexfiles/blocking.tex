@@ -1,0 +1,732 @@
+\documentclass{beamer}
+
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{bm}
+
+\title{The Blocking Method for Error Estimation in Monte Carlo Simulations}
+\author{Morten Hjorth-Jensen}
+\date{Spring 2026}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%------------------------------------------------
+
+\begin{frame}{Motivation}
+
+Monte Carlo simulations are central in many areas of physics
+
+\begin{itemize}
+\item Quantum Monte Carlo
+\item Lattice gauge theory
+\item Molecular dynamics
+\item Statistical mechanics
+\end{itemize}
+
+Typical goal: estimate expectation values
+
+\[
+\mu = \mathbb{E}[X]
+\]
+
+from a sequence of measurements
+
+\[
+X_1, X_2, \dots, X_N
+\]
+
+Problem:
+
+\begin{itemize}
+\item Successive samples are often \textbf{correlated}
+\item Naive statistical error estimates become incorrect
+\end{itemize}
+
+The blocking method provides a practical solution.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Naive Error Estimate}
+
+For independent samples the sample mean is
+
+\[
+\bar X = \frac{1}{N}\sum_{i=1}^{N} X_i
+\]
+
+The variance of the estimator is
+
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{\sigma^2}{N}
+\]
+
+with
+
+\[
+\sigma^2 = \mathrm{Var}(X)
+\]
+
+Estimator for the error:
+
+\[
+\sigma_{\bar X}^2
+=
+\frac{1}{N(N-1)}
+\sum_{i=1}^N (X_i-\bar X)^2
+\]
+
+This formula is only correct if the samples are \textbf{independent}.
+\end{frame}
+
+
+
+%------------------------------------------------
+
+\begin{frame}{Correlated Data}
+
+  In Markov Chain Monte Carlo we generate
+
+  \[
+  X_1 \rightarrow X_2 \rightarrow X_3 \rightarrow \dots
+  \]
+
+  via a Markov process.
+
+  Thus
+
+  \[
+  \text{Cov}(X_i,X_j) \neq 0
+  \]
+
+  Define the autocorrelation function
+
+  \[
+  C(t)
+  =
+  \langle (X_i-\mu)(X_{i+t}-\mu) \rangle
+  \]
+
+  Normalized autocorrelation
+
+  \[
+  \rho(t) = \frac{C(t)}{C(0)}
+  \]
+
+  Typically
+
+  \[
+  \rho(t) \sim e^{-t/\tau}
+  \]
+
+  where $\tau$ is the autocorrelation time.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Variance of the Mean with Correlations}
+
+  The variance of the mean becomes
+
+  \[
+  \mathrm{Var}(\bar X)
+  =
+  \frac{\sigma^2}{N}
+  \left(
+  1
+  +
+  2\sum_{t=1}^{\infty}\rho(t)
+  \right)
+  \]
+
+  Define the \textbf{integrated autocorrelation time}
+
+  \[
+  \tau_{\mathrm{int}}
+  =
+  \frac{1}{2}
+  +
+  \sum_{t=1}^{\infty}\rho(t)
+  \]
+
+  Then
+
+  \[
+  \mathrm{Var}(\bar X)
+  =
+  \frac{2\tau_{\mathrm{int}}\sigma^2}{N}
+  \]
+
+  Interpretation:
+
+  \begin{itemize}
+  \item Effective number of independent samples
+  \end{itemize}
+
+  \[
+  N_{\mathrm{eff}}
+  =
+  \frac{N}{2\tau_{\mathrm{int}}}
+  \]
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Idea Behind the Blocking Method}
+
+  Instead of estimating autocorrelations explicitly:
+
+  \begin{itemize}
+  \item Combine neighboring samples into blocks
+  \item Each blocking level reduces correlations
+  \end{itemize}
+
+  If blocks are large enough:
+
+  \[
+  \text{block averages} \approx \text{independent samples}
+  \]
+
+  Then the usual variance estimator becomes valid again.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Blocking Transformation}
+
+  Start with dataset
+
+  \[
+  X^{(0)}_i, \quad i=1,\dots,N
+  \]
+
+  Define the blocking transformation
+
+  \[
+  X^{(k+1)}_i
+  =
+  \frac{1}{2}
+  \left(
+  X^{(k)}_{2i-1}
+  +
+  X^{(k)}_{2i}
+  \right)
+  \]
+
+  Properties:
+
+  \begin{itemize}
+  \item Number of samples halves each iteration
+  \item Correlations decrease with blocking level
+  \end{itemize}
+
+  After $k$ transformations:
+
+  \[
+  N_k = \frac{N}{2^k}
+  \]
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Variance at Blocking Level $k$}
+
+  Compute
+
+  \[
+  \bar X_k
+  =
+  \frac{1}{N_k}
+  \sum_{i=1}^{N_k} X^{(k)}_i
+  \]
+
+  Variance estimate
+
+  \[
+  s_k^2
+  =
+  \frac{1}{N_k-1}
+  \sum_{i=1}^{N_k}
+  \left(
+  X^{(k)}_i - \bar X_k
+  \right)^2
+  \]
+
+  Error estimate
+
+  \[
+  \sigma_k^2
+  =
+  \frac{s_k^2}{N_k}
+  \]
+
+  As correlations disappear
+
+  \[
+  \sigma_k^2
+  \rightarrow
+  \mathrm{Var}(\bar X)
+  \]
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Convergence of the Blocking Method}
+
+  Key observation:
+
+  \begin{itemize}
+  \item Initially the variance estimate increases
+  \item Eventually it reaches a plateau
+  \end{itemize}
+
+  Plateau value gives the correct error estimate.
+
+  Graphically:
+
+  \begin{itemize}
+  \item Plot variance vs blocking level
+  \item Choose region where curve stabilizes
+  \end{itemize}
+
+  This plateau indicates that blocks are effectively independent.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Rigorous Derivation from the Covariance Matrix}
+
+Let
+\[
+\bm{X} = (X_1,X_2,\dots,X_N)^T
+\]
+be a random vector with mean
+\[
+\mathbb{E}[\bm{X}] = \mu \bm{1},
+\qquad
+\bm{1} = (1,1,\dots,1)^T .
+\]
+
+The sample mean can be written as
+\[
+\bar X = \frac{1}{N}\bm{1}^T \bm{X}.
+\]
+
+We want the variance of $\bar X$ when the entries of $\bm{X}$ are correlated.
+
+Define the covariance matrix
+\[
+\Sigma_{ij} = \mathrm{Cov}(X_i,X_j)
+= \mathbb{E}\big[(X_i-\mu)(X_j-\mu)\big].
+\]
+
+Then
+\[
+\mathrm{Var}(\bar X)
+=
+\mathrm{Var}\left(\frac{1}{N}\bm{1}^T\bm{X}\right).
+\]
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Variance of a Linear Combination}
+
+For any random vector $\bm{X}$ and deterministic vector $\bm{a}$,
+\[
+\mathrm{Var}(\bm{a}^T\bm{X}) = \bm{a}^T \Sigma \bm{a}.
+\]
+
+Choosing
+\[
+\bm{a} = \frac{1}{N}\bm{1},
+\]
+we obtain
+\[
+\mathrm{Var}(\bar X)
+=
+\left(\frac{1}{N}\bm{1}\right)^T
+\Sigma
+\left(\frac{1}{N}\bm{1}\right)
+=
+\frac{1}{N^2}\bm{1}^T\Sigma\bm{1}.
+\]
+
+Writing this out explicitly,
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{1}{N^2}\sum_{i=1}^N \sum_{j=1}^N \Sigma_{ij}
+=
+\frac{1}{N^2}\sum_{i=1}^N \sum_{j=1}^N \mathrm{Cov}(X_i,X_j).
+\]
+
+This is the exact formula for the variance of the sample mean for correlated data.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Stationary Time Series and Toeplitz Structure}
+
+Assume the process is weakly stationary:
+
+\begin{itemize}
+\item $\mathbb{E}[X_i]=\mu$ independent of $i$
+\item $\mathrm{Cov}(X_i,X_j)$ depends only on the lag $|i-j|$
+\end{itemize}
+
+Then
+\[
+\Sigma_{ij} = C(|i-j|),
+\]
+where
+\[
+C(t)=\mathrm{Cov}(X_k,X_{k+t}).
+\]
+
+Thus the covariance matrix has Toeplitz form:
+\[
+\Sigma =
+\begin{pmatrix}
+C(0) & C(1) & C(2) & \cdots \\
+C(1) & C(0) & C(1) & \cdots \\
+C(2) & C(1) & C(0) & \cdots \\
+\vdots & \vdots & \vdots & \ddots
+\end{pmatrix}.
+\]
+
+The diagonal entries are the ordinary variance:
+\[
+C(0)=\sigma^2.
+\]
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Summing the Covariances}
+
+Using stationarity,
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{1}{N^2}\sum_{i=1}^N\sum_{j=1}^N C(|i-j|).
+\]
+
+We now reorganize the double sum according to the lag
+\[
+t = |i-j|.
+\]
+
+For lag $t=0$, there are $N$ terms.
+
+For lag $t\ge 1$, there are
+\[
+2(N-t)
+\]
+terms, since both $(i,j)$ and $(j,i)$ contribute.
+
+Therefore
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{1}{N^2}
+\left[
+N C(0) + 2\sum_{t=1}^{N-1}(N-t)C(t)
+\right].
+\]
+
+Equivalently,
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{C(0)}{N}
++
+\frac{2}{N^2}\sum_{t=1}^{N-1}(N-t)C(t).
+\]
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Normalized Autocorrelation Function}
+
+Introduce the normalized autocorrelation function
+\[
+\rho(t)=\frac{C(t)}{C(0)}=\frac{C(t)}{\sigma^2}.
+\]
+
+Then
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{\sigma^2}{N}
+\left[
+1+\frac{2}{N}\sum_{t=1}^{N-1}(N-t)\rho(t)
+\right].
+\]
+
+Rewriting,
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{\sigma^2}{N}
+\left[
+1+2\sum_{t=1}^{N-1}\left(1-\frac{t}{N}\right)\rho(t)
+\right].
+\]
+
+This formula is exact for a stationary correlated sequence of finite length $N$.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Large-$N$ Limit and Integrated Autocorrelation Time}
+
+Suppose the autocorrelation decays sufficiently rapidly so that
+\[
+\sum_{t=1}^{\infty} |\rho(t)| < \infty.
+\]
+
+Then for large $N$,
+\[
+1-\frac{t}{N}\approx 1
+\qquad
+\text{for relevant lags } t,
+\]
+and hence
+\[
+\mathrm{Var}(\bar X)
+\approx
+\frac{\sigma^2}{N}
+\left[
+1+2\sum_{t=1}^{\infty}\rho(t)
+\right].
+\]
+
+Define the integrated autocorrelation time
+\[
+\tau_{\mathrm{int}}
+=
+\frac{1}{2}+\sum_{t=1}^{\infty}\rho(t).
+\]
+
+Then
+\[
+\mathrm{Var}(\bar X)
+\approx
+\frac{2\tau_{\mathrm{int}}\sigma^2}{N}.
+\]
+
+This shows precisely how correlations inflate the uncertainty of the mean.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Interpretation in Terms of Effective Sample Size}
+
+If the data were independent, we would have
+\[
+\mathrm{Var}(\bar X)=\frac{\sigma^2}{N}.
+\]
+
+For correlated data,
+\[
+\mathrm{Var}(\bar X)\approx \frac{2\tau_{\mathrm{int}}\sigma^2}{N}.
+\]
+
+Hence we define an effective number of independent samples by
+\[
+\frac{\sigma^2}{N_{\mathrm{eff}}}
+=
+\frac{2\tau_{\mathrm{int}}\sigma^2}{N}.
+\]
+
+Therefore
+\[
+N_{\mathrm{eff}}=\frac{N}{2\tau_{\mathrm{int}}}.
+\]
+
+So autocorrelations reduce the information content of the sample from $N$ to $N_{\mathrm{eff}}$.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Why Blocking Works}
+
+The blocking transformation is
+\[
+X_i^{(k+1)}=\frac{1}{2}\left(X_{2i-1}^{(k)}+X_{2i}^{(k)}\right).
+\]
+
+This is a linear coarse-graining of the original correlated sequence.
+
+Its effect is to suppress short-range correlations and to reduce the off-diagonal structure of the covariance matrix.
+
+At sufficiently high blocking level, the transformed covariance matrix becomes approximately diagonal:
+\[
+\Sigma^{(k)} \approx s_k^2 I.
+\]
+
+Then
+\[
+\mathrm{Var}(\bar X)
+\approx \frac{s_k^2}{N_k},
+\]
+which is exactly the independent-sample formula.
+
+Thus blocking is a practical numerical procedure for converting the full covariance structure into a reliable variance estimate.
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}{Mathematical Summary}
+
+Starting from the covariance matrix,
+\[
+\mathrm{Var}(\bar X)=\frac{1}{N^2}\bm{1}^T\Sigma\bm{1}.
+\]
+
+For a stationary process,
+\[
+\Sigma_{ij}=C(|i-j|),
+\]
+so
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{1}{N^2}
+\left[
+N C(0)+2\sum_{t=1}^{N-1}(N-t)C(t)
+\right].
+\]
+
+In terms of $\rho(t)=C(t)/C(0)$,
+\[
+\mathrm{Var}(\bar X)
+=
+\frac{\sigma^2}{N}
+\left[
+1+2\sum_{t=1}^{N-1}\left(1-\frac{t}{N}\right)\rho(t)
+\right].
+\]
+
+For large $N$,
+\[
+\mathrm{Var}(\bar X)\approx \frac{2\tau_{\mathrm{int}}\sigma^2}{N}.
+\]
+
+This is the theoretical foundation behind blocking analysis.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Blocking Algorithm}
+
+  Given data $X_1,\dots,X_N$:
+
+  \begin{enumerate}
+
+  \item Compute variance estimate
+
+    \[
+    \sigma_0^2
+    \]
+
+  \item Perform blocking transformation
+
+    \[
+    X_i \rightarrow \frac{X_{2i-1}+X_{2i}}{2}
+    \]
+
+  \item Recompute variance
+
+    \[
+    \sigma_k^2
+    \]
+
+  \item Repeat until
+
+    \[
+    N_k < 2
+    \]
+
+  \item Identify plateau region in variance
+
+  \end{enumerate}
+
+  The plateau gives the best estimate of the statistical error.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pseudocode}
+
+  \textbf{Blocking algorithm}
+
+\begin{verbatim}
+  data = X
+
+  while len(data) > 1:
+
+    compute mean(data)
+    compute variance(data)
+
+    store variance estimate
+
+    new_data = []
+
+    for i in range(0,len(data),2):
+        block = (data[i] + data[i+1])/2
+        new_data.append(block)
+
+    data = new_data
+\end{verbatim}
+
+Plot stored variance estimates versus blocking level.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Applications in Physics}
+
+  Blocking is widely used in
+
+  \begin{itemize}
+
+  \item Quantum Monte Carlo
+  \item Variational Monte Carlo
+  \item Diffusion Monte Carlo
+  \item Lattice QCD
+  \item Molecular dynamics
+
+  \end{itemize}
+
+  Typical observables
+
+  \begin{itemize}
+
+  \item Ground state energies
+  \item Correlation functions
+  \item Magnetization
+  \item Susceptibility
+
+  \end{itemize}
+
+  Blocking provides a robust error estimate without computing full autocorrelation functions.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Summary}
+
+  \begin{itemize}
+
+  \item Monte Carlo samples are typically correlated
+  \item Naive variance estimates underestimate errors
+  \item Blocking reduces correlations through recursive averaging
+  \item Variance converges to a plateau corresponding to correct error
+  \item Simple, robust and widely used in computational physics
+
+  \end{itemize}
+
+  Blocking remains one of the most reliable error estimation techniques in large-scale Monte Carlo simulations.
+\end{frame}
+
+%------------------------------------------------
+
+\end{document}

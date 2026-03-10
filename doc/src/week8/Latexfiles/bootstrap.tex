@@ -1,0 +1,477 @@
+\documentclass{beamer}
+
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{bm}
+
+\title{Bootstrap Resampling Methods}
+\subtitle{Statistical Error Estimation in Computational Physics}
+\author{Morten Hjorth-Jensen}
+\date{Spring 2026}
+
+\begin{document}
+
+\frame{\titlepage}
+
+%------------------------------------------------
+
+\begin{frame}{Motivation}
+
+In many areas of physics we estimate observables from finite datasets:
+
+\[
+X_1, X_2, \dots, X_N
+\]
+
+Examples:
+
+\begin{itemize}
+\item Monte Carlo simulations
+\item Lattice gauge theory
+\item Molecular dynamics
+\item Experimental measurements
+\end{itemize}
+
+Goal: estimate statistical uncertainty of an estimator
+
+\[
+\hat{\theta} = f(X_1,\dots,X_N)
+\]
+
+Problem:
+
+\begin{itemize}
+\item Analytical variance formulas may be unavailable
+\item Estimators may be nonlinear
+\item Distribution of $\hat{\theta}$ may be unknown
+\end{itemize}
+
+Bootstrap resampling provides a numerical solution.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Basic Idea of the Bootstrap}
+
+Suppose the unknown distribution generating the data is
+
+\[
+F(x)
+\]
+
+but we only observe samples
+
+\[
+X_1,\dots,X_N \sim F
+\]
+
+The bootstrap replaces the unknown distribution by the empirical distribution
+
+\[
+\hat{F}_N(x)
+\]
+
+defined by
+
+\[
+\hat{F}_N(x)=\frac{1}{N}\sum_{i=1}^{N}\delta(x-X_i)
+\]
+
+Interpretation:
+
+\begin{itemize}
+\item Treat the observed dataset as the population
+\item Generate new samples by resampling with replacement
+\end{itemize}
+
+This produces synthetic datasets from $\hat{F}_N$.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Bootstrap Resampling}
+
+Generate a bootstrap sample
+
+\[
+X_1^*, X_2^*, \dots, X_N^*
+\]
+
+by drawing $N$ values from the original data
+
+\[
+\{X_1,\dots,X_N\}
+\]
+
+with replacement.
+
+Example:
+
+\[
+\{1.2, 0.8, 1.4, 0.9\}
+\]
+
+Possible bootstrap sample:
+
+\[
+\{0.8,1.4,1.4,1.2\}
+\]
+
+Each bootstrap dataset mimics an independent experiment.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Bootstrap Distribution of an Estimator}
+
+For each bootstrap sample compute
+
+\[
+\hat{\theta}^* = f(X_1^*,\dots,X_N^*)
+\]
+
+Repeat this procedure $B$ times:
+
+\[
+\hat{\theta}_1^*, \hat{\theta}_2^*, \dots, \hat{\theta}_B^*
+\]
+
+These values form the \textbf{bootstrap distribution}
+
+\[
+P_B(\hat{\theta})
+\]
+
+which approximates the sampling distribution of the estimator
+
+\[
+P(\hat{\theta})
+\]
+
+in the limit of large $N$.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Bootstrap Estimate of the Variance}
+
+The bootstrap estimate of the variance is
+
+\[
+\mathrm{Var}_{\text{boot}}(\hat{\theta})
+=
+\frac{1}{B-1}
+\sum_{b=1}^{B}
+(\hat{\theta}_b^*-\bar{\theta}^*)^2
+\]
+
+where
+
+\[
+\bar{\theta}^*=
+\frac{1}{B}\sum_{b=1}^{B}\hat{\theta}_b^*
+\]
+
+Thus the bootstrap standard error becomes
+
+\[
+\sigma_{\text{boot}}
+=
+\sqrt{\mathrm{Var}_{\text{boot}}}.
+\]
+
+As $B\to\infty$, the estimate converges to the true variance.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Consistency of the Bootstrap}
+
+Let
+
+\[
+\hat{\theta}=f(X_1,\dots,X_N)
+\]
+
+be an estimator.
+
+Under mild regularity conditions,
+
+\[
+\sqrt{N}(\hat{\theta}-\theta)
+\]
+
+has a limiting distribution.
+
+Bootstrap theory shows
+
+\[
+\sqrt{N}(\hat{\theta}^*-\hat{\theta})
+\]
+
+approximates the same limiting distribution.
+
+Thus
+
+\[
+P^*(\hat{\theta}^*-\hat{\theta})
+\approx
+P(\hat{\theta}-\theta).
+\]
+
+This is the theoretical justification of the bootstrap.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Bootstrap Confidence Intervals}
+
+Let
+
+\[
+\hat{\theta}_1^*,\dots,\hat{\theta}_B^*
+\]
+
+be sorted.
+
+\textbf{Percentile interval}
+
+For confidence level $1-\alpha$:
+
+\[
+[\hat{\theta}_{\alpha/2}^*, \hat{\theta}_{1-\alpha/2}^*]
+\]
+
+Example:
+
+95\% interval
+
+\[
+[\hat{\theta}_{2.5\%}^*,\hat{\theta}_{97.5\%}^*]
+\]
+
+This method uses the empirical quantiles of the bootstrap distribution.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Bias Estimation}
+
+Bootstrap also estimates bias:
+
+\[
+\text{Bias} =
+\mathbb{E}[\hat{\theta}] - \theta
+\]
+
+Bootstrap estimate
+
+\[
+\widehat{\text{Bias}}
+=
+\bar{\theta}^* - \hat{\theta}
+\]
+
+Bias-corrected estimator:
+
+\[
+\hat{\theta}_{BC}
+=
+\hat{\theta} - \widehat{\text{Bias}}
+\]
+
+Bootstrap therefore provides both
+
+\begin{itemize}
+\item variance estimates
+\item bias corrections
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Bootstrap Algorithm}
+
+Given data
+
+\[
+X_1,\dots,X_N
+\]
+
+\begin{enumerate}
+
+\item Choose number of resamples $B$
+
+\item For $b=1\dots B$
+
+\begin{itemize}
+
+\item Draw bootstrap sample with replacement
+\[
+X_1^*,\dots,X_N^*
+\]
+
+\item Compute estimator
+\[
+\hat{\theta}_b^*
+\]
+
+\end{itemize}
+
+\item Compute
+
+\[
+\sigma_{\text{boot}}
+\]
+
+\end{enumerate}
+
+Typical choice:
+
+\[
+B = 1000 - 10000
+\]
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Bootstrap Pseudocode}
+
+\begin{verbatim}
+theta_boot = []
+
+for b in range(B):
+
+    sample = random.choice(data, size=N)
+
+    theta_star = estimator(sample)
+
+    theta_boot.append(theta_star)
+
+mean_boot = mean(theta_boot)
+
+variance_boot = var(theta_boot)
+\end{verbatim}
+
+The list \texttt{theta\_boot} approximates the sampling distribution of the estimator.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Applications in Physics}
+
+Bootstrap is widely used in
+
+\begin{itemize}
+
+\item Lattice QCD
+\item Quantum Monte Carlo
+\item Molecular simulations
+\item Experimental particle physics
+\item Parameter estimation in model fitting
+
+\end{itemize}
+
+Examples of estimators:
+
+\begin{itemize}
+
+\item correlation functions
+\item energy differences
+\item nonlinear observables
+\item fitted parameters
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Example: Monte Carlo Observable}
+
+Suppose we estimate an observable
+
+\[
+\langle O \rangle
+=
+\frac{1}{N}\sum_i O_i
+\]
+
+But we want uncertainty for a nonlinear function
+
+\[
+R = \frac{\langle A \rangle}{\langle B \rangle}
+\]
+
+Analytic variance formulas become complicated.
+
+Bootstrap procedure:
+
+\begin{itemize}
+
+\item resample pairs $(A_i,B_i)$
+\item recompute ratio
+\item obtain distribution of $R$
+
+\end{itemize}
+
+This yields robust uncertainty estimates.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Bootstrap vs Other Resampling Methods}
+
+Common resampling techniques:
+
+\begin{itemize}
+
+\item Bootstrap
+\item Jackknife
+\item Blocking
+\end{itemize}
+
+Bootstrap advantages:
+
+\begin{itemize}
+
+\item works for complex estimators
+\item easy to implement
+\item provides full distribution
+\end{itemize}
+
+Bootstrap limitation:
+
+\begin{itemize}
+
+\item assumes independent samples
+\end{itemize}
+
+For correlated Monte Carlo data we combine:
+
+\begin{itemize}
+
+\item blocking + bootstrap
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Summary}
+
+Bootstrap resampling is a powerful statistical tool.
+
+\begin{itemize}
+
+\item Approximates sampling distributions numerically
+\item Requires minimal analytical assumptions
+\item Provides variance, bias, and confidence intervals
+\item Widely used in computational physics
+
+\end{itemize}
+
+In modern simulations bootstrap analysis is a standard component of data analysis pipelines.
+\end{frame}
+
+%------------------------------------------------
+
+\end{document}
