@@ -1,0 +1,52 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+
+\PYG{o}{\PYGZpc{}}\PYG{n}{matplotlib} \PYG{n}{inline}
+
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{o}{*}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{n+nn}{.}\PYG{n+nn}{random}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{randint}\PYG{p}{,} \PYG{n}{randn}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{time}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{time}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{scipy}\PYG{n+nn}{.}\PYG{n+nn}{stats}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{norm}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{matplotlib}\PYG{n+nn}{.}\PYG{n+nn}{pyplot}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{plt}
+
+\PYG{c+c1}{\PYGZsh{} Returns mean of bootstrap samples}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{stat}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}\PYG{p}{:}
+    \PYG{k}{return} \PYG{n}{mean}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Bootstrap algorithm}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{bootstrap}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{statistic}\PYG{p}{,} \PYG{n}{R}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{t} \PYG{o}{=} \PYG{n}{zeros}\PYG{p}{(}\PYG{n}{R}\PYG{p}{)}\PYG{p}{;} \PYG{n}{n} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}\PYG{p}{;} \PYG{n}{inds} \PYG{o}{=} \PYG{n}{arange}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{;} \PYG{n}{t0} \PYG{o}{=} \PYG{n}{time}\PYG{p}{(}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} non\PYGZhy{}parametric bootstrap}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{R}\PYG{p}{)}\PYG{p}{:}
+        \PYG{n}{t}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n}{statistic}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[}\PYG{n}{randint}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{n}\PYG{p}{,}\PYG{n}{n}\PYG{p}{)}\PYG{p}{]}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} analysis}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Runtime: }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s2}{ sec}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{p}{(}\PYG{n}{time}\PYG{p}{(}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{t0}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;} \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Bootstrap Statistics :}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{original           bias      std. error}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZpc{}8g}\PYG{l+s+s2}{ }\PYG{l+s+si}{\PYGZpc{}8g}\PYG{l+s+s2}{ }\PYG{l+s+si}{\PYGZpc{}14g}\PYG{l+s+s2}{ }\PYG{l+s+si}{\PYGZpc{}15g}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{p}{(}\PYG{n}{statistic}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}\PYG{p}{,} \PYG{n}{std}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}\PYG{p}{,}\PYGZbs{}
+                             \PYG{n}{mean}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}\PYG{p}{,} \PYGZbs{}
+                             \PYG{n}{std}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{t}
+
+
+\PYG{n}{mu}\PYG{p}{,} \PYG{n}{sigma} \PYG{o}{=} \PYG{l+m+mi}{100}\PYG{p}{,} \PYG{l+m+mi}{15}
+\PYG{n}{datapoints} \PYG{o}{=} \PYG{l+m+mi}{10000}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{mu} \PYG{o}{+} \PYG{n}{sigma}\PYG{o}{*}\PYG{n}{random}\PYG{o}{.}\PYG{n}{randn}\PYG{p}{(}\PYG{n}{datapoints}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} bootstrap returns the data sample                                                                                                          t = bootstrap(x, stat, datapoints)}
+\PYG{c+c1}{\PYGZsh{} the histogram of the bootstrapped  data}
+\PYG{n}{t} \PYG{o}{=} \PYG{n}{bootstrap}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{stat}\PYG{p}{,} \PYG{n}{datapoints}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} the histogram of the bootstrapped  data}
+\PYG{n}{n}\PYG{p}{,} \PYG{n}{binsboot}\PYG{p}{,} \PYG{n}{patches} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{hist}\PYG{p}{(}\PYG{n}{t}\PYG{p}{,} \PYG{n}{bins}\PYG{o}{=}\PYG{l+m+mi}{50}\PYG{p}{,} \PYG{n}{density}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{true}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{n}{histtype}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bar}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{red}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.75}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} add a \PYGZsq{}best fit\PYGZsq{} line}
+\PYG{n}{y} \PYG{o}{=} \PYG{n}{norm}\PYG{o}{.}\PYG{n}{pdf}\PYG{p}{(} \PYG{n}{binsboot}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}\PYG{p}{,} \PYG{n}{std}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{lt} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{binsboot}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{r\PYGZhy{}\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{linewidth}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Smarts}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Probability}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{axis}\PYG{p}{(}\PYG{p}{[}\PYG{l+m+mf}{99.5}\PYG{p}{,} \PYG{l+m+mf}{100.6}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mf}{3.0}\PYG{p}{]}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{)}
+
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+
+
+\end{MintedVerbatim}

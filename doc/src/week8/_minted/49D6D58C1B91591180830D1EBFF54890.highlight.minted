@@ -1,0 +1,32 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{o}{*}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{n+nn}{.}\PYG{n+nn}{random}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{randint}\PYG{p}{,} \PYG{n}{randn}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{time}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{time}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{jackknife}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{stat}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{n} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}\PYG{p}{;}\PYG{n}{t} \PYG{o}{=} \PYG{n}{zeros}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{;} \PYG{n}{inds} \PYG{o}{=} \PYG{n}{arange}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{;} \PYG{n}{t0} \PYG{o}{=} \PYG{n}{time}\PYG{p}{(}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{}\PYGZsh{} \PYGZsq{}jackknifing\PYGZsq{} by leaving out an observation for each i}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}\PYG{p}{:}
+        \PYG{n}{t}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n}{stat}\PYG{p}{(}\PYG{n}{delete}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,}\PYG{n}{i}\PYG{p}{)} \PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} analysis}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Runtime: }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s2}{ sec}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{p}{(}\PYG{n}{time}\PYG{p}{(}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{n}{t0}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;} \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Jackknife Statistics :}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{original           bias      std. error}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZpc{}8g}\PYG{l+s+s2}{ }\PYG{l+s+si}{\PYGZpc{}14g}\PYG{l+s+s2}{ }\PYG{l+s+si}{\PYGZpc{}15g}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{p}{(}\PYG{n}{stat}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}\PYG{p}{,}\PYG{p}{(}\PYG{n}{n}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}\PYG{o}{/}\PYG{n}{n}\PYG{p}{,} \PYG{p}{(}\PYG{n}{n}\PYG{o}{*}\PYG{n}{var}\PYG{p}{(}\PYG{n}{t}\PYG{p}{)}\PYG{p}{)}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mf}{.5}\PYG{p}{)}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n}{t}
+
+
+\PYG{c+c1}{\PYGZsh{} Returns mean of data samples}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{stat}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}\PYG{p}{:}
+    \PYG{k}{return} \PYG{n}{mean}\PYG{p}{(}\PYG{n}{data}\PYG{p}{)}
+
+
+\PYG{n}{mu}\PYG{p}{,} \PYG{n}{sigma} \PYG{o}{=} \PYG{l+m+mi}{100}\PYG{p}{,} \PYG{l+m+mi}{15}
+\PYG{n}{datapoints} \PYG{o}{=} \PYG{l+m+mi}{10000}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{mu} \PYG{o}{+} \PYG{n}{sigma}\PYG{o}{*}\PYG{n}{random}\PYG{o}{.}\PYG{n}{randn}\PYG{p}{(}\PYG{n}{datapoints}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{} jackknife returns the data sample}
+\PYG{n}{t} \PYG{o}{=} \PYG{n}{jackknife}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{stat}\PYG{p}{)}
+
+
+\end{MintedVerbatim}
