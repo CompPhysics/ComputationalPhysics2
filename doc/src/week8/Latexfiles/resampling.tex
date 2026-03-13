@@ -72,6 +72,14 @@ with
 \sigma^2 = \mathrm{Var}(X)
 \]
 
+
+\end{frame}
+
+
+
+
+\begin{frame}{Naive Error Estimate, estimator}
+
 Estimator for the error:
 
 \[
@@ -84,9 +92,6 @@ Estimator for the error:
 This formula is only correct if the samples are \textbf{independent}.
 \end{frame}
 
-
-
-%------------------------------------------------
 
 \begin{frame}{Correlated Data}
 
@@ -111,6 +116,11 @@ This formula is only correct if the samples are \textbf{independent}.
   =
   \langle (X_i-\mu)(X_{i+t}-\mu) \rangle
   \]
+
+\end{frame}
+
+
+\begin{frame}{Correlated Data, Normalized}
 
   Normalized autocorrelation
 
@@ -162,7 +172,12 @@ This formula is only correct if the samples are \textbf{independent}.
   \frac{2\tau_{\mathrm{int}}\sigma^2}{N}
   \]
 
-  Interpretation:
+\end{frame}
+
+
+\begin{frame}{Variance of the Mean with Correlations, Interpretation}
+
+Interpretation
 
   \begin{itemize}
   \item Effective number of independent samples
@@ -218,6 +233,12 @@ This formula is only correct if the samples are \textbf{independent}.
   \right)
   \]
 
+\end{frame}
+
+
+
+\begin{frame}{Blocking Transformation, Properties}
+
   Properties:
 
   \begin{itemize}
@@ -232,7 +253,8 @@ This formula is only correct if the samples are \textbf{independent}.
   \]
 \end{frame}
 
-%------------------------------------------------
+
+
 
 \begin{frame}{Variance at Blocking Level $k$}
 
@@ -257,6 +279,13 @@ This formula is only correct if the samples are \textbf{independent}.
   \right)^2
   \]
 
+\end{frame}
+
+
+
+\begin{frame}{Variance at Blocking Level $k$, Error estimate}
+
+
   Error estimate
 
   \[
@@ -273,6 +302,7 @@ This formula is only correct if the samples are \textbf{independent}.
   \mathrm{Var}(\bar X)
   \]
 \end{frame}
+
 
 %------------------------------------------------
 
@@ -355,6 +385,15 @@ we obtain
 \frac{1}{N^2}\bm{1}^T\Sigma\bm{1}.
 \]
 
+\end{frame}
+
+
+
+
+%------------------------------------------------
+\begin{frame}{Variance of a Linear Combination}
+
+
 Writing this out explicitly,
 \[
 \mathrm{Var}(\bar X)
@@ -367,6 +406,7 @@ Writing this out explicitly,
 This is the exact formula for the variance of the sample mean for correlated data.
 \end{frame}
 
+
 %------------------------------------------------
 \begin{frame}{Stationary Time Series and Toeplitz Structure}
 
@@ -376,6 +416,13 @@ Assume the process is weakly stationary:
 \item $\mathbb{E}[X_i]=\mu$ independent of $i$
 \item $\mathrm{Cov}(X_i,X_j)$ depends only on the lag $|i-j|$
 \end{itemize}
+
+\end{frame}
+
+
+%------------------------------------------------
+\begin{frame}{Stationary Time Series and Toeplitz Structure}
+
 
 Then
 \[
@@ -426,6 +473,14 @@ For lag $t\ge 1$, there are
 \]
 terms, since both $(i,j)$ and $(j,i)$ contribute.
 
+
+\end{frame}
+
+
+\begin{frame}{Summing the Covariances}
+
+
+
 Therefore
 \[
 \mathrm{Var}(\bar X)
@@ -445,6 +500,8 @@ Equivalently,
 \frac{2}{N^2}\sum_{t=1}^{N-1}(N-t)C(t).
 \]
 \end{frame}
+
+
 
 %------------------------------------------------
 \begin{frame}{Normalized Autocorrelation Function}
@@ -501,6 +558,14 @@ and hence
 \right].
 \]
 
+
+\end{frame}
+
+
+
+\begin{frame}{Large-$N$ Limit and Integrated Autocorrelation Time}
+
+
 Define the integrated autocorrelation time
 \[
 \tau_{\mathrm{int}}
@@ -517,6 +582,8 @@ Then
 
 This shows precisely how correlations inflate the uncertainty of the mean.
 \end{frame}
+
+
 
 %------------------------------------------------
 \begin{frame}{Interpretation in Terms of Effective Sample Size}
@@ -595,6 +662,16 @@ N C(0)+2\sum_{t=1}^{N-1}(N-t)C(t)
 \right].
 \]
 
+
+\end{frame}
+
+
+%------------------------------------------------
+\begin{frame}{Mathematical Summary}
+
+
+
+
 In terms of $\rho(t)=C(t)/C(0)$,
 \[
 \mathrm{Var}(\bar X)
@@ -612,6 +689,8 @@ For large $N$,
 
 This is the theoretical foundation behind blocking analysis.
 \end{frame}
+
+
 
 %------------------------------------------------
 
@@ -651,66 +730,6 @@ This is the theoretical foundation behind blocking analysis.
 
   The plateau gives the best estimate of the statistical error.
 \end{frame}
-
-%------------------------------------------------
-
-\begin{frame}{Pseudocode}
-
-  \textbf{Blocking algorithm}
-
-\begin{verbatim}
-  data = X
-
-  while len(data) > 1:
-
-    compute mean(data)
-    compute variance(data)
-
-    store variance estimate
-
-    new_data = []
-
-    for i in range(0,len(data),2):
-        block = (data[i] + data[i+1])/2
-        new_data.append(block)
-
-    data = new_data
-\end{verbatim}
-
-Plot stored variance estimates versus blocking level.
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}{Applications in Physics}
-
-  Blocking is widely used in
-
-  \begin{itemize}
-
-  \item Quantum Monte Carlo
-  \item Variational Monte Carlo
-  \item Diffusion Monte Carlo
-  \item Lattice QCD
-  \item Molecular dynamics
-
-  \end{itemize}
-
-  Typical observables
-
-  \begin{itemize}
-
-  \item Ground state energies
-  \item Correlation functions
-  \item Magnetization
-  \item Susceptibility
-
-  \end{itemize}
-
-  Blocking provides a robust error estimate without computing full autocorrelation functions.
-\end{frame}
-
-%------------------------------------------------
 
 \begin{frame}{Blocking Summary}
 
@@ -756,6 +775,13 @@ defined by
 \hat{F}_N(x)=\frac{1}{N}\sum_{i=1}^{N}\delta(x-X_i)
 \]
 
+\end{frame}
+
+
+\begin{frame}{Basic Idea of the Bootstrap, Interpretation}
+
+
+
 Interpretation:
 
 \begin{itemize}
@@ -765,6 +791,8 @@ Interpretation:
 
 This produces synthetic datasets from $\hat{F}_N$.
 \end{frame}
+
+
 
 %------------------------------------------------
 
@@ -1012,30 +1040,6 @@ B = 1000 - 10000
 \]
 \end{frame}
 
-%------------------------------------------------
-
-\begin{frame}{Bootstrap Pseudocode}
-
-\begin{verbatim}
-theta_boot = []
-
-for b in range(B):
-
-    sample = random.choice(data, size=N)
-
-    theta_star = estimator(sample)
-
-    theta_boot.append(theta_star)
-
-mean_boot = mean(theta_boot)
-
-variance_boot = var(theta_boot)
-\end{verbatim}
-
-The list \texttt{theta\_boot} approximates the sampling distribution of the estimator.
-\end{frame}
-
-%------------------------------------------------
 
 \begin{frame}{Applications in Physics}
 
@@ -1117,6 +1121,13 @@ Bootstrap advantages:
 \item provides full distribution
 \end{itemize}
 
+
+\end{frame}
+
+
+\begin{frame}{Bootstrap vs Other Resampling Methods}
+
+
 Bootstrap limitation:
 
 \begin{itemize}
@@ -1131,6 +1142,7 @@ For correlated Monte Carlo data we combine:
 \item blocking + bootstrap
 \end{itemize}
 \end{frame}
+
 
 %------------------------------------------------
 
