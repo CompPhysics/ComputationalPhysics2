@@ -1,0 +1,46 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{c+ch}{\PYGZsh{}!/usr/bin/env python}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{np}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{matplotlib}\PYG{n+nn}{.}\PYG{n+nn}{mlab}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{mlab}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{matplotlib}\PYG{n+nn}{.}\PYG{n+nn}{pyplot}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{plt}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{random}
+
+\PYG{c+c1}{\PYGZsh{} initialize the rng with a seed, simple uniform distribution}
+\PYG{n}{random}\PYG{o}{.}\PYG{n}{seed}\PYG{p}{(}\PYG{p}{)}
+\PYG{n}{m} \PYG{o}{=} \PYG{l+m+mi}{10000}
+\PYG{n}{samplefactor} \PYG{o}{=} \PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{m}
+\PYG{n}{x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{m}\PYG{p}{)}
+\PYG{n}{MeanValue} \PYG{o}{=} \PYG{l+m+mf}{0.}
+\PYG{n}{VarValue} \PYG{o}{=} \PYG{l+m+mf}{0.}
+\PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range} \PYG{p}{(}\PYG{n}{m}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{value} \PYG{o}{=} \PYG{n}{random}\PYG{o}{.}\PYG{n}{random}\PYG{p}{(}\PYG{p}{)}
+    \PYG{n}{x}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n}{value}
+    \PYG{n}{MeanValue} \PYG{o}{+}\PYG{o}{=} \PYG{n}{value}
+    \PYG{n}{VarValue} \PYG{o}{+}\PYG{o}{=} \PYG{n}{value}\PYG{o}{*}\PYG{n}{value}
+
+\PYG{n}{MeanValue} \PYG{o}{*}\PYG{o}{=} \PYG{n}{samplefactor}
+\PYG{n}{VarValue} \PYG{o}{*}\PYG{o}{=} \PYG{n}{samplefactor}
+\PYG{n}{Variance} \PYG{o}{=} \PYG{n}{VarValue}\PYG{o}{\PYGZhy{}}\PYG{n}{MeanValue}\PYG{o}{*}\PYG{n}{MeanValue}
+\PYG{n}{STDev} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{Variance}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{MeanValue =}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{MeanValue}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Variance =}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{Variance}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Standard deviation =}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{STDev}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Computing the autocorrelation function}
+\PYG{n}{autocorrelation} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{m}\PYG{p}{)}
+\PYG{n}{darray} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{m}\PYG{p}{)}
+\PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range} \PYG{p}{(}\PYG{n}{m}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n+nb}{sum} \PYG{o}{=} \PYG{l+m+mf}{0.0}
+    \PYG{n}{darray}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]} \PYG{o}{=} \PYG{n}{j}
+    \PYG{k}{for} \PYG{n}{k} \PYG{o+ow}{in} \PYG{n+nb}{range} \PYG{p}{(}\PYG{n}{m}\PYG{o}{\PYGZhy{}}\PYG{n}{j}\PYG{p}{)}\PYG{p}{:}
+        \PYG{n+nb}{sum} \PYG{o}{+}\PYG{o}{=} \PYG{p}{(}\PYG{n}{x}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{MeanValue}\PYG{p}{)}\PYG{o}{*}\PYG{p}{(}\PYG{n}{x}\PYG{p}{[}\PYG{n}{k}\PYG{o}{+}\PYG{n}{j}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{MeanValue} \PYG{p}{)}
+    \PYG{n}{autocorrelation}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]} \PYG{o}{=} \PYG{p}{(}\PYG{n+nb}{sum}\PYG{o}{/}\PYG{n}{Variance}\PYG{p}{)}\PYG{o}{*}\PYG{n}{samplefactor}
+\PYG{c+c1}{\PYGZsh{} Visualize results}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{darray}\PYG{p}{,} \PYG{n}{autocorrelation}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{ro}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{axis}\PYG{p}{(}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{m}\PYG{p}{,}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{0.2}\PYG{p}{,} \PYG{l+m+mf}{1.1}\PYG{p}{]}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+sa}{r}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}d\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+sa}{r}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+s1}{\PYGZbs{}}\PYG{l+s+s1}{kappa\PYGZus{}d\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+sa}{r}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{autocorrelation function for RNG with uniform distribution}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+
+\end{MintedVerbatim}

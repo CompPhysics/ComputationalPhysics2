@@ -1,0 +1,1546 @@
+<!--
+HTML file automatically generated from DocOnce source
+(https://github.com/doconce/doconce/)
+doconce format html week9-reveal.html week9-reveal reveal --html_slide_theme=beige
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="DocOnce: https://github.com/doconce/doconce/" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Resampling Techniques, Bootstrap and Blocking">
+<title>Resampling Techniques, Bootstrap and Blocking</title>
+
+<!-- reveal.js: https://lab.hakim.se/reveal-js/ -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+<link rel="stylesheet" href="reveal.js/css/reveal.css">
+<link rel="stylesheet" href="reveal.js/css/theme/beige.css" id="theme">
+<!--
+<link rel="stylesheet" href="reveal.js/css/reveal.css">
+<link rel="stylesheet" href="reveal.js/css/theme/beige.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/beigesmall.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/solarized.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/serif.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/night.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/moon.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/simple.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/sky.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/darkgray.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/default.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/cbc.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/simula.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/black.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/white.css" id="theme">
+<link rel="stylesheet" href="reveal.js/css/theme/league.css" id="theme">
+-->
+
+<!-- For syntax highlighting -->
+<link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+<!-- Printing and PDF exports -->
+<script>
+var link = document.createElement( 'link' );
+link.rel = 'stylesheet';
+link.type = 'text/css';
+link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+document.getElementsByTagName( 'head' )[0].appendChild( link );
+</script>
+
+<style type="text/css">
+hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+p.caption { width: 80%; font-size: 60%; font-style: italic; text-align: left; }
+hr.figure { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+.reveal .alert-text-small   { font-size: 80%;  }
+.reveal .alert-text-large   { font-size: 130%; }
+.reveal .alert-text-normal  { font-size: 90%;  }
+.reveal .alert {
+  padding:8px 35px 8px 14px; margin-bottom:18px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5);
+  border:5px solid #bababa;
+  -webkit-border-radius: 14px; -moz-border-radius: 14px;
+  border-radius:14px;
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  background-size: 38px;
+  padding-left: 30px; /* 55px; if icon */
+}
+.reveal .alert-block {padding-top:14px; padding-bottom:14px}
+.reveal .alert-block > p, .alert-block > ul {margin-bottom:1em}
+/*.reveal .alert li {margin-top: 1em}*/
+.reveal .alert-block p+p {margin-top:5px}
+/*.reveal .alert-notice { background-image: url(https://hplgit.github.io/doconce/bundled/html_images/small_gray_notice.png); }
+.reveal .alert-summary  { background-image:url(https://hplgit.github.io/doconce/bundled/html_images/small_gray_summary.png); }
+.reveal .alert-warning { background-image: url(https://hplgit.github.io/doconce/bundled/html_images/small_gray_warning.png); }
+.reveal .alert-question {background-image:url(https://hplgit.github.io/doconce/bundled/html_images/small_gray_question.png); } */
+/* Override reveal.js table border */
+.reveal table td {
+  border: 0;
+}
+
+<style type="text/css">
+/* Override h1, h2, ... styles */
+h1 { font-size: 2.8em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.4em; }
+h4 { font-size: 1.3em; }
+h1, h2, h3, h4 { font-weight: bold; line-height: 1.2; }
+body { overflow: auto; } /* vertical scrolling */
+hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+p.caption { width: 80%; font-size: 60%; font-style: italic; text-align: left; }
+hr.figure { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+.slide .alert-text-small   { font-size: 80%;  }
+.slide .alert-text-large   { font-size: 130%; }
+.slide .alert-text-normal  { font-size: 90%;  }
+.slide .alert {
+  padding:8px 35px 8px 14px; margin-bottom:18px;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5);
+  border:5px solid #bababa;
+    -webkit-border-radius:14px; -moz-border-radius:14px;
+  border-radius:14px
+  background-position: 10px 10px;
+  background-repeat: no-repeat;
+  background-size: 38px;
+  padding-left: 30px; /* 55px; if icon */
+}
+.slide .alert-block {padding-top:14px; padding-bottom:14px}
+.slide .alert-block > p, .alert-block > ul {margin-bottom:0}
+/*.slide .alert li {margin-top: 1em}*/
+.deck .alert-block p+p {margin-top:5px}
+/*.slide .alert-notice { background-image: url(https://hplgit.github.io/doconce/
+bundled/html_images//small_gray_notice.png); }
+.slide .alert-summary  { background-image:url(https://hplgit.github.io/doconce/
+bundled/html_images//small_gray_summary.png); }
+.slide .alert-warning { background-image: url(https://hplgit.github.io/doconce/
+bundled/html_images//small_gray_warning.png); }
+.slide .alert-question {background-image:url(https://hplgit.github.io/doconce/
+bundled/html_images/small_gray_question.png); } */
+.dotable table, .dotable th, .dotable tr, .dotable tr td {
+  border: 2px solid black;
+  border-collapse: collapse;
+  padding: 2px;
+}
+</style>
+
+
+<!-- Styles for table layout of slides -->
+<style type="text/css">
+td.padding {
+  padding-top:20px;
+  padding-bottom:20px;
+  padding-right:50px;
+  padding-left:50px;
+}
+</style>
+
+</head>
+
+
+<body>
+<div class="reveal">
+<div class="slides">
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  TeX: {
+     equationNumbers: {  autoNumber: "none"  },
+     extensions: ["AMSmath.js", "AMSsymbols.js", "autobold.js", "color.js"]
+  }
+});
+</script>
+<script type="text/javascript" async
+ src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+
+
+<section>
+<!-- ------------------- main content ---------------------- -->
+<center>
+<h1 style="text-align: center;">Resampling Techniques, Bootstrap and Blocking</h1>
+</center>  <!-- document title -->
+
+<!-- author(s): Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no -->
+<center>
+<b>Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no</b> 
+</center>
+<!-- institution -->
+<center>
+<b>Department of Physics and Center fo Computing in Science Education, University of Oslo, Oslo, Norway</b>
+</center>
+<br>
+<center>
+<h4>March 20, 2026</h4>
+</center> <!-- date -->
+<br>
+
+
+<center style="font-size:80%">
+<!-- copyright --> &copy; 1999-2026, Morten Hjorth-Jensen  Email morten.hjorth-jensen@fys.uio.no. Released under CC Attribution-NonCommercial 4.0 license
+</center>
+</section>
+
+<section>
+<h2 id="overview-of-week-march-16-20-2025">Overview of week March 16-20, 2025 </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Topics</b>
+<p>
+<ol>
+<p><li> Resampling Techniques, Bootstrap and Blocking</li> 
+<p><li> Calculation of one-body densities (see whiteboard notes)</li>
+<p><li> <a href="https://youtu.be/cnPh5FuGf3o" target="_blank">Video of lecture</a></li>
+<p><li> <a href="https://github.com/CompPhysics/ComputationalPhysics2/blob/gh-pages/doc/HandWrittenNotes/2025/NotesMarch21.pdf" target="_blank">Handwritten notes</a></li>
+</ol>
+</div>
+</section>
+
+<section>
+<h2 id="why-resampling-methods">Why resampling methods ? </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Statistical analysis</b>
+<p>
+<ul>
+<p><li> Our simulations can be treated as <em>computer experiments</em>. This is particularly the case for Monte Carlo methods</li>
+<p><li> The results can be analysed with the same statistical tools as we would use analysing experimental data.</li>
+<p><li> As in all experiments, we are looking for expectation values and an estimate of how accurate they are, i.e., possible sources for errors.</li>
+</ul>
+</div>
+</section>
+
+<section>
+<h2 id="statistical-analysis">Statistical analysis </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<ul>
+<p><li> As in other experiments, many numerical  experiments have two classes of errors:
+<ol type="a"></li>
+<p><li> Statistical errors</li>
+<p><li> Systematical errors</li>
+</ol>
+<p>
+<p><li> Statistical errors can be estimated using standard tools from statistics</li>
+<p><li> Systematical errors are method specific and must be treated differently from case to case.</li> 
+</ul>
+</div>
+</section>
+
+<section>
+<h2 id="and-why-do-we-use-such-methods">And why do we use such methods? </h2>
+
+<p>As you will see below, due to correlations between various
+measurements, we need to evaluate the so-called covariance in order to
+establish a proper evaluation of the total variance and the thereby
+the standard deviation of a given expectation value.
+</p>
+
+<p>The covariance however, leads to an evaluation of a double sum over the various stochastic variables. This becomes computationally too expensive to evaluate.
+Methods like the Bootstrap, the Jackknife and/or Blocking allow us to circumvent this problem. 
+</p>
+</section>
+
+<section>
+<h2 id="central-limit-theorem-reminder-from-last-week">Central limit theorem, reminder from last week </h2>
+
+<p>Last week we derived the central limit theorem with the following assumptions:</p>
+
+<div class="alert alert-block alert-block alert-text-normal">
+<b>Measurement \( i \)</b>
+<p>
+<p>We assumed that each individual measurement \( x_{ij} \) is represented by stochastic variables which independent and identically distributed (iid).
+This defined the sample mean of of experiment \( i \) with \( n \) samples as
+</p>
+<p>&nbsp;<br>
+$$
+\overline{x}_i=\frac{1}{n}\sum_{j} x_{ij}.
+$$
+<p>&nbsp;<br>
+
+<p>and the sample variance</p>
+<p>&nbsp;<br>
+$$
+\sigma^2_i=\frac{1}{n}\sum_{j} \left(x_{ij}-\overline{x}_i\right)^2.
+$$
+<p>&nbsp;<br>
+</div>
+</section>
+
+<section>
+<h2 id="further-remarks">Further remarks </h2>
+
+<p>Note that we use \( n \) instead of \( n-1 \) in the definition of
+variance. The sample variance and the sample mean are not necessarily equal to
+the exact values we would get if we knew the corresponding probability
+distribution.
+</p>
+</section>
+
+<section>
+<h2 id="statistics-more-technicalities">Statistics, more technicalities  </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>The desired variance
+\( \mathrm{var}(\overline X_n) \), i.e. the sample error squared
+\( \mathrm{err}_X^2 \), is given by:
+</p>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\mathrm{err}_X^2 = \mathrm{var}(\overline X_n) = \frac{1}{n^2}
+\sum_{ij} \mathrm{cov}(X_i, X_j)
+\tag{1}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+<p>We see now that in order to calculate the exact error of the sample
+with the above expression, we would need the true means
+\( \mu_{X_i}^{\phantom X} \) of the stochastic variables \( X_i \). To
+calculate these requires that we know the true multivariate PDF of all
+the \( X_i \). But this PDF is unknown to us, we have only got the measurements of
+one sample. The best we can do is to let the sample itself be an
+estimate of the PDF of each of the \( X_i \), estimating all properties of
+\( X_i \) through the measurements of the sample.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="statistics">Statistics </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>Our estimate of \( \mu_{X_i}^{\phantom X} \) is then the sample mean \( \bar x \)
+itself, in accordance with the the central limit theorem:
+</p>
+<p>&nbsp;<br>
+$$
+\mu_{X_i}^{\phantom X} = \langle x_i\rangle \approx \frac{1}{n}\sum_{k=1}^n x_k = \bar x
+$$
+<p>&nbsp;<br>
+
+<p>Using \( \bar x \) in place of \( \mu_{X_i}^{\phantom X} \) we can give an
+<em>estimate</em> of the covariance in Eq.&nbsp;<a href="#mjx-eqn-1">(1)</a>
+</p>
+<p>&nbsp;<br>
+$$
+\mathrm{cov}(X_i, X_j) = \langle (x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle
+\approx\langle (x_i - \bar x)(x_j - \bar{x})\rangle,
+$$
+<p>&nbsp;<br>
+
+<p>resulting in</p>
+<p>&nbsp;<br>
+$$ 
+\frac{1}{n} \sum_{l}^n \left(\frac{1}{n}\sum_{k}^n (x_k -\bar x_n)(x_l - \bar x_n)\right)=\frac{1}{n}\frac{1}{n} \sum_{kl} (x_k -\bar x_n)(x_l - \bar x_n)=\frac{1}{n}\mathrm{cov}(x)
+$$
+<p>&nbsp;<br>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-and-sample-variance">Statistics and sample variance  </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>By the same procedure we can use the sample variance as an
+estimate of the variance of any of the stochastic variables \( X_i \)
+</p>
+<p>&nbsp;<br>
+$$
+\mathrm{var}(X_i)=\langle x_i - \langle x_i\rangle\rangle \approx \langle x_i - \bar x_n\rangle\nonumber,
+$$
+<p>&nbsp;<br>
+
+<p>which is approximated as </p>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\mathrm{var}(X_i)\approx \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)=\mathrm{var}(x)
+\tag{2}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+<p>Now we can calculate an estimate of the error
+\( \mathrm{err}_X^{\phantom X} \) of the sample mean \( \bar x_n \):
+</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+\mathrm{err}_X^2
+&=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) \nonumber \\
+&\approx&\frac{1}{n^2}\sum_{ij}\frac{1}{n}\mathrm{cov}(x) =\frac{1}{n^2}n^2\frac{1}{n}\mathrm{cov}(x)\nonumber\\
+&=\frac{1}{n}\mathrm{cov}(x)
+\tag{3}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>which is nothing but the sample covariance divided by the number of
+measurements in the sample.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-uncorrelated-results">Statistics, uncorrelated results </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>In the special case that the measurements of the sample are
+uncorrelated (equivalently the stochastic variables \( X_i \) are
+uncorrelated) we have that the off-diagonal elements of the covariance
+are zero. This gives the following estimate of the sample error:
+</p>
+<p>&nbsp;<br>
+$$
+\mathrm{err}_X^2=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) =
+\frac{1}{n^2} \sum_i \mathrm{var}(X_i),
+$$
+<p>&nbsp;<br>
+
+<p>resulting in</p>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\mathrm{err}_X^2\approx \frac{1}{n^2} \sum_i \mathrm{var}(x)= \frac{1}{n}\mathrm{var}(x)
+\tag{4}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+<p>where in the second step we have used Eq.&nbsp;<a href="#mjx-eqn-2">(2)</a>.
+The error of the sample is then just its standard deviation divided by
+the square root of the number of measurements the sample contains.
+This is a very useful formula which is easy to compute. It acts as a
+first approximation to the error, but in numerical experiments, we
+cannot overlook the always present correlations.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-computations">Statistics, computations </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>For computational purposes one usually splits up the estimate of
+\( \mathrm{err}_X^2 \), given by Eq.&nbsp;<a href="#mjx-eqn-3">(3)</a>, into two
+parts
+</p>
+<p>&nbsp;<br>
+$$
+\mathrm{err}_X^2 = \frac{1}{n}\mathrm{var}(x) + \frac{1}{n}(\mathrm{cov}(x)-\mathrm{var}(x)),
+$$
+<p>&nbsp;<br>
+
+<p>which equals</p>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\frac{1}{n^2}\sum_{k=1}^n (x_k - \bar x_n)^2 +\frac{2}{n^2}\sum_{k < l} (x_k - \bar x_n)(x_l - \bar x_n)
+\tag{5}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+<p>The first term is the same as the error in the uncorrelated case,
+Eq.&nbsp;<a href="#mjx-eqn-4">(4)</a>. This means that the second
+term accounts for the error correction due to correlation between the
+measurements. For uncorrelated measurements this second term is zero.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-more-on-computations-of-errors">Statistics, more on computations of errors </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>Computationally the uncorrelated first term is much easier to treat
+efficiently than the second.
+</p>
+<p>&nbsp;<br>
+$$
+\mathrm{var}(x) = \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)^2 =
+\left(\frac{1}{n}\sum_{k=1}^n x_k^2\right) - \bar x_n^2
+$$
+<p>&nbsp;<br>
+
+<p>We just accumulate separately the values \( x^2 \) and \( x \) for every
+measurement \( x \) we receive. The correlation term, though, has to be
+calculated at the end of the experiment since we need all the
+measurements to calculate the cross terms. Therefore, all measurements
+have to be stored throughout the experiment.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-wrapping-up-1">Statistics, wrapping up 1 </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>Let us analyze the problem by splitting up the correlation term into
+partial sums of the form:
+</p>
+<p>&nbsp;<br>
+$$
+f_d = \frac{1}{n-d}\sum_{k=1}^{n-d}(x_k - \bar x_n)(x_{k+d} - \bar x_n)
+$$
+<p>&nbsp;<br>
+
+<p>The correlation term of the error can now be rewritten in terms of
+\( f_d \)
+</p>
+<p>&nbsp;<br>
+$$
+\frac{2}{n}\sum_{k < l} (x_k - \bar x_n)(x_l - \bar x_n) =
+2\sum_{d=1}^{n-1} f_d
+$$
+<p>&nbsp;<br>
+
+<p>The value of \( f_d \) reflects the correlation between measurements
+separated by the distance \( d \) in the sample samples.  Notice that for
+\( d=0 \), \( f \) is just the sample variance, \( \mathrm{var}(x) \). If we divide \( f_d \)
+by \( \mathrm{var}(x) \), we arrive at the so called <em>autocorrelation function</em>
+</p>
+<p>&nbsp;<br>
+$$
+\kappa_d = \frac{f_d}{\mathrm{var}(x)}
+$$
+<p>&nbsp;<br>
+
+<p>which gives us a useful measure of pairwise correlations
+starting always at \( 1 \) for \( d=0 \).
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-final-expression">Statistics, final expression </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>The sample error (see eq.&nbsp;<a href="#mjx-eqn-5">(5)</a>) can now be
+written in terms of the autocorrelation function:
+</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+\mathrm{err}_X^2 &=
+\frac{1}{n}\mathrm{var}(x)+\frac{2}{n}\cdot\mathrm{var}(x)\sum_{d=1}^{n-1}
+\frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
+\left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
+&=\frac{\tau}{n}\cdot\mathrm{var}(x)
+\tag{6}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>and we see that \( \mathrm{err}_X \) can be expressed in terms the
+uncorrelated sample variance times a correction factor \( \tau \) which
+accounts for the correlation between measurements. We call this
+correction factor the <em>autocorrelation time</em>:
+</p>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+\tau = 1+2\sum_{d=1}^{n-1}\kappa_d
+\tag{7}
+\end{equation}
+$$
+<p>&nbsp;<br>
+</div>
+</section>
+
+<section>
+<h2 id="statistics-effective-number-of-correlations">Statistics, effective number of correlations </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>For a correlation free experiment, \( \tau \)
+equals 1. From the point of view of
+eq.&nbsp;<a href="#mjx-eqn-6">(6)</a> we can interpret a sequential
+correlation as an effective reduction of the number of measurements by
+a factor \( \tau \). The effective number of measurements becomes:
+</p>
+<p>&nbsp;<br>
+$$
+n_\mathrm{eff} = \frac{n}{\tau}
+$$
+<p>&nbsp;<br>
+
+<p>To neglect the autocorrelation time \( \tau \) will always cause our
+simple uncorrelated estimate of \( \mathrm{err}_X^2\approx \mathrm{var}(x)/n \) to
+be less than the true sample error. The estimate of the error will be
+too <em>good</em>. On the other hand, the calculation of the full
+autocorrelation time poses an efficiency problem if the set of
+measurements is very large.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="computing-the-correlation-function">Computing the correlation function </h2>
+
+<p>This code is best seen with the jupyter-notebook</p>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #228B22">#!/usr/bin/env python</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.mlab</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">mlab</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">random</span>
+
+<span style="color: #228B22"># initialize the rng with a seed, simple uniform distribution</span>
+random.seed() 
+m = <span style="color: #B452CD">10000</span>
+samplefactor = <span style="color: #B452CD">1.0</span>/m
+x = np.zeros(m)   
+MeanValue = <span style="color: #B452CD">0.</span>
+VarValue = <span style="color: #B452CD">0.</span>
+<span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span> (m):
+    value = random.random()
+    x[i] = value
+    MeanValue += value
+    VarValue += value*value
+
+MeanValue *= samplefactor
+VarValue *= samplefactor
+Variance = VarValue-MeanValue*MeanValue
+STDev = np.sqrt(Variance)
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;MeanValue =&quot;</span>, MeanValue)
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Variance =&quot;</span>, Variance)
+<span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Standard deviation =&quot;</span>, STDev)
+
+<span style="color: #228B22"># Computing the autocorrelation function</span>
+autocorrelation = np.zeros(m)
+darray = np.zeros(m)
+<span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span> (m):
+    <span style="color: #658b00">sum</span> = <span style="color: #B452CD">0.0</span>
+    darray[j] = j
+    <span style="color: #8B008B; font-weight: bold">for</span> k <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span> (m-j):
+        <span style="color: #658b00">sum</span> += (x[k]-MeanValue)*(x[k+j]-MeanValue ) 
+    autocorrelation[j] = (<span style="color: #658b00">sum</span>/Variance)*samplefactor
+<span style="color: #228B22"># Visualize results</span>
+plt.plot(darray, autocorrelation,<span style="color: #CD5555">&#39;ro&#39;</span>)
+plt.axis([<span style="color: #B452CD">0</span>,m,-<span style="color: #B452CD">0.2</span>, <span style="color: #B452CD">1.1</span>])
+plt.xlabel(<span style="color: #CD5555">r&#39;$d$&#39;</span>)
+plt.ylabel(<span style="color: #CD5555">r&#39;$\kappa_d$&#39;</span>)
+plt.title(<span style="color: #CD5555">r&#39;autocorrelation function for RNG with uniform distribution&#39;</span>)
+plt.show()
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>The so-called time-displacement autocorrelation \( \phi(t) \) for a quantity \( \mathbf{M} \) is given by</p>
+<p>&nbsp;<br>
+$$
+\phi(t) = \int dt' \left[\mathbf{M}(t')-\langle \mathbf{M} \rangle\right]\left[\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle\right],
+$$
+<p>&nbsp;<br>
+
+<p>which can be rewritten as </p>
+<p>&nbsp;<br>
+$$
+\phi(t) = \int dt' \left[\mathbf{M}(t')\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle^2\right],
+$$
+<p>&nbsp;<br>
+
+<p>where \( \langle \mathbf{M} \rangle \) is the average value and
+\( \mathbf{M}(t) \) its instantaneous value. We can discretize this function as follows, where we used our
+set of computed values \( \mathbf{M}(t) \) for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
+</p>
+<p>&nbsp;<br>
+$$
+\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\mathbf{M}(t'+t)
+-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\times
+\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t'+t).
+\tag{8}
+$$
+<p>&nbsp;<br>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>One should be careful with times close to \( t_{\mathrm{max}} \), the upper limit of the sums 
+becomes small and we end up integrating over a rather small time interval. This means that the statistical
+error in \( \phi(t) \) due to the random nature of the fluctuations in \( \mathbf{M}(t) \) can become large.
+</p>
+
+<p>One should therefore choose \( t \ll t_{\mathrm{max}} \).</p>
+
+<p>Note that the variable \( \mathbf{M} \) can be any expectation values of interest.</p>
+
+<p>The time-correlation function gives a measure of the correlation between the various values of the variable 
+at a time \( t' \) and a time \( t'+t \). If we multiply the values of \( \mathbf{M} \) at these two different times,
+we will get a positive contribution if they are fluctuating in the same direction, or a negative value
+if they fluctuate in the opposite direction. If we then integrate over time, or use the discretized version of, the time correlation function \( \phi(t) \) should take a non-zero value if the fluctuations are 
+correlated, else it should gradually go to zero. For times a long way apart 
+the different values of \( \mathbf{M} \)  are most likely 
+uncorrelated and \( \phi(t) \) should be zero.
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>We can derive the correlation time by observing that our Metropolis algorithm is based on a random
+walk in the space of all  possible spin configurations. 
+Our probability 
+distribution function \( \mathbf{\hat{w}}(t) \) after a given number of time steps \( t \) could be written as
+</p>
+<p>&nbsp;<br>
+$$
+   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}^t\hat{w}}(0),
+$$
+<p>&nbsp;<br>
+
+<p>with \( \mathbf{\hat{w}}(0) \) the distribution at \( t=0 \) and \( \mathbf{\hat{W}} \) representing the 
+transition probability matrix. 
+We can always expand \( \mathbf{\hat{w}}(0) \) in terms of the right eigenvectors of 
+\( \mathbf{\hat{v}} \) of \( \mathbf{\hat{W}} \) as 
+</p>
+<p>&nbsp;<br>
+$$
+    \mathbf{\hat{w}}(0)  = \sum_i\alpha_i\mathbf{\hat{v}}_i,
+$$
+<p>&nbsp;<br>
+
+<p>resulting in </p>
+<p>&nbsp;<br>
+$$
+   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}}^t\mathbf{\hat{w}}(0)=\mathbf{\hat{W}}^t\sum_i\alpha_i\mathbf{\hat{v}}_i=
+\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i,
+$$
+<p>&nbsp;<br>
+
+<p>with \( \lambda_i \) the \( i^{\mathrm{th}} \) eigenvalue corresponding to  
+the eigenvector \( \mathbf{\hat{v}}_i \). 
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>If we assume that \( \lambda_0 \) is the largest eigenvector we see that in the limit \( t\rightarrow \infty \),
+\( \mathbf{\hat{w}}(t) \) becomes proportional to the corresponding eigenvector 
+\( \mathbf{\hat{v}}_0 \). This is our steady state or final distribution. 
+</p>
+
+<p>We can relate this property to an observable like the mean energy.
+With the probabilty \( \mathbf{\hat{w}}(t) \) (which in our case is the squared trial wave function) we
+can write the expectation values as 
+</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}\mathbf{M}_{\mu},
+$$
+<p>&nbsp;<br>
+
+<p>or as the scalar of a  vector product</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
+$$
+<p>&nbsp;<br>
+
+<p>with \( \mathbf{m} \) being the vector whose elements are the values of \( \mathbf{M}_{\mu} \) in its 
+various microstates \( \mu \).
+</p>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+<p>We rewrite this relation  as</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
+$$
+<p>&nbsp;<br>
+
+<p>If we define \( m_i=\mathbf{\hat{v}}_i\mathbf{m}_i \) as the expectation value of
+\( \mathbf{M} \) in the \( i^{\mathrm{th}} \) eigenstate we can rewrite the last equation as
+</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
+$$
+<p>&nbsp;<br>
+
+<p>Since we have that in the limit \( t\rightarrow \infty \) the mean value is dominated by the 
+the largest eigenvalue \( \lambda_0 \), we can rewrite the last equation as
+</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
+$$
+<p>&nbsp;<br>
+
+<p>We define the quantity</p>
+<p>&nbsp;<br>
+$$
+   \tau_i=-\frac{1}{log\lambda_i},
+$$
+<p>&nbsp;<br>
+
+<p>and rewrite the last expectation value as</p>
+<p>&nbsp;<br>
+$$
+ \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
+\tag{9}
+$$
+<p>&nbsp;<br>
+</div>
+</section>
+
+<section>
+<h2 id="time-auto-correlation-function">Time Auto-correlation Function </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>The quantities \( \tau_i \) are the correlation times for the system. They control also the auto-correlation function 
+discussed above.  The longest correlation time is obviously given by the second largest
+eigenvalue \( \tau_1 \), which normally defines the correlation time discussed above. For large times, this is the 
+only correlation time that survives. If higher eigenvalues of the transition matrix are well separated from 
+\( \lambda_1 \) and we simulate long enough,  \( \tau_1 \) may well define the correlation time. 
+In other cases we may not be able to extract a reliable result for \( \tau_1 \). 
+Coming back to the time correlation function \( \phi(t) \) we can present a more general definition in terms
+of the mean magnetizations $ \langle \mathbf{M}(t) \rangle$. Recalling that the mean value is equal 
+to $ \langle \mathbf{M}(\infty) \rangle$ we arrive at the expectation values
+</p>
+<p>&nbsp;<br>
+$$
+\phi(t) =\langle \mathbf{M}(0)-\mathbf{M}(\infty)\rangle \langle \mathbf{M}(t)-\mathbf{M}(\infty)\rangle,
+$$
+<p>&nbsp;<br>
+
+<p>resulting in</p>
+<p>&nbsp;<br>
+$$
+\phi(t) =\sum_{i,j\ne 0}m_i\alpha_im_j\alpha_je^{-t/\tau_i},
+$$
+<p>&nbsp;<br>
+
+<p>which is appropriate for all times.</p>
+</div>
+</section>
+
+<section>
+<h2 id="correlation-time">Correlation Time </h2>
+<div class="alert alert-block alert-block alert-text-normal">
+<b></b>
+<p>
+
+<p>If the correlation function decays exponentially</p>
+<p>&nbsp;<br>
+$$ \phi (t) \sim \exp{(-t/\tau)}$$
+<p>&nbsp;<br>
+
+<p>then the exponential correlation time can be computed as the average</p>
+<p>&nbsp;<br>
+$$   \tau_{\mathrm{exp}}  =  -\langle  \frac{t}{log|\frac{\phi(t)}{\phi(0)}|} \rangle. $$
+<p>&nbsp;<br>
+
+<p>If the decay is exponential, then</p>
+<p>&nbsp;<br>
+$$  \int_0^{\infty} dt \phi(t)  = \int_0^{\infty} dt \phi(0)\exp{(-t/\tau)}  = \tau \phi(0),$$
+<p>&nbsp;<br>
+
+<p>which  suggests another measure of correlation</p>
+<p>&nbsp;<br>
+$$   \tau_{\mathrm{int}} = \sum_k \frac{\phi(k)}{\phi(0)}, $$
+<p>&nbsp;<br>
+
+<p>called the integrated correlation time.</p>
+</div>
+</section>
+
+<section>
+<h2 id="resampling-methods-blocking">Resampling methods: Blocking  </h2>
+
+<p>The blocking method was made popular by <a href="https://aip.scitation.org/doi/10.1063/1.457480" target="_blank">Flyvbjerg and Pedersen (1989)</a>
+and has become one of the standard ways to estimate the variance
+\( \mathrm{var}(\widehat{\theta}) \) for exactly one estimator \( \widehat{\theta} \), namely
+\( \widehat{\theta} = \overline{X} \), the mean value. 
+</p>
+
+<p>Assume \( n = 2^d \) for some integer \( d>1 \) and \( X_1,X_2,\cdots, X_n \) is a stationary time series to begin with. 
+Moreover, assume that the series is asymptotically uncorrelated. We switch to vector notation by arranging \( X_1,X_2,\cdots,X_n \) in an \( n \)-tuple. Define:
+</p>
+<p>&nbsp;<br>
+$$
+\begin{align*}
+\hat{X} = (X_1,X_2,\cdots,X_n).
+\end{align*}
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="why-blocking">Why blocking? </h2>
+
+<p>The strength of the blocking method is when the number of
+observations, \( n \) is large. For large \( n \), the complexity of dependent
+bootstrapping scales poorly, but the blocking method does not,
+moreover, it becomes more accurate the larger \( n \) is.
+</p>
+</section>
+
+<section>
+<h2 id="blocking-transformations">Blocking Transformations </h2>
+<p> We now define the blocking transformations. The idea is to take the mean of subsequent
+pair of elements from \( \boldsymbol{X} \) and form a new vector
+\( \boldsymbol{X}_1 \). Continuing in the same way by taking the mean of
+subsequent pairs of elements of \( \boldsymbol{X}_1 \) we obtain \( \boldsymbol{X}_2 \), and
+so on. 
+Define \( \boldsymbol{X}_i \) recursively by:
+</p>
+
+<p>&nbsp;<br>
+$$
+\begin{align} 
+(\boldsymbol{X}_0)_k &\equiv (\boldsymbol{X})_k \nonumber \\
+(\boldsymbol{X}_{i+1})_k &\equiv \frac{1}{2}\Big( (\boldsymbol{X}_i)_{2k-1} +
+(\boldsymbol{X}_i)_{2k} \Big) \qquad \text{for all} \qquad 1 \leq i \leq d-1
+\tag{10}
+\end{align} 
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="blocking-transformations">Blocking transformations </h2>
+
+<p>The quantity \( \boldsymbol{X}_k \) is
+subject to \( k \) <b>blocking transformations</b>.  We now have \( d \) vectors
+\( \boldsymbol{X}_0, \boldsymbol{X}_1,\cdots,\boldsymbol{X}_{d-1} \) containing the subsequent
+averages of observations. It turns out that if the components of
+\( \boldsymbol{X} \) is a stationary time series, then the components of
+\( \boldsymbol{X}_i \) is a stationary time series for all \( 0 \leq i \leq d-1 \)
+</p>
+
+<p>We can then compute the autocovariance (or just covariance), the variance, sample mean, and
+number of observations for each \( i \). 
+Let \( \gamma_i, \sigma_i^2,
+\overline{X}_i \) denote the covariance, variance and average of the
+elements of \( \boldsymbol{X}_i \) and let \( n_i \) be the number of elements of
+\( \boldsymbol{X}_i \). It follows by induction that \( n_i = n/2^i \). 
+</p>
+</section>
+
+<section>
+<h2 id="blocking-transformations">Blocking Transformations </h2>
+
+<p>Using the
+definition of the blocking transformation and the distributive
+property of the covariance, it is clear that since \( h =|i-j| \)
+we can define
+</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+\gamma_{k+1}(h) &= cov\left( ({X}_{k+1})_{i}, ({X}_{k+1})_{j} \right) \nonumber \\
+&=  \frac{1}{4}cov\left( ({X}_{k})_{2i-1} + ({X}_{k})_{2i}, ({X}_{k})_{2j-1} + ({X}_{k})_{2j} \right) \nonumber \\
+&=  \frac{1}{2}\gamma_{k}(2h) + \frac{1}{2}\gamma_k(2h+1) \hspace{0.1cm} \mathrm{h = 0} 
+\tag{11}\\
+&=\frac{1}{4}\gamma_k(2h-1) + \frac{1}{2}\gamma_k(2h) + \frac{1}{4}\gamma_k(2h+1) \quad \mathrm{else}
+\tag{12}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>The quantity \( \hat{X} \) is asymptotically uncorrelated by assumption, \( \hat{X}_k \) is also asymptotic uncorrelated. Let's turn our attention to the variance of the sample
+mean \( \mathrm{var}(\overline{X}) \). 
+</p>
+</section>
+
+<section>
+<h2 id="blocking-transformations-getting-there">Blocking Transformations, getting there </h2>
+<p>We have</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+\mathrm{var}(\overline{X}_k) = \frac{\sigma_k^2}{n_k} + \underbrace{\frac{2}{n_k} \sum_{h=1}^{n_k-1}\left( 1 - \frac{h}{n_k} \right)\gamma_k(h)}_{\equiv e_k} = \frac{\sigma^2_k}{n_k} + e_k \quad \text{if} \quad \gamma_k(0) = \sigma_k^2. 
+\tag{13}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>The term \( e_k \) is called the <b>truncation error</b>: </p>
+<p>&nbsp;<br>
+$$
+\begin{equation}
+e_k = \frac{2}{n_k} \sum_{h=1}^{n_k-1}\left( 1 - \frac{h}{n_k} \right)\gamma_k(h). 
+\tag{14}
+\end{equation}
+$$
+<p>&nbsp;<br>
+
+<p>We can show that \( \mathrm{var}(\overline{X}_i) = \mathrm{var}(\overline{X}_j) \) for all \( 0 \leq i \leq d-1 \) and \( 0 \leq j \leq d-1 \). </p>
+</section>
+
+<section>
+<h2 id="blocking-transformations-final-expressions">Blocking Transformations, final expressions </h2>
+
+<p>We can then wrap up</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+n_{j+1} \overline{X}_{j+1}  &= \sum_{i=1}^{n_{j+1}} (\hat{X}_{j+1})_i =  \frac{1}{2}\sum_{i=1}^{n_{j}/2} (\hat{X}_{j})_{2i-1} + (\hat{X}_{j})_{2i} \nonumber \\
+&= \frac{1}{2}\left[ (\hat{X}_j)_1 + (\hat{X}_j)_2 + \cdots + (\hat{X}_j)_{n_j} \right] = \underbrace{\frac{n_j}{2}}_{=n_{j+1}} \overline{X}_j = n_{j+1}\overline{X}_j. 
+\tag{15}
+\end{align}
+$$
+<p>&nbsp;<br>
+
+<p>By repeated use of this equation we get \( \mathrm{var}(\overline{X}_i) = \mathrm{var}(\overline{X}_0) = \mathrm{var}(\overline{X}) \) for all \( 0 \leq i \leq d-1 \). This has the consequence that</p>
+<p>&nbsp;<br>
+$$
+\begin{align}
+\mathrm{var}(\overline{X}) = \frac{\sigma_k^2}{n_k} + e_k \qquad \text{for all} \qquad 0 \leq k \leq d-1. \tag{16}
+\end{align}
+$$
+<p>&nbsp;<br>
+</section>
+
+<section>
+<h2 id="more-on-the-blocking-method">More on the blocking method </h2>
+
+<p>Flyvbjerg and Petersen demonstrated that the sequence
+\( \{e_k\}_{k=0}^{d-1} \) is decreasing, and conjecture that the term
+\( e_k \) can be made as small as we would like by making \( k \) (and hence
+\( d \)) sufficiently large. The sequence is decreasing.
+It means we can apply blocking transformations until
+\( e_k \) is sufficiently small, and then estimate \( \mathrm{var}(\overline{X}) \) by
+\( \widehat{\sigma}^2_k/n_k \). 
+</p>
+
+<p>For an elegant solution and proof of the blocking method, see the recent article of <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" target="_blank">Marius Jonsson (former MSc student of the Computational Physics group)</a>.</p>
+</section>
+
+<section>
+<h2 id="example-code-form-last-week">Example code form last week </h2>
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #228B22"># 2-electron VMC code for 2dim quantum dot with importance sampling</span>
+<span style="color: #228B22"># Using gaussian rng for new positions and Metropolis- Hastings </span>
+<span style="color: #228B22"># Added energy minimization</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">math</span> <span style="color: #8B008B; font-weight: bold">import</span> exp, sqrt
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">random</span> <span style="color: #8B008B; font-weight: bold">import</span> random, seed, normalvariate
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">np</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">plt</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">mpl_toolkits.mplot3d</span> <span style="color: #8B008B; font-weight: bold">import</span> Axes3D
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib</span> <span style="color: #8B008B; font-weight: bold">import</span> cm
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">matplotlib.ticker</span> <span style="color: #8B008B; font-weight: bold">import</span> LinearLocator, FormatStrFormatter
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">scipy.optimize</span> <span style="color: #8B008B; font-weight: bold">import</span> minimize
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">sys</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">os</span>
+
+<span style="color: #228B22"># Where to save data files</span>
+PROJECT_ROOT_DIR = <span style="color: #CD5555">&quot;Results&quot;</span>
+DATA_ID = <span style="color: #CD5555">&quot;Results/EnergyMin&quot;</span>
+
+<span style="color: #8B008B; font-weight: bold">if</span> <span style="color: #8B008B">not</span> os.path.exists(PROJECT_ROOT_DIR):
+    os.mkdir(PROJECT_ROOT_DIR)
+
+<span style="color: #8B008B; font-weight: bold">if</span> <span style="color: #8B008B">not</span> os.path.exists(DATA_ID):
+    os.makedirs(DATA_ID)
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">data_path</span>(dat_id):
+    <span style="color: #8B008B; font-weight: bold">return</span> os.path.join(DATA_ID, dat_id)
+
+outfile = <span style="color: #658b00">open</span>(data_path(<span style="color: #CD5555">&quot;Energies.dat&quot;</span>),<span style="color: #CD5555">&#39;w&#39;</span>)
+
+
+<span style="color: #228B22"># Trial wave function for the 2-electron quantum dot in two dims</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">WaveFunction</span>(r,alpha,beta):
+    r1 = r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r2 = r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = r12/(<span style="color: #B452CD">1</span>+beta*r12)
+    <span style="color: #8B008B; font-weight: bold">return</span> exp(-<span style="color: #B452CD">0.5</span>*alpha*(r1+r2)+deno)
+
+<span style="color: #228B22"># Local energy  for the 2-electron quantum dot in two dims, using analytical local energy</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">LocalEnergy</span>(r,alpha,beta):
+    
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    <span style="color: #8B008B; font-weight: bold">return</span> <span style="color: #B452CD">0.5</span>*(<span style="color: #B452CD">1</span>-alpha*alpha)*(r1 + r2) +<span style="color: #B452CD">2.0</span>*alpha + <span style="color: #B452CD">1.0</span>/r12+deno2*(alpha*r12-deno2+<span style="color: #B452CD">2</span>*beta*deno-<span style="color: #B452CD">1.0</span>/r12)
+
+<span style="color: #228B22"># Derivate of wave function ansatz as function of variational parameters</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">DerivativeWFansatz</span>(r,alpha,beta):
+    
+    WfDer  = np.zeros((<span style="color: #B452CD">2</span>), np.double)
+    r1 = (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r2 = (r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>]**<span style="color: #B452CD">2</span> + r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>]**<span style="color: #B452CD">2</span>)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    deno2 = deno*deno
+    WfDer[<span style="color: #B452CD">0</span>] = -<span style="color: #B452CD">0.5</span>*(r1+r2)
+    WfDer[<span style="color: #B452CD">1</span>] = -r12*r12*deno2
+    <span style="color: #8B008B; font-weight: bold">return</span>  WfDer
+
+<span style="color: #228B22"># Setting up the quantum force for the two-electron quantum dot, recall that it is a vector</span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">QuantumForce</span>(r,alpha,beta):
+
+    qforce = np.zeros((NumberParticles,Dimension), np.double)
+    r12 = sqrt((r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">0</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">0</span>])**<span style="color: #B452CD">2</span> + (r[<span style="color: #B452CD">0</span>,<span style="color: #B452CD">1</span>]-r[<span style="color: #B452CD">1</span>,<span style="color: #B452CD">1</span>])**<span style="color: #B452CD">2</span>)
+    deno = <span style="color: #B452CD">1.0</span>/(<span style="color: #B452CD">1</span>+beta*r12)
+    qforce[<span style="color: #B452CD">0</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">0</span>,:]*alpha*(r[<span style="color: #B452CD">0</span>,:]-r[<span style="color: #B452CD">1</span>,:])*deno*deno/r12
+    qforce[<span style="color: #B452CD">1</span>,:] = -<span style="color: #B452CD">2</span>*r[<span style="color: #B452CD">1</span>,:]*alpha*(r[<span style="color: #B452CD">1</span>,:]-r[<span style="color: #B452CD">0</span>,:])*deno*deno/r12
+    <span style="color: #8B008B; font-weight: bold">return</span> qforce
+    
+
+<span style="color: #228B22"># Computing the derivative of the energy and the energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">EnergyDerivative</span>(x0):
+
+    
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    alpha = x0[<span style="color: #B452CD">0</span>]
+    beta = x0[<span style="color: #B452CD">1</span>]
+    EnergyDer = <span style="color: #B452CD">0.0</span>
+    DeltaPsi = <span style="color: #B452CD">0.0</span>
+    DerivativePsiE = <span style="color: #B452CD">0.0</span> 
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        DerPsi = DerivativeWFansatz(PositionOld,alpha,beta)
+        DeltaPsi += DerPsi
+        energy += DeltaE
+        DerivativePsiE += DerPsi*DeltaE
+            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    DerivativePsiE /= NumberMCcycles
+    DeltaPsi /= NumberMCcycles
+    EnergyDer  = <span style="color: #B452CD">2</span>*(DerivativePsiE-DeltaPsi*energy)
+    <span style="color: #8B008B; font-weight: bold">return</span> EnergyDer
+
+
+<span style="color: #228B22"># Computing the expectation value of the local energy </span>
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">Energy</span>(x0):
+    <span style="color: #228B22"># Parameters in the Fokker-Planck simulation of the quantum force</span>
+    D = <span style="color: #B452CD">0.5</span>
+    TimeStep = <span style="color: #B452CD">0.05</span>
+    <span style="color: #228B22"># positions</span>
+    PositionOld = np.zeros((NumberParticles,Dimension), np.double)
+    PositionNew = np.zeros((NumberParticles,Dimension), np.double)
+    <span style="color: #228B22"># Quantum force</span>
+    QuantumForceOld = np.zeros((NumberParticles,Dimension), np.double)
+    QuantumForceNew = np.zeros((NumberParticles,Dimension), np.double)
+
+    energy = <span style="color: #B452CD">0.0</span>
+    DeltaE = <span style="color: #B452CD">0.0</span>
+    alpha = x0[<span style="color: #B452CD">0</span>]
+    beta = x0[<span style="color: #B452CD">1</span>]
+    <span style="color: #228B22">#Initial position</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+        <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+            PositionOld[i,j] = normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)
+    wfold = WaveFunction(PositionOld,alpha,beta)
+    QuantumForceOld = QuantumForce(PositionOld,alpha, beta)
+
+    <span style="color: #228B22">#Loop over MC MCcycles</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> MCcycle <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberMCcycles):
+        <span style="color: #228B22">#Trial position moving one particle at the time</span>
+        <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(NumberParticles):
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                PositionNew[i,j] = PositionOld[i,j]+normalvariate(<span style="color: #B452CD">0.0</span>,<span style="color: #B452CD">1.0</span>)*sqrt(TimeStep)+\
+                                       QuantumForceOld[i,j]*TimeStep*D
+            wfnew = WaveFunction(PositionNew,alpha,beta)
+            QuantumForceNew = QuantumForce(PositionNew,alpha, beta)
+            GreensFunction = <span style="color: #B452CD">0.0</span>
+            <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                GreensFunction += <span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]+QuantumForceNew[i,j])*\
+	                              (D*TimeStep*<span style="color: #B452CD">0.5</span>*(QuantumForceOld[i,j]-QuantumForceNew[i,j])-\
+                                      PositionNew[i,j]+PositionOld[i,j])
+      
+            GreensFunction = exp(GreensFunction)
+            ProbabilityRatio = GreensFunction*wfnew**<span style="color: #B452CD">2</span>/wfold**<span style="color: #B452CD">2</span>
+            <span style="color: #228B22">#Metropolis-Hastings test to see whether we accept the move</span>
+            <span style="color: #8B008B; font-weight: bold">if</span> random() &lt;= ProbabilityRatio:
+                <span style="color: #8B008B; font-weight: bold">for</span> j <span style="color: #8B008B">in</span> <span style="color: #658b00">range</span>(Dimension):
+                    PositionOld[i,j] = PositionNew[i,j]
+                    QuantumForceOld[i,j] = QuantumForceNew[i,j]
+                wfold = wfnew
+        DeltaE = LocalEnergy(PositionOld,alpha,beta)
+        energy += DeltaE
+        <span style="color: #8B008B; font-weight: bold">if</span> Printout: 
+           outfile.write(<span style="color: #CD5555">&#39;%f\n&#39;</span> %(energy/(MCcycle+<span style="color: #B452CD">1.0</span>)))            
+    <span style="color: #228B22"># We calculate mean values</span>
+    energy /= NumberMCcycles
+    <span style="color: #8B008B; font-weight: bold">return</span> energy
+
+<span style="color: #228B22">#Here starts the main program with variable declarations</span>
+NumberParticles = <span style="color: #B452CD">2</span>
+Dimension = <span style="color: #B452CD">2</span>
+<span style="color: #228B22"># seed for rng generator </span>
+seed()
+<span style="color: #228B22"># Monte Carlo cycles for parameter optimization</span>
+Printout = <span style="color: #8B008B; font-weight: bold">False</span>
+NumberMCcycles= <span style="color: #B452CD">10000</span>
+<span style="color: #228B22"># guess for variational parameters</span>
+x0 = np.array([<span style="color: #B452CD">0.9</span>,<span style="color: #B452CD">0.2</span>])
+<span style="color: #228B22"># Using Broydens method to find optimal parameters</span>
+res = minimize(Energy, x0, method=<span style="color: #CD5555">&#39;BFGS&#39;</span>, jac=EnergyDerivative, options={<span style="color: #CD5555">&#39;gtol&#39;</span>: <span style="color: #B452CD">1e-4</span>,<span style="color: #CD5555">&#39;disp&#39;</span>: <span style="color: #8B008B; font-weight: bold">True</span>})
+x0 = res.x
+<span style="color: #228B22"># Compute the energy again with the optimal parameters and increased number of Monte Cycles</span>
+NumberMCcycles= <span style="color: #B452CD">2</span>**<span style="color: #B452CD">19</span>
+Printout = <span style="color: #8B008B; font-weight: bold">True</span>
+FinalEnergy = Energy(x0)
+EResult = np.array([FinalEnergy,FinalEnergy])
+outfile.close()
+<span style="color: #228B22">#nice printout with Pandas</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">pd</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">import</span> DataFrame
+data ={<span style="color: #CD5555">&#39;Optimal Parameters&#39;</span>:x0, <span style="color: #CD5555">&#39;Final Energy&#39;</span>:EResult}
+frame = pd.DataFrame(data)
+<span style="color: #658b00">print</span>(frame)
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section>
+<h2 id="resampling-analysis">Resampling analysis </h2>
+
+<p>The next step is then to use the above data sets and perform a
+resampling analysis using the blocking method
+The blocking code, based on the article of <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304" target="_blank">Marius Jonsson</a> is given here
+</p>
+
+
+<!-- code=python (!bc pycod) typeset with pygments style "perldoc" -->
+<div class="cell border-box-sizing code_cell rendered">
+  <div class="input">
+    <div class="inner_cell">
+      <div class="input_area">
+        <div class="highlight" style="background: #eeeedd">
+  <pre style="font-size: 80%; line-height: 125%;"><span style="color: #228B22"># Common imports</span>
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">os</span>
+
+<span style="color: #228B22"># Where to save the figures and data files</span>
+DATA_ID = <span style="color: #CD5555">&quot;Results/EnergyMin&quot;</span>
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">data_path</span>(dat_id):
+    <span style="color: #8B008B; font-weight: bold">return</span> os.path.join(DATA_ID, dat_id)
+
+infile = <span style="color: #658b00">open</span>(data_path(<span style="color: #CD5555">&quot;Energies.dat&quot;</span>),<span style="color: #CD5555">&#39;r&#39;</span>)
+
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy</span> <span style="color: #8B008B; font-weight: bold">import</span> log2, zeros, mean, var, <span style="color: #658b00">sum</span>, loadtxt, arange, array, cumsum, dot, transpose, diagonal, sqrt
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">numpy.linalg</span> <span style="color: #8B008B; font-weight: bold">import</span> inv
+
+<span style="color: #8B008B; font-weight: bold">def</span> <span style="color: #008b45">block</span>(x):
+    <span style="color: #228B22"># preliminaries</span>
+    n = <span style="color: #658b00">len</span>(x)
+    d = <span style="color: #658b00">int</span>(log2(n))
+    s, gamma = zeros(d), zeros(d)
+    mu = mean(x)
+
+    <span style="color: #228B22"># estimate the auto-covariance and variances </span>
+    <span style="color: #228B22"># for each blocking transformation</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> i <span style="color: #8B008B">in</span> arange(<span style="color: #B452CD">0</span>,d):
+        n = <span style="color: #658b00">len</span>(x)
+        <span style="color: #228B22"># estimate autocovariance of x</span>
+        gamma[i] = (n)**(-<span style="color: #B452CD">1</span>)*<span style="color: #658b00">sum</span>( (x[<span style="color: #B452CD">0</span>:(n-<span style="color: #B452CD">1</span>)]-mu)*(x[<span style="color: #B452CD">1</span>:n]-mu) )
+        <span style="color: #228B22"># estimate variance of x</span>
+        s[i] = var(x)
+        <span style="color: #228B22"># perform blocking transformation</span>
+        x = <span style="color: #B452CD">0.5</span>*(x[<span style="color: #B452CD">0</span>::<span style="color: #B452CD">2</span>] + x[<span style="color: #B452CD">1</span>::<span style="color: #B452CD">2</span>])
+   
+    <span style="color: #228B22"># generate the test observator M_k from the theorem</span>
+    M = (cumsum( ((gamma/s)**<span style="color: #B452CD">2</span>*<span style="color: #B452CD">2</span>**arange(<span style="color: #B452CD">1</span>,d+<span style="color: #B452CD">1</span>)[::-<span style="color: #B452CD">1</span>])[::-<span style="color: #B452CD">1</span>] )  )[::-<span style="color: #B452CD">1</span>]
+
+    <span style="color: #228B22"># we need a list of magic numbers</span>
+    q =array([<span style="color: #B452CD">6.634897</span>,<span style="color: #B452CD">9.210340</span>, <span style="color: #B452CD">11.344867</span>, <span style="color: #B452CD">13.276704</span>, <span style="color: #B452CD">15.086272</span>, <span style="color: #B452CD">16.811894</span>, <span style="color: #B452CD">18.475307</span>, <span style="color: #B452CD">20.090235</span>, <span style="color: #B452CD">21.665994</span>, <span style="color: #B452CD">23.209251</span>, <span style="color: #B452CD">24.724970</span>, <span style="color: #B452CD">26.216967</span>, <span style="color: #B452CD">27.688250</span>, <span style="color: #B452CD">29.141238</span>, <span style="color: #B452CD">30.577914</span>, <span style="color: #B452CD">31.999927</span>, <span style="color: #B452CD">33.408664</span>, <span style="color: #B452CD">34.805306</span>, <span style="color: #B452CD">36.190869</span>, <span style="color: #B452CD">37.566235</span>, <span style="color: #B452CD">38.932173</span>, <span style="color: #B452CD">40.289360</span>, <span style="color: #B452CD">41.638398</span>, <span style="color: #B452CD">42.979820</span>, <span style="color: #B452CD">44.314105</span>, <span style="color: #B452CD">45.641683</span>, <span style="color: #B452CD">46.962942</span>, <span style="color: #B452CD">48.278236</span>, <span style="color: #B452CD">49.587884</span>, <span style="color: #B452CD">50.892181</span>])
+
+    <span style="color: #228B22"># use magic to determine when we should have stopped blocking</span>
+    <span style="color: #8B008B; font-weight: bold">for</span> k <span style="color: #8B008B">in</span> arange(<span style="color: #B452CD">0</span>,d):
+        <span style="color: #8B008B; font-weight: bold">if</span>(M[k] &lt; q[k]):
+            <span style="color: #8B008B; font-weight: bold">break</span>
+    <span style="color: #8B008B; font-weight: bold">if</span> (k &gt;= d-<span style="color: #B452CD">1</span>):
+        <span style="color: #658b00">print</span>(<span style="color: #CD5555">&quot;Warning: Use more data&quot;</span>)
+    <span style="color: #8B008B; font-weight: bold">return</span> mu, s[k]/<span style="color: #B452CD">2</span>**(d-k)
+
+
+x = loadtxt(infile)
+(mean, var) = block(x) 
+std = sqrt(var)
+<span style="color: #8B008B; font-weight: bold">import</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">as</span> <span style="color: #008b45; text-decoration: underline">pd</span>
+<span style="color: #8B008B; font-weight: bold">from</span> <span style="color: #008b45; text-decoration: underline">pandas</span> <span style="color: #8B008B; font-weight: bold">import</span> DataFrame
+data ={<span style="color: #CD5555">&#39;Mean&#39;</span>:[mean], <span style="color: #CD5555">&#39;STDev&#39;</span>:[std]}
+frame = pd.DataFrame(data,index=[<span style="color: #CD5555">&#39;Values&#39;</span>])
+<span style="color: #658b00">print</span>(frame)
+</pre>
+</div>
+      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output">
+      <div class="output_area">
+        <div class="output_subarea output_stream output_stdout output_text">          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+
+</div> <!-- class="slides" -->
+</div> <!-- class="reveal" -->
+
+<script src="reveal.js/lib/js/head.min.js"></script>
+<script src="reveal.js/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+  // Display navigation controls in the bottom right corner
+  controls: true,
+
+  // Display progress bar (below the horiz. slider)
+  progress: true,
+
+  // Display the page number of the current slide
+  slideNumber: true,
+
+  // Push each slide change to the browser history
+  history: false,
+
+  // Enable keyboard shortcuts for navigation
+  keyboard: true,
+
+  // Enable the slide overview mode
+  overview: true,
+
+  // Vertical centering of slides
+  //center: true,
+  center: false,
+
+  // Enables touch navigation on devices with touch input
+  touch: true,
+
+  // Loop the presentation
+  loop: false,
+
+  // Change the presentation direction to be RTL
+  rtl: false,
+
+  // Turns fragments on and off globally
+  fragments: true,
+
+  // Flags if the presentation is running in an embedded mode,
+  // i.e. contained within a limited portion of the screen
+  embedded: false,
+
+  // Number of milliseconds between automatically proceeding to the
+  // next slide, disabled when set to 0, this value can be overwritten
+  // by using a data-autoslide attribute on your slides
+  autoSlide: 0,
+
+  // Stop auto-sliding after user input
+  autoSlideStoppable: true,
+
+  // Enable slide navigation via mouse wheel
+  mouseWheel: false,
+
+  // Hides the address bar on mobile devices
+  hideAddressBar: true,
+
+  // Opens links in an iframe preview overlay
+  previewLinks: false,
+
+  // Transition style
+  transition: 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+  // Transition speed
+  transitionSpeed: 'default', // default/fast/slow
+
+  // Transition style for full page slide backgrounds
+  backgroundTransition: 'default', // default/none/slide/concave/convex/zoom
+
+  // Number of slides away from the current that are visible
+  viewDistance: 3,
+
+  // Parallax background image
+    //parallaxBackgroundImage: '', // e.g. "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'"
+
+  // Parallax background size
+  //parallaxBackgroundSize: '' // CSS syntax, e.g. "2100px 900px"
+
+  theme: Reveal.getQueryHash().theme, // available themes are in reveal.js/css/theme
+    transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/none
+
+});
+
+Reveal.initialize({
+  dependencies: [
+      // Cross-browser shim that fully implements classList - https://github.com/eligrey/classList.js/
+      { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+
+      // Interpret Markdown in <section> elements
+      { src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+
+      // Syntax highlight for <code> elements
+      { src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+
+      // Zoom in and out with Alt+click
+      { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+
+      // Speaker notes
+      { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+
+      // Remote control your reveal.js presentation using a touch device
+      //{ src: 'reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } },
+
+      // MathJax
+      //{ src: 'reveal.js/plugin/math/math.js', async: true }
+  ]
+});
+
+Reveal.initialize({
+
+  // The "normal" size of the presentation, aspect ratio will be preserved
+  // when the presentation is scaled to fit different resolutions. Can be
+  // specified using percentage units.
+  width: 1170,  // original: 960,
+  height: 700,
+
+  // Factor of the display size that should remain empty around the content
+  margin: 0.1,
+
+  // Bounds for smallest/largest possible scale to apply to content
+  minScale: 0.2,
+  maxScale: 1.0
+
+});
+</script>
+
+<!-- begin footer logo
+<div style="position: absolute; bottom: 0px; left: 0; margin-left: 0px">
+<img src="somelogo.png">
+</div>
+   end footer logo -->
+
+
+
+
+</body>
+</html>
