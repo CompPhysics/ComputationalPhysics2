@@ -1,0 +1,37 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{std\PYGZus{}with\PYGZus{}covariance}\PYG{p}{(}\PYG{n}{x}\PYG{p}{:} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ndarray}\PYG{p}{,} \PYG{n}{tau\PYGZus{}int}\PYG{p}{:} \PYG{n+nb}{float}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n+nb}{float}\PYG{p}{:}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Corrected sigma\PYGZus{}mean = s * sqrt(2 * tau\PYGZus{}int / N).}
+
+\PYG{l+s+sd}{    Derivation: Var(x\PYGZhy{}bar) = (sigma\PYGZca{}2 / N) * sum\PYGZus{}\PYGZob{}t\PYGZcb{} (1 \PYGZhy{} |t|/N) C(t)}
+\PYG{l+s+sd}{                            ≈ (sigma\PYGZca{}2 / N) * 2 * tau\PYGZus{}int   for large N.}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{N} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{ddof}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{tau\PYGZus{}int} \PYG{o}{/} \PYG{n}{N}\PYG{p}{)}\PYG{p}{)}
+
+\PYG{n}{sigma\PYGZus{}corr} \PYG{o}{=} \PYG{n}{std\PYGZus{}with\PYGZus{}covariance}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{tau\PYGZus{}int}\PYG{p}{)}
+\PYG{n}{correction} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{tau\PYGZus{}int}\PYG{p}{)}   \PYG{c+c1}{\PYGZsh{} = 1 when tau\PYGZus{}int = 1/2}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{tau\PYGZus{}int               = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{tau\PYGZus{}int}\PYG{l+s+si}{:}\PYG{l+s+s2}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Correction factor     = sqrt(2*tau\PYGZus{}int) = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{correction}\PYG{l+s+si}{:}\PYG{l+s+s2}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Corrected sigma\PYGZus{}mean  = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}corr}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Naive    sigma\PYGZus{}mean   = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}naive}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Ratio corr/naive      = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}corr}\PYG{o}{/}\PYG{n}{sigma\PYGZus{}naive}\PYG{l+s+si}{:}\PYG{l+s+s2}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{  (= sqrt(2*tau\PYGZus{}int))}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} ── Full covariance sum Gamma\PYGZus{}N (exact, no tau\PYGZus{}int approximation) ─────}
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{gamma\PYGZus{}N}\PYG{p}{(}\PYG{n}{acf\PYGZus{}full}\PYG{p}{:} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ndarray}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n+nb}{float}\PYG{p}{:}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}Compute Gamma\PYGZus{}N = sum\PYGZus{}\PYGZob{}t=\PYGZhy{}(N\PYGZhy{}1)\PYGZcb{}\PYGZca{}\PYGZob{}N\PYGZhy{}1\PYGZcb{} (1\PYGZhy{}|t|/N) C(t) exactly.\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{N}   \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{acf\PYGZus{}full}\PYG{p}{)}
+    \PYG{n}{lag} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{arange}\PYG{p}{(}\PYG{n}{N}\PYG{p}{)}
+    \PYG{n}{w}   \PYG{o}{=} \PYG{l+m+mi}{1} \PYG{o}{\PYGZhy{}} \PYG{n}{lag} \PYG{o}{/} \PYG{n}{N}       \PYG{c+c1}{\PYGZsh{} triangular window}
+    \PYG{c+c1}{\PYGZsh{} Full symmetric sum: C(0) + 2 * sum\PYGZus{}\PYGZob{}t=1\PYGZcb{}\PYGZca{}\PYGZob{}N\PYGZhy{}1\PYGZcb{} (1\PYGZhy{}t/N) C(t)}
+    \PYG{k}{return} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{acf\PYGZus{}full}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{*} \PYG{n}{w}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{+} \PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{acf\PYGZus{}full}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{p}{]} \PYG{o}{*} \PYG{n}{w}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}
+
+\PYG{n}{acf\PYGZus{}full} \PYG{o}{=} \PYG{n}{autocorrelation}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{max\PYGZus{}lag}\PYG{o}{=}\PYG{n}{N} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{n}{GN}       \PYG{o}{=} \PYG{n}{gamma\PYGZus{}N}\PYG{p}{(}\PYG{n}{acf\PYGZus{}full}\PYG{p}{)}
+\PYG{n}{sigma\PYGZus{}exact\PYGZus{}cov} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{ddof}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{GN} \PYG{o}{/} \PYG{n}{N}\PYG{p}{)}\PYG{p}{)}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Gamma\PYGZus{}N (exact sum)   = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{GN}\PYG{l+s+si}{:}\PYG{l+s+s2}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{  (expect \PYGZti{}2*tau\PYGZus{}int = }\PYG{l+s+si}{\PYGZob{}}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{tau\PYGZus{}int}\PYG{l+s+si}{:}\PYG{l+s+s2}{.4f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Exact\PYGZhy{}cov sigma\PYGZus{}mean  = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}exact\PYGZus{}cov}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+\end{MintedVerbatim}

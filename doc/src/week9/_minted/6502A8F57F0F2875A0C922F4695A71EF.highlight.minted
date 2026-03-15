@@ -1,0 +1,63 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{std\PYGZus{}bootstrap}\PYG{p}{(}\PYG{n}{x}\PYG{p}{:} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ndarray}\PYG{p}{,}
+                  \PYG{n}{n\PYGZus{}boot}\PYG{p}{:} \PYG{n+nb}{int} \PYG{o}{=} \PYG{l+m+mi}{3000}\PYG{p}{,}
+                  \PYG{n}{block\PYGZus{}size}\PYG{p}{:} \PYG{n+nb}{int} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{p}{,}
+                  \PYG{n}{seed}\PYG{p}{:} \PYG{n+nb}{int} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n+nb}{tuple}\PYG{p}{:}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Block bootstrap estimate of sigma\PYGZus{}mean.}
+\PYG{l+s+sd}{    Returns (sigma\PYGZus{}boot, array\PYGZus{}of\PYGZus{}bootstrap\PYGZus{}means).}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{rng}     \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{random}\PYG{o}{.}\PYG{n}{default\PYGZus{}rng}\PYG{p}{(}\PYG{n}{seed}\PYG{p}{)}
+    \PYG{n}{N}       \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{n}{means}   \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{empty}\PYG{p}{(}\PYG{n}{n\PYGZus{}boot}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{block\PYGZus{}size} \PYG{o}{\PYGZlt{}}\PYG{o}{=} \PYG{l+m+mi}{1}\PYG{p}{:}
+        \PYG{c+c1}{\PYGZsh{} Standard i.i.d. bootstrap}
+        \PYG{k}{for} \PYG{n}{b} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{n\PYGZus{}boot}\PYG{p}{)}\PYG{p}{:}
+            \PYG{n}{means}\PYG{p}{[}\PYG{n}{b}\PYG{p}{]} \PYG{o}{=} \PYG{n}{rng}\PYG{o}{.}\PYG{n}{choice}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{size}\PYG{o}{=}\PYG{n}{N}\PYG{p}{,} \PYG{n}{replace}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{c+c1}{\PYGZsh{} Circular block bootstrap}
+        \PYG{n}{n\PYGZus{}blocks} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{ceil}\PYG{p}{(}\PYG{n}{N} \PYG{o}{/} \PYG{n}{block\PYGZus{}size}\PYG{p}{)}\PYG{p}{)}
+        \PYG{k}{for} \PYG{n}{b} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{n\PYGZus{}boot}\PYG{p}{)}\PYG{p}{:}
+            \PYG{n}{starts}  \PYG{o}{=} \PYG{n}{rng}\PYG{o}{.}\PYG{n}{integers}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{N}\PYG{p}{,} \PYG{n}{size}\PYG{o}{=}\PYG{n}{n\PYGZus{}blocks}\PYG{p}{)}
+            \PYG{n}{indices} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{concatenate}\PYG{p}{(}\PYG{p}{[}
+                \PYG{n}{np}\PYG{o}{.}\PYG{n}{arange}\PYG{p}{(}\PYG{n}{s}\PYG{p}{,} \PYG{n}{s} \PYG{o}{+} \PYG{n}{block\PYGZus{}size}\PYG{p}{)} \PYG{o}{\PYGZpc{}} \PYG{n}{N} \PYG{k}{for} \PYG{n}{s} \PYG{o+ow}{in} \PYG{n}{starts}
+            \PYG{p}{]}\PYG{p}{)}\PYG{p}{[}\PYG{p}{:}\PYG{n}{N}\PYG{p}{]}
+            \PYG{n}{means}\PYG{p}{[}\PYG{n}{b}\PYG{p}{]} \PYG{o}{=} \PYG{n}{x}\PYG{p}{[}\PYG{n}{indices}\PYG{p}{]}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{means}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{ddof}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{)}\PYG{p}{,} \PYG{n}{means}
+
+\PYG{n}{block\PYGZus{}size}   \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n+nb}{int}\PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{tau\PYGZus{}int}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{sigma\PYGZus{}boot}\PYG{p}{,} \PYG{n}{boot\PYGZus{}means} \PYG{o}{=} \PYG{n}{std\PYGZus{}bootstrap}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{n\PYGZus{}boot}\PYG{o}{=}\PYG{l+m+mi}{3000}\PYG{p}{,}
+                                        \PYG{n}{block\PYGZus{}size}\PYG{o}{=}\PYG{n}{block\PYGZus{}size}\PYG{p}{,} \PYG{n}{seed}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Block size             = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{block\PYGZus{}size}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{  (\PYGZti{}2*tau\PYGZus{}int = }\PYG{l+s+si}{\PYGZob{}}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{tau\PYGZus{}int}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Bootstrap sigma\PYGZus{}mean   = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}boot}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Naive    sigma\PYGZus{}mean    = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}naive}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Corrected sigma\PYGZus{}mean   = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}corr}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} ── Plot bootstrap distribution ───────────────────────────────────────}
+\PYG{n}{mu\PYGZus{}b}  \PYG{o}{=} \PYG{n}{boot\PYGZus{}means}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}
+\PYG{n}{sig\PYGZus{}b} \PYG{o}{=} \PYG{n}{boot\PYGZus{}means}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{ddof}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{n}{t\PYGZus{}vals} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{n}{boot\PYGZus{}means}\PYG{o}{.}\PYG{n}{min}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,} \PYG{n}{boot\PYGZus{}means}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,} \PYG{l+m+mi}{400}\PYG{p}{)}
+\PYG{n}{gauss}  \PYG{o}{=} \PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{exp}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{0.5}\PYG{o}{*}\PYG{p}{(}\PYG{p}{(}\PYG{n}{t\PYGZus{}vals} \PYG{o}{\PYGZhy{}} \PYG{n}{mu\PYGZus{}b}\PYG{p}{)}\PYG{o}{/}\PYG{n}{sig\PYGZus{}b}\PYG{p}{)}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}
+          \PYG{o}{/} \PYG{p}{(}\PYG{n}{sig\PYGZus{}b} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{pi}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)}
+
+\PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{hist}\PYG{p}{(}\PYG{n}{boot\PYGZus{}means}\PYG{p}{,} \PYG{n}{bins}\PYG{o}{=}\PYG{l+m+mi}{60}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{ACCENT}\PYG{p}{,} \PYG{n}{edgecolor}\PYG{o}{=}\PYG{n}{BG}\PYG{p}{,}
+        \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.85}\PYG{p}{,} \PYG{n}{density}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Bootstrap means}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{t\PYGZus{}vals}\PYG{p}{,} \PYG{n}{gauss}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{WARM}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{2.5}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Gaussian fit}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{axvline}\PYG{p}{(}\PYG{n}{mu\PYGZus{}b}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{GREEN}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZhy{}\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+           \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{hat}\PYG{l+s+se}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{mu}\PYG{l+s+se}{\PYGZcb{}\PYGZcb{}}\PYG{l+s+s1}{=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{mu\PYGZus{}b}\PYG{l+s+si}{:}\PYG{l+s+s1}{.5f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{axvline}\PYG{p}{(}\PYG{n}{mu\PYGZus{}b} \PYG{o}{\PYGZhy{}} \PYG{n}{sig\PYGZus{}b}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{PURPLE}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{axvline}\PYG{p}{(}\PYG{n}{mu\PYGZus{}b} \PYG{o}{+} \PYG{n}{sig\PYGZus{}b}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{PURPLE}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+           \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{hat}\PYG{l+s+se}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{sigma}\PYG{l+s+se}{\PYGZcb{}\PYGZcb{}}\PYG{l+s+s1}{=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sig\PYGZus{}b}\PYG{l+s+si}{:}\PYG{l+s+s1}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Bootstrap mean \PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{bar}\PYG{l+s+si}{\PYGZob{}x\PYGZcb{}}\PYG{l+s+s1}{\PYGZca{}*\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Density}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Block Bootstrap Distribution  }\PYG{l+s+s1}{\PYGZsq{}}
+             \PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{(\PYGZdl{}N=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{N}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{}, \PYGZdl{}b=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{block\PYGZus{}size}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{}, \PYGZdl{}B=3000\PYGZdl{})}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+             \PYG{n}{fontweight}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bold}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{TEXT}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{(}\PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{;} \PYG{n}{ax}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.35}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{tight\PYGZus{}layout}\PYG{p}{(}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+
+
+\end{MintedVerbatim}

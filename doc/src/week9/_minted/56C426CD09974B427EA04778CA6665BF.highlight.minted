@@ -1,0 +1,69 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{autocorrelation}\PYG{p}{(}\PYG{n}{x}\PYG{p}{:} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ndarray}\PYG{p}{,} \PYG{n}{max\PYGZus{}lag}\PYG{p}{:} \PYG{n+nb}{int} \PYG{o}{=} \PYG{k+kc}{None}\PYG{p}{)} \PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ndarray}\PYG{p}{:}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Normalised autocorrelation C(t) via FFT.  Returns C(0)..C(max\PYGZus{}lag).}
+
+\PYG{l+s+sd}{    C(t) = \PYGZlt{}(x\PYGZus{}i \PYGZhy{} \PYGZlt{}x\PYGZgt{})(x\PYGZus{}\PYGZob{}i+t\PYGZcb{} \PYGZhy{} \PYGZlt{}x\PYGZgt{})\PYGZgt{} / Var(x)}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{N} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{max\PYGZus{}lag} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{max\PYGZus{}lag} \PYG{o}{=} \PYG{n}{N} \PYG{o}{/}\PYG{o}{/} \PYG{l+m+mi}{2}
+    \PYG{n}{max\PYGZus{}lag} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{max\PYGZus{}lag}\PYG{p}{,} \PYG{n}{N} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)}
+
+    \PYG{n}{xc}  \PYG{o}{=} \PYG{n}{x} \PYG{o}{\PYGZhy{}} \PYG{n}{x}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}
+    \PYG{c+c1}{\PYGZsh{} Zero\PYGZhy{}pad to next power of 2 for efficient FFT}
+    \PYG{n}{fft\PYGZus{}size} \PYG{o}{=} \PYG{l+m+mi}{1}
+    \PYG{k}{while} \PYG{n}{fft\PYGZus{}size} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{N}\PYG{p}{:}
+        \PYG{n}{fft\PYGZus{}size} \PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{o}{=} \PYG{l+m+mi}{1}
+
+    \PYG{n}{F}   \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{fft}\PYG{o}{.}\PYG{n}{rfft}\PYG{p}{(}\PYG{n}{xc}\PYG{p}{,} \PYG{n}{n}\PYG{o}{=}\PYG{n}{fft\PYGZus{}size}\PYG{p}{)}
+    \PYG{n}{acf} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{fft}\PYG{o}{.}\PYG{n}{irfft}\PYG{p}{(}\PYG{n}{F} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{conj}\PYG{p}{(}\PYG{n}{F}\PYG{p}{)}\PYG{p}{)}\PYG{p}{[}\PYG{p}{:}\PYG{n}{N}\PYG{p}{]}
+    \PYG{n}{counts} \PYG{o}{=} \PYG{n}{N} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{arange}\PYG{p}{(}\PYG{n}{N}\PYG{p}{)}          \PYG{c+c1}{\PYGZsh{} number of pairs at each lag}
+    \PYG{n}{acf}    \PYG{o}{=} \PYG{n}{acf} \PYG{o}{/} \PYG{n}{counts}          \PYG{c+c1}{\PYGZsh{} normalise by number of pairs at each lag}
+    \PYG{n}{acf}    \PYG{o}{=} \PYG{n}{acf} \PYG{o}{/} \PYG{n}{acf}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}          \PYG{c+c1}{\PYGZsh{} normalise so C(0) = 1  (= variance at lag 0)}
+    \PYG{k}{return} \PYG{n}{acf}\PYG{p}{[}\PYG{p}{:}\PYG{n}{max\PYGZus{}lag} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{]}
+
+\PYG{n}{MAX\PYGZus{}LAG} \PYG{o}{=} \PYG{l+m+mi}{200}
+\PYG{n}{acf} \PYG{o}{=} \PYG{n}{autocorrelation}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{max\PYGZus{}lag}\PYG{o}{=}\PYG{n}{MAX\PYGZus{}LAG}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{C(0) = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{acf}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{l+s+si}{:}\PYG{l+s+s2}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{  (should be 1.0)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{C(1) = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{acf}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{l+s+si}{:}\PYG{l+s+s2}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{  (expect \PYGZti{}0 for good RNG)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{C(2) = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{acf}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{]}\PYG{l+s+si}{:}\PYG{l+s+s2}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{max|C(t)| for t\PYGZgt{}=1 : }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{acf}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{l+s+si}{:}\PYG{l+s+s2}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} ── Plot ACF ──────────────────────────────────────────────────────────}
+\PYG{n}{lags} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{arange}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{acf}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{conf} \PYG{o}{=} \PYG{l+m+mf}{1.96} \PYG{o}{/} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{N}\PYG{p}{)}
+
+\PYG{n}{fig}\PYG{p}{,} \PYG{n}{axes} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{16}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Left: bar plot}
+\PYG{n}{ax} \PYG{o}{=} \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{axhline}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{GRID}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{fill\PYGZus{}between}\PYG{p}{(}\PYG{n}{lags}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{n}{conf}\PYG{p}{,} \PYG{n}{conf}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{ACCENT}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.12}\PYG{p}{,}
+                \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{95\PYGZpc{} CI  (±}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{conf}\PYG{l+s+si}{:}\PYG{l+s+s1}{.4f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{)}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{bar}\PYG{p}{(}\PYG{n}{lags}\PYG{p}{,} \PYG{n}{acf}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{ACCENT}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.75}\PYG{p}{,} \PYG{n}{width}\PYG{o}{=}\PYG{l+m+mf}{0.8}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Lag \PYGZdl{}t\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}C(t)\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Normalised ACF  \PYGZdl{}C(t)\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontweight}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bold}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{TEXT}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlim}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{l+m+mf}{50.5}\PYG{p}{)}
+\PYG{n}{ax}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{(}\PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{;} \PYG{n}{ax}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.35}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Right: log scale}
+\PYG{n}{ax2} \PYG{o}{=} \PYG{n}{axes}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}
+\PYG{n}{pos} \PYG{o}{=} \PYG{n}{acf} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{lags}\PYG{p}{[}\PYG{n}{pos}\PYG{p}{]}\PYG{p}{,}  \PYG{n}{acf}\PYG{p}{[}\PYG{n}{pos}\PYG{p}{]}\PYG{p}{,}          \PYG{n}{color}\PYG{o}{=}\PYG{n}{ACCENT}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}C(t)\PYGZgt{}0\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{semilogy}\PYG{p}{(}\PYG{n}{lags}\PYG{p}{[}\PYG{o}{\PYGZti{}}\PYG{n}{pos}\PYG{p}{]}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{acf}\PYG{p}{[}\PYG{o}{\PYGZti{}}\PYG{n}{pos}\PYG{p}{]}\PYG{p}{)}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{o}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{WARM}\PYG{p}{,} \PYG{n}{ms}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.6}\PYG{p}{,}
+             \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}|C(t)|,}\PYG{l+s+s1}{\PYGZbs{}}\PYG{l+s+s1}{ C(t)\PYGZlt{}0\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{axhline}\PYG{p}{(}\PYG{n}{conf}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{GREEN}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZhy{}\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{95}\PYG{l+s+s1}{\PYGZpc{}}\PYG{l+s+s1}{ noise floor}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Lag \PYGZdl{}t\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}|C(t)|\PYGZdl{}  (log)}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Log\PYGZhy{}scale ACF — Exponential Decay}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontweight}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bold}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{TEXT}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlim}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{l+m+mf}{100.5}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{(}\PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{;} \PYG{n}{ax2}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.35}\PYG{p}{,} \PYG{n}{which}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{both}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{suptitle}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{ACF of NumPy PCG64  (\PYGZdl{}N=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{N}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{})}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+             \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{14}\PYG{p}{,} \PYG{n}{fontweight}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bold}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{TEXT}\PYG{p}{,} \PYG{n}{y}\PYG{o}{=}\PYG{l+m+mf}{1.01}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{tight\PYGZus{}layout}\PYG{p}{(}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+
+\end{MintedVerbatim}

@@ -1,0 +1,127 @@
+\begin{MintedVerbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8\relax}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{blocking\PYGZus{}analysis}\PYG{p}{(}\PYG{n}{x}\PYG{p}{,} \PYG{n}{n\PYGZus{}blocks\PYGZus{}range}\PYG{o}{=}\PYG{k+kc}{None}\PYG{p}{)}\PYG{p}{:}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    Blocking analysis: sweep block size b = N // n\PYGZus{}b and estimate}
+
+\PYG{l+s+sd}{        sigma\PYGZus{}block(b) = std(\PYGZob{}y\PYGZus{}k\PYGZcb{}) / sqrt(n\PYGZus{}b)}
+
+\PYG{l+s+sd}{    where y\PYGZus{}k are the n\PYGZus{}b non\PYGZhy{}overlapping block means.}
+\PYG{l+s+sd}{    Returns a dict with block sizes, sigma estimates, error bars, and}
+\PYG{l+s+sd}{    the detected plateau index, value, and implied tau\PYGZus{}int.}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{N} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{n\PYGZus{}blocks\PYGZus{}range} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+        \PYG{n}{bs} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{unique}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{round}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{geomspace}\PYG{p}{(}\PYG{l+m+mi}{4}\PYG{p}{,} \PYG{n}{N} \PYG{o}{/}\PYG{o}{/} \PYG{l+m+mi}{4}\PYG{p}{,} \PYG{l+m+mi}{80}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{)}\PYG{p}{)}
+        \PYG{n}{n\PYGZus{}blocks\PYGZus{}range} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{unique}\PYG{p}{(}\PYG{p}{(}\PYG{n}{N} \PYG{o}{/}\PYG{o}{/} \PYG{n}{bs}\PYG{p}{)}\PYG{o}{.}\PYG{n}{astype}\PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{)}\PYG{p}{)}
+        \PYG{n}{n\PYGZus{}blocks\PYGZus{}range} \PYG{o}{=} \PYG{n}{n\PYGZus{}blocks\PYGZus{}range}\PYG{p}{[}\PYG{n}{n\PYGZus{}blocks\PYGZus{}range} \PYG{o}{\PYGZgt{}}\PYG{o}{=} \PYG{l+m+mi}{4}\PYG{p}{]}
+
+    \PYG{n}{n\PYGZus{}blocks\PYGZus{}arr} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n+nb}{sorted}\PYG{p}{(}\PYG{n+nb}{set}\PYG{p}{(}\PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{v}\PYG{p}{)} \PYG{k}{for} \PYG{n}{v} \PYG{o+ow}{in} \PYG{n}{n\PYGZus{}blocks\PYGZus{}range}
+                                        \PYG{k}{if} \PYG{l+m+mi}{4} \PYG{o}{\PYGZlt{}}\PYG{o}{=} \PYG{n}{v} \PYG{o}{\PYGZlt{}}\PYG{o}{=} \PYG{n}{N} \PYG{o}{/}\PYG{o}{/} \PYG{l+m+mi}{4}\PYG{p}{)}\PYG{p}{)}\PYG{p}{,} \PYG{n}{dtype}\PYG{o}{=}\PYG{n+nb}{int}\PYG{p}{)}
+    \PYG{n}{sigma\PYGZus{}block} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{n\PYGZus{}blocks\PYGZus{}arr}\PYG{p}{)}\PYG{p}{)}
+    \PYG{n}{sigma\PYGZus{}err}   \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{n\PYGZus{}blocks\PYGZus{}arr}\PYG{p}{)}\PYG{p}{)}
+
+    \PYG{k}{for} \PYG{n}{idx}\PYG{p}{,} \PYG{n}{n\PYGZus{}b} \PYG{o+ow}{in} \PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{n\PYGZus{}blocks\PYGZus{}arr}\PYG{p}{)}\PYG{p}{:}
+        \PYG{n}{b}      \PYG{o}{=} \PYG{n}{N} \PYG{o}{/}\PYG{o}{/} \PYG{n}{n\PYGZus{}b}
+        \PYG{n}{blocks} \PYG{o}{=} \PYG{n}{x}\PYG{p}{[}\PYG{p}{:}\PYG{n}{n\PYGZus{}b} \PYG{o}{*} \PYG{n}{b}\PYG{p}{]}\PYG{o}{.}\PYG{n}{reshape}\PYG{p}{(}\PYG{n}{n\PYGZus{}b}\PYG{p}{,} \PYG{n}{b}\PYG{p}{)}
+        \PYG{n}{y}      \PYG{o}{=} \PYG{n}{blocks}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+        \PYG{n}{s}      \PYG{o}{=} \PYG{n}{y}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{ddof}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{/} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{n\PYGZus{}b}\PYG{p}{)}
+        \PYG{n}{sigma\PYGZus{}block}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]} \PYG{o}{=} \PYG{n}{s}
+        \PYG{n}{sigma\PYGZus{}err}\PYG{p}{[}\PYG{n}{idx}\PYG{p}{]}   \PYG{o}{=} \PYG{n}{s} \PYG{o}{/} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{p}{(}\PYG{n}{n\PYGZus{}b} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{)}
+
+    \PYG{n}{block\PYGZus{}sizes} \PYG{o}{=} \PYG{n}{N} \PYG{o}{/}\PYG{o}{/} \PYG{n}{n\PYGZus{}blocks\PYGZus{}arr}
+
+    \PYG{c+c1}{\PYGZsh{} Detect plateau: find where sigma\PYGZus{}block (vs increasing b) stabilises}
+    \PYG{n}{sb\PYGZus{}by\PYGZus{}b}   \PYG{o}{=} \PYG{n}{sigma\PYGZus{}block}\PYG{p}{[}\PYG{p}{:}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]}
+    \PYG{n}{window}    \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{sb\PYGZus{}by\PYGZus{}b}\PYG{p}{)} \PYG{o}{/}\PYG{o}{/} \PYG{l+m+mi}{10}\PYG{p}{)}
+    \PYG{n}{smoothed}  \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{convolve}\PYG{p}{(}\PYG{n}{sb\PYGZus{}by\PYGZus{}b}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{(}\PYG{n}{window}\PYG{p}{)}\PYG{o}{/}\PYG{n}{window}\PYG{p}{,} \PYG{n}{mode}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{valid}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{rel\PYGZus{}change}\PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{diff}\PYG{p}{(}\PYG{n}{smoothed}\PYG{p}{)} \PYG{o}{/} \PYG{p}{(}\PYG{n}{smoothed}\PYG{p}{[}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{l+m+mf}{1e\PYGZhy{}30}\PYG{p}{)}\PYG{p}{)}
+    \PYG{n}{plateau\PYGZus{}idx\PYGZus{}rev} \PYG{o}{=} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{sb\PYGZus{}by\PYGZus{}b}\PYG{p}{)} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{rel\PYGZus{}change}\PYG{p}{)} \PYG{o}{\PYGZhy{}} \PYG{n}{window}\PYG{p}{)}\PYG{p}{:}
+        \PYG{k}{if} \PYG{n}{np}\PYG{o}{.}\PYG{n}{all}\PYG{p}{(}\PYG{n}{rel\PYGZus{}change}\PYG{p}{[}\PYG{n}{i}\PYG{p}{:}\PYG{n}{i}\PYG{o}{+}\PYG{n}{window}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mf}{0.05}\PYG{p}{)}\PYG{p}{:}
+            \PYG{n}{plateau\PYGZus{}idx\PYGZus{}rev} \PYG{o}{=} \PYG{n}{i} \PYG{o}{+} \PYG{n}{window} \PYG{o}{/}\PYG{o}{/} \PYG{l+m+mi}{2}
+            \PYG{k}{break}
+    \PYG{n}{plateau\PYGZus{}idx}   \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{clip}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{sigma\PYGZus{}block}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{o}{\PYGZhy{}}\PYG{n}{plateau\PYGZus{}idx\PYGZus{}rev}\PYG{p}{,}
+                                \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{sigma\PYGZus{}block}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{)}
+    \PYG{n}{plateau\PYGZus{}value} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{median}\PYG{p}{(}
+        \PYG{n}{sigma\PYGZus{}block}\PYG{p}{[}\PYG{n+nb}{max}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{plateau\PYGZus{}idx}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{3}\PYG{p}{)}\PYG{p}{:} \PYG{n}{plateau\PYGZus{}idx}\PYG{o}{+}\PYG{l+m+mi}{4}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}
+    \PYG{n}{b\PYGZus{}plateau} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{block\PYGZus{}sizes}\PYG{p}{[}\PYG{n}{plateau\PYGZus{}idx}\PYG{p}{]}\PYG{p}{)}
+
+    \PYG{k}{return} \PYG{n+nb}{dict}\PYG{p}{(}\PYG{n}{n\PYGZus{}blocks}\PYG{o}{=}\PYG{n}{n\PYGZus{}blocks\PYGZus{}arr}\PYG{p}{,} \PYG{n}{block\PYGZus{}sizes}\PYG{o}{=}\PYG{n}{block\PYGZus{}sizes}\PYG{p}{,}
+                \PYG{n}{sigma\PYGZus{}block}\PYG{o}{=}\PYG{n}{sigma\PYGZus{}block}\PYG{p}{,} \PYG{n}{sigma\PYGZus{}err}\PYG{o}{=}\PYG{n}{sigma\PYGZus{}err}\PYG{p}{,}
+                \PYG{n}{plateau\PYGZus{}idx}\PYG{o}{=}\PYG{n}{plateau\PYGZus{}idx}\PYG{p}{,} \PYG{n}{plateau\PYGZus{}value}\PYG{o}{=}\PYG{n}{plateau\PYGZus{}value}\PYG{p}{,}
+                \PYG{n}{tau\PYGZus{}from\PYGZus{}block}\PYG{o}{=}\PYG{n}{b\PYGZus{}plateau}\PYG{o}{/}\PYG{l+m+mf}{2.0}\PYG{p}{)}
+
+\PYG{n}{blk} \PYG{o}{=} \PYG{n}{blocking\PYGZus{}analysis}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}
+\PYG{n}{sigma\PYGZus{}block\PYGZus{}plateau} \PYG{o}{=} \PYG{n}{blk}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{plateau\PYGZus{}value}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{tau\PYGZus{}from\PYGZus{}block}      \PYG{o}{=} \PYG{n}{blk}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{tau\PYGZus{}from\PYGZus{}block}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Plateau sigma\PYGZus{}mean  = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}block\PYGZus{}plateau}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{tau\PYGZus{}int from blocks = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{tau\PYGZus{}from\PYGZus{}block}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{   (Sokal: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{tau\PYGZus{}int}\PYG{l+s+si}{:}\PYG{l+s+s2}{.4f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{)}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Naive sigma\PYGZus{}mean    = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}naive}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Cov\PYGZhy{}corr sigma\PYGZus{}mean = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}corr}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Bootstrap           = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}boot}\PYG{l+s+si}{:}\PYG{l+s+s2}{.8f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} ── Plot blocking analysis ────────────────────────────────────────────}
+\PYG{n}{bs}   \PYG{o}{=} \PYG{n}{blk}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{block\PYGZus{}sizes}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{nb}   \PYG{o}{=} \PYG{n}{blk}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{n\PYGZus{}blocks}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{sig}  \PYG{o}{=} \PYG{n}{blk}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sigma\PYGZus{}block}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{err}  \PYG{o}{=} \PYG{n}{blk}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{sigma\PYGZus{}err}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{pidx} \PYG{o}{=} \PYG{n}{blk}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{plateau\PYGZus{}idx}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{plat} \PYG{o}{=} \PYG{n}{blk}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{plateau\PYGZus{}value}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{n}{b\PYGZus{}pl} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{bs}\PYG{p}{[}\PYG{n}{pidx}\PYG{p}{]}\PYG{p}{)}
+\PYG{n}{nb\PYGZus{}pl} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{nb}\PYG{p}{[}\PYG{n}{pidx}\PYG{p}{]}\PYG{p}{)}
+
+\PYG{n}{fig}\PYG{p}{,} \PYG{p}{(}\PYG{n}{ax1}\PYG{p}{,} \PYG{n}{ax2}\PYG{p}{)} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{16}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Left: sigma vs block size b (the standard view)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{errorbar}\PYG{p}{(}\PYG{n}{bs}\PYG{p}{,} \PYG{n}{sig}\PYG{p}{,} \PYG{n}{yerr}\PYG{o}{=}\PYG{n}{err}\PYG{p}{,} \PYG{n}{fmt}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{o\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{ACCENT}\PYG{p}{,}
+             \PYG{n}{ms}\PYG{o}{=}\PYG{l+m+mi}{4}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.6}\PYG{p}{,} \PYG{n}{elinewidth}\PYG{o}{=}\PYG{l+m+mf}{1.0}\PYG{p}{,} \PYG{n}{capsize}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.85}\PYG{p}{,}
+             \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{sigma\PYGZus{}}\PYG{l+s+s1}{\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{rm block\PYGZcb{}(b)\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{axhline}\PYG{p}{(}\PYG{n}{plat}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{GREEN}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{2.0}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZhy{}\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Plateau  }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{plat}\PYG{l+s+si}{:}\PYG{l+s+s1}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{axhline}\PYG{p}{(}\PYG{n}{sigma\PYGZus{}naive}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{WARM}\PYG{p}{,}   \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Naive    }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}naive}\PYG{l+s+si}{:}\PYG{l+s+s1}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{axhline}\PYG{p}{(}\PYG{n}{sigma\PYGZus{}corr}\PYG{p}{,}  \PYG{n}{color}\PYG{o}{=}\PYG{n}{PURPLE}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZhy{}.}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Cov\PYGZhy{}corr }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}corr}\PYG{l+s+si}{:}\PYG{l+s+s1}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{axhline}\PYG{p}{(}\PYG{n}{sigma\PYGZus{}boot}\PYG{p}{,}  \PYG{n}{color}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZsh{}f48fb1}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{)}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Bootstrap }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}boot}\PYG{l+s+si}{:}\PYG{l+s+s1}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{axvline}\PYG{p}{(}\PYG{n}{b\PYGZus{}pl}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{GREEN}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.2}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZhy{}\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Plateau onset \PYGZdl{}b=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{b\PYGZus{}pl}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{axvspan}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n+nb}{max}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{tau\PYGZus{}int}\PYG{p}{,} \PYG{l+m+mf}{1.5}\PYG{p}{)}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{WARM}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.07}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}b \PYGZlt{} 2}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{tau\PYGZus{}}\PYG{l+s+se}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{rm int}\PYG{l+s+se}{\PYGZcb{}\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{}  (biased)}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{set\PYGZus{}xscale}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{log}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Block size  \PYGZdl{}b\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{sigma\PYGZus{}}\PYG{l+s+s1}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{bar}\PYG{l+s+s1}{\PYGZob{}\PYGZob{}}\PYG{l+s+s1}{x\PYGZcb{}\PYGZcb{}\PYGZcb{}\PYGZcb{}\PYGZca{}}\PYG{l+s+s1}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{rm block\PYGZcb{}\PYGZcb{}(b)\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Blocking: \PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{sigma\PYGZdl{} vs Block Size \PYGZdl{}b\PYGZdl{}  (log scale)}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+              \PYG{n}{fontweight}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bold}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{TEXT}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{(}\PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mf}{8.5}\PYG{p}{,} \PYG{n}{loc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{lower right}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax1}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.35}\PYG{p}{,} \PYG{n}{which}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{both}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} Right: sigma vs number of blocks n\PYGZus{}b (inverted x mirrors left panel)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{errorbar}\PYG{p}{(}\PYG{n}{nb}\PYG{p}{,} \PYG{n}{sig}\PYG{p}{,} \PYG{n}{yerr}\PYG{o}{=}\PYG{n}{err}\PYG{p}{,} \PYG{n}{fmt}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{s\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{ACCENT}\PYG{p}{,}
+             \PYG{n}{ms}\PYG{o}{=}\PYG{l+m+mi}{4}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.6}\PYG{p}{,} \PYG{n}{elinewidth}\PYG{o}{=}\PYG{l+m+mf}{1.0}\PYG{p}{,} \PYG{n}{capsize}\PYG{o}{=}\PYG{l+m+mi}{3}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.85}\PYG{p}{,}
+             \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{sigma\PYGZus{}}\PYG{l+s+s1}{\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{rm block\PYGZcb{}(n\PYGZus{}b)\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{axhline}\PYG{p}{(}\PYG{n}{plat}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{GREEN}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{2.0}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZhy{}\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Plateau  }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{plat}\PYG{l+s+si}{:}\PYG{l+s+s1}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{axhline}\PYG{p}{(}\PYG{n}{sigma\PYGZus{}naive}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{WARM}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Naive  }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sigma\PYGZus{}naive}\PYG{l+s+si}{:}\PYG{l+s+s1}{.6f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{axvline}\PYG{p}{(}\PYG{n}{nb\PYGZus{}pl}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{GREEN}\PYG{p}{,} \PYG{n}{lw}\PYG{o}{=}\PYG{l+m+mf}{1.2}\PYG{p}{,} \PYG{n}{ls}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZhy{}\PYGZhy{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.5}\PYG{p}{,}
+            \PYG{n}{label}\PYG{o}{=}\PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Plateau at \PYGZdl{}n\PYGZus{}b=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{nb\PYGZus{}pl}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{set\PYGZus{}xscale}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{log}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{invert\PYGZus{}xaxis}\PYG{p}{(}\PYG{p}{)}   \PYG{c+c1}{\PYGZsh{} large n\PYGZus{}b (small b) on right \PYGZhy{}\PYGZgt{} matches left panel}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{set\PYGZus{}xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Number of blocks  \PYGZdl{}n\PYGZus{}b\PYGZdl{}  (reversed)}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{set\PYGZus{}ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{sigma\PYGZus{}}\PYG{l+s+s1}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{bar}\PYG{l+s+s1}{\PYGZob{}\PYGZob{}}\PYG{l+s+s1}{x\PYGZcb{}\PYGZcb{}\PYGZcb{}\PYGZcb{}\PYGZca{}}\PYG{l+s+s1}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{rm block\PYGZcb{}\PYGZcb{}(n\PYGZus{}b)\PYGZdl{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{13}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Blocking: \PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{sigma\PYGZdl{} vs \PYGZdl{}n\PYGZus{}b\PYGZdl{}  (same data, reversed axis)}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+              \PYG{n}{fontweight}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bold}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{TEXT}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{(}\PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{9}\PYG{p}{,} \PYG{n}{loc}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{lower left}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{ax2}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{alpha}\PYG{o}{=}\PYG{l+m+mf}{0.35}\PYG{p}{,} \PYG{n}{which}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{both}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{suptitle}\PYG{p}{(}
+    \PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{Blocking Analysis  (\PYGZdl{}N=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{N}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{},  }\PYG{l+s+s1}{\PYGZsq{}}
+    \PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{hat}\PYG{l+s+se}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{tau}\PYG{l+s+se}{\PYGZcb{}\PYGZcb{}}\PYG{l+s+s1}{\PYGZus{}}\PYG{l+s+se}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{rm Sokal}\PYG{l+s+se}{\PYGZcb{}\PYGZcb{}}\PYG{l+s+s1}{=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{tau\PYGZus{}int}\PYG{l+s+si}{:}\PYG{l+s+s1}{.3f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{},  }\PYG{l+s+s1}{\PYGZsq{}}
+    \PYG{l+s+sa}{f}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{\PYGZdl{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{tau\PYGZus{}}\PYG{l+s+se}{\PYGZob{}\PYGZob{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{rm block}\PYG{l+s+se}{\PYGZcb{}\PYGZcb{}}\PYG{l+s+se}{\PYGZbs{}\PYGZbs{}}\PYG{l+s+s1}{approx}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{tau\PYGZus{}from\PYGZus{}block}\PYG{l+s+si}{:}\PYG{l+s+s1}{.1f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s1}{\PYGZdl{})}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}
+    \PYG{n}{fontsize}\PYG{o}{=}\PYG{l+m+mi}{14}\PYG{p}{,} \PYG{n}{fontweight}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bold}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{n}{TEXT}\PYG{p}{,} \PYG{n}{y}\PYG{o}{=}\PYG{l+m+mf}{1.01}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{tight\PYGZus{}layout}\PYG{p}{(}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+
+\end{MintedVerbatim}

@@ -42,8 +42,7 @@ The covariance however, leads to an evaluation of a double sum over the various 
 Methods like the Bootstrap, the Jackknife and/or Blocking allow us to circumvent this problem. 
 
 !split
-===== Central limit theorem, reminder from last week =====
-
+===== Central limit theorem =====
 
 Last week we derived the central limit theorem with the following assumptions:
 
@@ -71,247 +70,120 @@ variance. The sample variance and the sample mean are not necessarily equal to
 the exact values we would get if we knew the corresponding probability
 distribution.
 
-
 !split
-===== Statistics, more technicalities  =====
-!bblock
-The desired variance
-$\mathrm{var}(\overline X_n)$, i.e. the sample error squared
-$\mathrm{err}_X^2$, is given by:
-!bt
-\begin{equation}
-\mathrm{err}_X^2 = \mathrm{var}(\overline X_n) = \frac{1}{n^2}
-\sum_{ij} \mathrm{cov}(X_i, X_j)
-label{eq:error_exact}
-\end{equation}
-!et
-We see now that in order to calculate the exact error of the sample
-with the above expression, we would need the true means
-$\mu_{X_i}^{\phantom X}$ of the stochastic variables $X_i$. To
-calculate these requires that we know the true multivariate PDF of all
-the $X_i$. But this PDF is unknown to us, we have only got the measurements of
-one sample. The best we can do is to let the sample itself be an
-estimate of the PDF of each of the $X_i$, estimating all properties of
-$X_i$ through the measurements of the sample.
-!eblock
+===== Running many measurements =====
 
-
-!split
-===== Statistics =====
-!bblock
-Our estimate of $\mu_{X_i}^{\phantom X}$ is then the sample mean $\bar x$
-itself, in accordance with the the central limit theorem:
+!bblock Adding $m$ measurements $i$
+With the assumption that the average measurements $i$ are also defined as  iid stochastic variables and have the same probability function $p$,
+we defined the total average over $m$ experiments as
 !bt
 \[
-\mu_{X_i}^{\phantom X} = \langle x_i\rangle \approx \frac{1}{n}\sum_{k=1}^n x_k = \bar x
+\overline{X}=\frac{1}{m}\sum_{i} \overline{x}_{i}.
 \]
 !et
-Using $\bar x$ in place of $\mu_{X_i}^{\phantom X}$ we can give an
-*estimate* of the covariance in Eq.~(ref{eq:error_exact})
+and the total variance
 !bt
 \[
-\mathrm{cov}(X_i, X_j) = \langle (x_i-\langle x_i\rangle)(x_j-\langle x_j\rangle)\rangle
-\approx\langle (x_i - \bar x)(x_j - \bar{x})\rangle,
-\]
-!et
-resulting in
-!bt
-\[ 
-\frac{1}{n} \sum_{l}^n \left(\frac{1}{n}\sum_{k}^n (x_k -\bar x_n)(x_l - \bar x_n)\right)=\frac{1}{n}\frac{1}{n} \sum_{kl} (x_k -\bar x_n)(x_l - \bar x_n)=\frac{1}{n}\mathrm{cov}(x)
+\sigma^2_{m}=\frac{1}{m}\sum_{i} \left( \overline{x}_{i}-\overline{X}\right)^2.
 \]
 !et
 !eblock
-
-
-
-!split
-===== Statistics and sample variance  =====
-!bblock
-By the same procedure we can use the sample variance as an
-estimate of the variance of any of the stochastic variables $X_i$
-!bt
-\[
-\mathrm{var}(X_i)=\langle x_i - \langle x_i\rangle\rangle \approx \langle x_i - \bar x_n\rangle\nonumber,
-\]
-!et
-which is approximated as 
-!bt
-\begin{equation}
-\mathrm{var}(X_i)\approx \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)=\mathrm{var}(x)
-label{eq:var_estimate_i_think}
-\end{equation}
-!et
-
-Now we can calculate an estimate of the error
-$\mathrm{err}_X^{\phantom X}$ of the sample mean $\bar x_n$:
-!bt
-\begin{align}
-\mathrm{err}_X^2
-&=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) \nonumber \\
-&\approx&\frac{1}{n^2}\sum_{ij}\frac{1}{n}\mathrm{cov}(x) =\frac{1}{n^2}n^2\frac{1}{n}\mathrm{cov}(x)\nonumber\\
-&=\frac{1}{n}\mathrm{cov}(x)
-label{eq:error_estimate}
-\end{align}
-!et
-which is nothing but the sample covariance divided by the number of
-measurements in the sample.
-!eblock
+These are the quantities we used in showing that if the individual mean values are iid stochastic variables, then in the limit $m\rightarrow \infty$, the distribution for $\overline{X}$ is given by a Gaussian distribution with variance $\sigma^2_m$.
 
 !split
-===== Statistics, uncorrelated results =====
-!bblock
+===== Adding more definitions =====
 
-In the special case that the measurements of the sample are
-uncorrelated (equivalently the stochastic variables $X_i$ are
-uncorrelated) we have that the off-diagonal elements of the covariance
-are zero. This gives the following estimate of the sample error:
+The total sample variance over the $mn$ measurements is defined as
 !bt
 \[
-\mathrm{err}_X^2=\frac{1}{n^2}\sum_{ij} \mathrm{cov}(X_i, X_j) =
-\frac{1}{n^2} \sum_i \mathrm{var}(X_i),
+\sigma^2=\frac{1}{mn}\sum_{i=1}^{m} \sum_{j=1}^{n}\left(x_{ij}-\overline{X}\right)^2.
 \]
 !et
-resulting in
+We have from the equation for $\sigma_m^2$ 
 !bt
-\begin{equation}
-\mathrm{err}_X^2\approx \frac{1}{n^2} \sum_i \mathrm{var}(x)= \frac{1}{n}\mathrm{var}(x)
-label{eq:error_estimate_uncorrel}
-\end{equation}
+\[
+\overline{x}_i-\overline{X}=\frac{1}{n}\sum_{j=1}^{n}\left(x_{i}-\overline{X}\right),
+\]
 !et
-where in the second step we have used Eq.~(ref{eq:var_estimate_i_think}).
-The error of the sample is then just its standard deviation divided by
-the square root of the number of measurements the sample contains.
-This is a very useful formula which is easy to compute. It acts as a
-first approximation to the error, but in numerical experiments, we
-cannot overlook the always present correlations.
-!eblock
+and introducing the centered value $\tilde{x}_{ij}=x_{ij}-\overline{X}$, we can rewrite $\sigma_m^2$ as
+!bt
+\[
+\sigma^2_{m}=\frac{1}{m}\sum_{i} \left( \overline{x}_{i}-\overline{X}\right)^2=\frac{1}{m}\sum_{i=1}^{m}\left[ \frac{i}{n}\sum_{j=1}^{n}\tilde{x}_{ij}\right]^2.
+\]
+!et
 
 !split
-===== Statistics, computations =====
-!bblock
-For computational purposes one usually splits up the estimate of
-$\mathrm{err}_X^2$, given by Eq.~(ref{eq:error_estimate}), into two
-parts
-!bt
-\[
-\mathrm{err}_X^2 = \frac{1}{n}\mathrm{var}(x) + \frac{1}{n}(\mathrm{cov}(x)-\mathrm{var}(x)),
-\]
-!et
-which equals
-!bt
-\begin{equation}
-\frac{1}{n^2}\sum_{k=1}^n (x_k - \bar x_n)^2 +\frac{2}{n^2}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n)
-label{eq:error_estimate_split_up}
-\end{equation}
-!et
-The first term is the same as the error in the uncorrelated case,
-Eq.~(ref{eq:error_estimate_uncorrel}). This means that the second
-term accounts for the error correction due to correlation between the
-measurements. For uncorrelated measurements this second term is zero.
-!eblock
+===== Further rewriting =====
 
-!split
-===== Statistics, more on computations of errors =====
-!bblock
-Computationally the uncorrelated first term is much easier to treat
-efficiently than the second.
+We can rewrite the latter in terms of a sum over diagonal elements only and another sum which contains the non-diagonal elements
 !bt
-\[
-\mathrm{var}(x) = \frac{1}{n}\sum_{k=1}^n (x_k - \bar x_n)^2 =
-\left(\frac{1}{n}\sum_{k=1}^n x_k^2\right) - \bar x_n^2
-\]
+\begin{align*}
+\sigma^2_{m}& =\frac{1}{m}\sum_{i=1}^{m}\left[ \frac{i}{n}\sum_{j=1}^{n}\tilde{x}_{ij}\right]^2 \\
+            & = \frac{1}{mn^2}\sum_{i=1}^{m} \sum_{j=1}^{n}\tilde{x}_{ij}^2+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j<k}^{n}\tilde{x}_{ij}\tilde{x}_{ik}.
+\end{align*}
 !et
-We just accumulate separately the values $x^2$ and $x$ for every
-measurement $x$ we receive. The correlation term, though, has to be
-calculated at the end of the experiment since we need all the
-measurements to calculate the cross terms. Therefore, all measurements
-have to be stored throughout the experiment.
-!eblock
-
+The first term on the last rhs is nothing but the total sample variance $\sigma^2$ divided by $m$. The second term represents the covariance.
 
 
 
 !split
-===== Statistics, wrapping up 1 =====
-!bblock
-Let us analyze the problem by splitting up the correlation term into
-partial sums of the form:
-!bt
-\[
-f_d = \frac{1}{n-d}\sum_{k=1}^{n-d}(x_k - \bar x_n)(x_{k+d} - \bar x_n)
-\]
-!et
-The correlation term of the error can now be rewritten in terms of
-$f_d$
-!bt
-\[
-\frac{2}{n}\sum_{k<l} (x_k - \bar x_n)(x_l - \bar x_n) =
-2\sum_{d=1}^{n-1} f_d
-\]
-!et
-The value of $f_d$ reflects the correlation between measurements
-separated by the distance $d$ in the sample samples.  Notice that for
-$d=0$, $f$ is just the sample variance, $\mathrm{var}(x)$. If we divide $f_d$
-by $\mathrm{var}(x)$, we arrive at the so called *autocorrelation function*
-!bt
-\[
-\kappa_d = \frac{f_d}{\mathrm{var}(x)}
-\]
-!et
-which gives us a useful measure of pairwise correlations
-starting always at $1$ for $d=0$.
-!eblock
+===== The covariance term  =====
 
+Using the definition of the total sample variance we have
+!bt
+\begin{align*}
+\sigma^2_{m}& = \frac{\sigma^2}{m}+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j<k}^{n}\tilde{x}_{ij}\tilde{x}_{ik}.
+\end{align*}
+!et
+
+The first term is what we have used till now in order to estimate the
+standard deviation. However, the second term which gives us a measure
+of the correlations between different stochastic events, can result in
+contributions which give rise to a larger standard deviation and
+variance $\sigma_m^2$. Note also the evaluation of the second term
+leads to a double sum over all events. If we run a VMC calculation
+with say $10^9$ Monte carlo samples, the latter term would lead to
+$10^{18}$ function evaluations. We don't want to, by obvious reasons, to venture into that many evaluations.
+
+Note also that if our stochastic events are iid then the covariance terms is zero.
 
 !split
-===== Statistics, final expression =====
-!bblock
-The sample error (see eq.~(ref{eq:error_estimate_split_up})) can now be
-written in terms of the autocorrelation function:
-!bt
-\begin{align}
-\mathrm{err}_X^2 &=
-\frac{1}{n}\mathrm{var}(x)+\frac{2}{n}\cdot\mathrm{var}(x)\sum_{d=1}^{n-1}
-\frac{f_d}{\mathrm{var}(x)}\nonumber\\ &=&
-\left(1+2\sum_{d=1}^{n-1}\kappa_d\right)\frac{1}{n}\mathrm{var}(x)\nonumber\\
-&=\frac{\tau}{n}\cdot\mathrm{var}(x)
-label{eq:error_estimate_corr_time}
-\end{align}
-!et
-and we see that $\mathrm{err}_X$ can be expressed in terms the
-uncorrelated sample variance times a correction factor $\tau$ which
-accounts for the correlation between measurements. We call this
-correction factor the *autocorrelation time*:
-!bt
-\begin{equation}
-\tau = 1+2\sum_{d=1}^{n-1}\kappa_d
-label{eq:autocorrelation_time}
-\end{equation}
-!et
-!eblock
+===== Rewriting the covariance term  =====
 
-!split
-===== Statistics, effective number of correlations =====
-!bblock
-For a correlation free experiment, $\tau$
-equals 1. From the point of view of
-eq.~(ref{eq:error_estimate_corr_time}) we can interpret a sequential
-correlation as an effective reduction of the number of measurements by
-a factor $\tau$. The effective number of measurements becomes:
+We introduce now a variable $d=\vert j-k\vert $ and rewrite 
 !bt
 \[
-n_\mathrm{eff} = \frac{n}{\tau}
+\frac{2}{mn^2}\sum_{i=1}^{m} \sum_{j<k}^{n}\tilde{x}_{ij}\tilde{x}_{ik},
 \]
 !et
-To neglect the autocorrelation time $\tau$ will always cause our
-simple uncorrelated estimate of $\mathrm{err}_X^2\approx \mathrm{var}(x)/n$ to
-be less than the true sample error. The estimate of the error will be
-too *good*. On the other hand, the calculation of the full
-autocorrelation time poses an efficiency problem if the set of
-measurements is very large.
-!eblock
+in terms of a function
+!bt
+\[
+f_d=\frac{2}{mn}\sum_{i=1}^{m} \sum_{k=1}^{n-d}\tilde{x}_{ik}\tilde{x}_{i(k+d)}.
+\]
+!et
+We note that for $d=0$ we have
+!bt
+\[
+f_0=\frac{2}{mn}\sum_{i=1}^{m} \sum_{k=1}^{n}\tilde{x}_{ik}\tilde{x}_{i(k)}=\sigma^2!
+\]
+!et
 
+!split
+===== Introducing the correlation function =====
 
+We introduce then a correlation function $\kappa_d=f_d/\sigma^2$. Note that $\kappa_0 =1$.  We rewrite the variance $\sigma_m^2$ as
+!bt
+\begin{align*}
+\sigma^2_{m}& = \frac{\sigma^2}{m}\left[1+2\sum_{d=1}^{n-1} \kappa_d\right].
+\end{align*}
+!et
+
+The code here shows the evolution of $\kappa_d$ as a function of $d$
+for a series of random numbers. We see that the function $\kappa_d$
+approaches $0$ as $d\rightarrow \infty$.
+
+In this case, our data are given by random numbers generated for the uniform distribution with $x\in [0,1]$. Even with two random numbers being far away, we note that the correlation function is not zero.
 
 !split
 ===== Computing the correlation function =====
@@ -366,219 +238,6 @@ plt.show()
 
 
 
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-The so-called time-displacement autocorrelation $\phi(t)$ for a quantity $\mathbf{M}$ is given by
-!bt
-\[
-\phi(t) = \int dt' \left[\mathbf{M}(t')-\langle \mathbf{M} \rangle\right]\left[\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle\right],
-\]
-!et
-which can be rewritten as 
-!bt
-\[
-\phi(t) = \int dt' \left[\mathbf{M}(t')\mathbf{M}(t'+t)-\langle \mathbf{M} \rangle^2\right],
-\]
-!et
-where $\langle \mathbf{M} \rangle$ is the average value and
-$\mathbf{M}(t)$ its instantaneous value. We can discretize this function as follows, where we used our
-set of computed values $\mathbf{M}(t)$ for a set of discretized times (our Monte Carlo cycles corresponding to moving all electrons?)
-!bt
-\[
-\phi(t)  = \frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\mathbf{M}(t'+t)
--\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t')\times
-\frac{1}{t_{\mathrm{max}}-t}\sum_{t'=0}^{t_{\mathrm{max}}-t}\mathbf{M}(t'+t).
-label{eq:phitf}
-\]
-!et
-!eblock
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-One should be careful with times close to $t_{\mathrm{max}}$, the upper limit of the sums 
-becomes small and we end up integrating over a rather small time interval. This means that the statistical
-error in $\phi(t)$ due to the random nature of the fluctuations in $\mathbf{M}(t)$ can become large.
-
-One should therefore choose $t \ll t_{\mathrm{max}}$.
-
-Note that the variable $\mathbf{M}$ can be any expectation values of interest.
-
-
-
-The time-correlation function gives a measure of the correlation between the various values of the variable 
-at a time $t'$ and a time $t'+t$. If we multiply the values of $\mathbf{M}$ at these two different times,
-we will get a positive contribution if they are fluctuating in the same direction, or a negative value
-if they fluctuate in the opposite direction. If we then integrate over time, or use the discretized version of, the time correlation function $\phi(t)$ should take a non-zero value if the fluctuations are 
-correlated, else it should gradually go to zero. For times a long way apart 
-the different values of $\mathbf{M}$  are most likely 
-uncorrelated and $\phi(t)$ should be zero.
-!eblock
-
-
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-We can derive the correlation time by observing that our Metropolis algorithm is based on a random
-walk in the space of all  possible spin configurations. 
-Our probability 
-distribution function $\mathbf{\hat{w}}(t)$ after a given number of time steps $t$ could be written as
-!bt
-\[
-   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}^t\hat{w}}(0),
-\]
-!et
-with $\mathbf{\hat{w}}(0)$ the distribution at $t=0$ and $\mathbf{\hat{W}}$ representing the 
-transition probability matrix. 
-We can always expand $\mathbf{\hat{w}}(0)$ in terms of the right eigenvectors of 
-$\mathbf{\hat{v}}$ of $\mathbf{\hat{W}}$ as 
-!bt
-\[
-    \mathbf{\hat{w}}(0)  = \sum_i\alpha_i\mathbf{\hat{v}}_i,
-\]
-!et
-resulting in 
-!bt
-\[
-   \mathbf{\hat{w}}(t) = \mathbf{\hat{W}}^t\mathbf{\hat{w}}(0)=\mathbf{\hat{W}}^t\sum_i\alpha_i\mathbf{\hat{v}}_i=
-\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i,
-\]
-!et
-with $\lambda_i$ the $i^{\mathrm{th}}$ eigenvalue corresponding to  
-the eigenvector $\mathbf{\hat{v}}_i$. 
-!eblock
-
-
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-If we assume that $\lambda_0$ is the largest eigenvector we see that in the limit $t\rightarrow \infty$,
-$\mathbf{\hat{w}}(t)$ becomes proportional to the corresponding eigenvector 
-$\mathbf{\hat{v}}_0$. This is our steady state or final distribution. 
-
-We can relate this property to an observable like the mean energy.
-With the probabilty $\mathbf{\hat{w}}(t)$ (which in our case is the squared trial wave function) we
-can write the expectation values as 
-!bt
-\[
- \langle \mathbf{M}(t) \rangle  = \sum_{\mu} \mathbf{\hat{w}}(t)_{\mu}\mathbf{M}_{\mu},
-\] 
-!et 
-or as the scalar of a  vector product
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m},
-\] 
-!et 
-with $\mathbf{m}$ being the vector whose elements are the values of $\mathbf{M}_{\mu}$ in its 
-various microstates $\mu$.
-!eblock
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-We rewrite this relation  as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \mathbf{\hat{w}}(t)\mathbf{m}=\sum_i\lambda_i^t\alpha_i\mathbf{\hat{v}}_i\mathbf{m}_i.
-\] 
-!et 
-If we define $m_i=\mathbf{\hat{v}}_i\mathbf{m}_i$ as the expectation value of
-$\mathbf{M}$ in the $i^{\mathrm{th}}$ eigenstate we can rewrite the last equation as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \sum_i\lambda_i^t\alpha_im_i.
-\] 
-!et
-Since we have that in the limit $t\rightarrow \infty$ the mean value is dominated by the 
-the largest eigenvalue $\lambda_0$, we can rewrite the last equation as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\lambda_i^t\alpha_im_i.
-\] 
-!et
-We define the quantity
-!bt
-\[
-   \tau_i=-\frac{1}{log\lambda_i},
-\]
-!et
-and rewrite the last expectation value as
-!bt
- \[
- \langle \mathbf{M}(t) \rangle  = \langle \mathbf{M}(\infty) \rangle+\sum_{i\ne 0}\alpha_im_ie^{-t/\tau_i}.
-label{eq:finalmeanm}
-\] 
-!et
-!eblock
-
-
-!split
-===== Time Auto-correlation Function =====
-!bblock
-
-The quantities $\tau_i$ are the correlation times for the system. They control also the auto-correlation function 
-discussed above.  The longest correlation time is obviously given by the second largest
-eigenvalue $\tau_1$, which normally defines the correlation time discussed above. For large times, this is the 
-only correlation time that survives. If higher eigenvalues of the transition matrix are well separated from 
-$\lambda_1$ and we simulate long enough,  $\tau_1$ may well define the correlation time. 
-In other cases we may not be able to extract a reliable result for $\tau_1$. 
-Coming back to the time correlation function $\phi(t)$ we can present a more general definition in terms
-of the mean magnetizations $ \langle \mathbf{M}(t) \rangle$. Recalling that the mean value is equal 
-to $ \langle \mathbf{M}(\infty) \rangle$ we arrive at the expectation values
-!bt
-\[
-\phi(t) =\langle \mathbf{M}(0)-\mathbf{M}(\infty)\rangle \langle \mathbf{M}(t)-\mathbf{M}(\infty)\rangle,
-\]
-!et
-resulting in
-!bt
-\[
-\phi(t) =\sum_{i,j\ne 0}m_i\alpha_im_j\alpha_je^{-t/\tau_i},
-\]
-!et
-which is appropriate for all times.
-!eblock
-
-
-
-!split
-===== Correlation Time =====
-!bblock
-
-If the correlation function decays exponentially
-!bt
-\[ \phi (t) \sim \exp{(-t/\tau)}\]
-!et
-then the exponential correlation time can be computed as the average
-!bt
-\[   \tau_{\mathrm{exp}}  =  -\langle  \frac{t}{log|\frac{\phi(t)}{\phi(0)}|} \rangle. \]
-!et
-If the decay is exponential, then
-!bt
-\[  \int_0^{\infty} dt \phi(t)  = \int_0^{\infty} dt \phi(0)\exp{(-t/\tau)}  = \tau \phi(0),\] 
-!et
-which  suggests another measure of correlation
-!bt
-\[   \tau_{\mathrm{int}} = \sum_k \frac{\phi(k)}{\phi(0)}, \]
-!et
-called the integrated correlation time.
-!eblock
-
-
-
-
-
-
-
 !split
 ===== Resampling methods: Blocking  =====
 
@@ -606,110 +265,691 @@ moreover, it becomes more accurate the larger $n$ is.
 
 !split
 ===== Blocking Transformations =====
- We now define the blocking transformations. The idea is to take the mean of subsequent
-pair of elements from $\bm{X}$ and form a new vector
-$\bm{X}_1$. Continuing in the same way by taking the mean of
-subsequent pairs of elements of $\bm{X}_1$ we obtain $\bm{X}_2$, and
-so on. 
-Define $\bm{X}_i$ recursively by:
-
-!bt 
-\begin{align} 
-(\bm{X}_0)_k &\equiv (\bm{X})_k \nonumber \\
-(\bm{X}_{i+1})_k &\equiv \frac{1}{2}\Big( (\bm{X}_i)_{2k-1} +
-(\bm{X}_i)_{2k} \Big) \qquad \text{for all} \qquad 1 \leq i \leq d-1
-\end{align} 
-!et 
-
-!split
-===== Blocking transformations =====
-
-
-The quantity $\bm{X}_k$ is
-subject to $k$ _blocking transformations_.  We now have $d$ vectors
-$\bm{X}_0, \bm{X}_1,\cdots,\bm{X}_{d-1}$ containing the subsequent
-averages of observations. It turns out that if the components of
-$\bm{X}$ is a stationary time series, then the components of
-$\bm{X}_i$ is a stationary time series for all $0 \leq i \leq d-1$
-
-We can then compute the autocovariance (or just covariance), the variance, sample mean, and
-number of observations for each $i$. 
-Let $\gamma_i, \sigma_i^2,
-\overline{X}_i$ denote the covariance, variance and average of the
-elements of $\bm{X}_i$ and let $n_i$ be the number of elements of
-$\bm{X}_i$. It follows by induction that $n_i = n/2^i$. 
-
-!split
-===== Blocking Transformations =====
-
-Using the
-definition of the blocking transformation and the distributive
-property of the covariance, it is clear that since $h =|i-j|$
-we can define
-!bt
-\begin{align}
-\gamma_{k+1}(h) &= cov\left( ({X}_{k+1})_{i}, ({X}_{k+1})_{j} \right) \nonumber \\
-&=  \frac{1}{4}cov\left( ({X}_{k})_{2i-1} + ({X}_{k})_{2i}, ({X}_{k})_{2j-1} + ({X}_{k})_{2j} \right) \nonumber \\
-&=  \frac{1}{2}\gamma_{k}(2h) + \frac{1}{2}\gamma_k(2h+1) \hspace{0.1cm} \mathrm{h = 0} \\
-&=\frac{1}{4}\gamma_k(2h-1) + \frac{1}{2}\gamma_k(2h) + \frac{1}{4}\gamma_k(2h+1) \quad \mathrm{else}
-\end{align}
-!et
-
-The quantity $\hat{X}$ is asymptotically uncorrelated by assumption, $\hat{X}_k$ is also asymptotic uncorrelated. Let's turn our attention to the variance of the sample
-mean $\mathrm{var}(\overline{X})$. 
-
-!split
-===== Blocking Transformations, getting there =====
-We have
-!bt
-\begin{align}
-\mathrm{var}(\overline{X}_k) = \frac{\sigma_k^2}{n_k} + \underbrace{\frac{2}{n_k} \sum_{h=1}^{n_k-1}\left( 1 - \frac{h}{n_k} \right)\gamma_k(h)}_{\equiv e_k} = \frac{\sigma^2_k}{n_k} + e_k \quad \text{if} \quad \gamma_k(0) = \sigma_k^2. 
-\end{align}
-!et
-The term $e_k$ is called the _truncation error_: 
-!bt
-\begin{equation}
-e_k = \frac{2}{n_k} \sum_{h=1}^{n_k-1}\left( 1 - \frac{h}{n_k} \right)\gamma_k(h). 
-\end{equation}
-!et
-We can show that $\mathrm{var}(\overline{X}_i) = \mathrm{var}(\overline{X}_j)$ for all $0 \leq i \leq d-1$ and $0 \leq j \leq d-1$. 
-
-!split
-===== Blocking Transformations, final expressions =====
-
-We can then wrap up
-!bt
-\begin{align}
-n_{j+1} \overline{X}_{j+1}  &= \sum_{i=1}^{n_{j+1}} (\hat{X}_{j+1})_i =  \frac{1}{2}\sum_{i=1}^{n_{j}/2} (\hat{X}_{j})_{2i-1} + (\hat{X}_{j})_{2i} \nonumber \\
-&= \frac{1}{2}\left[ (\hat{X}_j)_1 + (\hat{X}_j)_2 + \cdots + (\hat{X}_j)_{n_j} \right] = \underbrace{\frac{n_j}{2}}_{=n_{j+1}} \overline{X}_j = n_{j+1}\overline{X}_j. 
-\end{align}
-!et
-By repeated use of this equation we get $\mathrm{var}(\overline{X}_i) = \mathrm{var}(\overline{X}_0) = \mathrm{var}(\overline{X})$ for all $0 \leq i \leq d-1$. This has the consequence that
-!bt
-\begin{align}
-\mathrm{var}(\overline{X}) = \frac{\sigma_k^2}{n_k} + e_k \qquad \text{for all} \qquad 0 \leq k \leq d-1. label{eq:convergence}
-\end{align}
-!et
-
-
-!split
-===== More on the blocking method =====
-
-Flyvbjerg and Petersen demonstrated that the sequence
-$\{e_k\}_{k=0}^{d-1}$ is decreasing, and conjecture that the term
-$e_k$ can be made as small as we would like by making $k$ (and hence
-$d$) sufficiently large. The sequence is decreasing.
-It means we can apply blocking transformations until
-$e_k$ is sufficiently small, and then estimate $\mathrm{var}(\overline{X})$ by
-$\widehat{\sigma}^2_k/n_k$. 
-
 
 For an elegant solution and proof of the blocking method, see the recent article of "Marius Jonsson (former MSc student of the Computational Physics group)":"https://journals.aps.org/pre/abstract/10.1103/PhysRevE.98.043304".
 
+!split
+===== Bootstrap method  =====
 
 
 !split
-===== Example code form last week =====
+===== Using random number generators as example =====
+
+NumPy's `default_rng()` uses the PCG64 (Permuted Congruential Generator,
+64-bit) algorithm, which passes all standard statistical tests and has an
+astronomically long period of $2^{128}$.
+
+!split
+===== Normalised Autocorrelation Function =====
+
+Given a time series $\{x_i\}_{i=1}^{N}$ with mean $\bar{x}$ and variance
+$\sigma^2 = \langle (x_i - \bar{x})^2 \rangle$, the normalised
+autocorrelation function at lag $t$ is:
+
+!bt
+\[
+\boxed{C(t) = \frac{\langle (x_i - \bar{x})(x_{i+t} - \bar{x}) \rangle}{\sigma^2}}
+\]
+!et
+By construction $C(0) = 1$, and for uncorrelated data $C(t) = 0$ for all
+$t \geq 1$.
+
+!split
+===== Variance of the Sample Mean =====
+
+For a correlated* time series the true variance of the sample mean is:
+!bt
+\[
+\text{Var}(\bar{x}) = \frac{1}{N^2} \sum_{i,j=1}^{N} \text{Cov}(x_i, x_j)
+= \frac{\sigma^2}{N} \sum_{t=-(N-1)}^{N-1} \left(1 - \frac{|t|}{N}\right) C(t)
+\approx \frac{2\,\tau_{\rm int}\,\sigma^2}{N}.
+\]
+!et
+
+Hence the corrected standard deviation of the mean is:
+
+!bt
+\[
+\boxed{\sigma_{\bar{x}}^{\rm corr} = \sigma \sqrt{\frac{2\,\tau_{\rm int}}{N}}}
+\]
+!et
+
+The naive estimate assumes $\tau_{\rm int} = 1/2$ (no correlations):
+
+!bt
+\[
+\sigma_{\bar{x}}^{\rm naive} = \frac{\sigma}{\sqrt{N}}
+\]
+!et
+
+!split
+===== Integrated Autocorrelation Time =====
+
+!bt
+\[
+\boxed{\tau_{\rm int} = \frac{1}{2} + \sum_{t=1}^{W} C(t)}.
+\]
+!et
+
+The sum is truncated at window $W$ chosen by the Madras–Sokal
+automatic-windowing criterion: stop at the first $W$ with
+$W < c \cdot \tau_{\rm int}$ (typically $c = 6$).
+
+!split
+===== Bootstrap Estimator =====
+
+For correlated data, use _circular block bootstrapping_: resample blocks
+of consecutive observations of length $b \sim \tau_{\rm int}$ with
+replacement, then compute the standard deviation of the bootstrap
+distribution of the mean:
+
+!bt
+\[
+\hat{\sigma}_{\bar{x}}^{\rm boot} = \text{std}\!\left[\{\bar{x}^{(k)}\}_{k=1}^{B}\right]
+\]
+!et
+
+For i.i.d. uniform $[0,1)$ data the exact value is
+$\sigma_{\bar{x}} = 1 / \sqrt{12 N}$.
+
+!bc pycod 
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
+# ── Plot styling ──────────────────────────────────────────────────────
+BG     = "#0d0f1a"
+PANEL  = "#131629"
+ACCENT = "#4fc3f7"
+WARM   = "#ff7043"
+GREEN  = "#69f0ae"
+PURPLE = "#ce93d8"
+GRID   = "#1e2340"
+TEXT   = "#e8eaf6"
+
+def apply_dark_style():
+    plt.rcParams.update({
+        'figure.facecolor':  BG,   'axes.facecolor':  PANEL,
+        'axes.edgecolor':    GRID, 'axes.labelcolor': TEXT,
+        'xtick.color':       TEXT, 'ytick.color':     TEXT,
+        'text.color':        TEXT, 'grid.color':      GRID,
+        'grid.linewidth':    0.6,  'legend.facecolor':PANEL,
+        'legend.edgecolor':  GRID,
+    })
+
+apply_dark_style()
+print("Imports OK — NumPy", np.__version__)
+!ec
+
+
+!split
+===== Generating RNG Samples =====
+
+!bc pycod
+def generate_sample(N: int, seed: int = 42) -> np.ndarray:
+    """Draw N uniform [0,1) samples from NumPy's default PCG64 RNG."""
+    rng = np.random.default_rng(seed)
+    return rng.random(N)
+
+N    = 50_000
+SEED = 42
+x    = generate_sample(N, seed=SEED)
+
+print(f"N          = {N}")
+print(f"Min        = {x.min():.6f}  (expect ~0)")
+print(f"Max        = {x.max():.6f}  (expect ~1)")
+print(f"Mean       = {x.mean():.6f}  (expect 0.5)")
+print(f"Std        = {x.std():.6f}  (expect {1/np.sqrt(12):.6f}  =  1/√12)")
+
+# ── Plot raw samples and running mean ─────────────────────────────────
+fig, axes = plt.subplots(1, 2, figsize=(16, 4))
+
+axes[0].plot(x[:500], color=ACCENT, lw=0.8, alpha=0.85)
+axes[0].axhline(x.mean(), color=WARM, lw=1.5, ls='--',
+                label=f'mean = {x.mean():.5f}')
+axes[0].set_xlabel('Sample index $i$', fontsize=12)
+axes[0].set_ylabel('$x_i$', fontsize=12)
+axes[0].set_title('First 500 RNG Samples', fontweight='bold', color=TEXT)
+axes[0].legend(); axes[0].grid(True, alpha=0.35)
+
+running = np.cumsum(x) / np.arange(1, N + 1)
+axes[1].plot(running, color=GREEN, lw=1.0, alpha=0.85)
+axes[1].axhline(0.5, color=WARM, lw=1.5, ls='--', label='True mean = 0.5')
+axes[1].set_xlabel('$N$', fontsize=12)
+axes[1].set_ylabel('Running mean', fontsize=12)
+axes[1].set_title('Convergence of the Sample Mean', fontweight='bold', color=TEXT)
+axes[1].legend(); axes[1].grid(True, alpha=0.35)
+
+plt.tight_layout()
+plt.show()
+!ec    
+
+!split
+===== Autocorrelation Function =====
+
+We compute the **normalised auto coreelation function using the FFT-based algorithm:
+!bt
+\[
+C(t) = \frac{\text{IFFT}\!\left[|\text{FFT}[x_c]|^2\right](t)}{(N-t)\,\sigma^2}.
+\]
+!et
+
+The $95\%$  confidence band under the null hypothesis $C(t)=0$ is
+$\pm 1.96 / \sqrt{N}$.
+
+!bc pycod
+def autocorrelation(x: np.ndarray, max_lag: int = None) -> np.ndarray:
+    """
+    Normalised autocorrelation C(t) via FFT.  Returns C(0)..C(max_lag).
+
+    C(t) = <(x_i - <x>)(x_{i+t} - <x>)> / Var(x)
+    """
+    N = len(x)
+    if max_lag is None:
+        max_lag = N // 2
+    max_lag = min(max_lag, N - 1)
+
+    xc  = x - x.mean()
+    # Zero-pad to next power of 2 for efficient FFT
+    fft_size = 1
+    while fft_size < 2 * N:
+        fft_size <<= 1
+
+    F   = np.fft.rfft(xc, n=fft_size)
+    acf = np.fft.irfft(F * np.conj(F))[:N]
+    counts = N - np.arange(N)          # number of pairs at each lag
+    acf    = acf / counts          # normalise by number of pairs at each lag
+    acf    = acf / acf[0]          # normalise so C(0) = 1  (= variance at lag 0)
+    return acf[:max_lag + 1]
+
+MAX_LAG = 200
+acf = autocorrelation(x, max_lag=MAX_LAG)
+print(f"C(0) = {acf[0]:.6f}  (should be 1.0)")
+print(f"C(1) = {acf[1]:.6f}  (expect ~0 for good RNG)")
+print(f"C(2) = {acf[2]:.6f}")
+print(f"max|C(t)| for t>=1 : {np.max(np.abs(acf[1:])):.6f}")
+
+# ── Plot ACF ──────────────────────────────────────────────────────────
+lags = np.arange(len(acf))
+conf = 1.96 / np.sqrt(N)
+
+fig, axes = plt.subplots(1, 2, figsize=(16, 5))
+
+# Left: bar plot
+ax = axes[0]
+ax.axhline(0, color=GRID, lw=1)
+ax.fill_between(lags, -conf, conf, color=ACCENT, alpha=0.12,
+                label=f'95% CI  (±{conf:.4f})')
+ax.bar(lags, acf, color=ACCENT, alpha=0.75, width=0.8)
+ax.set_xlabel('Lag $t$', fontsize=13)
+ax.set_ylabel('$C(t)$', fontsize=13)
+ax.set_title('Normalised ACF  $C(t)$', fontweight='bold', color=TEXT)
+ax.set_xlim(-0.5, 50.5)
+ax.legend(fontsize=10); ax.grid(True, alpha=0.35)
+
+# Right: log scale
+ax2 = axes[1]
+pos = acf > 0
+ax2.semilogy(lags[pos],  acf[pos],          color=ACCENT, lw=1.5, label='$C(t)>0$')
+ax2.semilogy(lags[~pos], np.abs(acf[~pos]), 'o', color=WARM, ms=3, alpha=0.6,
+             label='$|C(t)|,\ C(t)<0$')
+ax2.axhline(conf, color=GREEN, lw=1.4, ls='--', label='95% noise floor')
+ax2.set_xlabel('Lag $t$', fontsize=13)
+ax2.set_ylabel('$|C(t)|$  (log)', fontsize=13)
+ax2.set_title('Log-scale ACF — Exponential Decay', fontweight='bold', color=TEXT)
+ax2.set_xlim(-0.5, 100.5)
+ax2.legend(fontsize=10); ax2.grid(True, alpha=0.35, which='both')
+
+plt.suptitle(f'ACF of NumPy PCG64  ($N={N}$)',
+             fontsize=14, fontweight='bold', color=TEXT, y=1.01)
+plt.tight_layout()
+plt.show()
+!ec
+   
+!split
+===== Integrated Autocorrelation Time $\tau_{\rm int}$ =====
+
+!bt
+\[
+\tau_{\rm int} = \frac{1}{2} + \sum_{t=1}^{W} C(t).
+\]
+!et
+
+The window $W$ is chosen by the **Madras–Sokal criterion**: advance $t$ until
+$t \geq c\,\tau_{\rm int}$ (with $c=6$). This prevents the noise in the
+tail of $C(t)$ from inflating $\tau_{\rm int}$.
+
+The minimum possible value is $\tau_{\rm int} = 1/2$, corresponding to
+perfectly uncorrelated data.
+
+
+!bc pycod
+def integrated_autocorrelation_time(acf: np.ndarray,
+                                   c_factor: float = 6.0) -> tuple:
+    """
+    Estimate tau_int = 1/2 + sum_{t=1}^{W} C(t)
+    using the Madras-Sokal automatic-windowing rule.
+    Returns (tau_int, window W).
+    """
+    tau = 0.5
+    for t in range(1, len(acf)):
+        tau += acf[t]
+        if t >= c_factor * tau:
+            return tau, t
+    return tau, len(acf) - 1
+
+tau_int, W = integrated_autocorrelation_time(acf)
+print(f"tau_int = {tau_int:.4f}   (1/2 = uncorrelated)")
+print(f"Window  W = {W}")
+print(f"Effective sample size  N_eff = N / (2*tau_int) = {N / (2*tau_int):.1f}")
+
+# ── Visualise the running sum converging to tau_int ───────────────────
+running_tau = np.cumsum(np.concatenate([[0.5], acf[1:W+5]]))
+# fix: running_tau[t] = 0.5 + sum_{s=1}^{t} C(s)
+
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.plot(range(len(running_tau)), running_tau, color=ACCENT, lw=2)
+ax.axvline(W, color=WARM, lw=1.8, ls='--', label=f'Sokal window $W={W}$')
+ax.axhline(tau_int, color=GREEN, lw=1.8, ls=':', label=f'$\\hat{{\\tau}}_{{\\rm int}}={tau_int:.4f}$')
+ax.set_xlabel('Truncation window $W$', fontsize=12)
+ax.set_ylabel('Running $\\tau_{\\rm int}$', fontsize=12)
+ax.set_title('Convergence of $\\tau_{\\rm int}$ Sum', fontweight='bold', color=TEXT)
+ax.legend(fontsize=11); ax.grid(True, alpha=0.35)
+plt.tight_layout()
+plt.show()
+!ec
+
+!split
+===== Standard Deviation — Naive Method =====
+
+The _naive_ estimator assumes the $N$ samples are i.i.d.:
+
+$$\sigma_{\bar{x}}^{\rm naive} = \frac{s}{\sqrt{N}}, \qquad
+s^2 = \frac{1}{N-1}\sum_{i=1}^{N}(x_i - \bar{x})^2$$
+
+For uncorrelated uniform $[0,1)$ data the exact value is
+$\sigma_{\bar{x}} = 1/\sqrt{12N}$.
+
+This estimator is **biased low** whenever $\tau_{\rm int} > 1/2$.
+
+!bc pycod
+def std_naive(x: np.ndarray) -> float:
+    """Naive sigma_mean = std(x) / sqrt(N), assumes i.i.d."""
+    return float(np.std(x, ddof=1) / np.sqrt(len(x)))
+
+sigma_naive = std_naive(x)
+exact       = 1.0 / (np.sqrt(12) * np.sqrt(N))
+
+print(f"Naive sigma_mean = {sigma_naive:.8f}")
+print(f"Exact (i.i.d.)   = {exact:.8f}")
+print(f"Ratio            = {sigma_naive / exact:.6f}  (expect 1.0 for good RNG)")
+!ec
+
+!split
+===== Standard Deviation — Covariance Method =====
+
+The exact variance of the mean for a **stationary** process is:
+
+$$\text{Var}(\bar{x}) = \frac{\sigma^2}{N}\,\Gamma_N, \qquad
+\Gamma_N = \sum_{t=-(N-1)}^{N-1}\!\left(1-\frac{|t|}{N}\right)C(t)$$
+
+For large $N$, $\Gamma_N \approx 2\tau_{\rm int}$, giving:
+
+$$\boxed{\sigma_{\bar{x}}^{\rm corr} = s\sqrt{\frac{2\,\tau_{\rm int}}{N}}}$$
+
+The correction factor relative to the naive estimate is $\sqrt{2\tau_{\rm int}}$.
+For the PCG64 generator, $\tau_{\rm int} \approx 1/2$, so the two methods agree.
+
+!bc pycod
+def std_with_covariance(x: np.ndarray, tau_int: float) -> float:
+    """
+    Corrected sigma_mean = s * sqrt(2 * tau_int / N).
+
+    Derivation: Var(x-bar) = (sigma^2 / N) * sum_{t} (1 - |t|/N) C(t)
+                            ≈ (sigma^2 / N) * 2 * tau_int   for large N.
+    """
+    N = len(x)
+    return float(np.std(x, ddof=1) * np.sqrt(2 * tau_int / N))
+
+sigma_corr = std_with_covariance(x, tau_int)
+correction = np.sqrt(2 * tau_int)   # = 1 when tau_int = 1/2
+
+print(f"tau_int               = {tau_int:.6f}")
+print(f"Correction factor     = sqrt(2*tau_int) = {correction:.6f}")
+print(f"Corrected sigma_mean  = {sigma_corr:.8f}")
+print(f"Naive    sigma_mean   = {sigma_naive:.8f}")
+print(f"Ratio corr/naive      = {sigma_corr/sigma_naive:.6f}  (= sqrt(2*tau_int))")
+
+# ── Full covariance sum Gamma_N (exact, no tau_int approximation) ─────
+def gamma_N(acf_full: np.ndarray) -> float:
+    """Compute Gamma_N = sum_{t=-(N-1)}^{N-1} (1-|t|/N) C(t) exactly."""
+    N   = len(acf_full)
+    lag = np.arange(N)
+    w   = 1 - lag / N       # triangular window
+    # Full symmetric sum: C(0) + 2 * sum_{t=1}^{N-1} (1-t/N) C(t)
+    return float(acf_full[0] * w[0] + 2 * np.sum(acf_full[1:] * w[1:]))
+
+acf_full = autocorrelation(x, max_lag=N - 1)
+GN       = gamma_N(acf_full)
+sigma_exact_cov = float(np.std(x, ddof=1) * np.sqrt(GN / N))
+
+print(f"Gamma_N (exact sum)   = {GN:.6f}  (expect ~2*tau_int = {2*tau_int:.4f})")
+print(f"Exact-cov sigma_mean  = {sigma_exact_cov:.8f}")
+!ec
+
+!split
+===== Standard Deviation — Bootstrap Method =====
+
+The _block bootstrap_ resamples contiguous blocks of length $b$ to
+preserve within-block correlations.  The recommended block size is
+$b \sim 2\,\tau_{\rm int}$.
+
+!bblock Algorithm (circular block bootstrap):
+o Choose $\lceil N/b \rceil$ random starting indices $s_k \in \{0,\ldots,N-1\}$
+o Form a synthetic sample of length $N$: $x^* = x_{s_1}, x_{s_1+1}, \ldots, x_{s_1+b-1},\; x_{s_2}, \ldots$ (indices mod $N$)
+o Compute $\bar{x}^{*(k)}$ for each of the $B$ bootstrap replicates
+o $\hat{\sigma}_{\bar{x}}^{\rm boot} = \text{std}(\{\bar{x}^{*(k)}\})$
+!eblock 
+
+
+!split
+===== Bootstrap =====
+!bc pycod
+def std_bootstrap(x: np.ndarray,
+                  n_boot: int = 3000,
+                  block_size: int = 1,
+                  seed: int = 0) -> tuple:
+    """
+    Block bootstrap estimate of sigma_mean.
+    Returns (sigma_boot, array_of_bootstrap_means).
+    """
+    rng     = np.random.default_rng(seed)
+    N       = len(x)
+    means   = np.empty(n_boot)
+    if block_size <= 1:
+        # Standard i.i.d. bootstrap
+        for b in range(n_boot):
+            means[b] = rng.choice(x, size=N, replace=True).mean()
+    else:
+        # Circular block bootstrap
+        n_blocks = int(np.ceil(N / block_size))
+        for b in range(n_boot):
+            starts  = rng.integers(0, N, size=n_blocks)
+            indices = np.concatenate([
+                np.arange(s, s + block_size) % N for s in starts
+            ])[:N]
+            means[b] = x[indices].mean()
+    return float(means.std(ddof=1)), means
+
+block_size   = max(1, int(2 * tau_int))
+sigma_boot, boot_means = std_bootstrap(x, n_boot=3000,
+                                        block_size=block_size, seed=0)
+
+print(f"Block size             = {block_size}  (~2*tau_int = {2*tau_int:.2f})")
+print(f"Bootstrap sigma_mean   = {sigma_boot:.8f}")
+print(f"Naive    sigma_mean    = {sigma_naive:.8f}")
+print(f"Corrected sigma_mean   = {sigma_corr:.8f}")
+
+# ── Plot bootstrap distribution ───────────────────────────────────────
+mu_b  = boot_means.mean()
+sig_b = boot_means.std(ddof=1)
+t_vals = np.linspace(boot_means.min(), boot_means.max(), 400)
+gauss  = (np.exp(-0.5*((t_vals - mu_b)/sig_b)**2)
+          / (sig_b * np.sqrt(2*np.pi)))
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.hist(boot_means, bins=60, color=ACCENT, edgecolor=BG,
+        alpha=0.85, density=True, label='Bootstrap means')
+ax.plot(t_vals, gauss, color=WARM, lw=2.5, label='Gaussian fit')
+ax.axvline(mu_b, color=GREEN, lw=2, ls='--',
+           label=f'$\\hat{{\\mu}}={mu_b:.5f}$')
+ax.axvline(mu_b - sig_b, color=PURPLE, lw=1.5, ls=':')
+ax.axvline(mu_b + sig_b, color=PURPLE, lw=1.5, ls=':',
+           label=f'$\\hat{{\\sigma}}={sig_b:.6f}$')
+ax.set_xlabel('Bootstrap mean $\\bar{x}^*$', fontsize=13)
+ax.set_ylabel('Density', fontsize=13)
+ax.set_title(f'Block Bootstrap Distribution  '
+             f'($N={N}$, $b={block_size}$, $B=3000$)',
+             fontweight='bold', color=TEXT)
+ax.legend(fontsize=10); ax.grid(True, alpha=0.35)
+plt.tight_layout()
+plt.show()
+
+!ec
+
+!split
+===== Standard Deviation — Blocking Method =====
+
+The _blocking_ (or binning) method splits the $N$ samples into $n_b$
+non-overlapping blocks of size $b = N/n_b$ and forms block averages
+$y_k = \frac{1}{b}\sum_{i\in\text{block }k}x_i$.  The estimator is:
+!bt
+\[
+\boxed{\sigma_{\bar{x}}^{\rm block}(b) = \frac{\operatorname{std}(\{y_k\})}{\sqrt{n_b}}}.
+\]
+!et
+!bblock
+o Rising region ($b \ll \tau_{\rm int}$): within-block correlations are not averaged out → $\sigma^{\rm block}$ is biased low.
+o Plateau ($b \gg \tau_{\rm int}$): block means are approximately i.i.d. → $\sigma^{\rm block}$ reaches the true value.
+o Noisy tail (very large $b$, very few blocks $n_b$): the estimate becomes noisy because there are too few blocks.
+!eblock 
+The plateau onset gives a second independent estimate:
+$$\tau_{\rm int} \approx b_{\rm plateau}/2$$
+
+The statistical uncertainty on the estimator:
+$$\operatorname{err}[\sigma^{\rm block}] \approx \frac{\sigma^{\rm block}}{\sqrt{2(n_b-1)}}$$
+
+!split
+===== Blocking =====
+!bc pycod
+def blocking_analysis(x, n_blocks_range=None):
+    """
+    Blocking analysis: sweep block size b = N // n_b and estimate
+
+        sigma_block(b) = std({y_k}) / sqrt(n_b)
+
+    where y_k are the n_b non-overlapping block means.
+    Returns a dict with block sizes, sigma estimates, error bars, and
+    the detected plateau index, value, and implied tau_int.
+    """
+    N = len(x)
+    if n_blocks_range is None:
+        bs = np.unique(np.round(np.geomspace(4, N // 4, 80)).astype(int))
+        n_blocks_range = np.unique((N // bs).astype(int))
+        n_blocks_range = n_blocks_range[n_blocks_range >= 4]
+
+    n_blocks_arr = np.array(sorted(set(int(v) for v in n_blocks_range
+                                        if 4 <= v <= N // 4)), dtype=int)
+    sigma_block = np.zeros(len(n_blocks_arr))
+    sigma_err   = np.zeros(len(n_blocks_arr))
+
+    for idx, n_b in enumerate(n_blocks_arr):
+        b      = N // n_b
+        blocks = x[:n_b * b].reshape(n_b, b)
+        y      = blocks.mean(axis=1)
+        s      = y.std(ddof=1) / np.sqrt(n_b)
+        sigma_block[idx] = s
+        sigma_err[idx]   = s / np.sqrt(2 * (n_b - 1))
+
+    block_sizes = N // n_blocks_arr
+
+    # Detect plateau: find where sigma_block (vs increasing b) stabilises
+    sb_by_b   = sigma_block[::-1]
+    window    = max(3, len(sb_by_b) // 10)
+    smoothed  = np.convolve(sb_by_b, np.ones(window)/window, mode='valid')
+    rel_change= np.abs(np.diff(smoothed) / (smoothed[:-1] + 1e-30))
+    plateau_idx_rev = len(sb_by_b) - 1
+    for i in range(len(rel_change) - window):
+        if np.all(rel_change[i:i+window] < 0.05):
+            plateau_idx_rev = i + window // 2
+            break
+    plateau_idx   = int(np.clip(len(sigma_block)-1-plateau_idx_rev,
+                                0, len(sigma_block)-1))
+    plateau_value = float(np.median(
+        sigma_block[max(0, plateau_idx-3): plateau_idx+4]))
+    b_plateau = int(block_sizes[plateau_idx])
+
+    return dict(n_blocks=n_blocks_arr, block_sizes=block_sizes,
+                sigma_block=sigma_block, sigma_err=sigma_err,
+                plateau_idx=plateau_idx, plateau_value=plateau_value,
+                tau_from_block=b_plateau/2.0)
+
+blk = blocking_analysis(x)
+sigma_block_plateau = blk['plateau_value']
+tau_from_block      = blk['tau_from_block']
+
+print(f"Plateau sigma_mean  = {sigma_block_plateau:.8f}")
+print(f"tau_int from blocks = {tau_from_block:.2f}   (Sokal: {tau_int:.4f})")
+print(f"Naive sigma_mean    = {sigma_naive:.8f}")
+print(f"Cov-corr sigma_mean = {sigma_corr:.8f}")
+print(f"Bootstrap           = {sigma_boot:.8f}")
+
+# ── Plot blocking analysis ────────────────────────────────────────────
+bs   = blk['block_sizes']
+nb   = blk['n_blocks']
+sig  = blk['sigma_block']
+err  = blk['sigma_err']
+pidx = blk['plateau_idx']
+plat = blk['plateau_value']
+b_pl = int(bs[pidx])
+nb_pl = int(nb[pidx])
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 5))
+
+# Left: sigma vs block size b (the standard view)
+ax1.errorbar(bs, sig, yerr=err, fmt='o-', color=ACCENT,
+             ms=4, lw=1.6, elinewidth=1.0, capsize=3, alpha=0.85,
+             label='$\\sigma_{\\rm block}(b)$')
+ax1.axhline(plat, color=GREEN, lw=2.0, ls='--',
+            label=f'Plateau  {plat:.6f}')
+ax1.axhline(sigma_naive, color=WARM,   lw=1.5, ls=':',
+            label=f'Naive    {sigma_naive:.6f}')
+ax1.axhline(sigma_corr,  color=PURPLE, lw=1.5, ls='-.',
+            label=f'Cov-corr {sigma_corr:.6f}')
+ax1.axhline(sigma_boot,  color='#f48fb1', lw=1.5, ls=(0,(3,1,1,1)),
+            label=f'Bootstrap {sigma_boot:.6f}')
+ax1.axvline(b_pl, color=GREEN, lw=1.2, ls='--', alpha=0.5,
+            label=f'Plateau onset $b={b_pl}$')
+ax1.axvspan(1, max(2*tau_int, 1.5), color=WARM, alpha=0.07,
+            label=f'$b < 2\\tau_{{\\rm int}}$  (biased)')
+ax1.set_xscale('log')
+ax1.set_xlabel('Block size  $b$', fontsize=13)
+ax1.set_ylabel('$\\sigma_{{\\bar{{x}}}}^{{\\rm block}}(b)$', fontsize=13)
+ax1.set_title('Blocking: $\\sigma$ vs Block Size $b$  (log scale)',
+              fontweight='bold', color=TEXT)
+ax1.legend(fontsize=8.5, loc='lower right')
+ax1.grid(True, alpha=0.35, which='both')
+
+# Right: sigma vs number of blocks n_b (inverted x mirrors left panel)
+ax2.errorbar(nb, sig, yerr=err, fmt='s-', color=ACCENT,
+             ms=4, lw=1.6, elinewidth=1.0, capsize=3, alpha=0.85,
+             label='$\\sigma_{\\rm block}(n_b)$')
+ax2.axhline(plat, color=GREEN, lw=2.0, ls='--',
+            label=f'Plateau  {plat:.6f}')
+ax2.axhline(sigma_naive, color=WARM, lw=1.5, ls=':',
+            label=f'Naive  {sigma_naive:.6f}')
+ax2.axvline(nb_pl, color=GREEN, lw=1.2, ls='--', alpha=0.5,
+            label=f'Plateau at $n_b={nb_pl}$')
+ax2.set_xscale('log')
+ax2.invert_xaxis()   # large n_b (small b) on right -> matches left panel
+ax2.set_xlabel('Number of blocks  $n_b$  (reversed)', fontsize=13)
+ax2.set_ylabel('$\\sigma_{{\\bar{{x}}}}^{{\\rm block}}(n_b)$', fontsize=13)
+ax2.set_title('Blocking: $\\sigma$ vs $n_b$  (same data, reversed axis)',
+              fontweight='bold', color=TEXT)
+ax2.legend(fontsize=9, loc='lower left')
+ax2.grid(True, alpha=0.35, which='both')
+
+plt.suptitle(
+    f'Blocking Analysis  ($N={N}$,  '
+    f'$\\hat{{\\tau}}_{{\\rm Sokal}}={tau_int:.3f}$,  '
+    f'$\\tau_{{\\rm block}}\\approx{tau_from_block:.1f}$)',
+    fontsize=14, fontweight='bold', color=TEXT, y=1.01)
+plt.tight_layout()
+plt.show()
+!ec
+
+!split
+===== Comparison Across Sample Sizes =====
+
+All four estimators should scale as $1/\sqrt{N}$ and converge to
+$1/\sqrt{12N}$ for uncorrelated uniform data.
+
+!bc pycod
+N_values = [500, 1000, 5000, 10_000, 50_000]
+results  = {}
+
+for Nv in N_values:
+    xv       = generate_sample(Nv, seed=SEED)
+    acfv     = autocorrelation(xv, max_lag=min(Nv//2, 500))
+    tv, _    = integrated_autocorrelation_time(acfv)
+    blk_v    = max(1, int(2 * tv))
+    blk_res  = blocking_analysis(xv)
+    s_n      = std_naive(xv)
+    s_c      = std_with_covariance(xv, tv)
+    s_b, _   = std_bootstrap(xv, n_boot=1000, block_size=blk_v, seed=0)
+    s_blk    = blk_res['plateau_value']
+    results[Nv] = dict(naive=s_n, corr=s_c, boot=s_b, blocking=s_blk,
+                        tau=tv, exact=1/(np.sqrt(12)*np.sqrt(Nv)))
+    print(f"N={Nv:>6d}  tau={tv:.3f}  naive={s_n:.6f}  corr={s_c:.6f}  "
+          f"boot={s_b:.6f}  block={s_blk:.6f}  exact={results[Nv]['exact']:.6f}")
+
+labels = ['naive', 'corr', 'boot', 'blocking', 'exact']
+colors = [ACCENT, WARM, GREEN, '#f48fb1', PURPLE]
+names  = ['Naive  $\\sigma_N$', 'Covariance-corrected',
+          'Block bootstrap', 'Blocking plateau', 'Exact  $1/\\sqrt{12N}$']
+styles = ['o-', 's-', '^-', 'D-', '--']
+
+Nv_arr   = np.array(N_values)
+data_arr = {k: np.array([results[Nv][k] for Nv in N_values]) for k in labels}
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 5))
+
+for k, col, nm, st in zip(labels, colors, names, styles):
+    ax1.plot(Nv_arr, data_arr[k], st, color=col, lw=2, ms=6, label=nm)
+ax1.set_xlabel('Sample size $N$', fontsize=13)
+ax1.set_ylabel('$\\sigma_{\\bar{x}}$', fontsize=13)
+ax1.set_title('$\\sigma_{\\bar{x}}$ vs $N$', fontweight='bold', color=TEXT)
+ax1.legend(fontsize=10); ax1.grid(True, alpha=0.35)
+
+for k, col, nm, st in zip(labels, colors, names, styles):
+    ax2.loglog(Nv_arr, data_arr[k], st, color=col, lw=2, ms=6, label=nm)
+ax2.set_xlabel('$N$  (log)', fontsize=13)
+ax2.set_ylabel('$\\sigma_{\\bar{x}}$  (log)', fontsize=13)
+ax2.set_title('Log-Log: $1/\\sqrt{N}$ Scaling', fontweight='bold', color=TEXT)
+ax2.legend(fontsize=10); ax2.grid(True, alpha=0.35, which='both')
+
+plt.suptitle('Four Estimators of $\\sigma_{\\bar{x}}$',
+             fontsize=14, fontweight='bold', color=TEXT, y=1.01)
+plt.tight_layout()
+plt.show()
+!ec    
+
+!split
+===== Summary =====
+!bc pycod
+print("=" * 62)
+print(f"  Autocorrelation Analysis of NumPy PCG64  (N = {N})")
+print("=" * 62)
+print(f"  Sample mean              = {x.mean():.6f}  (true = 0.5)")
+print(f"  tau_int (Sokal)          = {tau_int:.4f}  (1/2 = uncorrelated)")
+print(f"  tau_int (blocking)       = {tau_from_block:.4f}")
+print(f"  Effective sample size    = {N/(2*tau_int):.1f}")
+print()
+print(f"  sigma_mean (naive)       = {sigma_naive:.8f}")
+print(f"  sigma_mean (covariance)  = {sigma_corr:.8f}")
+print(f"  sigma_mean (bootstrap)   = {sigma_boot:.8f}")
+print(f"  sigma_mean (blocking)    = {sigma_block_plateau:.8f}")
+print(f"  sigma_mean (exact iid)   = {1/(np.sqrt(12)*np.sqrt(N)):.8f}")
+print()
+print("  All four estimators agree: PCG64 is statistically i.i.d.")
+!ec
+
+
+
+
+
+!split
+===== Example code form last week on how we could use the blocking analysis =====
 !bc pycod
 # 2-electron VMC code for 2dim quantum dot with importance sampling
 # Using gaussian rng for new positions and Metropolis- Hastings 
@@ -996,16 +1236,5 @@ frame = pd.DataFrame(data,index=['Values'])
 print(frame)
 
 !ec
-
-
-
-
-
-
-
-
-
-
-
 
 
